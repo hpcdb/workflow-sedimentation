@@ -1,0 +1,15 @@
+# PETSc - Installation
+./configure --prefix=/Users/vitor/Documents/Program_Installations/petsc-3.6.4/build --download-fblaslapack
+make PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4 PETSC_ARCH=arch-darwin-c-debug all
+make PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4 PETSC_ARCH=arch-darwin-c-debug install
+
+export PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4
+
+
+# libMesh - Installation
+./configure --enable-parmesh --prefix=/Users/vitor/Documents/Program_Installations/libmesh/build --with-hdf5=/Users/vitor/Documents/Program_Installations/hdf5-1.8.9/hdf5 PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4
+make -j 2
+make install
+
+
+# libMesh - Installation
