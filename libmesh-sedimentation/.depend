@@ -123,6 +123,9 @@ mesh_moviment.$(obj-suffix):\
     define.h\
     define.h\
     mesh_moviment.h
+provenance.$(obj-suffix):\
+    provenance.C\
+    provenance.h
 sedimentation.$(obj-suffix):\
     sedimentation.C\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/analytic_function.h\
@@ -252,6 +255,7 @@ sedimentation.$(obj-suffix):\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/vtk_io.h\
     define.h\
     mesh_moviment.h\
+    provenance.h\
     sedimentation_deposition.h\
     sedimentation_flow.h\
     sedimentation_transport.h\

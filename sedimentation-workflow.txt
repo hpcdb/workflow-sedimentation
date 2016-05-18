@@ -1,7 +1,18 @@
 Sedimentation Workflow
 
-Equation Systems
-- input: dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval, max_r_steps
+STEP 1 - Mesh Refinements
+- input: dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval
+- output: r_fraction, c_fraction, max_h_level, hlevels, first_step_refinement
+
+STEP 2 - Create Equation Systems
+
 - output: n_time_steps, n_nonlinear_steps, write_interval, nonlinear_tolerance, max_linear_iter
+
+STEP 3 - Define loop
+
+- output: init_tstep, n_time_steps, tmax
+
+
+
 
 
