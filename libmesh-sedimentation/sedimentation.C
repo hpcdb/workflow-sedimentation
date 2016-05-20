@@ -102,6 +102,8 @@ bool is_file_exist(const char *fileName)
 // since it was designed to be run only with real numbers.
 int main (int argc, char** argv)
 {
+  int simulationID = 0;
+
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
@@ -127,8 +129,9 @@ int main (int argc, char** argv)
   int ref_interval = infile("r_interval" , 1);
 
 #ifdef PROV
+  // Mesh Refinement
   Provenance prov;
-  prov.step1(dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
+  prov.inputMeshRefinement(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
 #endif
 
   // Create a mesh object, with dimension to be overridden later,
@@ -148,10 +151,10 @@ int main (int argc, char** argv)
   bool first_step_refinement = false;
 
 #ifdef PROV
-  //Step-1 - Output 
-  //Step-2 - Input
+  // Create Equation Systems
+  prov.outputMeshRefinement(simulationID,r_fraction,c_fraction,max_h_level,hlevels,first_step_refinement);
 #endif
-  // Create an equation systems object.
+// Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
   SedimentationFlow       sediment_flow(equation_systems);
@@ -180,10 +183,10 @@ int main (int argc, char** argv)
 
   Real Diffusivity = 1.0/(Sc*Reynolds);
 
-  // cout << "Parameters: " << endl;
-  // cout << "  Reynolds: " << Reynolds << endl;
-  // cout << "  Grashof : " << Gr   << endl;
-  // cout << "  Sc      : " << Sc   << endl;
+  cout << "Parameters: " << endl;
+  cout << "  Reynolds: " << Reynolds << endl;
+  cout << "  Grashof : " << Gr   << endl;
+  cout << "  Sc      : " << Sc   << endl;
 
   equation_systems.parameters.set<Real> ("Reynolds")    = Reynolds;
   equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
@@ -199,524 +202,533 @@ int main (int argc, char** argv)
   equation_systems.parameters.set<Real> ("c_factor")    = c_factor;
   ////
 
-// #ifdef PROV
-//   //Step-2 - Output 
-//   //Step-3 - Input --> Loop parameters
-// #endif
-//   // LOOP 
-//   Real init_time = 0.0;
+#ifdef PROV
+  // Generate solver parameters
+  prov.outputCreateEquationSystems(simulationID,Reynolds,Gr,Sc,Us,Diffusivity,xlock,alfa,theta,ex,ey,ez,c_factor);
+#endif
+  // LOOP 
+  Real init_time = 0.0;
 
-//   // INPUT: TIME INTEGRATION
-//   Real dt                               = infile( "deltat" , 0.005 );
-//   Real tmax                             = infile( "tmax"   , 0.1 );
-//   const unsigned int n_time_steps       = infile("n_time_steps", 10 );
+  // INPUT: TIME INTEGRATION
+  Real dt                               = infile( "deltat" , 0.005 );
+  Real tmax                             = infile( "tmax"   , 0.1 );
+  const unsigned int n_time_steps       = infile("n_time_steps", 10 );
 
-//   //INPUT: NONLINEAR SOLVER
-//   const unsigned int n_nonlinear_steps  = infile("n_nonlinear_steps", 10 );
-//   double nonlinear_tolerance            = infile("nonlinear_tolerance", 1.0E-03);
-//   int max_linear_iter                   = infile("max_linear_iterations" , 2000 );
+  //INPUT: NONLINEAR SOLVER
+  const unsigned int n_nonlinear_steps  = infile("n_nonlinear_steps", 10 );
+  double nonlinear_tolerance            = infile("nonlinear_tolerance", 1.0E-03);
+  int max_linear_iters                   = infile("max_linear_iterations" , 2000 );
+  int max_r_steps  = infile("max_r_steps" , 1);
+
+  const unsigned int write_interval     = infile("write_interval", 10 );
+  std::string rname                     = infile("output", "out_");
 
-//   const unsigned int write_interval     = infile("write_interval", 10 );
-//   std::string rname                     = infile("output", "out_");
-
-// #ifdef XDMF_
-//   XDMF_IO xdmf_writer(mesh, rname);
-// #endif
-
-//   if( !is_file_exist("restart.in") || true) {
-
-//     const string mesh_file = infile("mesh_file","0");
-
-//     std::cout << "Opening file: " << mesh_file << endl;
-
-//     if(dim == 2)
-//     {
-//         MeshTools::Generation::build_square (mesh,ncellx,ncelly,
-//                                              xmin,  xmax,
-//                                              ymin,  ymax, QUAD4);
-//     } else {
-//          MeshTools::Generation::build_cube (mesh,ncellx,ncelly,ncellz,
-//                                         xmin,  xmax,
-//                                         ymin,  ymax,
-//                                         zmin,  zmax, QUAD8);
-//     }
-
-//      refinement.uniformly_refine(hlevels);
-
-//      sediment_flow.setup();
-//      sediment_transport.setup();
-//      sediment_deposition.setup();
-
-// #ifdef MESH_MOVIMENT
-//      moving_mesh.setup();
-// #endif
-
-//      // Initialize the data structures for the equation system.
-//      equation_systems.init ();
-
-//   } else
-//   {
-//       GetPot restart("restart.in");
-//       const string mesh_restart = restart("mesh_restart","0");
-//       const string solution_restart = restart("solution_restart","0");
-//       init_time = restart("init_time",0.0);
-//       dt        = restart("deltat",0.0);
-
-// #ifdef XDMF_
-//       int xdmf_file_id =  restart("xdmf_file_id",0);
-//       xdmf_writer.SetFileID(xdmf_file_id);
-// #endif
-
-//       mesh.read(mesh_restart);
-//       equation_systems.read(solution_restart, READ);
-
-//       // Get a reference to the Convection-Diffusion system object.
-//      TransientLinearImplicitSystem & transport_system =
-//          equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
-
-//      //transport_system.add_vector("volume");
-
-//      transport_system.update();
-
-//      // Get a reference to the Convection-Diffusion system object.
-//      TransientLinearImplicitSystem & flow_system =
-//        equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
-
-//      flow_system.update();
-
-//      ExplicitSystem & deposition_system = equation_systems.get_system<ExplicitSystem>("deposition");
-//      deposition_system.add_vector("deposition_rate");
-
-//      deposition_system.update();
-
-//   }
-
-//   // Print information about the mesh to the screen.
-//   mesh.print_info();
-
-//   // Get a reference to the Convection-Diffusion system object.
-//   TransientLinearImplicitSystem & transport_system =
-//      equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
-
-//     // Get a reference to the Convection-Diffusion system object.
-//   TransientLinearImplicitSystem & flow_system =
-//      equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
-
-// #ifdef MESH_MOVIMENT
-//   LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
-// #endif
-//   // Prints information about the system to the screen.
-//   equation_systems.print_info();
-
-//   double time                           = init_time;
-//   transport_system.time                 = time;
-//   flow_system.time                      = time;
-
-
-// #ifdef XDMF_
-//   xdmf_writer.write_timestep(equation_systems, time);
-// #else
-//   int exodus_step = 0;
-//   std::string exodus_filename = "output.e";
-//   ExodusII_IO(mesh).write_equation_systems (exodus_filename, equation_systems);
-// #endif
-//   unsigned int t_step                           = 0;
-//   unsigned int n_linear_iterations_flow         = 0;
-//   unsigned int n_nonlinear_iterations_flow      = 0;
-//   unsigned int n_nonlinear_iterations_transport = 0;
-//   unsigned int n_linear_iterations_transport    = 0;
-//   bool redo_nl;
-
-
-//   int max_r_steps  = infile("max_r_steps" , 1);
-
-// #ifdef PROV
-//   //Step-3 - Output --> cross-product of loop parameters
-//   //Step-4 - Input --> cross-product of loop parameters
-// #endif
-
-// // STEP LOOP
-//   // Loop in time steps
-//   for (t_step = init_tstep; (t_step < n_time_steps)&&( time < tmax); t_step++)
-//     {
-
-//       if(is_file_exist("abort.run")) break;
-
-//       // Incremenet the time counter, set the time and the
-//       // time step size as parameters in the EquationSystem.
-//       time                  += dt;
-//       flow_system.time      += dt;
-//       transport_system.time += dt;
-
-//       Real tmp = Reynolds;
-//       equation_systems.parameters.set<Real> ("Reynolds")    = tmp;
-//       equation_systems.parameters.set<Real> ("Diffusivity") = 1.0/(Sc*tmp);
-//       equation_systems.parameters.set<Real> ("time")        = time;
-//       equation_systems.parameters.set<Real> ("dt")          = dt;
-
-//       // A pretty update message
-//       std:: cout << std::setw(55)
-//            << std::setfill('=')
-//            << "\n";
-//       std::cout << " Time step ";
-//       {
-//             std::ostringstream out;
-
-//             out << std::setw(2)
-//             << std::right
-//             << t_step
-//             << "  simulation time = "
-//             << std::fixed
-//             << std::setw(6)
-//             << std::setprecision(3)
-//             << std::setfill('0')
-//             << std::left
-//             << transport_system.time
-//             <<  "...";
-
-//             std::cout << out.str() << std::endl;
-//        }
-//       std:: cout << std::setw(55)
-//            << std::setfill('=')
-//            << "\n";
-
-//        // At the beginning of each solve, reset the linear solver tolerance
-//        // to a "reasonable" starting value.
-//        const Real initial_linear_solver_tol                                              = 1.e-6;
-//        equation_systems.parameters.set<Real> ("linear solver tolerance")                 = initial_linear_solver_tol;
-//        equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iter;
-
-//       // AMR/C Loop
-//       redo_nl  = true;
-//       *flow_system.old_local_solution      = *flow_system.current_local_solution;
-//       *transport_system.old_local_solution = *transport_system.current_local_solution;
-
-//       // Loop in linear steps
-//       for  (unsigned int r = 0; r < max_r_steps; r++)
-//       {
-//           if(!redo_nl) break;
-//             std::cout << " Solving Navier-Stokes equation..." <<std::endl;
-//             {
-//                 std::ostringstream out;
-
-//               // We write the file in the ExodusII format.
-//                 out << std::setw(55)
-//                  << std::setfill('-')
-//                  << "\n"
-//                  << std::setfill(' ')
-//                  << std::setw(5)
-//                  << std::left
-//                  << "STEP"
-//                  << std::setw(5)
-//                  << "NLI"
-//                  << std::setw(15)
-//                  << "|b-AX|"
-//                  << std::setw(15)
-//                  << "|du|"
-//                  << std::setw(15)
-//                  << "|du|/|u|"
-//                  << "\n"
-//                  <<std::right
-//                  << std::setw(55)
-//                  << std::setfill('-')
-//                  << "\n";
-//                  std::cout << out.str() << std::flush;
-//               }
-
-//             // determine if we can exit the nonlinear loop.
-//             UniquePtr<NumericVector<Number> >
-//                 flow_last_nonlinear_soln (flow_system.solution->clone());
-
-//             // Fluid
-//             // FLOW NONLINEAR LOOP
-//             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
-//             {
-//               // Update the nonlinear solution.
-//               flow_last_nonlinear_soln->zero();
-//               flow_last_nonlinear_soln->add(*flow_system.solution);
-
-//               // Assemble & solve the linear system.
-//               flow_system.solve();
-
-//               // Compute the difference between this solution and the last
-//               // nonlinear iterate.
-//               flow_last_nonlinear_soln->add (-1., *flow_system.solution);
-
-//               // Close the vector before computing its norm
-//               flow_last_nonlinear_soln->close();
-
-//               // Compute the l2 norm of the difference
-//               const Real norm_delta = flow_last_nonlinear_soln->l2_norm();
-//               const Real u_norm     = flow_system.solution->l2_norm();
-
-//               // How many iterations were required to solve the linear system?
-//               const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
-//               //Total number of linear iterations (so far)
-//               n_linear_iterations_flow = n_linear_iterations_flow + n_linear_iterations;
-
-//               // What was the final residual of the linear system?
-//               const Real final_linear_residual = flow_system.final_linear_residual();
-
-//               {
-//                         std::ostringstream out;
-
-//                         // We write the file in the ExodusII format.
-//                         out << std::setw(5)
-//                             << std::left
-//                             << l
-//                             << std::setw(5)
-//                             << n_linear_iterations
-//                             << std::setw(15)
-//                             << final_linear_residual
-//                             << std::setw(15)
-//                             << norm_delta
-//                             << std::setw(15)
-//                             << norm_delta/u_norm
-//                             << "\n";
-
-//                             std::cout << out.str() << std::flush ;
-//                 }
-
-//               //Total number of non-linear iterations (so far)
-//               n_nonlinear_iterations_flow++;
-
-//               // Terminate the solution iteration if the difference between
-//               // this nonlinear iterate and the last is sufficiently small, AND
-//               // if the most recent linear system was solved to a sufficient tolerance.
-//               if ((norm_delta < nonlinear_tolerance)
-//                    // && (flow_system.final_linear_residual() < nonlinear_tolerance)
-//                       )
-//                 {
-//                         std::ostringstream out;
-//                          // We write the file in the ExodusII format.
-//                          out << std::setw(55)
-//                              << std::setfill('-')
-//                              << "\n";
-//                          std::cout << out.str()
-//                                    << " Nonlinear solver converged at step "
-//                                    << l
-//                                    << std::endl;
-//                   break;
-//                 }
-
-//               // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-//               // method, the linear solver tolerance needs to decrease as we get closer to
-//               // the solution to ensure quadratic convergence.  The new linear solver tolerance
-//               // is chosen (heuristically) as the square of the previous linear system residual norm.
-//               //Real flr2 = final_linear_residual*final_linear_residual;
-//               equation_systems.parameters.set<Real> ("linear solver tolerance") =
-//                 std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-
-//             } // end nonlinear loop
-
-//             std::cout << " Solving sedimentation equation..." <<std::endl;
-//             {
-//                 std::ostringstream out;
-
-//               // We write the file in the ExodusII format.
-//                 out << std::setw(55)
-//                  << std::setfill('-')
-//                  << "\n"
-//                  << std::setfill(' ')
-//                  << std::setw(5)
-//                  << std::left
-//                  << "STEP"
-//                  << std::setw(5)
-//                  << "NLI"
-//                  << std::setw(15)
-//                  << "|b-AX|"
-//                  << std::setw(15)
-//                  << "|du|"
-//                  << std::setw(15)
-//                  << "|du|/|u|"
-//                  << "\n"
-//                  <<std::right
-//                  << std::setw(55)
-//                  << std::setfill('-')
-//                  << "\n";
-//                  std::cout << out.str() << std::flush;
-//               }
-
-//             equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
-
-//             // determine if we can exit the nonlinear loop.
-//             UniquePtr<NumericVector<Number> > sed_last_nonlinear_soln (transport_system.solution->clone());
-
-//             // Sediments
-//             // FLOW NON-LINEAR LOOP
-//             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
-//             {
-//               // Update the nonlinear solution.
-//               sed_last_nonlinear_soln->zero();
-//               sed_last_nonlinear_soln->add(*transport_system.solution);
-
-//               // Assemble & solve the linear system.
-//               transport_system.solve();
-
-//               // Compute the difference between this solution and the last
-//               // nonlinear iterate.
-//               sed_last_nonlinear_soln->add (-1., *transport_system.solution);
-
-//               // Close the vector before computing its norm
-//               sed_last_nonlinear_soln->close();
-
-//               // Compute the l2 norm of the difference
-//               const Real norm_delta = sed_last_nonlinear_soln->l2_norm();
-//               const Real u_norm     = transport_system.solution->l2_norm();
-
-//               // How many iterations were required to solve the linear system?
-//               const unsigned int n_linear_iterations = transport_system.n_linear_iterations();
-//               //Total number of linear iterations (so far)
-//               n_linear_iterations_transport += n_linear_iterations;
-
-//               // What was the final residual of the linear system?
-//               const Real final_linear_residual = transport_system.final_linear_residual();
-
-//               {
-//                         std::ostringstream out;
-
-//                         // We write the file in the ExodusII format.
-//                         out << std::setw(5)
-//                             << std::left
-//                             << l
-//                             << std::setw(5)
-//                             << n_linear_iterations
-//                             << std::setw(15)
-//                             << final_linear_residual
-//                             << std::setw(15)
-//                             << norm_delta
-//                             << std::setw(15)
-//                             << norm_delta/u_norm
-//                             << "\n";
-
-//                             std::cout << out.str() << std::flush ;
-//                 }
-
-//               //Total number of non-linear iterations (so far)
-//               n_nonlinear_iterations_transport++;
-
-//               // Terminate the solution iteration if the difference between
-//               // this nonlinear iterate and the last is sufficiently small, AND
-//               // if the most recent linear system was solved to a sufficient tolerance.
-//               if ((norm_delta < nonlinear_tolerance) &&
-//                   (transport_system.final_linear_residual() < nonlinear_tolerance))
-//                 {
-//                         std::ostringstream out;
-//                          // We write the file in the ExodusII format.
-//                          out << std::setw(55)
-//                              << std::setfill('-')
-//                              << "\n";
-//                          std::cout << out.str()
-//                                   << " Nonlinear solver converged at step "
-//                                   << l
-//                                   << std::endl;
-//                   break;
-//                 }
-
-//               // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-//               // method, the linear solver tolerance needs to decrease as we get closer to
-//               // the solution to ensure quadratic convergence.  The new linear solver tolerance
-//               // is chosen (heuristically) as the square of the previous linear system residual norm.
-//               //Real flr2 = final_linear_residual*final_linear_residual;
-//               equation_systems.parameters.set<Real> ("linear solver tolerance") =
-//                 std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-
-//           } // end nonlinear loop
-
-//           redo_nl = false;
-
-//           if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) )
-//           {
-//             std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
-//             std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
-//             Real H1norm = transport_system.calculate_norm(*transport_system.solution, SystemNorm(H1));
-//             ErrorVector error;
-//             KellyErrorEstimator error_estimator;
-//             error_estimator.estimate_error (transport_system, error);
-//             refinement.flag_elements_by_error_fraction (error);
-//             refinement.refine_and_coarsen_elements();
-//             equation_systems.reinit ();
-//             redo_nl = true;
-//             first_step_refinement = false;
-//             std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
-
-//          }
-//       }
-
-
-//       sediment_deposition.ComputeDeposition();
-//       sediment_deposition.print();
-
-// #ifdef MESH_MOVIMENT
-//       std::cout << "Solving Mesh moviment..." << std::endl;
-
-//       equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
-//       mesh_system.solve();
-
-//       // How many iterations were required to solve the linear system?
-//       const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
-//       std::cout << " Number of iterations: " <<  n_linear_iterations << std::endl;
-
-
-//       // What was the final residual of the linear system?
-//       const Real final_linear_residual = flow_system.final_linear_residual();
-//       std::cout << " final residual " <<  final_linear_residual << std::endl;
-
-//       moving_mesh.updateMesh();
-// #endif
-
-//       // Output every 10 timesteps to file.
-//       if ((t_step+1)%write_interval == 0)
-//         {
-//             const std::string mesh_restart      = rname + "_mesh_restart.xda";
-//             const std::string solution_restart  = rname + "_solution_restart.xda";
-
-//             mesh.write(mesh_restart);
-//             equation_systems.write(solution_restart, WRITE);
-
-//             std::ofstream fout;
-//             fout.open("restart.in");
-//             fout << "#Restart file: "     << std::endl;
-//             fout << "time = "             << time             << std::endl;
-//             fout << "dt   = "             << dt               << std::endl;
-//             fout << "init_tstep = "       << t_step           << std::endl;
-//             fout << "mesh_restart = "     << mesh_restart     << std::endl;
-//             fout << "solution_restart = " << solution_restart << std::endl;
-// #ifdef XDMF_
-//             fout << "xdmf_file_id = "     << xdmf_writer.GetFileID() << std::endl;
-// #endif
-//             fout.close();
-
-// #ifdef XDMF_
-//            xdmf_writer.write_timestep(equation_systems, time);
-// #else
-//            ExodusII_IO exo(mesh);
-//            exo.append(true);
-//            exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
-// #endif
-
-
-//         }
-//     }
-
-//     if (t_step%write_interval != 0)
-//     {
-
-// #ifdef XDMF_
-//            xdmf_writer.write_timestep(equation_systems, time);
-// #else
-//         ExodusII_IO exo(mesh);
-//         exo.append(true);
-//         exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
-
-// #endif
-
-//     }
-
-//     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
-//     std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
-
-
-//   // All done.
+#ifdef PROV
+  // Generate loop iterations
+  prov.outputGetMaximumIterations(simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval);
+#endif
+
+#ifdef XDMF_
+  XDMF_IO xdmf_writer(mesh, rname);
+#endif
+
+  if( !is_file_exist("restart.in") || true) {
+
+    const string mesh_file = infile("mesh_file","0");
+
+    std::cout << "Opening file: " << mesh_file << endl;
+
+    if(dim == 2)
+    {
+        MeshTools::Generation::build_square (mesh,ncellx,ncelly,
+                                             xmin,  xmax,
+                                             ymin,  ymax, QUAD4);
+    } else {
+         MeshTools::Generation::build_cube (mesh,ncellx,ncelly,ncellz,
+                                        xmin,  xmax,
+                                        ymin,  ymax,
+                                        zmin,  zmax, QUAD8);
+    }
+
+     refinement.uniformly_refine(hlevels);
+
+     sediment_flow.setup();
+     sediment_transport.setup();
+     sediment_deposition.setup();
+
+#ifdef MESH_MOVIMENT
+     moving_mesh.setup();
+#endif
+
+     // Initialize the data structures for the equation system.
+     equation_systems.init ();
+
+  } else
+  {
+      GetPot restart("restart.in");
+      const string mesh_restart = restart("mesh_restart","0");
+      const string solution_restart = restart("solution_restart","0");
+      init_time = restart("init_time",0.0);
+      dt        = restart("deltat",0.0);
+
+#ifdef XDMF_
+      int xdmf_file_id =  restart("xdmf_file_id",0);
+      xdmf_writer.SetFileID(xdmf_file_id);
+#endif
+
+      mesh.read(mesh_restart);
+      equation_systems.read(solution_restart, READ);
+
+      // Get a reference to the Convection-Diffusion system object.
+     TransientLinearImplicitSystem & transport_system =
+         equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
+
+     //transport_system.add_vector("volume");
+
+     transport_system.update();
+
+     // Get a reference to the Convection-Diffusion system object.
+     TransientLinearImplicitSystem & flow_system =
+       equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
+
+     flow_system.update();
+
+     ExplicitSystem & deposition_system = equation_systems.get_system<ExplicitSystem>("deposition");
+     deposition_system.add_vector("deposition_rate");
+
+     deposition_system.update();
+
+  }
+
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+
+  // Get a reference to the Convection-Diffusion system object.
+  TransientLinearImplicitSystem & transport_system =
+     equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
+
+    // Get a reference to the Convection-Diffusion system object.
+  TransientLinearImplicitSystem & flow_system =
+     equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
+
+#ifdef MESH_MOVIMENT
+  LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
+#endif
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
+
+  double time                           = init_time;
+  transport_system.time                 = time;
+  flow_system.time                      = time;
+
+
+#ifdef XDMF_
+  xdmf_writer.write_timestep(equation_systems, time);
+#else
+  int exodus_step = 0;
+  std::string exodus_filename = "output.e";
+  ExodusII_IO(mesh).write_equation_systems (exodus_filename, equation_systems);
+#endif
+  unsigned int t_step                           = 0;
+  unsigned int n_linear_iterations_flow         = 0;
+  unsigned int n_nonlinear_iterations_flow      = 0;
+  unsigned int n_nonlinear_iterations_transport = 0;
+  unsigned int n_linear_iterations_transport    = 0;
+  bool redo_nl;
+
+// STEP LOOP
+  // Loop in time steps
+  for (t_step = init_tstep; (t_step < n_time_steps)&&( time < tmax); t_step++)
+    {
+
+      if(is_file_exist("abort.run")) break;
+
+      // Incremenet the time counter, set the time and the
+      // time step size as parameters in the EquationSystem.
+      time                  += dt;
+      flow_system.time      += dt;
+      transport_system.time += dt;
+
+      Real tmp = Reynolds;
+      equation_systems.parameters.set<Real> ("Reynolds")    = tmp;
+      equation_systems.parameters.set<Real> ("Diffusivity") = 1.0/(Sc*tmp);
+      equation_systems.parameters.set<Real> ("time")        = time;
+      equation_systems.parameters.set<Real> ("dt")          = dt;
+
+      // A pretty update message
+      std:: cout << std::setw(55)
+           << std::setfill('=')
+           << "\n";
+      std::cout << " Time step ";
+      {
+            std::ostringstream out;
+
+            out << std::setw(2)
+            << std::right
+            << t_step
+            << "  simulation time = "
+            << std::fixed
+            << std::setw(6)
+            << std::setprecision(3)
+            << std::setfill('0')
+            << std::left
+            << transport_system.time
+            <<  "...";
+
+            std::cout << out.str() << std::endl;
+       }
+      std:: cout << std::setw(55)
+           << std::setfill('=')
+           << "\n";
+
+       // At the beginning of each solve, reset the linear solver tolerance
+       // to a "reasonable" starting value.
+       const Real initial_linear_solver_tol                                              = 1.e-6;
+       equation_systems.parameters.set<Real> ("linear solver tolerance")                 = initial_linear_solver_tol;
+       equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iters;
+
+      // AMR/C Loop
+      redo_nl  = true;
+      *flow_system.old_local_solution      = *flow_system.current_local_solution;
+      *transport_system.old_local_solution = *transport_system.current_local_solution;
+
+      // Loop in linear steps
+      for  (unsigned int r = 0; r < max_r_steps; r++)
+      {
+          if(!redo_nl) break;
+            std::cout << " Solving Navier-Stokes equation..." <<std::endl;
+            {
+                std::ostringstream out;
+
+              // We write the file in the ExodusII format.
+                out << std::setw(55)
+                 << std::setfill('-')
+                 << "\n"
+                 << std::setfill(' ')
+                 << std::setw(5)
+                 << std::left
+                 << "STEP"
+                 << std::setw(5)
+                 << "NLI"
+                 << std::setw(15)
+                 << "|b-AX|"
+                 << std::setw(15)
+                 << "|du|"
+                 << std::setw(15)
+                 << "|du|/|u|"
+                 << "\n"
+                 <<std::right
+                 << std::setw(55)
+                 << std::setfill('-')
+                 << "\n";
+                 std::cout << out.str() << std::flush;
+            }
+
+            // determine if we can exit the nonlinear loop.
+            UniquePtr<NumericVector<Number> >
+                flow_last_nonlinear_soln (flow_system.solution->clone());
+
+            // Fluid
+            // FLOW NONLINEAR LOOP
+            for (unsigned int l=0; l< n_nonlinear_steps; ++l)
+            {
+              // Update the nonlinear solution.
+              flow_last_nonlinear_soln->zero();
+              flow_last_nonlinear_soln->add(*flow_system.solution);
+
+              // Assemble & solve the linear system.
+              flow_system.solve();
+
+              // Compute the difference between this solution and the last
+              // nonlinear iterate.
+              flow_last_nonlinear_soln->add (-1., *flow_system.solution);
+
+              // Close the vector before computing its norm
+              flow_last_nonlinear_soln->close();
+
+              // Compute the l2 norm of the difference
+              const Real norm_delta = flow_last_nonlinear_soln->l2_norm();
+              const Real u_norm     = flow_system.solution->l2_norm();
+
+              // How many iterations were required to solve the linear system?
+              const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
+              //Total number of linear iterations (so far)
+              n_linear_iterations_flow = n_linear_iterations_flow + n_linear_iterations;
+
+              // What was the final residual of the linear system?
+              const Real final_linear_residual = flow_system.final_linear_residual();
+
+              {
+                        std::ostringstream out;
+
+                        // We write the file in the ExodusII format.
+                        out << std::setw(5)
+                            << std::left
+                            << l
+                            << std::setw(5)
+                            << n_linear_iterations
+                            << std::setw(15)
+                            << final_linear_residual
+                            << std::setw(15)
+                            << norm_delta
+                            << std::setw(15)
+                            << norm_delta/u_norm
+                            << "\n";
+
+                            std::cout << out.str() << std::flush ;
+                }
+
+              bool converged = (norm_delta < nonlinear_tolerance);
+
+#ifdef PROV
+// Fluids
+prov.outputSolverSimulationFluid(simulationID,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+#endif
+
+              //Total number of non-linear iterations (so far)
+              n_nonlinear_iterations_flow++;
+
+              // Terminate the solution iteration if the difference between
+              // this nonlinear iterate and the last is sufficiently small, AND
+              // if the most recent linear system was solved to a sufficient tolerance.
+              if ((norm_delta < nonlinear_tolerance)
+                   // && (flow_system.final_linear_residual() < nonlinear_tolerance)
+                      )
+                {
+                  std::ostringstream out;
+                   // We write the file in the ExodusII format.
+                   out << std::setw(55)
+                       << std::setfill('-')
+                       << "\n";
+                   std::cout << out.str()
+                            << " Nonlinear solver converged at step "
+                            << l
+                            << std::endl;
+                  break;
+                }
+
+              // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+              // method, the linear solver tolerance needs to decrease as we get closer to
+              // the solution to ensure quadratic convergence.  The new linear solver tolerance
+              // is chosen (heuristically) as the square of the previous linear system residual norm.
+              //Real flr2 = final_linear_residual*final_linear_residual;
+              equation_systems.parameters.set<Real> ("linear solver tolerance") =
+                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+
+            } // end nonlinear loop
+
+            std::cout << " Solving sedimentation equation..." <<std::endl;
+            {
+                std::ostringstream out;
+
+              // We write the file in the ExodusII format.
+                out << std::setw(55)
+                 << std::setfill('-')
+                 << "\n"
+                 << std::setfill(' ')
+                 << std::setw(5)
+                 << std::left
+                 << "STEP"
+                 << std::setw(5)
+                 << "NLI"
+                 << std::setw(15)
+                 << "|b-AX|"
+                 << std::setw(15)
+                 << "|du|"
+                 << std::setw(15)
+                 << "|du|/|u|"
+                 << "\n"
+                 <<std::right
+                 << std::setw(55)
+                 << std::setfill('-')
+                 << "\n";
+                 std::cout << out.str() << std::flush;
+              }
+
+            equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+
+            // determine if we can exit the nonlinear loop.
+            UniquePtr<NumericVector<Number> > sed_last_nonlinear_soln (transport_system.solution->clone());
+
+            // Sediments
+            // FLOW NON-LINEAR LOOP
+            for (unsigned int l=0; l< n_nonlinear_steps; ++l)
+            {
+              // Update the nonlinear solution.
+              sed_last_nonlinear_soln->zero();
+              sed_last_nonlinear_soln->add(*transport_system.solution);
+
+              // Assemble & solve the linear system.
+              transport_system.solve();
+
+              // Compute the difference between this solution and the last
+              // nonlinear iterate.
+              sed_last_nonlinear_soln->add (-1., *transport_system.solution);
+
+              // Close the vector before computing its norm
+              sed_last_nonlinear_soln->close();
+
+              // Compute the l2 norm of the difference
+              const Real norm_delta = sed_last_nonlinear_soln->l2_norm();
+              const Real u_norm     = transport_system.solution->l2_norm();
+
+              // How many iterations were required to solve the linear system?
+              const unsigned int n_linear_iterations = transport_system.n_linear_iterations();
+              //Total number of linear iterations (so far)
+              n_linear_iterations_transport += n_linear_iterations;
+
+              // What was the final residual of the linear system?
+              const Real final_linear_residual = transport_system.final_linear_residual();
+
+              {
+                        std::ostringstream out;
+
+                        // We write the file in the ExodusII format.
+                        out << std::setw(5)
+                            << std::left
+                            << l
+                            << std::setw(5)
+                            << n_linear_iterations
+                            << std::setw(15)
+                            << final_linear_residual
+                            << std::setw(15)
+                            << norm_delta
+                            << std::setw(15)
+                            << norm_delta/u_norm
+                            << "\n";
+
+                            std::cout << out.str() << std::flush ;
+                }
+
+                bool converged = (norm_delta < nonlinear_tolerance) &&
+                  (transport_system.final_linear_residual() < nonlinear_tolerance);
+
+#ifdef PROV
+// Sediments
+prov.outputSolverSimulationSediments(simulationID,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+#endif
+
+              //Total number of non-linear iterations (so far)
+              n_nonlinear_iterations_transport++;
+
+              // Terminate the solution iteration if the difference between
+              // this nonlinear iterate and the last is sufficiently small, AND
+              // if the most recent linear system was solved to a sufficient tolerance.
+              if ((norm_delta < nonlinear_tolerance) &&
+                  (transport_system.final_linear_residual() < nonlinear_tolerance))
+                {
+                  // std::ostringstream out;
+                  //  // We write the file in the ExodusII format.
+                  //  out << std::setw(55)
+                  //      << std::setfill('-')
+                  //      << "\n";
+                  //  std::cout << out.str()
+                  //           << " Nonlinear solver converged at step "
+                  //           << l
+                  //           << std::endl;
+                  break;
+                }
+
+              // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+              // method, the linear solver tolerance needs to decrease as we get closer to
+              // the solution to ensure quadratic convergence.  The new linear solver tolerance
+              // is chosen (heuristically) as the square of the previous linear system residual norm.
+              //Real flr2 = final_linear_residual*final_linear_residual;
+              equation_systems.parameters.set<Real> ("linear solver tolerance") =
+                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+
+          } // end nonlinear loop
+
+          redo_nl = false;
+
+          if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) )
+          {
+            std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
+            std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
+            Real H1norm = transport_system.calculate_norm(*transport_system.solution, SystemNorm(H1));
+            ErrorVector error;
+            KellyErrorEstimator error_estimator;
+            error_estimator.estimate_error (transport_system, error);
+            refinement.flag_elements_by_error_fraction (error);
+            refinement.refine_and_coarsen_elements();
+            equation_systems.reinit ();
+            redo_nl = true;
+            first_step_refinement = false;
+            
+            std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
+
+         }
+      }
+
+      sediment_deposition.ComputeDeposition();
+      sediment_deposition.print();
+
+#ifdef MESH_MOVIMENT
+      std::cout << "Solving Mesh moviment..." << std::endl;
+
+      equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+      mesh_system.solve();
+
+      // How many iterations were required to solve the linear system?
+      const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
+      std::cout << " Number of iterations: " <<  n_linear_iterations << std::endl;
+
+
+      // What was the final residual of the linear system?
+      const Real final_linear_residual = flow_system.final_linear_residual();
+      std::cout << " final residual " <<  final_linear_residual << std::endl;
+
+      moving_mesh.updateMesh();
+#endif
+
+      // Output every 10 timesteps to file.
+      if ((t_step+1)%write_interval == 0)
+        {
+            const std::string mesh_restart      = rname + "_mesh_restart.xda";
+            const std::string solution_restart  = rname + "_solution_restart.xda";
+
+            mesh.write(mesh_restart);
+            equation_systems.write(solution_restart, WRITE);
+
+            std::ofstream fout;
+            fout.open("restart.in");
+            fout << "#Restart file: "     << std::endl;
+            fout << "time = "             << time             << std::endl;
+            fout << "dt   = "             << dt               << std::endl;
+            fout << "init_tstep = "       << t_step           << std::endl;
+            fout << "mesh_restart = "     << mesh_restart     << std::endl;
+            fout << "solution_restart = " << solution_restart << std::endl;
+#ifdef XDMF_
+            fout << "xdmf_file_id = "     << xdmf_writer.GetFileID() << std::endl;
+#endif
+            fout.close();
+
+#ifdef XDMF_
+           xdmf_writer.write_timestep(equation_systems, time);
+#else
+           ExodusII_IO exo(mesh);
+           exo.append(true);
+           exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+#endif
+        }
+    }
+
+    if (t_step%write_interval != 0)
+    {
+
+#ifdef XDMF_
+           xdmf_writer.write_timestep(equation_systems, time);
+#else
+        ExodusII_IO exo(mesh);
+        exo.append(true);
+        exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+#endif
+
+    }
+
+    std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
+    std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
+
+  // All done.
   return 0;
 }
