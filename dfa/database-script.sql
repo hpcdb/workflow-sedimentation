@@ -12,6 +12,7 @@ CREATE SEQUENCE "ecombination_id_seq" as integer START WITH 1;
 CREATE SEQUENCE "att_id_seq" as integer START WITH 1;
 CREATE SEQUENCE "task_id_seq" as integer START WITH 1;
 CREATE SEQUENCE "file_id_seq" as integer START WITH 1;
+CREATE SEQUENCE "performance_id_seq" as integer START WITH 1;
 
 -- tables
 CREATE TABLE dataflow(
@@ -98,7 +99,7 @@ CREATE TABLE attribute(
 	id INTEGER DEFAULT NEXT VALUE FOR "att_id_seq" NOT NULL,
 	ds_id INTEGER NOT NULL,
 	extractor_id INTEGER,
-	name VARCHAR(20),
+	name VARCHAR(30),
 	type VARCHAR(15),
 	PRIMARY KEY ("id"),
 	FOREIGN KEY ("ds_id") REFERENCES data_set("id") ON DELETE CASCADE ON UPDATE CASCADE,
@@ -126,6 +127,17 @@ CREATE TABLE file(
 	task_id INTEGER NOT NULL,
 	name VARCHAR(200) NOT NULL,
 	path VARCHAR(500) NOT NULL,
+	PRIMARY KEY ("id"),
+	FOREIGN KEY ("task_id") REFERENCES task("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE performance(
+	id INTEGER DEFAULT NEXT VALUE FOR "performance_id_seq" NOT NULL,
+	task_id INTEGER NOT NULL,	
+	method VARCHAR(30) NOT NULL,
+	description VARCHAR(200),
+	starttime VARCHAR(30) NOT NULL,
+	endtime VARCHAR(30) NOT NULL,
 	PRIMARY KEY ("id"),
 	FOREIGN KEY ("task_id") REFERENCES task("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -222,7 +234,7 @@ BEGIN
 END;
 
 -- DROP FUNCTION insertAttribute;
-CREATE FUNCTION insertAttribute (dds_id INTEGER, vextractor_id INTEGER, vname VARCHAR(20), vtype VARCHAR(15))
+CREATE FUNCTION insertAttribute (dds_id INTEGER, vextractor_id INTEGER, vname VARCHAR(30), vtype VARCHAR(15))
 RETURNS INTEGER
 BEGIN
 	DECLARE vid INTEGER;
@@ -277,6 +289,20 @@ BEGIN
 	END IF;
 	RETURN vid;
 END;
+
+-- DROP FUNCTION insertPerformance;
+CREATE FUNCTION insertPerformance (vtask_id INTEGER, pstarttime VARCHAR(30), pmethod VARCHAR(30), pdescription VARCHAR(200), penditme VARCHAR(30))
+RETURNS INTEGER
+BEGIN
+	DECLARE vid INTEGER;
+    SELECT id INTO vid FROM performance WHERE method=pmethod;
+    IF(vid IS NULL) THEN
+    	SELECT NEXT VALUE FOR "performance_id_seq" into vid;
+    	INSERT INTO performance(id,task_id,starttime,method,description,endtime) VALUES (vid,vtask_id,pstarttime,pmethod,pdescription,penditme);
+	END IF;
+	RETURN vid;
+END;
+
 
 -- DROP FUNCTION insertExtractor;
 CREATE FUNCTION insertExtractor (vtag VARCHAR(20), vds_id INTEGER, vcartridge VARCHAR(20), vextension VARCHAR(20))

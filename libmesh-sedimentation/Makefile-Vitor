@@ -6,7 +6,7 @@ LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh-git/build
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
 
-target     := ./example-$(METHOD)
+target     := ./libmesh-sedimentation-$(METHOD)
 
 
 ###############################################################################

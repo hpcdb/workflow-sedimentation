@@ -12,8 +12,10 @@
 #include <fstream>
 #include <string>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
- #include "libmesh/libmesh.h"
+#include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_modification.h"
@@ -56,13 +58,41 @@ using namespace std;
 using namespace libMesh;
 
 string space = "      ";
-string directory = "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation/example/prov";
+string directory = "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov";
+string pgCommandLine = "java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar ";
 
 void Provenance::inputMeshRefinement(int simulationID, int dim, int ncellx, int ncelly, int ncellz, 
 			double xmin, double ymin, double zmin, double xmax, double ymax, double zmax, int ref_interval)
 {
 	clock_t begin = clock();
 	
+	// run PG
+	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
+		+ to_string(simulationID) 
+		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -invocation MeshRefinement -status FINISHED";
+	system(strdup(str.c_str()));
+
+	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshRefinement -id "
+	+  to_string(simulationID) 
+	+ " -set imeshrefinement -element [{'" 
+	+ to_string(simulationID) + ";"
+	+ to_string(dim) + ";"
+	+ to_string(ncellx) + ";"
+	+ to_string(ncelly) + ";"
+	+ to_string(ncellz) + ";"
+	+ to_string(xmin) + ";"
+	+ to_string(ymin) + ";"
+	+ to_string(zmin) + ";"
+	+ to_string(xmax) + ";"
+	+ to_string(ymax) + ";"
+	+ to_string(zmax) + ";"
+	+ to_string(ref_interval)
+	+ "'}]";
+	system(strdup(str.c_str()));
+
+	clock_t end = clock();
+  	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
+
 	ofstream file;
 	file.open(directory + "/1.mesh-refinement.prov", ios_base::app);
 	file << "PROV:MeshRefinement:Input" << endl << 
@@ -80,14 +110,33 @@ void Provenance::inputMeshRefinement(int simulationID, int dim, int ncellx, int 
 	    space << "ref_interval(" + to_string(ref_interval) + ")" << endl <<
 	    space << "xmax(" + to_string(xmax) + ")" << endl;
 
-	clock_t end = clock();
-  	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
-  	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
+	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
 	file.close();
 }
 
 void Provenance::outputMeshRefinement(int simulationID, double r_fraction,double c_fraction,double max_h_level,unsigned int hlevels,bool first_step_refinement){
 	clock_t begin = clock();
+
+	// run PG
+	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
+		+ to_string(simulationID) 
+		+ " -status FINISHED";
+	system(strdup(str.c_str()));
+
+	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshRefinement -id "
+	+  to_string(simulationID) 
+	+ " -set omeshrefinement -element [{'" 
+	+ to_string(simulationID) + ";"
+	+ to_string(r_fraction) + ";"
+	+ to_string(c_fraction) + ";"
+	+ to_string(max_h_level) + ";"
+	+ to_string(hlevels) + ";"
+	+ to_string(first_step_refinement)
+	+ "'}]";
+	system(strdup(str.c_str()));
+
+	clock_t end = clock();
+  	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
 
 	ofstream file;
 	file.open(directory + "/1.mesh-refinement.prov", ios_base::app);
@@ -99,9 +148,7 @@ void Provenance::outputMeshRefinement(int simulationID, double r_fraction,double
 	    space << "hlevels(" + to_string(hlevels) + ")" << endl <<
 	    space << "first_step_refinement(" + to_string(first_step_refinement) + ")" << endl;
 
-	clock_t end = clock();
-  	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
-  	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
+	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
 	file.close();
 }
 

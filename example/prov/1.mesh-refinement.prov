@@ -1,5 +1,5 @@
 PROV:MeshRefinement:Input
-      simulationID(0)
+      simulationID(1)
       dim(2)
       ncellx(180)
       ncelly(20)
@@ -12,12 +12,12 @@ PROV:MeshRefinement:Input
       zmax(2.000000)
       ref_interval(3)
       xmax(18.000000)
-      elapsed-time: 0.000159 seconds.
+      elapsed-time: 0.324256 seconds.
 PROV:MeshRefinement:Output
-      simulationID(0)
+      simulationID(1)
       r_fraction(0.850000)
       c_fraction(0.050000)
       max_h_level(3.000000)
       hlevels(0)
       first_step_refinement(0)
-      elapsed-time: 0.000125 seconds.
+      elapsed-time: 0.312641 seconds.

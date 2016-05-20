@@ -1,0 +1,5 @@
+TO DO
+- Loop para varredura de parâmetros: Discutir parâmetros e valores com o Camata
+- Execução usando MPI
+- DfA - permitir segregar atributo numeric para float e integer
+- DfA - resolver atributo booleano

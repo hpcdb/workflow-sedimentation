@@ -1,1 +1,0 @@
-java -jar DI-1.0.jar -daemon start &

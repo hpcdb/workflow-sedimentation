@@ -1,1 +1,0 @@
-{"subid":null,"output":"","workspace":"\/Users\/vitor\/Documents\/Repository\/Thesis\/EdgeCFD-trunk\/workflow\/workflow\/exp\/EdgeCFDSolver\/190\/093\/906\/0","invocation":".\/experiment.sh","dataflow":"edgecfd","resource":"local","id":"1","transformation":"edgecfdsolver","error":"","dependencies":[{"tag":"edgecfdpre","id":1}],"status":"RUNNING"}
