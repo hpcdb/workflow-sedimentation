@@ -1,0 +1,1 @@
+{"subid":"0","workspace":"\/Users\/vitor\/Documents\/Repository\/Thesis\/WorkflowSedimentation\/example\/prov","dataflow":"sedimentation","sets":[{"elements":["1;2;0.030000;0;0;49;0.000001;0.072598;0.010116;0"],"tag":"osolversimulationfluid"}],"resource":"","id":"1","transformation":"solversimulationfluid","dependencies":[],"status":"FINISHED"}

@@ -1,27 +1,18 @@
 {
   "subid": null,
-  "output": "",
-  "workspace": "",
-  "invocation": "",
+  "workspace": "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov",
   "dataflow": "sedimentation",
   "sets": [
     {
       "elements": [
         "1;2;180;20;20;0.000000;0.000000;0.000000;18.000000;2.000000;2.000000;3"
       ],
-      "tag": "imeshrefinement"
-    },
-    {
-      "elements": [
-        "1;0.850000;0.050000;3.000000;0;0"
-      ],
-      "tag": "omeshrefinement"
+      "tag": "imeshgeneration"
     }
   ],
   "resource": "",
   "id": "1",
-  "transformation": "meshrefinement",
-  "error": "",
+  "transformation": "meshgeneration",
   "dependencies": [],
   "status": "FINISHED"
 }

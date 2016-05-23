@@ -129,30 +129,34 @@ int main (int argc, char** argv)
   int ref_interval = infile("r_interval" , 1);
 
 #ifdef PROV
-  // Mesh Refinement
+  // Mesh Generation
   Provenance prov;
-  prov.inputMeshRefinement(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
+  prov.inputMeshGeneration(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
 #endif
-
   // Create a mesh object, with dimension to be overridden later,
   // distributed across the default MPI communicator.
   Mesh mesh(init.comm());
-  MeshRefinement refinement(mesh);
 
   double r_fraction = infile("r_fraction", 0.70);
   double c_fraction = infile("c_fraction", 0.10);
   double max_h_level = infile("max_h_level", 1);
+  const unsigned int hlevels = infile("hlevels" , 0);
+
+#ifdef PROV
+  // Mesh Refinement
+  prov.outputMeshGeneration(simulationID,r_fraction,c_fraction,max_h_level,hlevels);
+#endif
+  MeshRefinement refinement(mesh);
 
   refinement.refine_fraction()  = r_fraction;
   refinement.coarsen_fraction() = c_fraction;
   refinement.max_h_level()      = max_h_level;
 
-  const unsigned int hlevels = infile("hlevels" , 0);
   bool first_step_refinement = false;
 
 #ifdef PROV
   // Create Equation Systems
-  prov.outputMeshRefinement(simulationID,r_fraction,c_fraction,max_h_level,hlevels,first_step_refinement);
+  prov.outputMeshRefinement(simulationID,first_step_refinement);
 #endif
 // Create an equation systems object.
   EquationSystems equation_systems (mesh);
@@ -326,8 +330,16 @@ int main (int argc, char** argv)
   xdmf_writer.write_timestep(equation_systems, time);
 #else
   int exodus_step = 0;
-  std::string exodus_filename = "output.e";
-  ExodusII_IO(mesh).write_equation_systems (exodus_filename, equation_systems);
+  {
+
+    std::ostringstream out;
+    out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
+    ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
+    exodus_step++;
+  }
+  
+  //std::string exodus_filename = "output.e";
+  
 #endif
   unsigned int t_step                           = 0;
   unsigned int n_linear_iterations_flow         = 0;
@@ -706,9 +718,16 @@ prov.outputSolverSimulationSediments(simulationID,t_step,transport_system.time,r
 #ifdef XDMF_
            xdmf_writer.write_timestep(equation_systems, time);
 #else
-           ExodusII_IO exo(mesh);
-           exo.append(true);
-           exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+           //ExodusII_IO exo(mesh);
+           //exo.append(true);
+           //exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+
+            {
+              std::ostringstream out;
+              out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
+              ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
+              exodus_step++;
+            }
 #endif
         }
     }
@@ -719,9 +738,15 @@ prov.outputSolverSimulationSediments(simulationID,t_step,transport_system.time,r
 #ifdef XDMF_
            xdmf_writer.write_timestep(equation_systems, time);
 #else
-        ExodusII_IO exo(mesh);
-        exo.append(true);
-        exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+//        ExodusII_IO exo(mesh);
+//        exo.append(true);
+//        exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+           {
+              std::ostringstream out;
+              out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
+              ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
+              exodus_step++;
+            }
 #endif
 
     }

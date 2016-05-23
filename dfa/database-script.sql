@@ -112,7 +112,6 @@ CREATE TABLE task(
 	df_version INTEGER NOT NULL,
 	dt_id INTEGER NOT NULL,
 	status VARCHAR(10),
-	invocation TEXT,
 	workspace VARCHAR(500),
 	computing_resource VARCHAR(100),
 	output_msg TEXT,
@@ -138,6 +137,7 @@ CREATE TABLE performance(
 	description VARCHAR(200),
 	starttime VARCHAR(30) NOT NULL,
 	endtime VARCHAR(30) NOT NULL,
+	invocation TEXT,
 	PRIMARY KEY ("id"),
 	FOREIGN KEY ("task_id") REFERENCES task("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -247,7 +247,7 @@ BEGIN
 END;
 
 -- DROP FUNCTION insertTask;
-CREATE FUNCTION insertTask (videntifier INTEGER, vdf_tag VARCHAR(50), vdt_tag VARCHAR(50), vstatus VARCHAR(10), vinvocation TEXT, vworkspace VARCHAR(500), vcomputing_resource VARCHAR(100), voutput_msg TEXT, verror_msg TEXT)
+CREATE FUNCTION insertTask (videntifier INTEGER, vdf_tag VARCHAR(50), vdt_tag VARCHAR(50), vstatus VARCHAR(10), vworkspace VARCHAR(500), vcomputing_resource VARCHAR(100), voutput_msg TEXT, verror_msg TEXT)
 RETURNS INTEGER
 BEGIN
 	DECLARE vid INTEGER;
@@ -266,8 +266,8 @@ BEGIN
 
 		IF(vid IS NULL) THEN
 		    SELECT NEXT VALUE FOR "task_id_seq" into vid;
-		    INSERT INTO task(id,identifier,df_version,dt_id,status,invocation,workspace,computing_resource,output_msg,error_msg) 
-		    VALUES (vid,videntifier,vdf_version,vdt_id,vstatus,vinvocation,vworkspace,vcomputing_resource,voutput_msg,verror_msg);
+		    INSERT INTO task(id,identifier,df_version,dt_id,status,workspace,computing_resource,output_msg,error_msg) 
+		    VALUES (vid,videntifier,vdf_version,vdt_id,vstatus,vworkspace,vcomputing_resource,voutput_msg,verror_msg);
 	    ELSE
 	    	UPDATE task
 	    	SET status = vstatus, output_msg = voutput_msg, error_msg = verror_msg
@@ -291,14 +291,14 @@ BEGIN
 END;
 
 -- DROP FUNCTION insertPerformance;
-CREATE FUNCTION insertPerformance (vtask_id INTEGER, pstarttime VARCHAR(30), pmethod VARCHAR(30), pdescription VARCHAR(200), penditme VARCHAR(30))
+CREATE FUNCTION insertPerformance (vtask_id INTEGER, vmethod VARCHAR(30), vdescription VARCHAR(200), vstarttime VARCHAR(30), venditme VARCHAR(30), vinvocation TEXT)
 RETURNS INTEGER
 BEGIN
 	DECLARE vid INTEGER;
-    SELECT id INTO vid FROM performance WHERE method=pmethod;
+    SELECT id INTO vid FROM performance WHERE method=vmethod;
     IF(vid IS NULL) THEN
     	SELECT NEXT VALUE FOR "performance_id_seq" into vid;
-    	INSERT INTO performance(id,task_id,starttime,method,description,endtime) VALUES (vid,vtask_id,pstarttime,pmethod,pdescription,penditme);
+    	INSERT INTO performance(id,task_id,method,description,starttime,endtime,invocation) VALUES (vid,vtask_id,vmethod,vdescription,vstarttime,venditme,vinvocation);
 	END IF;
 	RETURN vid;
 END;

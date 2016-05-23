@@ -2,87 +2,118 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 echo "Dataflow - libMesh Sedimentation"
 # Default mode
+# Dataflow
 java -jar ../dfa/PG-1.0.jar -dataflow -tag sedimentation
+
+echo "Mesh Generation"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshGeneration
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation meshGeneration -name libmesh-sedimentation-opt::MeshGeneration -filepath /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshGeneration -tag imeshgeneration -type input
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshGeneration -tag omeshgeneration -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name dim -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ncellx -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ncelly -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ncellz -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name xmin -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ymin -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name zmin -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name xmax -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ymax -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name zmax -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ref_interval -type numeric
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name r_fraction -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name c_fraction -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name max_h_level -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name hlevels -type numeric
+
+echo "Mesh Refinement"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshRefinement
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation meshRefinement -name libmesh-sedimentation-opt::MeshRefinement -filepath /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshRefinement -tag imeshrefinement -type input
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshRefinement -tag omeshgeneration -type input -dependency meshGeneration
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshRefinement -tag omeshrefinement -type output
 
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name simulationID -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name dim -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name ncellx -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name ncelly -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name ncellz -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name xmin -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name ymin -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name zmin -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name xmax -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name ymax -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name zmax -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set imeshrefinement -name ref_interval -type numeric
-
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name simulationID -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name r_fraction -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name c_fraction -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name max_h_level -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name hlevels -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name first_step_refinement -type text
 
+echo "Create Equation Systems"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag createEquationSystems
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation createEquationSystems -name libmesh-sedimentation-opt::CreateEquationSystems -filepath /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
 
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag omeshrefinement -type input -dependency meshRefinement
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag ocreateequationsystems -type output
 
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name Reynolds -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name Gr -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name Sc -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name Us -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name Diffusivity -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name xlock -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name alfa -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name theta -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name ex -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name ey -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name ez -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name c_factor -type numeric
 
+echo "Get Maximum Iterations"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag getMaximumIterations
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation getMaximumIterations -name libmesh-sedimentation-opt::getMaximumIterations -filepath /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
 
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation getMaximumIterations -tag ocreateequationsystems -type input -dependency createEquationSystems
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation getMaximumIterations -tag ogetmaximumiterations -type output
 
-# java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -tag dl_pre -algorithm EXTRACTION:CSV
-# java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -tag dl_in -algorithm EXTRACTION:CSV
-# java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -tag dl_mat -algorithm EXTRACTION:CSV
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name dt -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name tmax -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name n_time_steps -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name n_nonlinear_steps -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name nonlinear_tolerance -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name max_linear_iters -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name max_r_steps -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name write_interval -type numeric
 
-# java -jar ../dfa/PG-1.0.jar -extractor_combination -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -outer dl_pre -inner dl_in -keys {inn} -key_types {file}
-# java -jar ../dfa/PG-1.0.jar -extractor_combination -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -outer dl_pre -inner dl_mat -keys {mat} -key_types {file}
+echo "Solver Simulation to the Fluid"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag solverSimulationFluid
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation solverSimulationFluid -name libmesh-sedimentation-opt::SolverSimulationFluid -filepath /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
 
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set iedgecfdpre -name mid -type numeric
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set iedgecfdpre -name mesh -type text
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set iedgecfdpre -name processes -type numeric
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverSimulationFluid -tag ogetmaximumiterations -type input -dependency getMaximumIterations
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverSimulationFluid -tag osolversimulationfluid -type output
 
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name mid -type numeric
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name mesh -type text
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name processes -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name t_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name time -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name r -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name l -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name n_linear_iterations -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name final_linear_residual -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name norm_delta -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name norm_delta_u -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name converged -type text
 
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name edg -type file -extractor dl_pre
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name inn -type file -extractor dl_pre
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name mat -type file -extractor dl_pre
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name msh -type file -extractor dl_pre
+echo "Solver Simulation to the Sediments"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag solverSimulationSediments
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation solverSimulationSediments -name libmesh-sedimentation-opt::SolverSimulationSediments -filepath /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
 
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name iprint -type numeric -extractor dl_in
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name dt -type numeric -extractor dl_in
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name etaf -type numeric -extractor dl_in
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverSimulationSediments -tag osolversimulationfluid -type input -dependency solverSimulationFluid
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverSimulationSediments -tag osolversimulationsediments -type output
 
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name visc -type numeric -extractor dl_mat
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name dens -type numeric -extractor dl_mat
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name kxx -type numeric -extractor dl_mat
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name kyy -type numeric -extractor dl_mat
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdpre -set oedgecfdpre -name kzz -type numeric -extractor dl_mat
-
-# echo "	- edgecfdsolver"
-# java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag edgecfdsolver
-# java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation edgecfdsolver -name EdgeCFD-Solver -filepath /Users/vitor/Documents/Repository/Thesis/EdgeCFD-trunk/workflow/bin/edgecfdsolver
-
-# java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation edgecfdsolver -tag oedgecfdpre -type input -dependency edgecfdpre
-# java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation edgecfdsolver -tag oedgecfdsolver -type output
-
-# java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -tag dl_paraview -algorithm EXTRACTION:CSV
-
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name timestep -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name pressure -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name velocity_0 -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name velocity_1 -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name velocity_2 -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name vtkvalidpointmask -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name arc_length -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name points_0 -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name points_1 -type numeric -extractor dl_paraview
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation edgecfdsolver -set oedgecfdsolver -name points_2 -type numeric -extractor dl_paraview
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name t_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name time -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name r -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name l -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name n_linear_iterations -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name final_linear_residual -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name norm_delta -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name norm_delta_u -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationSediments -set osolversimulationsediments -name converged -type text
 
 
 echo "Dataflow ingestion"
