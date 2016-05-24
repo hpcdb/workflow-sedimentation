@@ -4,7 +4,7 @@ cd ../libmesh-sedimentation
 make
 cd ../example
 # restart monetdb database
-# ./restart-monetdb.sh
+./restart-monetdb.sh
 # delete files from the previous execution
 ./delete.sh
 mkdir prov/pg/sedimentation

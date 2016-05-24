@@ -247,7 +247,8 @@ BEGIN
 END;
 
 -- DROP FUNCTION insertTask;
-CREATE FUNCTION insertTask (videntifier INTEGER, vdf_tag VARCHAR(50), vdt_tag VARCHAR(50), vstatus VARCHAR(10), vworkspace VARCHAR(500), vcomputing_resource VARCHAR(100), voutput_msg TEXT, verror_msg TEXT)
+CREATE FUNCTION insertTask (videntifier INTEGER, vdf_tag VARCHAR(50), vdt_tag VARCHAR(50), vstatus VARCHAR(10), vworkspace VARCHAR(500), 
+	vcomputing_resource VARCHAR(100), voutput_msg TEXT, verror_msg TEXT)
 RETURNS INTEGER
 BEGIN
 	DECLARE vid INTEGER;
@@ -260,7 +261,7 @@ BEGIN
 	WHERE df.id = dt.df_id AND dfv.df_id = df.id AND df.tag = vdf_tag AND dt.tag = vdt_tag;
 
 	IF((vdf_version IS NOT NULL) AND (vdt_id IS NOT NULL)) THEN
-		SELECT t.identifier, t.status INTO vid, vvstatus
+		SELECT t.id, t.status INTO vid, vvstatus
 		FROM task t
 		WHERE t.df_version = vdf_version AND t.dt_id = vdt_id AND t.identifier = videntifier;
 
@@ -271,7 +272,7 @@ BEGIN
 	    ELSE
 	    	UPDATE task
 	    	SET status = vstatus, output_msg = voutput_msg, error_msg = verror_msg
-	    	WHERE identifier = vid AND df_version = vdf_version AND dt_id = vdt_id AND status = 'RUNNING';
+	    	WHERE identifier = videntifier AND df_version = vdf_version AND dt_id = vdt_id;
 		END IF;
     END IF;
 	RETURN vid;

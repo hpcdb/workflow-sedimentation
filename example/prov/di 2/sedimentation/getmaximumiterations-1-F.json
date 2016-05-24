@@ -1,1 +1,0 @@
-{"subid":null,"workspace":"\/Users\/vitor\/Documents\/Repository\/Thesis\/WorkflowSedimentation\/example\/prov","dataflow":"sedimentation","sets":[{"elements":["1;0.010000;0.030000;500000;10;0.001000;200;1;1"],"tag":"ogetmaximumiterations"}],"resource":"","id":"1","transformation":"getmaximumiterations","dependencies":[],"status":"FINISHED"}

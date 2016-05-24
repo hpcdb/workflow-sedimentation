@@ -4,4 +4,4 @@ PROV:MeshRefinement:Output
       c_fraction(0.050000)
       max_h_level(3.000000)
       hlevels(0)
-      elapsed-time: 0.559687 seconds.
+      elapsed-time: 0.533265 seconds.

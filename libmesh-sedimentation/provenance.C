@@ -137,7 +137,8 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 	// mesh refinement
 	str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
 		+ to_string(simulationID) 
-		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -status FINISHED";
+		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -status FINISHED"
+		+ " -dependencies [{meshGeneration},{" + to_string(simulationID) + "}]";
 	system(strdup(str.c_str()));
 
 	clock_t end = clock();
@@ -176,7 +177,8 @@ void Provenance::outputMeshRefinement(int simulationID, bool first_step_refineme
 	// create equation systems
 	str = pgCommandLine + "-task -dataflow sedimentation -transformation createEquationSystems -id " 
 		+ to_string(simulationID) 
-		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -status FINISHED";
+		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -status FINISHED"
+		+ " -dependencies [{meshRefinement},{" + to_string(simulationID) + "}]";
 	system(strdup(str.c_str()));
 
 	clock_t end = clock();
@@ -224,7 +226,8 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds,Rea
 	// get maximum iterations
 	str = pgCommandLine + "-task -dataflow sedimentation -transformation getMaximumIterations -id " 
 		+ to_string(simulationID) 
-		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -status FINISHED";
+		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -status FINISHED"
+		+ " -dependencies [{createEquationSystems},{" + to_string(simulationID) + "}]";
 	system(strdup(str.c_str()));
 
 	clock_t end = clock();
@@ -302,7 +305,7 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
 	file.close();
 }
 
-void Provenance::outputSolverSimulationFluid(int simulationID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, 
+void Provenance::outputSolverSimulationFluid(int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, 
 	Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged){
 	clock_t begin = clock();
 
@@ -311,12 +314,13 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int time_step, Re
 	string str = pgCommandLine + "-task -dataflow sedimentation -transformation solverSimulationFluid -id " 
 		+ to_string(simulationID) + " -status FINISHED"
 		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -invocation SolverSimulationFluid"
-		+ " -subid " + to_string(n_linear_step);
+		+ " -subid " + to_string(subTaskID)
+		+ " -dependencies [{getMaximumIterations},{" + to_string(simulationID) + "}]";
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-element -dataflow sedimentation -transformation solverSimulationFluid -id "
 	+  to_string(simulationID) 
-	+ " -subid " + to_string(n_linear_step)
+	+ " -subid " + to_string(subTaskID)
 	+ " -set osolversimulationfluid -element [{'" 
 	+ to_string(simulationID) + ";"
 	+ to_string(time_step) + ";"
@@ -332,7 +336,7 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int time_step, Re
 	system(strdup(str.c_str()));
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation solverSimulationFluid " + to_string(simulationID) + " " + to_string(n_linear_step);
+	str = pgCommandLine + "-ingest -task sedimentation solverSimulationFluid " + to_string(simulationID) + " " + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
 	// solver simulation to the sediments
@@ -344,7 +348,7 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int time_step, Re
 	clock_t end = clock();
   	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
 
-	ofstream file;
+  	ofstream file;
 	file.open(directory + "/5.solver-simulation-fluid.prov", ios_base::app);
 	file << "PROV:SolverSimulationFluid:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
@@ -360,9 +364,22 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int time_step, Re
 
   	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
   	file.close();
+
+ //  	file.open(directory + "/debugging.prov", ios_base::app);
+	// file << to_string(simulationID) << ";" 
+	// 	<< to_string(time_step) << ";" 
+	// 	<< to_string(time) << ";" 
+	// 	<< to_string(linear_step) << ";" 
+	// 	<< to_string(n_linear_step) << ";" 
+	// 	<< to_string(n_linear_iterations) << ";" 
+	//     << to_string(linear_residual) << ";" 
+	//     << to_string(norm_delta) << ";" 
+	//     << to_string(norm_delta_u) << ";" 
+	//     << to_string(converged) << endl;
+ //    file.close();
 }
 
-void Provenance::outputSolverSimulationSediments(int simulationID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, 
+void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, 
 	Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged){
 	clock_t begin = clock();
 
@@ -371,12 +388,13 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int time_step
 	string str = pgCommandLine + "-task -dataflow sedimentation -transformation solverSimulationSediments -id " 
 		+ to_string(simulationID) + " -status FINISHED"
 		+ " -workspace /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov -invocation SolverSimulationSediments"
-		+ " -subid " + to_string(n_linear_step);
+		+ " -subid " + to_string(subTaskID)
+		+ " -dependencies [{solverSimulationFluid},{" + to_string(simulationID) + "}]";
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-element -dataflow sedimentation -transformation solverSimulationSediments -id "
 	+  to_string(simulationID) 
-	+ " -subid " + to_string(n_linear_step)
+	+ " -subid " + to_string(subTaskID)
 	+ " -set osolversimulationsediments -element [{'" 
 	+ to_string(simulationID) + ";"
 	+ to_string(time_step) + ";"
@@ -392,7 +410,7 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int time_step
 	system(strdup(str.c_str()));
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation solverSimulationSediments " + to_string(simulationID) + " " + to_string(n_linear_step);
+	str = pgCommandLine + "-ingest -task sedimentation solverSimulationSediments " + to_string(simulationID) + " " + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
 	clock_t end = clock();

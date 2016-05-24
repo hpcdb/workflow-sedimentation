@@ -77,7 +77,6 @@ double ramp(double t)
     double L2 = ((t - x[0])*(t-x[1]))/((x[2]-x[0])*(x[2]-x[1]));
 
     return (y[0]*L0 + y[1]*L1 + y[2]*L2);
-
 }
 
 void WriteRestartFile(EquationSystems &es,int t_step, std::string rname)
@@ -350,9 +349,10 @@ int main (int argc, char** argv)
 
 // STEP LOOP
   // Loop in time steps
+  int numberIterationsFluid = 0;
+  int numberIterationsSediments = 0;
   for (t_step = init_tstep; (t_step < n_time_steps)&&( time < tmax); t_step++)
-    {
-
+  {
       if(is_file_exist("abort.run")) break;
 
       // Incremenet the time counter, set the time and the
@@ -444,6 +444,7 @@ int main (int argc, char** argv)
             // FLOW NONLINEAR LOOP
             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
             {
+              numberIterationsFluid++;
               // Update the nonlinear solution.
               flow_last_nonlinear_soln->zero();
               flow_last_nonlinear_soln->add(*flow_system.solution);
@@ -494,7 +495,7 @@ int main (int argc, char** argv)
 
 #ifdef PROV
 // Fluids
-prov.outputSolverSimulationFluid(simulationID,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
 #endif
 
               //Total number of non-linear iterations (so far)
@@ -566,6 +567,7 @@ prov.outputSolverSimulationFluid(simulationID,t_step,transport_system.time,r,l,n
             // FLOW NON-LINEAR LOOP
             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
             {
+              numberIterationsSediments++;
               // Update the nonlinear solution.
               sed_last_nonlinear_soln->zero();
               sed_last_nonlinear_soln->add(*transport_system.solution);
@@ -617,7 +619,7 @@ prov.outputSolverSimulationFluid(simulationID,t_step,transport_system.time,r,l,n
 
 #ifdef PROV
 // Sediments
-prov.outputSolverSimulationSediments(simulationID,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
 #endif
 
               //Total number of non-linear iterations (so far)
