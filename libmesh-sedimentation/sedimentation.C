@@ -757,5 +757,6 @@ prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_st
     std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
 
   // All done.
+  prov.finishDataIngestor();
   return 0;
 }

@@ -9,7 +9,7 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.006846)
       norm_delta_u(0.000450)
       converged(0)
-      elapsed-time: 0.545588 seconds.
+      elapsed-time: 0.516986 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       time_step(0)
@@ -21,7 +21,7 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.000000)
       norm_delta_u(0.000000)
       converged(1)
-      elapsed-time: 0.548534 seconds.
+      elapsed-time: 0.529300 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       time_step(1)
@@ -33,7 +33,7 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.007548)
       norm_delta_u(0.000497)
       converged(0)
-      elapsed-time: 0.557535 seconds.
+      elapsed-time: 0.583343 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       time_step(1)
@@ -45,7 +45,7 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.000000)
       norm_delta_u(0.000000)
       converged(1)
-      elapsed-time: 0.531744 seconds.
+      elapsed-time: 0.517477 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       time_step(2)
@@ -57,7 +57,7 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.008617)
       norm_delta_u(0.000567)
       converged(0)
-      elapsed-time: 0.532001 seconds.
+      elapsed-time: 0.460662 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       time_step(2)
@@ -69,4 +69,4 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.000000)
       norm_delta_u(0.000000)
       converged(1)
-      elapsed-time: 0.519689 seconds.
+      elapsed-time: 0.465348 seconds.

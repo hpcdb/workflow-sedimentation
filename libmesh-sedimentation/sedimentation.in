@@ -51,4 +51,4 @@ is_gravitational_current = 0
 
 
 # Write out every nth timestep to file.
-write_interval = 10
+write_interval = 5

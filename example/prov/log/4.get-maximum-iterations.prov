@@ -8,4 +8,4 @@ PROV:GetMaximumIterations:Output
       max_linear_iters(200)
       max_r_steps(1)
       write_interval(1)
-      elapsed-time: 0.416898 seconds.
+      elapsed-time: 0.365159 seconds.
