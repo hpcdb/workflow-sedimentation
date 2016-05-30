@@ -332,7 +332,7 @@ int main (int argc, char** argv)
   {
 
     std::ostringstream out;
-    out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
+    out << rname << std::setw(5) << std::setfill('0') << exodus_step << ".e";
     ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
     exodus_step++;
   }

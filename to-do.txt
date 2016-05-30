@@ -1,5 +1,11 @@
 TO DO
-- Loop para varredura de parâmetros: Discutir parâmetros e valores com o Camata
 - Execução usando MPI
-- DfA - permitir segregar atributo numeric para float e integer
-- DfA - resolver atributo booleano
+- Escrita dos resultados em arquivos nos formatos XDMF e HDF5
+- Equation Systems x Mesh
+- Loop para varredura de parâmetros: Discutir parâmetros e valores com o Camata
+	- Caso real para ser testado
+	- Avaliar custo de proveniência em relação ao tempo de execução do solver
+- Propostas de gerência dos dados de proveniência
+- Ambiente de HPC a ser utilizado
+- Extração/Indexação de dados
+

@@ -1,0 +1,54 @@
+// coarse-online or -offline
+int main(){
+	Start provenance feature
+
+	// prov.inputMeshGeneration
+	Create task to activity Mesh Generation - FINISHED
+	Add input elements to the task of Mesh Generation
+	...
+	// prov.outputMeshGeneration
+	Add output elements to the task of Mesh Generation
+
+	Create task to activity Mesh Refinement - FINISHED
+	Propage output elements from activity Mesh Generation
+	...
+	// prov.outputMeshRefinement
+	Add output elements to the task of Mesh Refinement
+
+	Create task to activity Create Equation Systems
+	Propage output elements from activity Mesh Refinement
+	...
+	// prov.outputCreateEquationSystems
+	Add output elements to the task of Create Equation Systems
+
+	Create task to activity Get Maximum Iterations
+	Propage output elements from activity Create Equation Systems
+	...
+	// prov.outputGetMaximumIterations
+	Add output elements to the task of Get Maximum Iterations
+
+	...
+
+	loop(time steps){
+		...
+		loop(linear iterations){
+			...
+			loop(non linear iterations to the fluid){
+				...
+				// prov.outputSolverSimulationFluid()
+				Create task to activity Solver Simulation Fluid
+				Propage output elements from activity Get Maximum Iterations
+				Add output elements to the task of Solver Simulation Fluid
+			}
+			...
+			loop(non linear iterations to the sediments){
+				...
+				// prov.outputSolverSimulationSediments()
+				Create task to activity Solver Simulation Sediments
+				Propage output elements from activity Solver Simulation Fluid
+				Add output elements to the task of Solver Simulation Sediments
+			}
+		}
+	}
+	...
+}

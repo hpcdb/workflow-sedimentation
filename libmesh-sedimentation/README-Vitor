@@ -12,4 +12,15 @@ make -j 2
 make install
 
 
-# libMesh - Installation
+
+# Docker
+# PETSc
+./configure --prefix=/programs/petsc-3.7.1/build --download-fblaslapack
+make PETSC_DIR=/programs/petsc-3.7.1 all
+make PETSC_DIR=/programs/petsc-3.7.1 install
+export PETSC_DIR=/programs/petsc-3.7.1
+
+# libMesh
+./configure --enable-parmesh --prefix=/programs/libmesh/build --with-hdf5=/programs/hdf5-1.8.17/build PETSC_DIR=/programs/petsc-3.7.1
+make -j 2
+make install
