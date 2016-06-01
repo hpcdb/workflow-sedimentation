@@ -142,7 +142,14 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 	system(strdup(str.c_str()));
 
 	// mesh refinement
-	str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
+	// str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
+	// 	+ to_string(simulationID) 
+	// 	+ " -workspace " + directory + " -status FINISHED"
+	// 	+ " -dependencies [{meshGeneration},{" + to_string(simulationID) + "}]";
+	// system(strdup(str.c_str()));
+
+	// create equation systems
+	str = pgCommandLine + "-task -dataflow sedimentation -transformation createEquationSystems -id " 
 		+ to_string(simulationID) 
 		+ " -workspace " + directory + " -status FINISHED"
 		+ " -dependencies [{meshGeneration},{" + to_string(simulationID) + "}]";
@@ -152,8 +159,8 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
   	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
 
 	ofstream file;
-	file.open(directory + "/log/2.mesh-refinement.prov", ios_base::app);
-	file << "PROV:MeshRefinement:Output" << endl << 
+	file.open(directory + "/log/1.mesh-generation.prov", ios_base::app);
+	file << "PROV:MeshGeneration:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
 	    space << "r_fraction(" + to_string(r_fraction) + ")" << endl <<
 	    space << "c_fraction(" + to_string(c_fraction) + ")" << endl <<
@@ -241,7 +248,7 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds,Rea
   	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
 
 	ofstream file;
-	file.open(directory + "/log/3.create-equation-systems.prov", ios_base::app);
+	file.open(directory + "/log/2.create-equation-systems.prov", ios_base::app);
 	file << "PROV:CreateEquationSystems:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
 	    space << "Reynolds(" + to_string(Reynolds) + ")" << endl <<
@@ -296,7 +303,7 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
   	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
 
 	ofstream file;
-	file.open(directory + "/log/4.get-maximum-iterations.prov", ios_base::app);
+	file.open(directory + "/log/3.get-maximum-iterations.prov", ios_base::app);
 	file << "PROV:GetMaximumIterations:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
 	    space << "dt(" + to_string(dt) + ")" << endl <<
@@ -356,7 +363,7 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int subTaskID, in
   	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
 
   	ofstream file;
-	file.open(directory + "/log/5.solver-simulation-fluid.prov", ios_base::app);
+	file.open(directory + "/log/4.solver-simulation-fluid.prov", ios_base::app);
 	file << "PROV:SolverSimulationFluid:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
 	    space << "time_step(" + to_string(time_step) + ")" << endl <<
@@ -424,7 +431,7 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID
   	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
 
 	ofstream file;
-	file.open(directory + "/log/6.solver-simulation-sediments.prov", ios_base::app);
+	file.open(directory + "/log/5.solver-simulation-sediments.prov", ios_base::app);
 	file << "PROV:SolverSimulationSediments:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
 	    space << "time_step(" + to_string(time_step) + ")" << endl <<

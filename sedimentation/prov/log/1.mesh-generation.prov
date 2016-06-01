@@ -1,0 +1,22 @@
+PROV:MeshGeneration:Input
+      simulationID(1)
+      dim(2)
+      ncellx(180)
+      ncelly(20)
+      ncellz(20)
+      xmin(0.000000)
+      ymin(0.000000)
+      zmin(0.000000)
+      xmax(18.000000)
+      ymax(2.000000)
+      zmax(2.000000)
+      ref_interval(3)
+      xmax(18.000000)
+      elapsed-time: 0.001173 seconds.
+PROV:MeshGeneration:Output
+      simulationID(1)
+      r_fraction(0.850000)
+      c_fraction(0.050000)
+      max_h_level(3.000000)
+      hlevels(0)
+      elapsed-time: 0.001561 seconds.
