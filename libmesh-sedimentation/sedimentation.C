@@ -101,13 +101,14 @@ bool is_file_exist(const char *fileName)
 // since it was designed to be run only with real numbers.
 int main (int argc, char** argv)
 {
-  #ifdef PROV
-    Provenance prov;
-  #endif
   int simulationID = 1;
 
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
+
+  #ifdef PROV
+    Provenance prov;
+  #endif
 
   PerfLog perf_log("Sedimentation Solver");
 
