@@ -364,6 +364,7 @@ int main (int argc, char** argv)
   // Loop in time steps
   int numberIterationsFluid = 0;
   int numberIterationsSediments = 0;
+  int numberIterationsMeshRefinements = 0;
   for (t_step = init_tstep; (t_step < n_time_steps)&&( time < tmax); t_step++)
   {
       if(is_file_exist("abort.run")) break;
@@ -671,6 +672,7 @@ int main (int argc, char** argv)
           if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) )
           {
             std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
+            numberIterationsMeshRefinements++;
             int beforeNActiveElem = mesh.n_active_elem();
             std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
             Real H1norm = transport_system.calculate_norm(*transport_system.solution, SystemNorm(H1));
@@ -683,10 +685,10 @@ int main (int argc, char** argv)
             redo_nl = true;
             std::cout << "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
 
-#ifdef PROV
-  // Mesh Refinement
-  prov.outputMeshRefinement(simulationID,first_step_refinement,beforeNActiveElem,mesh.n_active_elem());
-#endif
+            #ifdef PROV
+              // Mesh Refinement
+              prov.outputMeshRefinement(simulationID,numberIterationsMeshRefinements,first_step_refinement,beforeNActiveElem,mesh.n_active_elem());
+            #endif
 
             first_step_refinement = false;
          }

@@ -299,6 +299,7 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int subTaskID, in
 	file.open(directory + "/log/4.solver-simulation-fluid.prov", ios_base::app);
 	file << "PROV:SolverSimulationFluid:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
+	    space << "subTaskID(" + to_string(subTaskID) + ")" << endl <<
 	    space << "time_step(" + to_string(time_step) + ")" << endl <<
 	    space << "time(" + to_string(time) + ")" << endl <<
 	    space << "linear_step(" + to_string(linear_step) + ")" << endl <<
@@ -369,6 +370,7 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID
 	file.open(directory + "/log/5.solver-simulation-sediments.prov", ios_base::app);
 	file << "PROV:SolverSimulationSediments:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
+	    space << "subTaskID(" + to_string(subTaskID) + ")" << endl <<
 	    space << "time_step(" + to_string(time_step) + ")" << endl <<
 	    space << "time(" + to_string(time) + ")" << endl <<
 	    space << "linear_step(" + to_string(linear_step) + ")" << endl <<
@@ -383,7 +385,7 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID
   	file.close();
 }
 
-void Provenance::outputMeshRefinement(int simulationID, bool first_step_refinement, int before_n_active_elem, int after_n_active_elem){
+void Provenance::outputMeshRefinement(int simulationID, int subTaskID, bool first_step_refinement, int before_n_active_elem, int after_n_active_elem){
 	if(processor_id != 0) return; 
 	
 	clock_t begin = clock();
@@ -393,12 +395,14 @@ void Provenance::outputMeshRefinement(int simulationID, bool first_step_refineme
 	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
 		+ to_string(simulationID) 
 		+ " -workspace " + directory + " -status FINISHED"
+		+ " -subid " + to_string(subTaskID)
 		+ " -dependencies [{solverSimulationSediments},{" + to_string(simulationID) + "}]";
 	system(strdup(str.c_str()));
 
 	// input element
 	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshRefinement -id "
 	+  to_string(simulationID) 
+	+ " -subid " + to_string(subTaskID)
 	+ " -set omeshrefinement -element [{'" 
 	+ to_string(simulationID) + ";"
 	+ to_string(first_step_refinement) + ";"
@@ -408,7 +412,7 @@ void Provenance::outputMeshRefinement(int simulationID, bool first_step_refineme
 	system(strdup(str.c_str()));
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation meshRefinement " + to_string(simulationID);
+	str = pgCommandLine + "-ingest -task sedimentation meshRefinement " + to_string(simulationID) + " " + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
 	clock_t end = clock();
@@ -418,6 +422,7 @@ void Provenance::outputMeshRefinement(int simulationID, bool first_step_refineme
 	file.open(directory + "/log/6.mesh-refinement.prov", ios_base::app);
 	file << "PROV:MeshRefinement:Output" << endl << 
 	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
+	    space << "subTaskID(" + to_string(subTaskID) + ")" << endl <<
 	    space << "first_step_refinement(" + to_string(first_step_refinement) + ")" << endl << 
 	    space << "before_n_active_elem(" + to_string(before_n_active_elem) + ")" << endl <<
 	    space << "after_n_active_elem(" + to_string(after_n_active_elem) + ")" << endl;
