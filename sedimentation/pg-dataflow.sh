@@ -1,7 +1,7 @@
 rm -rf prov/di/*
 rm -rf prov/pg/*
 
-PGDIR=/shared/experiment/libmesh-sedimentation
+PGDIR=/experiment/libmesh-sedimentation
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode
@@ -117,9 +117,10 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshRef
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name first_step_refinement -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name before_n_active_elem -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name after_n_active_elem -type numeric
 
 echo "Dataflow ingestion"
 java -jar ../dfa/PG-1.0.jar -ingest -dataflow sedimentation
 
 cp prov/pg/sedimentation/dataflow.json .
-

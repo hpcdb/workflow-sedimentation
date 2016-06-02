@@ -18,12 +18,12 @@ zmax =  2.0
 
 
 # refinement parameters
-hlevels     = 0
-max_r_steps = 1
+hlevels     = 4
+max_r_steps = 4
 r_fraction  = 0.85
 c_fraction  = 0.05
 max_h_level = 3
-r_interval  = 10
+r_interval  = 3
 
 
 #----------------------------------------------------

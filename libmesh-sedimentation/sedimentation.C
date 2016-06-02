@@ -101,6 +101,9 @@ bool is_file_exist(const char *fileName)
 // since it was designed to be run only with real numbers.
 int main (int argc, char** argv)
 {
+  #ifdef PROV
+    Provenance prov;
+  #endif
   int simulationID = 1;
 
   // Initialize libMesh.
@@ -127,11 +130,11 @@ int main (int argc, char** argv)
   double zmax = infile("zmax", 1.0);
   int ref_interval = infile("r_interval" , 1);
 
-#ifdef PROV
-  // Mesh Generation
-  Provenance prov;
-  prov.inputMeshGeneration(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
-#endif
+  #ifdef PROV
+    // Mesh Generation
+    prov.inputMeshGeneration(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
+  #endif
+
   // Create a mesh object, with dimension to be overridden later,
   // distributed across the default MPI communicator.
   Mesh mesh(init.comm());
@@ -141,22 +144,14 @@ int main (int argc, char** argv)
   double max_h_level = infile("max_h_level", 1);
   const unsigned int hlevels = infile("hlevels" , 0);
 
-#ifdef PROV
-  // Mesh Refinement
-  prov.outputMeshGeneration(simulationID,r_fraction,c_fraction,max_h_level,hlevels);
-#endif
   MeshRefinement refinement(mesh);
 
   refinement.refine_fraction()  = r_fraction;
   refinement.coarsen_fraction() = c_fraction;
   refinement.max_h_level()      = max_h_level;
 
-  bool first_step_refinement = false;
+  bool first_step_refinement = true;
 
-// #ifdef PROV
-//   // Create Equation Systems
-//   prov.outputMeshRefinement(simulationID,first_step_refinement);
-// #endif
 // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
@@ -205,10 +200,6 @@ int main (int argc, char** argv)
   equation_systems.parameters.set<Real> ("c_factor")    = c_factor;
   ////
 
-#ifdef PROV
-  // Generate solver parameters
-  prov.outputCreateEquationSystems(simulationID,Reynolds,Gr,Sc,Us,Diffusivity,xlock,alfa,theta,ex,ey,ez,c_factor);
-#endif
   // LOOP 
   Real init_time = 0.0;
 
@@ -225,11 +216,6 @@ int main (int argc, char** argv)
 
   const unsigned int write_interval     = infile("write_interval", 10 );
   std::string rname                     = infile("output", "out_");
-
-#ifdef PROV
-  // Generate loop iterations
-  prov.outputGetMaximumIterations(simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval);
-#endif
 
 #ifdef XDMF_
   XDMF_IO xdmf_writer(mesh, rname);
@@ -263,8 +249,18 @@ int main (int argc, char** argv)
      moving_mesh.setup();
 #endif
 
+      #ifdef PROV
+        // Mesh Refinement
+        prov.outputMeshGeneration(simulationID,r_fraction,c_fraction,max_h_level,hlevels);
+      #endif
+
      // Initialize the data structures for the equation system.
      equation_systems.init ();
+
+      #ifdef PROV
+        // Generate solver parameters
+        prov.outputCreateEquationSystems(simulationID,Reynolds,Gr,Sc,Us,Diffusivity,xlock,alfa,theta,ex,ey,ez,c_factor);
+      #endif
 
   } else
   {
@@ -280,6 +276,12 @@ int main (int argc, char** argv)
 #endif
 
       mesh.read(mesh_restart);
+
+      #ifdef PROV
+        // Mesh Refinement
+        prov.outputMeshGeneration(simulationID,r_fraction,c_fraction,max_h_level,hlevels);
+      #endif
+
       equation_systems.read(solution_restart, READ);
 
       // Get a reference to the Convection-Diffusion system object.
@@ -300,6 +302,11 @@ int main (int argc, char** argv)
      deposition_system.add_vector("deposition_rate");
 
      deposition_system.update();
+
+      #ifdef PROV
+        // Generate solver parameters
+        prov.outputCreateEquationSystems(simulationID,Reynolds,Gr,Sc,Us,Diffusivity,xlock,alfa,theta,ex,ey,ez,c_factor);
+      #endif
 
   }
 
@@ -346,6 +353,11 @@ int main (int argc, char** argv)
   unsigned int n_nonlinear_iterations_transport = 0;
   unsigned int n_linear_iterations_transport    = 0;
   bool redo_nl;
+
+  #ifdef PROV
+    // Generate loop iterations
+    prov.outputGetMaximumIterations(simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval);
+  #endif
 
 // STEP LOOP
   // Loop in time steps
@@ -493,10 +505,10 @@ int main (int argc, char** argv)
 
               bool converged = (norm_delta < nonlinear_tolerance);
 
-#ifdef PROV
-// Fluids
-prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-#endif
+              #ifdef PROV
+              // Fluids
+              prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+              #endif
 
               //Total number of non-linear iterations (so far)
               n_nonlinear_iterations_flow++;
@@ -617,10 +629,10 @@ prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,trans
                 bool converged = (norm_delta < nonlinear_tolerance) &&
                   (transport_system.final_linear_residual() < nonlinear_tolerance);
 
-#ifdef PROV
-// Sediments
-prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-#endif
+              #ifdef PROV
+                // Sediments
+                prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+              #endif
 
               //Total number of non-linear iterations (so far)
               n_nonlinear_iterations_transport++;
@@ -657,7 +669,8 @@ prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_st
 
           if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) )
           {
-            std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
+            std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
+            int beforeNActiveElem = mesh.n_active_elem();
             std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
             Real H1norm = transport_system.calculate_norm(*transport_system.solution, SystemNorm(H1));
             ErrorVector error;
@@ -667,10 +680,14 @@ prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_st
             refinement.refine_and_coarsen_elements();
             equation_systems.reinit ();
             redo_nl = true;
-            first_step_refinement = false;
-            
-            std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
+            std::cout << "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
 
+#ifdef PROV
+  // Mesh Refinement
+  prov.outputMeshRefinement(simulationID,first_step_refinement,beforeNActiveElem,mesh.n_active_elem());
+#endif
+
+            first_step_refinement = false;
          }
       }
 

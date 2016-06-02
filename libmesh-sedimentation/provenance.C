@@ -64,7 +64,7 @@ string pgCommandLine = "";
 Provenance::Provenance(){
 	GetPot infile("provenance.in");
 	directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/example/prov");
-	string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar ");
+	string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar");
 	pgCommandLine = "java -jar " + pgFilePath + " ";
 }
 
@@ -114,8 +114,7 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
 	    space << "xmax(" + to_string(xmax) + ")" << endl <<
 	    space << "ymax(" + to_string(ymax) + ")" << endl <<
 	    space << "zmax(" + to_string(zmax) + ")" << endl <<
-	    space << "ref_interval(" + to_string(ref_interval) + ")" << endl <<
-	    space << "xmax(" + to_string(xmax) + ")" << endl;
+	    space << "ref_interval(" + to_string(ref_interval) + ")" << endl;
 
 	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
 	file.close();
@@ -141,13 +140,6 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 	str = pgCommandLine + "-ingest -task sedimentation meshGeneration " + to_string(simulationID);
 	system(strdup(str.c_str()));
 
-	// mesh refinement
-	// str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
-	// 	+ to_string(simulationID) 
-	// 	+ " -workspace " + directory + " -status FINISHED"
-	// 	+ " -dependencies [{meshGeneration},{" + to_string(simulationID) + "}]";
-	// system(strdup(str.c_str()));
-
 	// create equation systems
 	str = pgCommandLine + "-task -dataflow sedimentation -transformation createEquationSystems -id " 
 		+ to_string(simulationID) 
@@ -166,43 +158,6 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 	    space << "c_fraction(" + to_string(c_fraction) + ")" << endl <<
 	    space << "max_h_level(" + to_string(max_h_level) + ")" << endl <<
 	    space << "hlevels(" + to_string(hlevels) + ")" << endl;
-
-	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
-	file.close();
-}
-
-void Provenance::outputMeshRefinement(int simulationID, bool first_step_refinement){
-	clock_t begin = clock();
-
-	// run PG
-	// mesh refinement
-	string str = pgCommandLine + "-element -dataflow sedimentation -transformation meshRefinement -id "
-	+  to_string(simulationID) 
-	+ " -set omeshrefinement -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ to_string(first_step_refinement)
-	+ "'}]";
-	system(strdup(str.c_str()));
-
-	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation meshRefinement " + to_string(simulationID);
-	system(strdup(str.c_str()));
-
-	// create equation systems
-	str = pgCommandLine + "-task -dataflow sedimentation -transformation createEquationSystems -id " 
-		+ to_string(simulationID) 
-		+ " -workspace " + directory + " -status FINISHED"
-		+ " -dependencies [{meshRefinement},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
-
-	clock_t end = clock();
-  	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
-
-	ofstream file;
-	file.open(directory + "/log/2.mesh-refinement.prov", ios_base::app);
-	file << "PROV:MeshRefinement:Output" << endl << 
-	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
-	    space << "first_step_refinement(" + to_string(first_step_refinement) + ")" << endl;
 
 	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
 	file.close();
@@ -446,6 +401,47 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID
 
   	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
   	file.close();
+}
+
+void Provenance::outputMeshRefinement(int simulationID, bool first_step_refinement, int before_n_active_elem, int after_n_active_elem){
+	clock_t begin = clock();
+
+	// run PG
+	// mesh refinement
+	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
+		+ to_string(simulationID) 
+		+ " -workspace " + directory + " -status FINISHED"
+		+ " -dependencies [{solverSimulationSediments},{" + to_string(simulationID) + "}]";
+	system(strdup(str.c_str()));
+
+	// input element
+	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshRefinement -id "
+	+  to_string(simulationID) 
+	+ " -set omeshrefinement -element [{'" 
+	+ to_string(simulationID) + ";"
+	+ to_string(first_step_refinement) + ";"
+	+ to_string(before_n_active_elem) + ";"
+	+ to_string(after_n_active_elem)
+	+ "'}]";
+	system(strdup(str.c_str()));
+
+	// ingest
+	str = pgCommandLine + "-ingest -task sedimentation meshRefinement " + to_string(simulationID);
+	system(strdup(str.c_str()));
+
+	clock_t end = clock();
+  	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
+
+	ofstream file;
+	file.open(directory + "/log/6.mesh-refinement.prov", ios_base::app);
+	file << "PROV:MeshRefinement:Output" << endl << 
+	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
+	    space << "first_step_refinement(" + to_string(first_step_refinement) + ")" << endl << 
+	    space << "before_n_active_elem(" + to_string(before_n_active_elem) + ")" << endl <<
+	    space << "after_n_active_elem(" + to_string(after_n_active_elem) + ")" << endl;
+
+	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::finishDataIngestor(){
