@@ -49,7 +49,7 @@
 // The definition of a geometric element
 #include "libmesh/elem.h"
 
-//#define XDMF_
+#define XDMF_
 
 #include "xdmf.h"
 
@@ -216,7 +216,7 @@ int main (int argc, char** argv)
   int max_r_steps  = infile("max_r_steps" , 1);
 
   const unsigned int write_interval     = infile("write_interval", 10 );
-  std::string rname                     = infile("output", "out_");
+  std::string rname                     = infile("output", "out");
 
 #ifdef XDMF_
   XDMF_IO xdmf_writer(mesh, rname);

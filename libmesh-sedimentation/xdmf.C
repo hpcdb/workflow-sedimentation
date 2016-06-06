@@ -141,12 +141,28 @@ void XDMF_IO::write_timestep(EquationSystems& es, double time)
 void XDMF_IO::write_spatial_collection(double time)
 {
 
+  int data[2];
+  int * local_data = new int [2*this->n_processors];
+
+  data[0] = this->_n_local_nodes;
+  data[1] = this->_n_local_elem;
+  MPI_Gather(data, 2, MPI_INT, local_data, 2, MPI_INT, 0, MPI_COMM_WORLD);
 
     if(processor_id == 0)
     {
         char filename[255];
         string elem_name;
         int nnoel = 0;
+        if(this->_elemtype == TRI3)
+        {
+          elem_name= "Triangle";
+          nnoel = 3;
+        }
+        else if(this->_elemtype == QUAD4)
+        {
+          elem_name= "Quadrilateral";
+          nnoel = 4;
+        }
         if(this->_elemtype == HEX8) {
              elem_name= "Hexahedron";
              nnoel = 8;
@@ -167,24 +183,27 @@ void XDMF_IO::write_spatial_collection(double time)
         fprintf(fxml,"  <Time Type=\"Single\" Value=\"%f\" />\n", time);
         for(int p=0; p < n_processors; p++)
         {
+            int lnnodes = local_data[p*2];
+            int lnelem  = local_data[p*2+1];
+
             fprintf(fxml," <Grid Name=\"%s_%d_%03d\" Type=\"Uniform\"> \n",this->_basename.c_str(), n_processors, p);
-            fprintf(fxml,"  <Topology Type=\"%s\" NumberOfElements=\"%d\">\n",elem_name.c_str(),this->_n_local_elem);
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Int\" Format=\"HDF\"> %s_%d_%03d_%05d.h5:/conn</DataItem>\n",this->_n_local_elem*nnoel,this->_basename.c_str(),n_processors,p,this->_timestep);
+            fprintf(fxml,"  <Topology Type=\"%s\" NumberOfElements=\"%d\">\n",elem_name.c_str(),lnelem);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Int\" Format=\"HDF\"> %s_%d_%03d_%05d.h5:/conn</DataItem>\n",lnnodes*nnoel,this->_basename.c_str(),n_processors,p,this->_timestep);
             fprintf(fxml,"  </Topology>\n");
             fprintf(fxml,"  <Geometry Type=\"XYZ\">\n");
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/coords</DataItem>\n",this->_n_local_nodes*3,this->_basename.c_str(),n_processors,p,this->_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/coords</DataItem>\n",lnnodes*3,this->_basename.c_str(),n_processors,p,this->_timestep);
             fprintf(fxml,"  </Geometry>\n");
             fprintf(fxml,"  <Attribute Name=\"velocity\" AttributeType=\"Vector\" Center=\"Node\">\n");
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/velocity</DataItem>\n",this->_n_local_nodes*3,this->_basename.c_str(),n_processors,p,this->_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/velocity</DataItem>\n",lnnodes*3,this->_basename.c_str(),n_processors,p,this->_timestep);
             fprintf(fxml,"  </Attribute>\n");
             fprintf(fxml,"  <Attribute Name=\"pressure\" AttributeType=\"Scalar\" Center=\"Node\">\n");
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/pressure</DataItem>\n",this->_n_local_nodes,this->_basename.c_str(),n_processors,p,this->_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/pressure</DataItem>\n",lnnodes,this->_basename.c_str(),n_processors,p,this->_timestep);
             fprintf(fxml,"  </Attribute>\n");
             fprintf(fxml,"  <Attribute Name=\"sediment\" AttributeType=\"Scalar\" Center=\"Node\">\n");
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/sediment</DataItem>\n",this->_n_local_nodes,this->_basename.c_str(),n_processors,p,this->_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/sediment</DataItem>\n",lnnodes,this->_basename.c_str(),n_processors,p,this->_timestep);
             fprintf(fxml,"  </Attribute>\n");
             fprintf(fxml,"  <Attribute Name=\"volume\" AttributeType=\"Scalar\" Center=\"Node\">\n");
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/volume</DataItem>\n",this->_n_local_nodes,this->_basename.c_str(),n_processors,p,this->_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/volume</DataItem>\n",lnnodes,this->_basename.c_str(),n_processors,p,this->_timestep);
             fprintf(fxml,"  </Attribute>\n");
             fprintf(fxml,"  </Grid>\n");
         }
@@ -192,6 +211,8 @@ void XDMF_IO::write_spatial_collection(double time)
         fprintf(fxml,"</Domain>\n");
         fprintf(fxml,"</Xdmf>\n");
         fclose(fxml);
+
+        delete [] local_data;
     }
 }
 
@@ -221,9 +242,11 @@ void XDMF_IO::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &con
 {
     node_map.clear();
     unsigned int local_node_counter = 0;
+
+    /*
     MeshBase::const_node_iterator nd = _mesh.local_nodes_begin();
     MeshBase::const_node_iterator nd_end = _mesh.local_nodes_end();
-    for (; nd != nd_end; nd++, ++local_node_counter)
+    for (; nd != nd_end; nd++)
     {
         Node* node = (*nd);
          // Fill mapping between global and local node numbers
@@ -234,22 +257,32 @@ void XDMF_IO::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &con
         coords.push_back(x);
         coords.push_back(y);
         coords.push_back(z);
+        local_node_counter++;
     }
+    */
 
     MeshBase::const_element_iterator       it      = _mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end = _mesh.active_local_elements_end();
+    const MeshBase::const_element_iterator end     = _mesh.active_local_elements_end();
 
     unsigned active_element_counter = 0;
-    for (; it != end; ++it, ++active_element_counter)
+
+    for (; it != end; ++it)
     {
         Elem *elem = *it;
-        libmesh_assert(elem->type() == TET4 || elem->type() == HEX8);
+        libmesh_assert(elem->type() == TRI3 || elem->type() == QUAD4 ||
+                       elem->type() == TET4 || elem->type() == HEX8) ;
 
-        if(active_element_counter == 0 ) this->_elemtype = elem->type();
-         for (unsigned int i=0; i<elem->n_nodes(); ++i)
-         {
+        if(active_element_counter == 0 )
+            this->_elemtype = elem->type();
+
+        for (unsigned int i=0; i<elem->n_nodes(); ++i)
+        {
               dof_id_type global_node_id = elem->node(i);
-              if (node_map.find(global_node_id) == node_map.end() ) {
+
+              // this node does not mapping yet.
+              // Include into node map
+              if (node_map.find(global_node_id) == node_map.end() )
+              {
 
                    const Node* node = _mesh.node_ptr(global_node_id);
 
@@ -264,19 +297,23 @@ void XDMF_IO::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &con
                     coords.push_back(y);
                     coords.push_back(z);
 
-                    node_map[global_node_id] = local_node_counter;
-
+                    node_map.insert(std::pair<dof_id_type, dof_id_type>(global_node_id, local_node_counter));
+                    //node_map[global_node_id] = local_node_counter;
                     local_node_counter++;
               }
 
               conn.push_back(node_map[elem->node(i)]);
+
          }
-
-
+         active_element_counter++;
     }
 
     this->_n_local_elem  = active_element_counter;
     this->_n_local_nodes = local_node_counter;
+
+    //printf("n_local_nodes = %d\n", this->_n_local_nodes);
+    //printf("n_local_elem  = %d\n", this->_n_local_elem );
+
 
 }
 
@@ -396,9 +433,10 @@ void XDMF_IO::GetLocalNavierStokesSolution(EquationSystems& es, std::vector<doub
     es.get_system<TransientLinearImplicitSystem> ("flow");
 
   // Numeric ids corresponding to each variable in the system
+  unsigned int w_var;
   const unsigned int u_var = navier_stokes_system.variable_number ("u");
   const unsigned int v_var = navier_stokes_system.variable_number ("v");
-  const unsigned int w_var = navier_stokes_system.variable_number ("w");
+  if(dim > 2) w_var = navier_stokes_system.variable_number ("w");
   const unsigned int p_var = navier_stokes_system.variable_number ("p");
   DofMap & dof_map   = navier_stokes_system.get_dof_map();
 
@@ -418,16 +456,15 @@ void XDMF_IO::GetLocalNavierStokesSolution(EquationSystems& es, std::vector<doub
 
       dof_map.dof_indices (elem, dof_indices_u, u_var);
       dof_map.dof_indices (elem, dof_indices_v, v_var);
-      dof_map.dof_indices (elem, dof_indices_w, w_var);
+      if(dim>2) dof_map.dof_indices (elem, dof_indices_w, w_var);
       dof_map.dof_indices (elem, dof_indices_p, p_var);
-
 
       for(int i=0; i < elem->n_nodes(); i++)
       {
-          int local_id = node_map[elem->node(i)];//g2l[elem->node(i)];
+          int local_id           = node_map[elem->node(i)];//g2l[elem->node(i)];
           velocity[local_id*3]   = navier_stokes_system.current_solution(dof_indices_u[i]);
           velocity[local_id*3+1] = navier_stokes_system.current_solution(dof_indices_v[i]);
-          velocity[local_id*3+2] = navier_stokes_system.current_solution(dof_indices_w[i]);
+          velocity[local_id*3+2] = (dim>2)?navier_stokes_system.current_solution(dof_indices_w[i]):0.0;
           pressure[local_id]     = navier_stokes_system.current_solution(dof_indices_p[i]);
       }
     }
@@ -480,7 +517,7 @@ void XDMF_IO::GetLocalNavierStokesSolution(EquationSystems& es, std::vector<doub
       for(int i=0; i < elem->n_nodes(); i++)
       {
           //int local_id = g2l[elem->node(i)];
-          int local_id = node_map[elem->node(i)];
+          int local_id          = node_map[elem->node(i)];
           sediment[local_id]    = system.current_solution(dof_indices_s[i]);
           volume[local_id]      = deposition_system.current_solution(dof_indices_d[i]);
       }
