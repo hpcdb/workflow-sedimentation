@@ -1,7 +1,7 @@
 rm -rf prov/di/*
 rm -rf prov/pg/*
 
-PGDIR=/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
+PGDIR=/experiment/libmesh-sedimentation
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode

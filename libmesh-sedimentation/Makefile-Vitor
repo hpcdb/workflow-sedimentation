@@ -1,7 +1,7 @@
 ######################################################################
 #
 # Template libMesh application Makefile
-LIBMESH_DIR ?=/programs/libmesh/build
+LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh-git/build
 # METHOD = dbg
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
