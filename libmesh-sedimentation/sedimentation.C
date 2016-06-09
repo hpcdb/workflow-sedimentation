@@ -458,6 +458,11 @@ int main (int argc, char** argv)
             // FLOW NONLINEAR LOOP
             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
             {
+              #ifdef PROV
+              // Fluids
+              prov.inputSolverSimulationFluid(simulationID,numberIterationsFluid);
+              #endif
+
               numberIterationsFluid++;
               // Update the nonlinear solution.
               flow_last_nonlinear_soln->zero();
@@ -581,6 +586,11 @@ int main (int argc, char** argv)
             // FLOW NON-LINEAR LOOP
             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
             {
+              #ifdef PROV
+              // Fluids
+              prov.inputSolverSimulationSediments(simulationID,numberIterationsSediments);
+              #endif
+
               numberIterationsSediments++;
               // Update the nonlinear solution.
               sed_last_nonlinear_soln->zero();
