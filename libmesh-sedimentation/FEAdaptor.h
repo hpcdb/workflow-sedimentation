@@ -8,7 +8,7 @@
 #ifndef FEADAPTOR_H
 #define	FEADAPTOR_H
 
-// #define USE_CATALIST
+#define USE_CATALIST
 
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"

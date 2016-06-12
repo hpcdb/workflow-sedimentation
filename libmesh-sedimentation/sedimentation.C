@@ -38,7 +38,6 @@
 #include "libmesh/error_vector.h"
 #include "libmesh/kelly_error_estimator.h"
 
-
 // For systems of equations the \p DenseSubMatrix
 // and \p DenseSubVector provide convenient ways for
 // assembling the element matrix and vector on a
@@ -62,6 +61,7 @@ using namespace std;
 #include "sedimentation_deposition.h"
 #include "mesh_moviment.h"
 #include "provenance.h"
+#include "FEAdaptor.h"
 
 double ramp(double t)
 {
@@ -344,10 +344,15 @@ int main (int argc, char** argv)
     ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
     exodus_step++;
   }
-  
   //std::string exodus_filename = "output.e";
-  
 #endif
+
+  #ifdef USE_CATALIST
+      FEAdaptor::Initialize(argc,argv);
+      
+      FEAdaptor::CoProcess(equation_systems,0.0,0.0,false,false);
+  #endif    
+
   unsigned int t_step                           = 0;
   unsigned int n_linear_iterations_flow         = 0;
   unsigned int n_nonlinear_iterations_flow      = 0;
@@ -365,6 +370,7 @@ int main (int argc, char** argv)
   int numberIterationsFluid = 0;
   int numberIterationsSediments = 0;
   int numberIterationsMeshRefinements = 0;
+
   for (t_step = init_tstep; (t_step < n_time_steps)&&( time < tmax); t_step++)
   {
       if(is_file_exist("abort.run")) break;
@@ -512,11 +518,6 @@ int main (int argc, char** argv)
 
               bool converged = (norm_delta < nonlinear_tolerance);
 
-              #ifdef PROV
-              // Fluids
-              prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-              #endif
-
               //Total number of non-linear iterations (so far)
               n_nonlinear_iterations_flow++;
 
@@ -546,6 +547,11 @@ int main (int argc, char** argv)
               //Real flr2 = final_linear_residual*final_linear_residual;
               equation_systems.parameters.set<Real> ("linear solver tolerance") =
                 std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+
+              #ifdef PROV
+                // Fluids
+                prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+              #endif               
 
             } // end nonlinear loop
 
@@ -641,11 +647,6 @@ int main (int argc, char** argv)
                 bool converged = (norm_delta < nonlinear_tolerance) &&
                   (transport_system.final_linear_residual() < nonlinear_tolerance);
 
-              #ifdef PROV
-                // Sediments
-                prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-              #endif
-
               //Total number of non-linear iterations (so far)
               n_nonlinear_iterations_transport++;
 
@@ -675,6 +676,10 @@ int main (int argc, char** argv)
               equation_systems.parameters.set<Real> ("linear solver tolerance") =
                 std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
+              #ifdef PROV
+                // Sediments
+                prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+              #endif
           } // end nonlinear loop
 
           redo_nl = false;
@@ -761,6 +766,11 @@ int main (int argc, char** argv)
               exodus_step++;
             }
 #endif
+
+      #ifdef USE_CATALIST
+        FEAdaptor::CoProcess(equation_systems,transport_system.time,t_step,false,false);
+      #endif
+
         }
     }
 
@@ -780,11 +790,15 @@ int main (int argc, char** argv)
               exodus_step++;
             }
 #endif
-
     }
 
-    std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
-    std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
+  #ifdef USE_CATALIST
+    FEAdaptor::CoProcess(equation_systems, transport_system.time,t_step,true,false);
+    FEAdaptor::Finalize();       
+  #endif
+
+  std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
+  std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
 
   // All done.
   prov.finishDataIngestor();

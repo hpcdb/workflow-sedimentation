@@ -276,8 +276,8 @@ namespace FEAdaptor
       }
   }
 
-  void CoProcess(EquationSystems &eq, double time,
-                 unsigned int timeStep, bool lastTimeStep = false, bool using_amr = false)
+  void CoProcess(EquationSystems &eq, double time, unsigned int timeStep, 
+    bool lastTimeStep = false, bool using_amr = false)
   {
     //std::cout << "COPROCESSING BEGIN" << std::endl;
     
