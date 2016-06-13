@@ -522,7 +522,7 @@ void Provenance::outputMeshRefinement(int simulationID, int subTaskID, bool firs
 void Provenance::finishDataIngestor(){
 	if(processor_id != 0) return; 
 	
-	string str = "cp " + directory + "/../../dfa/finish.token " + directory + "/di/sedimentation";
+	string str = "cp ../dfa/finish.token prov/di/sedimentation";
 	system(strdup(str.c_str()));
 
 	cout << "[Provenance] Finish Data Ingestor" << endl;
