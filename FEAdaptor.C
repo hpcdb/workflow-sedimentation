@@ -4,8 +4,7 @@
 #include <map>
 #include "FEAdaptor.h"
 
-
-#ifdef USE_CATALIST
+// #ifdef USE_CATALYST
 
 #include <vtkCellData.h>
 #include <vtkCellType.h>

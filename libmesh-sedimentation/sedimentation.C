@@ -61,7 +61,7 @@ using namespace std;
 #include "sedimentation_deposition.h"
 #include "mesh_moviment.h"
 #include "provenance.h"
-#include "FEAdaptor.h"
+// #include "FEAdaptor.h"
 
 double ramp(double t)
 {
@@ -347,11 +347,11 @@ int main (int argc, char** argv)
   //std::string exodus_filename = "output.e";
 #endif
 
-  #ifdef USE_CATALIST
-      FEAdaptor::Initialize(argc,argv);
+  // #ifdef USE_CATALYST
+  //     FEAdaptor::Initialize(argc,argv);
       
-      FEAdaptor::CoProcess(equation_systems,0.0,0.0,false,false);
-  #endif    
+  //     FEAdaptor::CoProcess(equation_systems,0.0,0.0,false,false);
+  // #endif    
 
   unsigned int t_step                           = 0;
   unsigned int n_linear_iterations_flow         = 0;
@@ -767,9 +767,9 @@ int main (int argc, char** argv)
             }
 #endif
 
-      #ifdef USE_CATALIST
-        FEAdaptor::CoProcess(equation_systems,transport_system.time,t_step,false,false);
-      #endif
+      // #ifdef USE_CATALYST
+      //   FEAdaptor::CoProcess(equation_systems,transport_system.time,t_step,false,false);
+      // #endif
 
         }
     }
@@ -792,10 +792,10 @@ int main (int argc, char** argv)
 #endif
     }
 
-  #ifdef USE_CATALIST
-    FEAdaptor::CoProcess(equation_systems, transport_system.time,t_step,true,false);
-    FEAdaptor::Finalize();       
-  #endif
+  // #ifdef USE_CATALYST
+  //   FEAdaptor::CoProcess(equation_systems, transport_system.time,t_step,true,false);
+  //   FEAdaptor::Finalize();       
+  // #endif
 
   std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
   std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
