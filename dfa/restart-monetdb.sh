@@ -1,3 +1,4 @@
+#!/bin/bash
 monetdb-stop-db
 monetdb-destroy-db -f
 monetdb-generate-db 

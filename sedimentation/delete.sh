@@ -1,3 +1,4 @@
+#!/bin/bash
 # delete files from the previous execution
 rm restart.in
 rm out*

@@ -1,3 +1,4 @@
+#!/bin/bash
 clear
 # compile solver
 cd ../libmesh-sedimentation
