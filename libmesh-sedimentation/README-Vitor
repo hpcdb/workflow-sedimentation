@@ -4,31 +4,19 @@
 ./configure --prefix=/Users/vitor/Documents/Program_Installations/petsc-3.6.4/build --download-fblaslapack
 make PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4 PETSC_ARCH=arch-darwin-c-debug all
 make PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4 PETSC_ARCH=arch-darwin-c-debug install
-
 export PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4
-
 
 # libMesh - Installation
 ./configure --enable-parmesh --prefix=/Users/vitor/Documents/Program_Installations/libmesh/build --with-hdf5=/Users/vitor/Documents/Program_Installations/hdf5-1.8.9/hdf5 PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4
 make -j 2
 make install
 
-
-# ParaView
-#1. Installing MesaOS:
-#1.1: OSMesa Gallium llvmpipe state-tracker
+# OSMesa Gallium llvmpipe state-tracker
  ./configure     CXXFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     CFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     --disable-xvmc     --disable-glx     --disable-dri     --with-dri-drivers=""     --with-gallium-drivers="swrast"     --enable-texture-float --enable-gles2     --disable-egl     --with-egl-platforms=""     --enable-gallium-osmesa     --enable-gallium-llvm=yes   --prefix=/opt/libs/mesa
-
 make 
 make install
 
-#1.2: OSMesa Classic
-./configure     CXXFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     CFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     --disable-xvmc     --disable-glx     --disable-dri     --with-dri-drivers=""     --with-gallium-drivers=""     --enable-texture-float     --enable-gles2     --disable-egl     --with-egl-platforms=""     --enable-osmesa     --enable-gallium-llvm=no     --prefix=/opt/libs/mesa/classic
-
-make
-make install
-
-#2. Configuring Paraview
+# Paraview
 BUILD_SHARED_LIBS: ON
 PARAVIEW_ENABLE_PYTHON: ON
 PARAVIEW_USE_MPI: ON
@@ -57,7 +45,16 @@ export PETSC_DIR=/programs/petsc-3.7.1
 make -j 2
 make install
 
+# MesaOS
+ ./configure     CXXFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     CFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     --disable-xvmc     --disable-glx     --disable-dri     --with-dri-drivers=""     --with-gallium-drivers="swrast"     --enable-texture-float --enable-gles2     --disable-egl     --with-egl-platforms=""     --enable-gallium-osmesa     --enable-gallium-llvm=yes   --prefix=/opt/libs/mesa
+make
+make install
 
+# ParaView
+apt-get install libphonon-dev libphonon4 qt4-dev-tools libqt4-core libqt4-gui qt4-qmake libxt-dev g++ gcc cmake-curses-gui libqt4-opengl-dev mesa-common-dev openmpi-common openmpi-bin libopenmpi-dev python-dev openmpi-common openmpi-bin libopenmpi-dev
+cmake /programs/ParaView-v5.0.1-source -DBUILD_SHARED_LIBS=1 -DPARAVIEW_ENABLE_PYTHON=1 -DPARAVIEW_USE_MPI=1 -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_ENABLE_CATALYST=1 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=1 -DPARAVIEW_BUILD_QT_GUI=0 -DVTK_OPENGL_HAS_OSMESA=1 -DVTK_USE_X=0 -DOSMESA_INCLUDE_DIR=/programs/mesa-build/include -DOSMESA_LIBRARY=/programs/mesa-build/lib/libOSMesa.so -DVTK_USE_OFFSCREEN=1 -DCMAKE_INSTALL_PREFIX=/programs/paraview-install -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi -DOPENGL_INCLUDE_DIR= -DOPENGL_gl_LIBRARY= -DOPENGL_glu_LIBRARY= -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi
+make
+make install
 
 ==========================================================================
 # Stampede
