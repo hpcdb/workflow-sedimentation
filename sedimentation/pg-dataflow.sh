@@ -1,7 +1,7 @@
 rm -rf prov/di/*
 rm -rf prov/pg/*
 
-PGDIR=/experiment/libmesh-sedimentation
+PGDIR=/shared/experiment/libmesh-sedimentation
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode

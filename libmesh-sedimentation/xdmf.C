@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cstdio>
 #include <map>
+ #include <string>
 using namespace std;
 
 #include "xdmf.h"
@@ -91,9 +92,11 @@ XDMF_IO::XDMF_IO(const Mesh & mesh, std::string basename) : _mesh(mesh), _timest
 }
 
 
-void XDMF_IO::write_timestep(EquationSystems& es, double time)
+string* XDMF_IO::write_timestep(EquationSystems& es, double time)
 {
-    char filename[256];
+    char hdf5_filename[256];
+    char xdmf_filename[256];
+    string* files = new string[2];
     hid_t   file_id;
     herr_t  status;
 
@@ -116,11 +119,12 @@ void XDMF_IO::write_timestep(EquationSystems& es, double time)
 
     //cout << "coords size = " << coords.size() << endl;
 
-    sprintf(filename,"%s_%d_%03d_%05d.h5",this->_basename.c_str(),n_processors,processor_id, this->_timestep);
+    sprintf(hdf5_filename,"%s_%d_%03d_%05d.h5",this->_basename.c_str(),n_processors,processor_id, this->_timestep);
+    sprintf(xdmf_filename,"%s_%d_%05d.xmf", this->_basename.c_str(), n_processors,this->_timestep);
+    files[0] = hdf5_filename;
+    files[1] = xdmf_filename;
 
-
-
-    file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    file_id = H5Fcreate(hdf5_filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     H5_WriteInteger(file_id,"/conn",&conn[0],conn.size(),false);
     H5_WriteDouble(file_id,"/coords",&coords[0],coords.size(),false);
     H5_WriteDouble(file_id,"/velocity",&velocity[0],velocity.size(),false);
@@ -135,6 +139,8 @@ void XDMF_IO::write_timestep(EquationSystems& es, double time)
     write_temporal_collection();
 
     this->_timestep++;
+    
+    return files;
 }
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # solver execution
-time mpirun -np 2 ../libmesh-sedimentation/libmesh-sedimentation-opt
+time mpirun -np 2 ../libmesh-sedimentation/libmesh-sedimentation-opt teste.py
 #time ../libmesh-sedimentation/libmesh-sedimentation-opt
 # Calculate total elapsed time for provenance gathering
 cd prov/log

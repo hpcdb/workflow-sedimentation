@@ -8,8 +8,12 @@
 #ifndef XDMF_H
 #define	XDMF_H
 
+#include <string>
+
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh.h"
+
+using namespace std;
 
 namespace libMesh
 {
@@ -23,7 +27,7 @@ class XDMF_IO
 public:
     XDMF_IO(const Mesh& mesh, std::string basename);
     virtual ~XDMF_IO();
-    void write_timestep(EquationSystems &es, double time);
+    string* write_timestep(EquationSystems &es, double time);
     int GetFileID() { return _timestep; }
     void SetFileID(int id) {_timestep = id;}
 private:

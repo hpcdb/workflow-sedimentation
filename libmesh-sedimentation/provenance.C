@@ -220,7 +220,7 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds,Rea
 }
 
 void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, 
-	int max_linear_iters, int max_r_steps, unsigned int write_interval){
+	int max_linear_iters, int max_r_steps, unsigned int write_interval, string hdf5, string xdmf){
 	if(processor_id != 0) return; 
 	
 	clock_t begin = clock();
