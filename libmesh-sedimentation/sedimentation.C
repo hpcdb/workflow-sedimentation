@@ -705,7 +705,7 @@ int main (int argc, char** argv)
 
             #ifdef PROV
               // Mesh Refinement
-              prov.outputMeshRefinement(simulationID,numberIterationsMeshRefinements,first_step_refinement,beforeNActiveElem,mesh.n_active_elem());
+              prov.outputMeshRefinement(simulationID,numberIterationsMeshRefinements,first_step_refinement,t_step,beforeNActiveElem,mesh.n_active_elem());
             #endif
 
             first_step_refinement = false;
@@ -755,6 +755,11 @@ int main (int argc, char** argv)
 #endif
             fout.close();
 
+            #ifdef PROV
+              // Mesh Writer
+              prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
+            #endif
+
 #ifdef XDMF_
            current_files = xdmf_writer.write_timestep(equation_systems, time);
            cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
@@ -771,6 +776,11 @@ int main (int argc, char** argv)
             }
 #endif
 
+            #ifdef PROV
+              // Mesh Writer
+              prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_n_processors(),libMesh::global_processor_id());
+            #endif
+
         #ifdef USE_CATALYST
           FEAdaptor::CoProcess(equation_systems,transport_system.time,t_step,false,false);
         #endif
@@ -781,10 +791,20 @@ int main (int argc, char** argv)
     if (t_step%write_interval != 0)
     {
 
+      #ifdef PROV
+        // Mesh Writer
+        prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
+      #endif
+
 #ifdef XDMF_
           current_files = xdmf_writer.write_timestep(equation_systems, time);
           cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 #else
+
+      #ifdef PROV
+        // Mesh Writer
+        prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_n_processors(),libMesh::global_processor_id());
+      #endif
 //        ExodusII_IO exo(mesh);
 //        exo.append(true);
 //        exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);

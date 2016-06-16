@@ -31,7 +31,9 @@ class Provenance
       void outputSolverSimulationFluid(int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
   		void inputSolverSimulationSediments(int simulationID, int subTaskID);
       void outputSolverSimulationSediments(int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
-      void outputMeshRefinement(int simulationID, int subTaskID, bool first_step_refinement, int before_n_active_elem, int after_n_active_elem);
+      void outputMeshRefinement(int simulationID, int subTaskID, bool first_step_refinement, int time_step, int before_n_active_elem, int after_n_active_elem);
+      void inputMeshWriter(int simulationID, int subTaskID);
+      void outputMeshWriter(int simulationID, int subTaskID, int time_step, string hdf5, string xdmf, int n_processors, int processor_id);
       void finishDataIngestor();
     private:
       int processor_id;

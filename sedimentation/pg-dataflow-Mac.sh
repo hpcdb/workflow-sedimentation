@@ -119,8 +119,23 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshRef
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name first_step_refinement -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name t_step -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name before_n_active_elem -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshRefinement -set omeshrefinement -name after_n_active_elem -type numeric
+
+echo "Mesh Writer"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshWriter
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation meshWriter -name libmesh-sedimentation-opt::MeshWriter -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshWriter -tag omeshrefinement -type input -dependency meshRefinement
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshWriter -tag omeshwriter -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name hdf5 -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name xdmf -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name n_processors -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name processor_id -type numeric
 
 echo "Dataflow ingestion"
 java -jar ../dfa/PG-1.0.jar -ingest -dataflow sedimentation
