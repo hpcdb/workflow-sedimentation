@@ -133,6 +133,7 @@ CREATE TABLE file(
 CREATE TABLE performance(
 	id INTEGER DEFAULT NEXT VALUE FOR "performance_id_seq" NOT NULL,
 	task_id INTEGER NOT NULL,	
+	subtask_id INTEGER,	
 	method VARCHAR(30) NOT NULL,
 	description VARCHAR(200),
 	starttime VARCHAR(30) NOT NULL,
@@ -297,14 +298,18 @@ BEGIN
 END;
 
 -- DROP FUNCTION insertPerformance;
-CREATE FUNCTION insertPerformance (vtask_id INTEGER, vmethod VARCHAR(30), vdescription VARCHAR(200), vstarttime VARCHAR(30), venditme VARCHAR(30), vinvocation TEXT)
+CREATE FUNCTION insertPerformance (vtask_id INTEGER, vsubtask_id INTEGER, vmethod VARCHAR(30), vdescription VARCHAR(200), vstarttime VARCHAR(30), vendtime VARCHAR(30), vinvocation TEXT)
 RETURNS INTEGER
 BEGIN
 	DECLARE vid INTEGER;
-    SELECT id INTO vid FROM performance WHERE method=vmethod;
+    SELECT id INTO vid FROM performance WHERE method=vmethod and task_id=vtask_id and subtask_id=vsubtask_id;
     IF(vid IS NULL) THEN
     	SELECT NEXT VALUE FOR "performance_id_seq" into vid;
-    	INSERT INTO performance(id,task_id,method,description,starttime,endtime,invocation) VALUES (vid,vtask_id,vmethod,vdescription,vstarttime,venditme,vinvocation);
+    	INSERT INTO performance(id,task_id,subtask_id,method,description,starttime,endtime,invocation) VALUES (vid,vtask_id,vsubtask_id,vmethod,vdescription,vstarttime,vendtime,vinvocation);
+	ELSE
+    	UPDATE performance
+    	SET endtime = vendtime, invocation = vinvocation
+    	WHERE id = vid and endtime = 'null';
 	END IF;
 	RETURN vid;
 END;

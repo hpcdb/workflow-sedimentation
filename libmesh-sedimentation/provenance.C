@@ -113,7 +113,8 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshGeneration -task "
-	+  to_string(simulationID) ;
+	+  to_string(simulationID) 
+	+ " -computation libMeshSedimentation::MeshGeneration";
 	system(strdup(str.c_str()));
 
 	// ingest
@@ -176,7 +177,8 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds,Rea
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation createEquationSystems -task "
-	+  to_string(simulationID) ;
+	+  to_string(simulationID) 
+	+ " -computation libMeshSedimentation::createEquationSystems";
 	system(strdup(str.c_str()));
 
 	// ingest
@@ -245,7 +247,8 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation getMaximumIterations -task "
-	+  to_string(simulationID) ;
+	+  to_string(simulationID) 
+	+ " -computation libMeshSedimentation::GetMaximumIterations";
 	system(strdup(str.c_str()));
 
 	// ingest
@@ -289,7 +292,7 @@ void Provenance::inputSolverSimulationFluid(int simulationID, int subTaskID){
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation solverSimulationFluid -task "
-	+  to_string(simulationID) + " -subid " + to_string(subTaskID)
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
 	+ " -computation libMeshSedimentation::SolverSimulationFluid-" + to_string(simulationID) + "-" + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
@@ -321,6 +324,11 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int subTaskID, in
 	string str = pgCommandLine + "-task -dataflow sedimentation -transformation solverSimulationFluid -id " 
 		+ to_string(simulationID) + " -status FINISHED"
 		+ " -subid " + to_string(subTaskID);
+	system(strdup(str.c_str()));
+
+	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation solverSimulationFluid -task "
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
+	+ " -computation libMeshSedimentation::SolverSimulationFluid-" + to_string(simulationID) + "-" + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-element -dataflow sedimentation -transformation solverSimulationFluid -id "
@@ -400,7 +408,7 @@ void Provenance::inputSolverSimulationSediments(int simulationID, int subTaskID)
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation solverSimulationSediments -task "
-	+  to_string(simulationID) + " -subid " + to_string(subTaskID)
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
 	+ " -computation libMeshSedimentation::SolverSimulationSediments-" + to_string(simulationID) + "-" + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
@@ -435,7 +443,7 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation solverSimulationSediments -task "
-	+  to_string(simulationID) + " -subid " + to_string(subTaskID)
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
 	+ " -computation libMeshSedimentation::SolverSimulationSediments-" + to_string(simulationID) + "-" + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
@@ -496,6 +504,11 @@ void Provenance::outputMeshRefinement(int simulationID, int subTaskID, bool firs
 		+ " -dependencies [{solverSimulationSediments},{" + to_string(simulationID) + "}]";
 	system(strdup(str.c_str()));
 
+	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation meshRefinement -task "
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
+	+ " -computation libMeshSedimentation::MeshRefinement-" + to_string(simulationID) + "-" + to_string(subTaskID);
+	system(strdup(str.c_str()));
+
 	// input element
 	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshRefinement -id "
 	+  to_string(simulationID) 
@@ -507,6 +520,11 @@ void Provenance::outputMeshRefinement(int simulationID, int subTaskID, bool firs
 	+ to_string(before_n_active_elem) + ";"
 	+ to_string(after_n_active_elem)
 	+ "'}]";
+	system(strdup(str.c_str()));
+
+	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshRefinement -task "
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
+	+ " -computation libMeshSedimentation::MeshRefinement-" + to_string(simulationID) + "-" + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
 	// ingest
@@ -543,7 +561,7 @@ void Provenance::inputMeshWriter(int simulationID, int subTaskID){
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation meshWriter -task "
-	+  to_string(simulationID) + " -subid " + to_string(subTaskID)
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
 	+ " -computation libMeshSedimentation::MeshWriter-" + to_string(simulationID) + "-" + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
@@ -565,7 +583,7 @@ void Provenance::inputMeshWriter(int simulationID, int subTaskID){
   	return;
 }
 
-void Provenance::outputMeshWriter(int simulationID, int subTaskID, int time_step, string hdf5, string xdmf, int n_processors, int processor_id){
+void Provenance::outputMeshWriter(int simulationID, int subTaskID, int time_step, string hdf5, string xdmf, int processor_id){
 	clock_t begin = clock();
 
 	// pg
@@ -576,7 +594,7 @@ void Provenance::outputMeshWriter(int simulationID, int subTaskID, int time_step
 	system(strdup(str.c_str()));
 
 	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshWriter -task "
-	+  to_string(simulationID) + " -subid " + to_string(subTaskID)
+	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
 	+ " -computation libMeshSedimentation::MeshWriter-" + to_string(simulationID) + "-" + to_string(subTaskID);
 	system(strdup(str.c_str()));
 
@@ -588,7 +606,6 @@ void Provenance::outputMeshWriter(int simulationID, int subTaskID, int time_step
 	+ to_string(time_step) + ";"
 	+ hdf5 + ";"
 	+ xdmf + ";"
-	+ to_string(n_processors) + ";"
 	+ to_string(processor_id)
 	+ "'}]";
 	system(strdup(str.c_str()));
@@ -608,8 +625,55 @@ void Provenance::outputMeshWriter(int simulationID, int subTaskID, int time_step
 	    space << "time_step(" + to_string(time_step) + ")" << endl <<
 	    space << "hdf5(" + hdf5 + ")" << endl <<
 	    space << "xdmf(" + xdmf + ")" << endl <<
-	    space << "n_processors(" + to_string(n_processors) + ")" << endl <<
 	    space << "processor_id(" + to_string(processor_id) + ")" << endl;
+
+  	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
+  	file.close();
+}
+
+void Provenance::outputMeshAggregator(int simulationID, string xdmf, int n_processors){
+	if(processor_id != 0) return; 
+	clock_t begin = clock();
+
+	// pg
+	// solver simulation to the sediments
+	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshAggregator -id " 
+		+ to_string(simulationID) + " -status FINISHED"
+		+ " -dependencies [{meshWriter},{" + to_string(simulationID) + "}]";
+	system(strdup(str.c_str()));
+
+	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation meshAggregator -task "
+	+  to_string(simulationID)
+	+ " -computation libMeshSedimentation::MeshAggregator-" + to_string(simulationID);
+	system(strdup(str.c_str()));
+
+	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshAggregator -id "
+	+  to_string(simulationID) 
+	+ " -set omeshaggregator -element [{'" 
+	+ to_string(simulationID) + ";"
+	+ xdmf + ";"
+	+ to_string(n_processors)
+	+ "'}]";
+	system(strdup(str.c_str()));
+
+	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshAggregator -task "
+	+  to_string(simulationID)
+	+ " -computation libMeshSedimentation::MeshAggregator-" + to_string(simulationID);
+	system(strdup(str.c_str()));
+
+	// ingest
+	str = pgCommandLine + "-ingest -task sedimentation meshAggregator " + to_string(simulationID);
+	system(strdup(str.c_str()));
+
+	clock_t end = clock();
+  	double elapsed_secs = (double(end - begin) / CLOCKS_PER_SEC);
+
+	ofstream file;
+	file.open("prov/log/8.mesh-aggregator.prov", ios_base::app);
+	file << "PROV:MeshAggregator:Output" << endl << 
+	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
+	    space << "xdmf(" + xdmf + ")" << endl <<
+	    space << "n_processors(" + to_string(n_processors) + ")" << endl;
 
   	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
   	file.close();

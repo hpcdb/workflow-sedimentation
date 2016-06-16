@@ -23,5 +23,12 @@ STEP 5 - Solver Simulation to the Sediments
 
 STEP 6 - Mesh Refinements
 
-- output: simulationID, first_step_refinement, before_n_active_elem, after_n_active_elem
+- output: simulationID, first_step_refinement, t_step, before_n_active_elem, after_n_active_elem
 
+STEP 7 - Mesh Writer
+
+- output: simulationID, t_step, xdmf, hdf5, processor_id
+
+STEP 8 - Mesh Aggregator
+
+- output: simulationID, xdmf, n_processors

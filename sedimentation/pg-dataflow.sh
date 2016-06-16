@@ -134,10 +134,23 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation m
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name time_step -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name hdf5 -type text
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name xdmf -type text
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name n_processors -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name processor_id -type numeric
+
+echo "Mesh Aggregator"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshAggregator
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation meshAggregator -name libmesh-sedimentation-opt::MeshAggregator -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshAggregator -tag omeshwriter -type input -dependency meshWriter
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshAggregator -tag omeshaggregator -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name xdmf -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name n_processors -type numeric
 
 echo "Dataflow ingestion"
 java -jar ../dfa/PG-1.0.jar -ingest -dataflow sedimentation
 
 cp prov/pg/sedimentation/dataflow.json .
+
+
+

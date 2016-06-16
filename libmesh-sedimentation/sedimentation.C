@@ -467,12 +467,12 @@ int main (int argc, char** argv)
             // FLOW NONLINEAR LOOP
             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
             {
+              numberIterationsFluid++;
               #ifdef PROV
               // Fluids
               prov.inputSolverSimulationFluid(simulationID,numberIterationsFluid);
               #endif
 
-              numberIterationsFluid++;
               // Update the nonlinear solution.
               flow_last_nonlinear_soln->zero();
               flow_last_nonlinear_soln->add(*flow_system.solution);
@@ -524,6 +524,11 @@ int main (int argc, char** argv)
               //Total number of non-linear iterations (so far)
               n_nonlinear_iterations_flow++;
 
+              #ifdef PROV
+                // Fluids
+                prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+              #endif  
+
               // Terminate the solution iteration if the difference between
               // this nonlinear iterate and the last is sufficiently small, AND
               // if the most recent linear system was solved to a sufficient tolerance.
@@ -549,12 +554,7 @@ int main (int argc, char** argv)
               // is chosen (heuristically) as the square of the previous linear system residual norm.
               //Real flr2 = final_linear_residual*final_linear_residual;
               equation_systems.parameters.set<Real> ("linear solver tolerance") =
-                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-
-              #ifdef PROV
-                // Fluids
-                prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-              #endif               
+                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);             
 
             } // end nonlinear loop
 
@@ -595,12 +595,13 @@ int main (int argc, char** argv)
             // FLOW NON-LINEAR LOOP
             for (unsigned int l=0; l< n_nonlinear_steps; ++l)
             {
+              numberIterationsSediments++;
+              
               #ifdef PROV
               // Fluids
               prov.inputSolverSimulationSediments(simulationID,numberIterationsSediments);
               #endif
 
-              numberIterationsSediments++;
               // Update the nonlinear solution.
               sed_last_nonlinear_soln->zero();
               sed_last_nonlinear_soln->add(*transport_system.solution);
@@ -653,6 +654,11 @@ int main (int argc, char** argv)
               //Total number of non-linear iterations (so far)
               n_nonlinear_iterations_transport++;
 
+              #ifdef PROV
+                // Sediments
+                prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
+              #endif
+
               // Terminate the solution iteration if the difference between
               // this nonlinear iterate and the last is sufficiently small, AND
               // if the most recent linear system was solved to a sufficient tolerance.
@@ -671,18 +677,14 @@ int main (int argc, char** argv)
                   break;
                 }
 
-              // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-              // method, the linear solver tolerance needs to decrease as we get closer to
-              // the solution to ensure quadratic convergence.  The new linear solver tolerance
-              // is chosen (heuristically) as the square of the previous linear system residual norm.
-              //Real flr2 = final_linear_residual*final_linear_residual;
-              equation_systems.parameters.set<Real> ("linear solver tolerance") =
-                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+                // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+                // method, the linear solver tolerance needs to decrease as we get closer to
+                // the solution to ensure quadratic convergence.  The new linear solver tolerance
+                // is chosen (heuristically) as the square of the previous linear system residual norm.
+                //Real flr2 = final_linear_residual*final_linear_residual;
+                equation_systems.parameters.set<Real> ("linear solver tolerance") =
+                  std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
-              #ifdef PROV
-                // Sediments
-                prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-              #endif
           } // end nonlinear loop
 
           redo_nl = false;
@@ -778,7 +780,7 @@ int main (int argc, char** argv)
 
             #ifdef PROV
               // Mesh Writer
-              prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_n_processors(),libMesh::global_processor_id());
+              prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
             #endif
 
         #ifdef USE_CATALYST
@@ -803,7 +805,7 @@ int main (int argc, char** argv)
 
       #ifdef PROV
         // Mesh Writer
-        prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_n_processors(),libMesh::global_processor_id());
+        prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
       #endif
 //        ExodusII_IO exo(mesh);
 //        exo.append(true);
@@ -824,6 +826,13 @@ int main (int argc, char** argv)
 
   std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
   std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
+
+  #ifdef PROV
+    // Mesh Aggregator
+    char out_filename[256];
+    sprintf(out_filename,"%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
+    prov.outputMeshAggregator(simulationID,out_filename,libMesh::global_n_processors());
+  #endif
 
   // All done.
   prov.finishDataIngestor();
