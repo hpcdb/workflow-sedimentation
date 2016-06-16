@@ -1,2 +1,2 @@
-directory=/shared/experiment/sedimentation/prov
-pgFilePath=/shared/experiment/dfa/PG-1.0.jar
+directory=/experiment/sedimentation/prov
+pgFilePath=/experiment/dfa/PG-1.0.jar

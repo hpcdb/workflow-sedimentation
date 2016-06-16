@@ -238,7 +238,9 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
 	+ to_string(nonlinear_tolerance) + ";"
 	+ to_string(max_linear_iters) + ";"
 	+ to_string(max_r_steps) + ";"
-	+ to_string(write_interval)
+	+ to_string(write_interval) + ";"
+	+ hdf5 + ";"
+	+ xdmf
 	+ "'}]";
 	system(strdup(str.c_str()));
 
@@ -264,7 +266,9 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
 	    space << "nonlinear_tolerance(" + to_string(nonlinear_tolerance) + ")" << endl <<
 	    space << "max_linear_iters(" + to_string(max_linear_iters) + ")" << endl <<
 	    space << "max_r_steps(" + to_string(max_r_steps) + ")" << endl <<
-	    space << "write_interval(" + to_string(write_interval) + ")" << endl;
+	    space << "write_interval(" + to_string(write_interval) + ")" << endl <<
+	    space << "hdf5(" + hdf5 + ")" << endl <<
+	    space << "xdmf(" + xdmf + ")" << endl;
 
   	file << space << "elapsed-time: " << to_string(elapsed_secs) << " seconds." << endl;
 	file.close();
