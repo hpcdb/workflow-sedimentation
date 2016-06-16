@@ -1,7 +1,7 @@
 rm -rf prov/di/*
 rm -rf prov/pg/*
 
-PGDIR=/experiment/libmesh-sedimentation
+PGDIR=/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode
@@ -127,7 +127,7 @@ echo "Mesh Writer"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshWriter
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation meshWriter -name libmesh-sedimentation-opt::MeshWriter -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshWriter -tag omeshrefinement -type input -dependency meshRefinement
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshWriter -tag osolversimulationsediments -type input -dependency solverSimulationSediments
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshWriter -tag omeshwriter -type output
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name simulationID -type numeric

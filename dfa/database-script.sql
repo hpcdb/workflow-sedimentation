@@ -215,7 +215,12 @@ BEGIN
 		SELECT id INTO vid FROM data_dependency WHERE previous_dt_id = vdep_dt_id AND next_dt_id IS NULL;
 
 		IF(vid IS NULL) THEN
-			INSERT INTO data_dependency(id,previous_dt_id,next_dt_id,ds_id) VALUES (vdd_id,vdep_dt_id,vdt_id,vds_id);
+			IF(vdd_id IS NULL) THEN
+				DECLARE vdd_id INTEGER;
+				SELECT NEXT VALUE FOR "dd_id_seq" into vdd_id;
+
+				INSERT INTO data_dependency(id,previous_dt_id,next_dt_id,ds_id) VALUES (vdd_id,vdep_dt_id,vdt_id,vds_id);
+			END IF;
 		ELSE
 			UPDATE data_dependency SET next_dt_id = vdt_id WHERE id = vid;
 		END IF;
