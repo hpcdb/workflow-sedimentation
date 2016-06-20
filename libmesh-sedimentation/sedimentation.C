@@ -323,9 +323,9 @@ int main (int argc, char** argv)
   TransientLinearImplicitSystem & flow_system =
      equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
 
-#ifdef MESH_MOVIMENT
-  LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
-#endif
+  #ifdef MESH_MOVIMENT
+    LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
+  #endif
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
@@ -335,21 +335,19 @@ int main (int argc, char** argv)
 
   string* current_files;
 
-#ifdef XDMF_
-  current_files = xdmf_writer.write_timestep(equation_systems, time);
-  cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#else
-
-  int exodus_step = 0;
-  {
-
-    std::ostringstream out;
-    out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
-    ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
-    exodus_step++;
-  }
-  //std::string exodus_filename = "output.e";
-#endif
+  #ifdef XDMF_
+    current_files = xdmf_writer.write_timestep(equation_systems, time);
+    cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
+  #else
+    int exodus_step = 0;
+    {
+      std::ostringstream out;
+      out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
+      ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
+      exodus_step++;
+    }
+    //std::string exodus_filename = "output.e";
+  #endif
 
   #ifdef USE_CATALYST
        FEAdaptor::Initialize(argc,argv);      
@@ -737,38 +735,40 @@ int main (int argc, char** argv)
 
       // Output every 10 timesteps to file.
       if ((t_step+1)%write_interval == 0)
-        {
-            const std::string mesh_restart      = rname + "_mesh_restart.xda";
-            const std::string solution_restart  = rname + "_solution_restart.xda";
+      {
+          const std::string mesh_restart      = rname + "_mesh_restart.xda";
+          const std::string solution_restart  = rname + "_solution_restart.xda";
 
-            mesh.write(mesh_restart);
-            equation_systems.write(solution_restart, WRITE);
+          mesh.write(mesh_restart);
+          equation_systems.write(solution_restart, WRITE);
 
-            std::ofstream fout;
-            fout.open("restart.in");
-            fout << "#Restart file: "     << std::endl;
-            fout << "time = "             << time             << std::endl;
-            fout << "dt   = "             << dt               << std::endl;
-            fout << "init_tstep = "       << t_step           << std::endl;
-            fout << "mesh_restart = "     << mesh_restart     << std::endl;
-            fout << "solution_restart = " << solution_restart << std::endl;
-#ifdef XDMF_
+          std::ofstream fout;
+          fout.open("restart.in");
+          fout << "#Restart file: "     << std::endl;
+          fout << "time = "             << time             << std::endl;
+          fout << "dt   = "             << dt               << std::endl;
+          fout << "init_tstep = "       << t_step           << std::endl;
+          fout << "mesh_restart = "     << mesh_restart     << std::endl;
+          fout << "solution_restart = " << solution_restart << std::endl;
+          
+          #ifdef XDMF_
             fout << "xdmf_file_id = "     << xdmf_writer.GetFileID() << std::endl;
-#endif
-            fout.close();
+          #endif
+          
+          fout.close();
 
-            #ifdef PROV
-              // Mesh Writer
-              prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
-            #endif
+          #ifdef PROV
+            // Mesh Writer
+            prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
+          #endif
 
-#ifdef XDMF_
-           current_files = xdmf_writer.write_timestep(equation_systems, time);
-           cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#else
-           //ExodusII_IO exo(mesh);
-           //exo.append(true);
-           //exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+          #ifdef XDMF_
+            current_files = xdmf_writer.write_timestep(equation_systems, time);
+            cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
+          #else
+            //ExodusII_IO exo(mesh);
+            //exo.append(true);
+            //exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
 
             {
               std::ostringstream out;
@@ -776,18 +776,18 @@ int main (int argc, char** argv)
               ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
               exodus_step++;
             }
-#endif
+          #endif
 
-            #ifdef PROV
-              // Mesh Writer
-              prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
-            #endif
+          #ifdef PROV
+            // Mesh Writer
+            prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
+          #endif
 
-        #ifdef USE_CATALYST
-          FEAdaptor::CoProcess(equation_systems,transport_system.time,t_step,false,false);
-        #endif
+          #ifdef USE_CATALYST
+            FEAdaptor::CoProcess(equation_systems,transport_system.time,t_step,false,false);
+          #endif
 
-        }
+      }
     }
 
     if (t_step%write_interval != 0)
@@ -798,31 +798,31 @@ int main (int argc, char** argv)
         prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
       #endif
 
-#ifdef XDMF_
-          current_files = xdmf_writer.write_timestep(equation_systems, time);
-          cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#else
+      #ifdef XDMF_
+                current_files = xdmf_writer.write_timestep(equation_systems, time);
+                cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
+      #else
+      //        ExodusII_IO exo(mesh);
+      //        exo.append(true);
+      //        exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+                 {
+                    std::ostringstream out;
+                    out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
+                    ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
+                    exodus_step++;
+                  }
+      #endif
 
       #ifdef PROV
         // Mesh Writer
         prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
       #endif
-//        ExodusII_IO exo(mesh);
-//        exo.append(true);
-//        exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
-           {
-              std::ostringstream out;
-              out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
-              ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
-              exodus_step++;
-            }
-#endif
-    }
 
-    #ifdef USE_CATALYST
-      FEAdaptor::CoProcess(equation_systems, transport_system.time,t_step,true,false);
-      FEAdaptor::Finalize();       
-    #endif
+      #ifdef USE_CATALYST
+        FEAdaptor::CoProcess(equation_systems, transport_system.time,t_step,true,false);
+        FEAdaptor::Finalize();       
+      #endif
+    }
 
   std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
   std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
