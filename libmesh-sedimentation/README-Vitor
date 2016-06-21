@@ -91,7 +91,7 @@ make
 make install
 
 # PETSc
-./configure --prefix=/home/vitor/programs/petsc --download-fblaslapack
+./configure --prefix=/home/vitor/programs/petsc --download-fblaslapack 
 make PETSC_DIR=/home/vitor/programs/petsc all
 make PETSC_DIR=/home/vitor/programs/petsc install
 export PETSC_DIR=/home/vitor/programs/petsc

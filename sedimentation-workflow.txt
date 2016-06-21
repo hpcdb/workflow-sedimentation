@@ -29,6 +29,12 @@ STEP 7 - Mesh Writer
 
 - output: simulationID, t_step, xdmf, hdf5, processor_id
 
-STEP 8 - Mesh Aggregator
+STEP 8 - (1) Data Extraction or (2) Mesh Statistics
+
+- output: simulationID, t_step, 
+
+- output: simulationID, t_step, sediments_amount
+
+STEP 9 - Mesh Aggregator
 
 - output: simulationID, xdmf, n_processors

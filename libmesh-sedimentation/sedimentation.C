@@ -832,9 +832,9 @@ int main (int argc, char** argv)
     char out_filename[256];
     sprintf(out_filename,"%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
     prov.outputMeshAggregator(simulationID,out_filename,libMesh::global_n_processors());
+    prov.finishDataIngestor();
   #endif
 
   // All done.
-  prov.finishDataIngestor();
   return 0;
 }
