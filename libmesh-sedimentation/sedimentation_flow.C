@@ -217,12 +217,11 @@ void SedimentationFlow::assemble3D()
     es.get_system<TransientLinearImplicitSystem> ("sediment");
 
   // Numeric ids corresponding to each variable in the system
-  const unsigned int u_var = navier_stokes_system.variable_number ("u");
-  const unsigned int v_var = navier_stokes_system.variable_number ("v");
-  const unsigned int w_var = navier_stokes_system.variable_number ("w");
-  const unsigned int p_var = navier_stokes_system.variable_number ("p");
-
-  const unsigned int s_var = transport_system.variable_number("s");
+  unsigned int u_var = navier_stokes_system.variable_number ("u");
+  unsigned int v_var = navier_stokes_system.variable_number ("v");
+  unsigned int w_var = navier_stokes_system.variable_number ("w");
+  unsigned int p_var = navier_stokes_system.variable_number ("p");
+  unsigned int s_var = transport_system.variable_number("s");
 
   FEType fe_vel_type = navier_stokes_system.variable_type(u_var);
 

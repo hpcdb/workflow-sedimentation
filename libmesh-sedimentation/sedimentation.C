@@ -107,10 +107,6 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-  #ifdef PROV
-    Provenance prov;
-  #endif
-
   PerfLog perf_log("Sedimentation Solver");
 
   // This example requires Adaptive Mesh Refinement support - although
@@ -132,11 +128,11 @@ int main (int argc, char** argv)
   double zmax = infile("zmax", 1.0);
   int ref_interval = infile("r_interval" , 1);
 
-  #ifdef PROV
-    // Mesh Generation
-    prov.inputMeshGeneration(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
-  #endif
-
+#ifdef PROV
+  // Mesh Generation
+  Provenance prov;
+  prov.inputMeshGeneration(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
+#endif
   // Create a mesh object, with dimension to be overridden later,
   // distributed across the default MPI communicator.
   Mesh mesh(init.comm());
@@ -176,7 +172,8 @@ int main (int argc, char** argv)
   Real ex       = infile( "ex", 0.0);
   Real ey       = infile( "ey", 0.0);
   Real ez       = infile( "ez",-1.0);
-  Real c_factor   = infile( "c_factor",1.0);
+  Real c_factor  = infile( "c_factor",1.0);
+  Real fopc      = infile( "fopc",0.2);
 
   if( Reynolds == 0.0 )
       Reynolds = std::sqrt(Gr);
@@ -194,12 +191,13 @@ int main (int argc, char** argv)
 
   /////// 
   equation_systems.parameters.set<Real> ("xlock")       = xlock;
-  equation_systems.parameters.set<Real> ("alfa")        = alfa;
   equation_systems.parameters.set<Real> ("theta")       = theta;
   equation_systems.parameters.set<Real> ("ex")          = ex;
   equation_systems.parameters.set<Real> ("ey")          = ey;
   equation_systems.parameters.set<Real> ("ez")          = ez;
   equation_systems.parameters.set<Real> ("c_factor")    = c_factor;
+  equation_systems.parameters.set<Real> ("fopc")        = fopc;
+  
   ////
 
   // LOOP 
@@ -220,7 +218,7 @@ int main (int argc, char** argv)
   std::string rname                     = infile("output", "out");
 
 #ifdef XDMF_
-  XDMF_IO xdmf_writer(mesh, rname);
+  XDMFWriter xdmf_writer(mesh);
 #endif
 
   if( !is_file_exist("restart.in") || true) {
@@ -272,9 +270,9 @@ int main (int argc, char** argv)
       init_time = restart("init_time",0.0);
       dt        = restart("deltat",0.0);
 
-#ifdef XDMF_
+#ifdef LIBMESH_HAVE_HDF5
       int xdmf_file_id =  restart("xdmf_file_id",0);
-      xdmf_writer.SetFileID(xdmf_file_id);
+      xdmf_writer.set_file_id(xdmf_file_id);
 #endif
 
       mesh.read(mesh_restart);
@@ -323,9 +321,9 @@ int main (int argc, char** argv)
   TransientLinearImplicitSystem & flow_system =
      equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
 
-  #ifdef MESH_MOVIMENT
-    LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
-  #endif
+#ifdef MESH_MOVIMENT
+  LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
+#endif
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
@@ -335,8 +333,8 @@ int main (int argc, char** argv)
 
   string* current_files;
 
-  #ifdef XDMF_
-    current_files = xdmf_writer.write_timestep(equation_systems, time);
+  #ifdef LIBMESH_HAVE_HDF5
+    current_files = xdmf_writer.write_time_step(equation_systems, time);
     cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
   #else
     int exodus_step = 0;
@@ -552,7 +550,7 @@ int main (int argc, char** argv)
               // is chosen (heuristically) as the square of the previous linear system residual norm.
               //Real flr2 = final_linear_residual*final_linear_residual;
               equation_systems.parameters.set<Real> ("linear solver tolerance") =
-                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);             
+                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
             } // end nonlinear loop
 
@@ -675,13 +673,13 @@ int main (int argc, char** argv)
                   break;
                 }
 
-                // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-                // method, the linear solver tolerance needs to decrease as we get closer to
-                // the solution to ensure quadratic convergence.  The new linear solver tolerance
-                // is chosen (heuristically) as the square of the previous linear system residual norm.
-                //Real flr2 = final_linear_residual*final_linear_residual;
-                equation_systems.parameters.set<Real> ("linear solver tolerance") =
-                  std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+              // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+              // method, the linear solver tolerance needs to decrease as we get closer to
+              // the solution to ensure quadratic convergence.  The new linear solver tolerance
+              // is chosen (heuristically) as the square of the previous linear system residual norm.
+              //Real flr2 = final_linear_residual*final_linear_residual;
+              equation_systems.parameters.set<Real> ("linear solver tolerance") =
+                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
           } // end nonlinear loop
 
@@ -751,8 +749,8 @@ int main (int argc, char** argv)
           fout << "mesh_restart = "     << mesh_restart     << std::endl;
           fout << "solution_restart = " << solution_restart << std::endl;
           
-          #ifdef XDMF_
-            fout << "xdmf_file_id = "     << xdmf_writer.GetFileID() << std::endl;
+          #ifdef LIBMESH_HAVE_HDF5
+            fout << "xdmf_file_id = "     << xdmf_writer.get_file_id() << std::endl;
           #endif
           
           fout.close();
@@ -762,13 +760,13 @@ int main (int argc, char** argv)
             prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
           #endif
 
-          #ifdef XDMF_
-            current_files = xdmf_writer.write_timestep(equation_systems, time);
+          #ifdef LIBMESH_HAVE_HDF5
+            current_files = xdmf_writer.write_time_step(equation_systems, time);
             cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
           #else
             //ExodusII_IO exo(mesh);
             //exo.append(true);
-            //exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+            //exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
 
             {
               std::ostringstream out;
@@ -798,13 +796,13 @@ int main (int argc, char** argv)
         prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
       #endif
 
-      #ifdef XDMF_
-                current_files = xdmf_writer.write_timestep(equation_systems, time);
+      #ifdef LIBMESH_HAVE_HDF5
+                current_files = xdmf_writer.write_time_step(equation_systems, time);
                 cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
       #else
       //        ExodusII_IO exo(mesh);
       //        exo.append(true);
-      //        exo.write_timestep (exodus_filename, equation_systems, t_step+1, flow_system.time);
+      //        exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
                  {
                     std::ostringstream out;
                     out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";

@@ -62,6 +62,9 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
+#define MAX(a,b) a>b?a:b
+#define MIN(a,b) a<b?a:b
+
 
 // Define a wrapper for exact_solution that will be needed below
 void one_wrapper (DenseVector<Number>& output,
@@ -222,7 +225,7 @@ void SedimentationTransport::assemble2D()
   //const RealVectorValue velocity = es.parameters.get<RealVectorValue> ("velocity");
   const Real dt      = es.parameters.get<Real>  ("dt");
 
-  const Real alfa    = es.parameters.get<Real>   ("alfa");
+  const Real fopc    = es.parameters.get<Real>   ("fopc");
   const Real theta   = es.parameters.get<Real>  ("theta");
   const Real k       = es.parameters.get<Real>  ("Diffusivity");
   const Real Us      = es.parameters.get<Real>  ("Us");
@@ -231,8 +234,7 @@ void SedimentationTransport::assemble2D()
   const Real ez      = es.parameters.get<Real>  ("ez");
 
   RealVectorValue norm(ex,ez);
-  const Real beta = alfa*0.5 -1.0;
-
+  
   const Real one3  = 1.0/3.0;
   const Real invPi = 1.0/libMesh::pi;
 
@@ -282,17 +284,17 @@ void SedimentationTransport::assemble2D()
       Fe.resize (dof_indices.size());
 
 
-	  // Compute SUPG stabilization parameters:
-	  // The carateristic height of the element
-        const Real volume      = elem->volume();
-        const Real h_caract    = 2.0*pow(volume*invPi, 0.5);
-        const Real aux1        = 9.0*pow(4.0*k/(h_caract*h_caract),2.0)+ 4.0/(dt*dt);
-        const Real invPHI      = 1.0;
+      // Compute SUPG stabilization parameters:
+      // The carateristic height of the element
+      const Real volume      = elem->volume();
+      const Real h_caract    = 2.0*pow(volume*invPi, 0.5);
+      const Real aux1        = 9.0*pow(4.0*k/(h_caract*h_caract),2.0)+ 4.0/(dt*dt);
+      const Real invPHI      = 1.0;
 
 
-        // loop over quadrature points
-        for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-        {
+      // loop over quadrature points
+      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+      {
             // Values to hold the old solution & its gradient.
             Number   s_old = 0.0, s = 0.0;
             Gradient grad_s_old , grad_s, grad_u, grad_v, grad_p;
@@ -325,42 +327,39 @@ void SedimentationTransport::assemble2D()
             f(0) = norm(0)*s;
             f(1) = norm(1)*s;
 
-
             RealVectorValue U(u,v);
 
-            Real unorm       = U.size();
+            Real unorm       = U.norm();
 
-            // Now compute the element matrix and RHS contributions.
-            /*
-            double tmp = 0;
-            for (unsigned int i=0; i<phi.size(); i++) {
-                tmp += std::fabs(velocity*dphi[i][qp]);
-            }
-
-	    const Real h_ugn       = 2.0*unorm/tmp;
-            const Real ts1         = h_ugn/2.0*unorm;
-            const Real ts2         = 0.5*dt;
-            const Real ts3         = h_ugn*h_ugn/(4.0*k);
-            const Real ts4         = 1.0/(ts1*ts1) +  1.0/(ts2*ts2) +  1.0/(ts3*ts3);
-            const Real tau         = std::pow(ts4,-0.5);
-            */
-
-            //const Real res         = (s-s_old)/dt + velocity*grad_s;
 
             Real aux2        = pow(2.0*unorm/h_caract,2.0) + aux1;
             Real tau         = pow(aux2,-0.5);
-            //const Real aux3        = invPHI*invPHI*(grad_s(0)*grad_s(0) + grad_s(1)*grad_s(1));
-            //const Real aux4        = 0.5*(pow(h_caract,alfa));
-            //Real delta = 0.0;
-            //if(aux3 > 0.0)
-            //    delta =  fabs(invPHI*res) * pow(aux3,beta) * aux4;
+
             Real rint_x = (u - u_old)/dt + (U*grad_u) + grad_p(0) - f(0);
             Real rint_y = (v - v_old)/dt + (U*grad_v) + grad_p(1) - f(1);
             tau = 0.0;
             RealVectorValue velocity(u-tau*rint_x,v-tau*rint_y);
-            unorm       = velocity.size();
+            unorm       = velocity.norm();
             aux2        = pow(2.0*unorm/h_caract,2.0) + aux1;
             tau         = pow(aux2,-0.5);
+            
+            
+            // CAU stabilization parameter
+            Real res_mass = (s - s_old)/dt;
+            Real res_adv  = (velocity*grad_s);
+            Real residuo    = res_mass + res_adv;
+            Real gcnorm = grad_s.norm();
+            gcnorm  = MAX(1.0E-10, gcnorm);
+            Real ogcnorm = 1.0/gcnorm;
+            Real aux3 = res_adv/(ogcnorm*ogcnorm);
+            RealVectorValue b(grad_s(0) * aux3, grad_s(1)*aux3);
+            Real bnorm = b.norm();
+            bnorm = MAX( bnorm, 1.0E-10 );
+            Real bdb = k*bnorm*bnorm;
+            bdb = MAX( bdb, 1.d-10 );
+            Real Pe_p = h_caract*(bnorm*bnorm*bnorm)/bdb;
+            Real alpha_c = MIN(0.25*Pe_p, 0.70);
+            Real delta_sco = 0.5*h_caract * alpha_c * residuo * ogcnorm * fopc;
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i=0; i<phi.size(); i++)
@@ -393,7 +392,7 @@ void SedimentationTransport::assemble2D()
                                                 theta*dt*(velocity*dphi[j][qp])*(velocity*dphi[i][qp])
                                             );
                     // YZBetha
-                    //Ke(i,j) += JxW[qp]*delta*dt*(dphi[i][qp]*dphi[j][qp]);
+                    Ke(i,j) += JxW[qp]*delta_sco*dt*(dphi[i][qp]*dphi[j][qp]);
                 }
             }
         }
@@ -578,7 +577,7 @@ void SedimentationTransport::assemble3D()
   //const RealVectorValue velocity = es.parameters.get<RealVectorValue> ("velocity");
   const Real dt      = es.parameters.get<Real>  ("dt");
 
-  const Real alfa    = es.parameters.get<Real>   ("alfa");
+  const Real fopc    = es.parameters.get<Real>   ("fopc");
   const Real theta    = es.parameters.get<Real>  ("theta");
   const Real k       = es.parameters.get<Real>  ("Diffusivity");
   const Real Us      = es.parameters.get<Real>  ("Us");
@@ -587,7 +586,6 @@ void SedimentationTransport::assemble3D()
   const Real ez      = es.parameters.get<Real>  ("ez");
 
   RealVectorValue e(ex,ey,ez);
-  const Real beta = alfa*0.5 -1.0;
 
   const Real one3  = 1.0/3.0;
   const Real invPi = 1.0/libMesh::pi;
@@ -672,15 +670,26 @@ void SedimentationTransport::assemble3D()
 
             RealVectorValue velocity(u+e(0)*Us,v+e(1)*Us,w+e(2)*Us);
 
-            const Real res         = (s-s_old)/dt + velocity*grad_s;
-	          const Real unorm       = velocity.size();
+	    const Real unorm       = velocity.size();
             const Real aux2        = pow(2.0*unorm/h_caract,2.0) + aux1;
             const Real tau         = pow(aux2,-0.5);
-            const Real aux3        = invPHI*invPHI*(grad_s(0)*grad_s(0) + grad_s(1)*grad_s(1) + grad_s(2)*grad_s(2));
-            const Real aux4        = 0.5*(pow(h_caract,alfa));
-            Real delta = 0.0;
-            //if(aux3 > 0.0)
-            //    delta =  fabs(invPHI*res) * pow(aux3,beta) * aux4;
+
+              // CAU stabilization parameter
+            Real res_mass = (s - s_old)/dt;
+            Real res_adv  = (velocity*grad_s);
+            Real residuo    = res_mass + res_adv;
+            Real gcnorm = grad_s.norm();
+            gcnorm  = MAX(1.0E-10, gcnorm);
+            Real ogcnorm = 1.0/gcnorm;
+            Real aux3 = res_adv/(ogcnorm*ogcnorm);
+            RealVectorValue b(grad_s(0) * aux3, grad_s(1)*aux3, grad_s(2)*aux3 );
+            Real bnorm = b.norm();
+            bnorm = MAX( bnorm, 1.0E-10 );
+            Real bdb = k*bnorm*bnorm;
+            bdb = MAX( bdb, 1.d-10 );
+            Real Pe_p = 0.5*h_caract*(bnorm*bnorm*bnorm)/bdb;
+            Real alpha_c = MIN(0.25*Pe_p, 0.70);
+            Real delta_sco = 0.5*h_caract * alpha_c * residuo * ogcnorm * fopc;
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i=0; i<phi.size(); i++)
@@ -714,7 +723,7 @@ void SedimentationTransport::assemble3D()
                                                 theta*dt*(velocity*dphi[j][qp])*(velocity*dphi[i][qp])
                                            );
                     // YZBetha
-                    // Ke(i,j) += JxW[qp]*delta*dt*(dphi[i][qp]*dphi[j][qp]);
+                    Ke(i,j) += JxW[qp]*delta_sco*dt*(dphi[i][qp]*dphi[j][qp]);
                 }
             }
         }

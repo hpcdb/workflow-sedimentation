@@ -4,9 +4,9 @@ rm -rf prov/pg/*
 # MacOS
 # PGDIR=/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/libmesh-sedimentation
 # docker
-# PGDIR=/experiment/libmesh-sedimentation
+PGDIR=/experiment/libmesh-sedimentation
 # Virtual Box - mint
-PGDIR=/media/sf_shared/libmesh-sedimentation
+# PGDIR=/media/sf_shared/libmesh-sedimentation
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode
@@ -141,16 +141,18 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation m
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name xdmf -type file
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name processor_id -type numeric
 
-# echo "Data Extraction"
-# java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag dataExtraction
-# java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation dataExtraction -name libmesh-sedimentation-opt::DataExtraction -filepath $PGDIR
+echo "Data Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag dataExtraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation dataExtraction -name libmesh-sedimentation-opt::DataExtraction -filepath $PGDIR
 
-# java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag omeshwriter -type input -dependency meshWriter
-# java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag odataextraction -type output
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag omeshwriter -type input -dependency meshWriter
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag odataextraction -type output
 
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name simulationID -type numeric
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name time_step -type numeric
-# java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm EXTRACTION:PROGRAM
+java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm EXTRACTION:PROGRAM
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name pressure -type numeric -extractor rde
 
 # echo "Compute Statistics"
 # java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag computeStatistics

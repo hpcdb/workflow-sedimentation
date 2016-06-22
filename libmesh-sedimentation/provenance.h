@@ -14,7 +14,7 @@
 
 #include "libmesh/libmesh.h"
 
-// #define PROV
+#define PROV
 
 using namespace std;
 using namespace libMesh;
