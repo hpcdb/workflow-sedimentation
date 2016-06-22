@@ -1,0 +1,1 @@
+{"subid":"0","workspace":"\/shared\/experiment\/sedimentation\/prov\r","dataflow":"sedimentation","resource":"","id":"1","transformation":"meshwriter","performances":[{"method":"COMPUTATION","description":"libMeshSedimentation::MeshWriter-1-0","startTime":"Wed Jun 22 18:17:34 UTC 2016"}],"dependencies":[{"tag":"solverSimulationSediments","id":1}],"status":"RUNNING"}

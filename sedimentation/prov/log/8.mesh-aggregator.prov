@@ -1,0 +1,5 @@
+PROV:MeshAggregator:Output
+      simulationID(1)
+      xdmf(out_2.xmf)
+      n_processors(2)
+      elapsed-time: 0.008091 seconds.
