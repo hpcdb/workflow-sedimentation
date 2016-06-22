@@ -236,7 +236,7 @@ int main (int argc, char** argv)
          MeshTools::Generation::build_cube (mesh,ncellx,ncelly,ncellz,
                                         xmin,  xmax,
                                         ymin,  ymax,
-                                        zmin,  zmax, QUAD8);
+                                        zmin,  zmax, HEX8);
     }
 
      refinement.uniformly_refine(hlevels);

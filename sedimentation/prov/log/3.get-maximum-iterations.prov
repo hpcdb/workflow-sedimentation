@@ -10,4 +10,4 @@ PROV:GetMaximumIterations:Output
       write_interval(1)
       hdf5(output_2_000_00000.h5)
       xdmf(output_2_00000.xmf)
-      elapsed-time: 0.004092 seconds.
+      elapsed-time: 0.003598 seconds.
