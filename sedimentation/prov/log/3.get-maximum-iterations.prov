@@ -1,7 +1,7 @@
 PROV:GetMaximumIterations:Output
       simulationID(1)
       dt(0.010000)
-      tmax(0.030000)
+      tmax(0.020000)
       n_time_steps(500000)
       n_nonlinear_steps(10)
       nonlinear_tolerance(0.001000)
@@ -10,4 +10,4 @@ PROV:GetMaximumIterations:Output
       write_interval(1)
       hdf5(output_2_000_00000.h5)
       xdmf(output_2_00000.xmf)
-      elapsed-time: 0.003598 seconds.
+      elapsed-time: 0.001266 seconds.

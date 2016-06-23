@@ -1,19 +1,11 @@
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(1)
-      elapsed-time: 0.004340 seconds.
+      elapsed-time: 0.001144 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(0)
-      elapsed-time: 0.003878 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(1)
-      time_step(0)
-      hdf5(output_2_001_00001.h5)
-      xdmf(output_2_00001.xmf)
-      processor_id(1)
-      elapsed-time: 0.005129 seconds.
+      elapsed-time: 0.001113 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(0)
@@ -21,15 +13,23 @@ PROV:MeshWriter:Output
       hdf5(output_2_000_00001.h5)
       xdmf(output_2_00001.xmf)
       processor_id(0)
-      elapsed-time: 0.005178 seconds.
+      elapsed-time: 0.001611 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(1)
-      elapsed-time: 0.003507 seconds.
+      time_step(0)
+      hdf5(output_2_001_00001.h5)
+      xdmf(output_2_00001.xmf)
+      processor_id(1)
+      elapsed-time: 0.001827 seconds.
+PROV:MeshWriter:Output
+      simulationID(1)
+      subTaskID(1)
+      elapsed-time: 0.001144 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(0)
-      elapsed-time: 0.003793 seconds.
+      elapsed-time: 0.001211 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(1)
@@ -37,7 +37,7 @@ PROV:MeshWriter:Output
       hdf5(output_2_001_00002.h5)
       xdmf(output_2_00002.xmf)
       processor_id(1)
-      elapsed-time: 0.005729 seconds.
+      elapsed-time: 0.001765 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(0)
@@ -45,28 +45,4 @@ PROV:MeshWriter:Output
       hdf5(output_2_000_00002.h5)
       xdmf(output_2_00002.xmf)
       processor_id(0)
-      elapsed-time: 0.006499 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(1)
-      elapsed-time: 0.003727 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(0)
-      elapsed-time: 0.003925 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(1)
-      time_step(2)
-      hdf5(output_2_001_00003.h5)
-      xdmf(output_2_00003.xmf)
-      processor_id(1)
-      elapsed-time: 0.005043 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(0)
-      time_step(2)
-      hdf5(output_2_000_00003.h5)
-      xdmf(output_2_00003.xmf)
-      processor_id(0)
-      elapsed-time: 0.005853 seconds.
+      elapsed-time: 0.001669 seconds.

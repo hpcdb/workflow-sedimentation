@@ -349,6 +349,7 @@ int main (int argc, char** argv)
 
   #ifdef USE_CATALYST
        FEAdaptor::Initialize(argc,argv);      
+       cout << "Invoking Catalyst" << endl;
        FEAdaptor::CoProcess(equation_systems,0.0,0.0,false,false);
   #endif    
 
@@ -782,6 +783,7 @@ int main (int argc, char** argv)
           #endif
 
           #ifdef USE_CATALYST
+            cout << "Invoking Catalyst" << endl;
             FEAdaptor::CoProcess(equation_systems,transport_system.time,t_step,false,false);
           #endif
 
@@ -817,6 +819,7 @@ int main (int argc, char** argv)
       #endif
 
       #ifdef USE_CATALYST
+        cout << "Invoking Catalyst" << endl;
         FEAdaptor::CoProcess(equation_systems, transport_system.time,t_step,true,false);
         FEAdaptor::Finalize();       
       #endif

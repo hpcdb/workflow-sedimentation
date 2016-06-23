@@ -3,6 +3,7 @@
 rm restart.in
 rm out*
 rm temp*
+rm *.csv
 rm -rf prov/log/*
 rm -rf prov/pg/*
 rm -rf prov/di/*

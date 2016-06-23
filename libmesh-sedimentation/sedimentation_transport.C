@@ -356,7 +356,7 @@ void SedimentationTransport::assemble2D()
             Real bnorm = b.norm();
             bnorm = MAX( bnorm, 1.0E-10 );
             Real bdb = k*bnorm*bnorm;
-            bdb = MAX( bdb, 1.d-10 );
+            bdb = MAX( bdb, 1.0E-10 );
             Real Pe_p = h_caract*(bnorm*bnorm*bnorm)/bdb;
             Real alpha_c = MIN(0.25*Pe_p, 0.70);
             Real delta_sco = 0.5*h_caract * alpha_c * residuo * ogcnorm * fopc;
@@ -686,7 +686,7 @@ void SedimentationTransport::assemble3D()
             Real bnorm = b.norm();
             bnorm = MAX( bnorm, 1.0E-10 );
             Real bdb = k*bnorm*bnorm;
-            bdb = MAX( bdb, 1.d-10 );
+            bdb = MAX( bdb, 1.0E-10 );
             Real Pe_p = 0.5*h_caract*(bnorm*bnorm*bnorm)/bdb;
             Real alpha_c = MIN(0.25*Pe_p, 0.70);
             Real delta_sco = 0.5*h_caract * alpha_c * residuo * ogcnorm * fopc;
