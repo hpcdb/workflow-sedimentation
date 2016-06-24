@@ -273,11 +273,18 @@ namespace FEAdaptor
       }
   }
 
-  void CoProcess(EquationSystems &eq, double time, unsigned int timeStep, 
+  void CoProcess(int numScripts, char* scripts[],EquationSystems &eq, double time, unsigned int timeStep, 
     bool lastTimeStep = false, bool using_amr = false)
   {
     //std::cout << "COPROCESSING BEGIN" << std::endl;
-    
+    Processor->RemoveAllPipelines();
+    for(int i=1;i<numScripts;i++)
+    {
+       vtkNew<vtkCPPythonScriptPipeline> pipeline;
+       pipeline->Initialize(scripts[i]);
+       Processor->AddPipeline(pipeline.GetPointer());
+    }
+
     vtkNew<vtkCPDataDescription> dataDescription;
     dataDescription->AddInput("input");
     dataDescription->SetTimeData(time, timeStep);
@@ -291,6 +298,7 @@ namespace FEAdaptor
     {
       BuildVTKDataStructures(eq, g2l, using_amr);
       dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
+      dataDescription->ForceOutputOn();
       Processor->CoProcess(dataDescription.GetPointer());
     }
   }

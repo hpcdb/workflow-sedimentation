@@ -12,15 +12,12 @@ from paraview import coprocessing
 # ----------------------- CoProcessor definition -----------------------
 
 def CreateCoProcessor():
-  timeStep = -1;
-  time = -1;
-
+  
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
       timeStep = datadescription.GetTimeStep()
       time = datadescription.GetTime()
       print "[CATALYST] Time step: " + str(timeStep) + " ; Time: " + str(time)
-
       # 3D analysis
       #### disable automatic camera reset on 'Show'
       paraview.simple._DisableFirstRenderCameraReset()
