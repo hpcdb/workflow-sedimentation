@@ -6,10 +6,10 @@ PROV:CreateEquationSystems:Output
       Us(0.020000)
       Diffusivity(0.000447)
       xlock(1.000000)
-      alfa(1.000000)
+      fopc(1.000000)
       theta(0.500000)
       ex(0.000000)
       ey(0.000000)
       ez(-1.000000)
       c_factor(1.000000)
-      elapsed-time: 0.002023 seconds.
+      elapsed-time: 0.001700 seconds.

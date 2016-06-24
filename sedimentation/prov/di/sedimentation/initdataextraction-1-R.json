@@ -1,0 +1,22 @@
+{
+  "subid": null,
+  "workspace": "",
+  "dataflow": "sedimentation",
+  "resource": "",
+  "id": "1",
+  "transformation": "initdataextraction",
+  "performances": [
+    {
+      "method": "COMPUTATION",
+      "description": "libMeshSedimentation::InitDataExtraction-1",
+      "startTime": "Fri Jun 24 19:16:27 BRT 2016"
+    }
+  ],
+  "dependencies": [
+    {
+      "tag": "getMaximumIterations",
+      "id": 1
+    }
+  ],
+  "status": "RUNNING"
+}

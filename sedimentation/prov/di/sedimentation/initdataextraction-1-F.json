@@ -1,0 +1,25 @@
+{
+  "subid": null,
+  "workspace": "",
+  "dataflow": "sedimentation",
+  "sets": [
+    {
+      "elements": [
+        "1;0;output_2_00000.xmf;ext_plane_0.csv"
+      ],
+      "tag": "oinitdataextraction"
+    }
+  ],
+  "resource": "",
+  "id": "1",
+  "transformation": "initdataextraction",
+  "performances": [
+    {
+      "method": "COMPUTATION",
+      "description": "libMeshSedimentation::InitDataExtraction-1",
+      "endTime": "Fri Jun 24 19:16:29 BRT 2016"
+    }
+  ],
+  "dependencies": [],
+  "status": "FINISHED"
+}

@@ -1,0 +1,18 @@
+PROV:DataExtraction:Output
+      simulationID(1)
+      elapsed-time: 0.001209 seconds.
+PROV:DataExtraction:Output
+      simulationID(1)
+      time_step(1)
+      xdmf(output_2_00001.xmf)
+      rawDataFile(ext_plane_1.csv)
+      elapsed-time: 0.001375 seconds.
+PROV:DataExtraction:Output
+      simulationID(1)
+      elapsed-time: 0.001159 seconds.
+PROV:DataExtraction:Output
+      simulationID(1)
+      time_step(2)
+      xdmf(output_2_00002.xmf)
+      rawDataFile(ext_plane_2.csv)
+      elapsed-time: 0.001337 seconds.

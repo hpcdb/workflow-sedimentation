@@ -1,1 +1,31 @@
-{"subid":null,"workspace":"\/Users\/vitor\/Documents\/Repository\/Thesis\/WorkflowSedimentation\/sedimentation\/prov","dataflow":"sedimentation","sets":[{"elements":["1;0.010000;0.020000;500000;10;0.001000;200;1;1;output_2_000_00000.h5;output_2_00000.xmf"],"tag":"ogetmaximumiterations"}],"resource":"","id":"1","transformation":"getmaximumiterations","performances":[{"method":"COMPUTATION","description":"libMeshSedimentation::GetMaximumIterations","startTime":"Thu Jun 23 15:21:36 BRT 2016","endTime":"Thu Jun 23 15:21:37 BRT 2016"}],"dependencies":[{"tag":"createEquationSystems","id":1}],"status":"FINISHED"}
+{
+  "subid": null,
+  "workspace": "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/prov",
+  "dataflow": "sedimentation",
+  "sets": [
+    {
+      "elements": [
+        "1;0.010000;0.020000;500000;10;0.001000;200;1;1;output_2_000_00000.h5;output_2_00000.xmf"
+      ],
+      "tag": "ogetmaximumiterations"
+    }
+  ],
+  "resource": "",
+  "id": "1",
+  "transformation": "getmaximumiterations",
+  "performances": [
+    {
+      "method": "COMPUTATION",
+      "description": "libMeshSedimentation::GetMaximumIterations",
+      "startTime": "Fri Jun 24 19:16:26 BRT 2016",
+      "endTime": "Fri Jun 24 19:16:27 BRT 2016"
+    }
+  ],
+  "dependencies": [
+    {
+      "tag": "createEquationSystems",
+      "id": 1
+    }
+  ],
+  "status": "FINISHED"
+}

@@ -331,6 +331,13 @@ int main (int argc, char** argv)
   transport_system.time                 = time;
   flow_system.time                      = time;
 
+  unsigned int t_step                           = 0;
+  unsigned int n_linear_iterations_flow         = 0;
+  unsigned int n_nonlinear_iterations_flow      = 0;
+  unsigned int n_nonlinear_iterations_transport = 0;
+  unsigned int n_linear_iterations_transport    = 0;
+  bool redo_nl;
+
   string* current_files;
 
   #ifdef LIBMESH_HAVE_HDF5
@@ -347,22 +354,33 @@ int main (int argc, char** argv)
     //std::string exodus_filename = "output.e";
   #endif
 
-  #ifdef USE_CATALYST
-       FEAdaptor::Initialize(argc,argv);    
-       FEAdaptor::CoProcess(argc,argv,equation_systems,0.0,0,false,false);
-  #endif    
-
-  unsigned int t_step                           = 0;
-  unsigned int n_linear_iterations_flow         = 0;
-  unsigned int n_nonlinear_iterations_flow      = 0;
-  unsigned int n_nonlinear_iterations_transport = 0;
-  unsigned int n_linear_iterations_transport    = 0;
-  bool redo_nl;
-
   #ifdef PROV
     // Generate loop iterations
     prov.outputGetMaximumIterations(simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval,current_files[0],current_files[1]);
   #endif
+
+  string firstFilename = "init_ext_plane_" + to_string(t_step) + ".csv";
+  string finalFilename = "ext_plane_" + to_string(t_step) + ".csv";
+
+  #ifdef PROV
+    // Mesh Writer
+    prov.inputInitDataExtraction(simulationID);
+  #endif
+     
+  #ifdef USE_CATALYST
+    FEAdaptor::Initialize(argc,argv);    
+    FEAdaptor::CoProcess(argc,argv,equation_systems,0.0,t_step,false,false);
+    if(libMesh::global_processor_id() == 0){
+     string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
+     system(strdup(commandLine.c_str()));
+    }
+  #endif    
+
+  #ifdef PROV
+    // Mesh Writer
+    prov.outputInitDataExtraction(simulationID,0,current_files[1],finalFilename);
+  #endif
+
 
 // STEP LOOP
   // Loop in time steps
@@ -777,13 +795,26 @@ int main (int argc, char** argv)
           #endif
 
           #ifdef PROV
-            // Mesh Writer
             prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
           #endif
 
+          #ifdef PROV
+            prov.inputDataExtraction(simulationID);
+          #endif
+
+          int step = t_step + 1;
+          string firstFilename = "init_ext_plane_" + to_string(step) + ".csv";
+          string finalFilename = "ext_plane_" + to_string(step) + ".csv";
           #ifdef USE_CATALYST
-            int step = t_step + 1;
             FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,false,false);
+            if(libMesh::global_processor_id() == 0){
+             string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
+             system(strdup(commandLine.c_str()));
+            }
+          #endif
+
+          #ifdef PROV
+            prov.outputDataExtraction(simulationID,step,current_files[1],finalFilename);
           #endif
 
       }
@@ -817,10 +848,25 @@ int main (int argc, char** argv)
         prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
       #endif
 
+      #ifdef PROV
+        prov.inputDataExtraction(simulationID);
+      #endif
+
+      int step = t_step + 1;
+      string firstFilename = "init_ext_plane_" + to_string(step) + ".csv";
+      string finalFilename = "ext_plane_" + to_string(step) + ".csv";
+
       #ifdef USE_CATALYST
-        int step = t_step+1;
         FEAdaptor::CoProcess(argc,argv,equation_systems, transport_system.time,step,true,false);
         FEAdaptor::Finalize();       
+        if(libMesh::global_processor_id() == 0){
+         string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
+         system(strdup(commandLine.c_str()));
+        }
+      #endif
+
+      #ifdef PROV
+        prov.outputDataExtraction(simulationID,step,current_files[1],finalFilename);
       #endif
     }
 
@@ -831,7 +877,7 @@ int main (int argc, char** argv)
     // Mesh Aggregator
     char out_filename[256];
     sprintf(out_filename,"%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
-    prov.outputMeshAggregator(simulationID,out_filename,libMesh::global_n_processors());
+    prov.meshAggregator(simulationID,out_filename,libMesh::global_n_processors());
     prov.finishDataIngestor();
   #endif
 

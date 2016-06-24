@@ -5,4 +5,4 @@ PROV:MeshRefinement:Output
       time_step(0)
       before_n_active_elem(3600)
       after_n_active_elem(3780)
-      elapsed-time: 0.001904 seconds.
+      elapsed-time: 0.001851 seconds.

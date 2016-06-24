@@ -11,11 +11,11 @@ PROV:MeshGeneration:Input
       ymax(2.000000)
       zmax(2.000000)
       ref_interval(3)
-      elapsed-time: 0.001193 seconds.
+      elapsed-time: 0.000954 seconds.
 PROV:MeshGeneration:Output
       simulationID(1)
       r_fraction(0.850000)
       c_fraction(0.050000)
       max_h_level(3.000000)
       hlevels(0)
-      elapsed-time: 0.002134 seconds.
+      elapsed-time: 0.001833 seconds.
