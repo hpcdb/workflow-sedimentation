@@ -76,14 +76,13 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation g
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name max_linear_iters -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name max_r_steps -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name write_interval -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name hdf5 -type text
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterations -set ogetmaximumiterations -name xdmf -type text
 
-echo "Data Extraction"
+echo "Init Data Extraction"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag initDataExtraction
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation initDataExtraction -name libmesh-sedimentation-opt::InitDataExtraction -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation initDataExtraction -tag omeshwriter -type input -dependency getMaximumIterations
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation initDataExtraction -tag ogetmaximumiterations -type input -dependency getMaximumIterations
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation initDataExtraction -tag oinitdataextraction -type output
 
 java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -tag irde -algorithm EXTRACTION:PROGRAM
@@ -97,15 +96,15 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation i
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name p -type numeric -extractor irde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name s -type numeric -extractor irde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name d -type numeric -extractor irde
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points0 -type numeric -extractor irde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points1 -type numeric -extractor irde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points2 -type numeric -extractor irde
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points3 -type numeric -extractor irde
 
 echo "Solver Simulation to the Fluid"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag solverSimulationFluid
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation solverSimulationFluid -name libmesh-sedimentation-opt::SolverSimulationFluid -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverSimulationFluid -tag ogetmaximumiterations -type input -dependency initDataExtraction
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverSimulationFluid -tag ogetmaximumiterations -type input -dependency getMaximumIterations
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverSimulationFluid -tag osolversimulationfluid -type output
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFluid -set osolversimulationfluid -name simulationID -type numeric
@@ -159,9 +158,7 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshWri
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name time_step -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name hdf5 -type file
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name xdmf -type file
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name processor_id -type numeric
 
 echo "Data Extraction"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag dataExtraction
@@ -181,9 +178,9 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation d
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name p -type numeric -extractor rde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name s -type numeric -extractor rde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name d -type numeric -extractor rde
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name points0 -type numeric -extractor rde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name points1 -type numeric -extractor rde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name points2 -type numeric -extractor rde
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name points3 -type numeric -extractor rde
 
 # echo "Compute Statistics"
 # java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag computeStatistics
@@ -201,7 +198,7 @@ echo "Mesh Aggregator"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshAggregator
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation meshAggregator -name libmesh-sedimentation-opt::MeshAggregator -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshAggregator -tag odataextraction -type input -dependency dataExtraction
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshAggregator -tag omeshwriter -type input -dependency meshWriter
 # java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshAggregator -tag ostatistics -type input -dependency computeStatistics
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshAggregator -tag omeshaggregator -type output
 

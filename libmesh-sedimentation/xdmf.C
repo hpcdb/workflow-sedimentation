@@ -12,6 +12,7 @@
 #include <cstring>
 #include <cstdio>
 #include <map>
+#include <unistd.h>
 using namespace std;
 
 
@@ -139,8 +140,8 @@ void XDMFWriter::set_file_name(std::string filename)
 
 string* XDMFWriter::write_time_step(EquationSystems& es, double time)
 {
-    char filename[256];
-    char xdmf_filename[256];
+    char filename[4096];
+    char xdmf_filename[4096];
     string* files = new string[2];
         
     std::vector<double> coords;
@@ -233,6 +234,8 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     write_temporal_collection();
 
     sprintf(xdmf_filename,"%s_%d_%05d.xmf", this->basename.c_str(), n_processors,this->n_timestep);
+    // char the_path[2048];
+    // getcwd(the_path, 2048);
     files[0] = filename;
     files[1] = xdmf_filename;
   

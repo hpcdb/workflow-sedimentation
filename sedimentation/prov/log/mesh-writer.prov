@@ -1,48 +1,20 @@
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(1)
-      elapsed-time: 0.001208 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(0)
-      elapsed-time: 0.000923 seconds.
+      elapsed-time: 0.001408 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(1)
       time_step(0)
-      hdf5(output_2_001_00001.h5)
-      xdmf(output_2_00001.xmf)
-      processor_id(1)
-      elapsed-time: 0.001588 seconds.
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_2_00001.xmf)
+      elapsed-time: 0.002315 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
-      subTaskID(0)
-      time_step(0)
-      hdf5(output_2_000_00001.h5)
-      xdmf(output_2_00001.xmf)
-      processor_id(0)
-      elapsed-time: 0.001446 seconds.
+      subTaskID(2)
+      elapsed-time: 0.001513 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
-      subTaskID(0)
-      elapsed-time: 0.001049 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(1)
-      elapsed-time: 0.001009 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(0)
+      subTaskID(2)
       time_step(1)
-      hdf5(output_2_000_00002.h5)
-      xdmf(output_2_00002.xmf)
-      processor_id(0)
-      elapsed-time: 0.001471 seconds.
-PROV:MeshWriter:Output
-      simulationID(1)
-      subTaskID(1)
-      time_step(1)
-      hdf5(output_2_001_00002.h5)
-      xdmf(output_2_00002.xmf)
-      processor_id(1)
-      elapsed-time: 0.001447 seconds.
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_2_00002.xmf)
+      elapsed-time: 0.002643 seconds.

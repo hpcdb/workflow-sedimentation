@@ -12,4 +12,4 @@ PROV:CreateEquationSystems:Output
       ey(0.000000)
       ez(-1.000000)
       c_factor(1.000000)
-      elapsed-time: 0.001700 seconds.
+      elapsed-time: 0.002551 seconds.

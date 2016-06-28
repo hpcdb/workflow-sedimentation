@@ -11,7 +11,7 @@ Sedimentation Workflow
 
 **** Get Maximum Iterations 
 
-- output: simulationID, dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval
+- output: simulationID, dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval, xdmf
 
 **** Init Data Extraction
 
@@ -31,7 +31,7 @@ Sedimentation Workflow
 
 **** Mesh Writer
 
-- output: simulationID, t_step, xdmf, hdf5, processor_id
+- output: simulationID, t_step, xdmf
 
 **** (1) Data Extraction or (2) Mesh Statistics
 

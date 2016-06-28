@@ -10,6 +10,7 @@
 #include <sstream>
 #include <math.h>
 #include <string>
+#include <unistd.h>
 
 // Basic include file needed for the mesh functionality.
 #include "libmesh/libmesh.h"
@@ -356,7 +357,7 @@ int main (int argc, char** argv)
 
   #ifdef PROV
     // Generate loop iterations
-    prov.outputGetMaximumIterations(simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval,current_files[0],current_files[1]);
+    prov.outputGetMaximumIterations(simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval,current_files[1]);
   #endif
 
   string firstFilename = "init_ext_plane_" + to_string(t_step) + ".csv";
@@ -387,6 +388,7 @@ int main (int argc, char** argv)
   int numberIterationsFluid = 0;
   int numberIterationsSediments = 0;
   int numberIterationsMeshRefinements = 0;
+  int numberOfWrites = 0;
 
   for (t_step = init_tstep; (t_step < n_time_steps)&&( time < tmax); t_step++)
   {
@@ -752,6 +754,7 @@ int main (int argc, char** argv)
       // Output every 10 timesteps to file.
       if ((t_step+1)%write_interval == 0)
       {
+          numberOfWrites++;
           const std::string mesh_restart      = rname + "_mesh_restart.xda";
           const std::string solution_restart  = rname + "_solution_restart.xda";
 
@@ -775,7 +778,7 @@ int main (int argc, char** argv)
 
           #ifdef PROV
             // Mesh Writer
-            prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
+            prov.inputMeshWriter(simulationID,numberOfWrites);
           #endif
 
           #ifdef LIBMESH_HAVE_HDF5
@@ -795,11 +798,11 @@ int main (int argc, char** argv)
           #endif
 
           #ifdef PROV
-            prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
+            prov.outputMeshWriter(simulationID,numberOfWrites,t_step,current_files[1]);
           #endif
 
           #ifdef PROV
-            prov.inputDataExtraction(simulationID);
+            prov.inputDataExtraction(simulationID,numberOfWrites);
           #endif
 
           int step = t_step + 1;
@@ -808,13 +811,13 @@ int main (int argc, char** argv)
           #ifdef USE_CATALYST
             FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,false,false);
             if(libMesh::global_processor_id() == 0){
-             string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
-             system(strdup(commandLine.c_str()));
+              string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
+              system(strdup(commandLine.c_str()));
             }
           #endif
 
           #ifdef PROV
-            prov.outputDataExtraction(simulationID,step,current_files[1],finalFilename);
+            prov.outputDataExtraction(simulationID,numberOfWrites,step,current_files[1],finalFilename);
           #endif
 
       }
@@ -822,10 +825,10 @@ int main (int argc, char** argv)
 
     if (t_step%write_interval != 0)
     {
-
+      numberOfWrites++;
       #ifdef PROV
         // Mesh Writer
-        prov.inputMeshWriter(simulationID,libMesh::global_processor_id());
+        prov.inputMeshWriter(simulationID,numberOfWrites);
       #endif
 
       #ifdef LIBMESH_HAVE_HDF5
@@ -845,11 +848,11 @@ int main (int argc, char** argv)
 
       #ifdef PROV
         // Mesh Writer
-        prov.outputMeshWriter(simulationID,libMesh::global_processor_id(),t_step,current_files[0],current_files[1],libMesh::global_processor_id());
+        prov.outputMeshWriter(simulationID,numberOfWrites,t_step,current_files[1]);
       #endif
 
       #ifdef PROV
-        prov.inputDataExtraction(simulationID);
+        prov.inputDataExtraction(simulationID,numberOfWrites);
       #endif
 
       int step = t_step + 1;
@@ -866,7 +869,7 @@ int main (int argc, char** argv)
       #endif
 
       #ifdef PROV
-        prov.outputDataExtraction(simulationID,step,current_files[1],finalFilename);
+        prov.outputDataExtraction(simulationID,numberOfWrites,step,current_files[1],finalFilename);
       #endif
     }
 

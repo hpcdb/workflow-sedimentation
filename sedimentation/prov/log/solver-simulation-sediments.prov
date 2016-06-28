@@ -1,7 +1,7 @@
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(1)
-      elapsed-time: 0.001091 seconds.
+      elapsed-time: 0.002002 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(1)
@@ -14,11 +14,11 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.006864)
       norm_delta_u(0.000452)
       converged(0)
-      elapsed-time: 0.001527 seconds.
+      elapsed-time: 0.002014 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(2)
-      elapsed-time: 0.001058 seconds.
+      elapsed-time: 0.001432 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(2)
@@ -31,11 +31,11 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.000318)
       norm_delta_u(0.000021)
       converged(1)
-      elapsed-time: 0.001462 seconds.
+      elapsed-time: 0.001981 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(3)
-      elapsed-time: 0.001189 seconds.
+      elapsed-time: 0.001660 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(3)
@@ -48,11 +48,11 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.015497)
       norm_delta_u(0.000864)
       converged(0)
-      elapsed-time: 0.001513 seconds.
+      elapsed-time: 0.002510 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(4)
-      elapsed-time: 0.001045 seconds.
+      elapsed-time: 0.001576 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(4)
@@ -65,11 +65,11 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.002314)
       norm_delta_u(0.000129)
       converged(0)
-      elapsed-time: 0.001489 seconds.
+      elapsed-time: 0.002167 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(5)
-      elapsed-time: 0.001155 seconds.
+      elapsed-time: 0.001670 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(5)
@@ -82,4 +82,4 @@ PROV:SolverSimulationSediments:Output
       norm_delta(0.000150)
       norm_delta_u(0.000008)
       converged(1)
-      elapsed-time: 0.001468 seconds.
+      elapsed-time: 0.002067 seconds.

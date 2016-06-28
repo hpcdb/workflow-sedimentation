@@ -136,8 +136,8 @@ CREATE TABLE performance(
 	subtask_id INTEGER,	
 	method VARCHAR(30) NOT NULL,
 	description VARCHAR(200),
-	starttime VARCHAR(30) NOT NULL,
-	endtime VARCHAR(30) NOT NULL,
+	starttime VARCHAR(30),
+	endtime VARCHAR(30),
 	invocation TEXT,
 	PRIMARY KEY ("id"),
 	FOREIGN KEY ("task_id") REFERENCES task("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -302,7 +302,12 @@ CREATE FUNCTION insertPerformance (vtask_id INTEGER, vsubtask_id INTEGER, vmetho
 RETURNS INTEGER
 BEGIN
 	DECLARE vid INTEGER;
-    SELECT id INTO vid FROM performance WHERE method=vmethod and task_id=vtask_id and subtask_id=vsubtask_id;
+	IF(vsubtask_id IS NULL) THEN
+		SELECT id INTO vid FROM performance WHERE method=vmethod and task_id=vtask_id;
+	ELSE
+		SELECT id INTO vid FROM performance WHERE method=vmethod and task_id=vtask_id and subtask_id=vsubtask_id;
+	END IF;
+    
     IF(vid IS NULL) THEN
     	SELECT NEXT VALUE FOR "performance_id_seq" into vid;
     	INSERT INTO performance(id,task_id,subtask_id,method,description,starttime,endtime,invocation) VALUES (vid,vtask_id,vsubtask_id,vmethod,vdescription,vstarttime,vendtime,vinvocation);
