@@ -1,7 +1,7 @@
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(1)
-      elapsed-time: 0.002002 seconds.
+      elapsed-time: 0.533003 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(1)
@@ -11,14 +11,14 @@ PROV:SolverSimulationSediments:Output
       n_linear_step(0)
       n_linear_iterations(1)
       linear_residual(0.000000)
-      norm_delta(0.006864)
-      norm_delta_u(0.000452)
+      norm_delta(0.031425)
+      norm_delta_u(0.000451)
       converged(0)
-      elapsed-time: 0.002014 seconds.
+      elapsed-time: 0.687894 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(2)
-      elapsed-time: 0.001432 seconds.
+      elapsed-time: 0.450918 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
       subTaskID(2)
@@ -28,58 +28,92 @@ PROV:SolverSimulationSediments:Output
       n_linear_step(1)
       n_linear_iterations(4)
       linear_residual(0.000000)
-      norm_delta(0.000318)
-      norm_delta_u(0.000021)
+      norm_delta(0.001572)
+      norm_delta_u(0.000023)
+      converged(0)
+      elapsed-time: 0.708065 seconds.
+PROV:SolverSimulationSediments:Output
+      simulationID(1)
+      subTaskID(3)
+      elapsed-time: 0.536462 seconds.
+PROV:SolverSimulationSediments:Output
+      simulationID(1)
+      subTaskID(3)
+      time_step(0)
+      time(0.010000)
+      linear_step(0)
+      n_linear_step(2)
+      n_linear_iterations(37)
+      linear_residual(0.000000)
+      norm_delta(0.000000)
+      norm_delta_u(0.000000)
       converged(1)
-      elapsed-time: 0.001981 seconds.
+      elapsed-time: 0.819932 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
-      subTaskID(3)
-      elapsed-time: 0.001660 seconds.
+      subTaskID(4)
+      elapsed-time: 0.455235 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
-      subTaskID(3)
+      subTaskID(4)
       time_step(1)
       time(0.020000)
       linear_step(0)
       n_linear_step(0)
       n_linear_iterations(2)
-      linear_residual(0.000009)
-      norm_delta(0.015497)
-      norm_delta_u(0.000864)
+      linear_residual(0.000079)
+      norm_delta(0.099373)
+      norm_delta_u(0.001024)
       converged(0)
-      elapsed-time: 0.002510 seconds.
+      elapsed-time: 0.644780 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
-      subTaskID(4)
-      elapsed-time: 0.001576 seconds.
+      subTaskID(5)
+      elapsed-time: 0.441616 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
-      subTaskID(4)
+      subTaskID(5)
       time_step(1)
       time(0.020000)
       linear_step(0)
       n_linear_step(1)
-      n_linear_iterations(4)
+      n_linear_iterations(3)
       linear_residual(0.000000)
-      norm_delta(0.002314)
-      norm_delta_u(0.000129)
+      norm_delta(0.016312)
+      norm_delta_u(0.000168)
       converged(0)
-      elapsed-time: 0.002167 seconds.
+      elapsed-time: 0.652463 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
-      subTaskID(5)
-      elapsed-time: 0.001670 seconds.
+      subTaskID(6)
+      elapsed-time: 0.444119 seconds.
 PROV:SolverSimulationSediments:Output
       simulationID(1)
-      subTaskID(5)
+      subTaskID(6)
       time_step(1)
       time(0.020000)
       linear_step(0)
       n_linear_step(2)
-      n_linear_iterations(10)
+      n_linear_iterations(6)
       linear_residual(0.000000)
-      norm_delta(0.000150)
-      norm_delta_u(0.000008)
+      norm_delta(0.001164)
+      norm_delta_u(0.000012)
+      converged(0)
+      elapsed-time: 0.785099 seconds.
+PROV:SolverSimulationSediments:Output
+      simulationID(1)
+      subTaskID(7)
+      elapsed-time: 0.488379 seconds.
+PROV:SolverSimulationSediments:Output
+      simulationID(1)
+      subTaskID(7)
+      time_step(1)
+      time(0.020000)
+      linear_step(0)
+      n_linear_step(3)
+      n_linear_iterations(36)
+      linear_residual(0.000000)
+      norm_delta(0.000077)
+      norm_delta_u(0.000001)
       converged(1)
-      elapsed-time: 0.002067 seconds.
+      elapsed-time: 0.665436 seconds.

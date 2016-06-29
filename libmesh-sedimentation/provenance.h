@@ -9,8 +9,12 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <chrono>
 
 #include "libmesh/libmesh.h"
 
@@ -30,8 +34,8 @@ class Provenance
 
       void outputGetMaximumIterations(int simulationID, Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, int max_r_steps, unsigned int write_interval, string xdmf);
 
-      void inputInitDataExtraction(int simulationID);
-      void outputInitDataExtraction(int simulationID, int time_step, string xdmf, string rawDataFile);
+      void inputInitDataExtraction(int simulationID, string transformation, string extractionFileName);
+      void outputInitDataExtraction(int simulationID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile);
   		
       void inputSolverSimulationFluid(int simulationID, int subTaskID);
       void outputSolverSimulationFluid(int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
@@ -44,11 +48,15 @@ class Provenance
       void inputMeshWriter(int simulationID, int subTaskID);
       void outputMeshWriter(int simulationID, int subTaskID, int time_step, string xdmf);
 
-      void inputDataExtraction(int simulationID, int subTaskID);
-      void outputDataExtraction(int simulationID, int subTaskID, int time_step, string xdmf, string rawDataFile);
+      void inputDataExtraction(int simulationID, int subTaskID, string transformation, string extractionFileName);
+      void outputDataExtraction(int simulationID, int subTaskID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile);
 
       void meshAggregator(int simulationID, string xdmf, int n_processors);
+      
       void finishDataIngestor();
+
+      void storeDataExtractionCost(int simulationID, int subTaskID, int time_step, string xdmf, string rawDataFile, double elapsedTime);
+      void storeSolverCost(double elapsedTime);
     private:
       int processor_id;
 };

@@ -1,0 +1,9 @@
+PROV:iLine3Extraction:Output
+      simulationID(1)
+      elapsed-time: 0.490167 seconds.
+PROV:iLine3Extraction:Output
+      simulationID(1)
+      time_step(0)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_3_0.csv)
+      elapsed-time: 1.146813 seconds.

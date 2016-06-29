@@ -15,7 +15,8 @@ def CreateCoProcessor():
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
       timeStep = datadescription.GetTimeStep()
-      print "[CATALYST] Time step: " + str(timeStep)
+      time = datadescription.GetTime()
+      print "[CATALYST] Time step: " + str(timeStep) + " ; Time: " + str(time)
 
       # 3D analysis
       #### disable automatic camera reset on 'Show'
@@ -62,19 +63,19 @@ def CreateCoProcessor():
       plotOverLine2.Source.Point2 = [9.0, 2.0, 0.0]
 
       # save data
-      SaveData('ext_hline_' + str(timeStep) + ".csv", proxy=plotOverLine1, Precision=5,
+      SaveData('init_ext_line_0_' + str(timeStep) + ".csv", proxy=plotOverLine1, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
-      SaveData('ext_vline_1_' + str(timeStep) + ".csv", proxy=plotOverLine3, Precision=5,
+      SaveData('init_ext_line_1_' + str(timeStep) + ".csv", proxy=plotOverLine3, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
-      SaveData('ext_vline_2_' + str(timeStep) + ".csv", proxy=plotOverLine2, Precision=5,
+      SaveData('init_ext_line_2_' + str(timeStep) + ".csv", proxy=plotOverLine2, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
-      SaveData('ext_vline_3_' + str(timeStep) + ".csv", proxy=plotOverLine4, Precision=5,
+      SaveData('init_ext_line_3_' + str(timeStep) + ".csv", proxy=plotOverLine4, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
@@ -86,7 +87,7 @@ def CreateCoProcessor():
       self.Pipeline = _CreatePipeline(self, datadescription)
 
   coprocessor = CoProcessor()
-  freqs = {'input': [10, 100]}
+  freqs = {'input': [1]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 

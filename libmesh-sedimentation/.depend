@@ -251,6 +251,7 @@ provenance.$(obj-suffix):\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/threads_pthread.h\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/threads_tbb.h\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/unique_ptr.hpp\
+    performance.h\
     provenance.h
 sedimentation.$(obj-suffix):\
     sedimentation.C\
@@ -382,6 +383,7 @@ sedimentation.$(obj-suffix):\
     FEAdaptor.h\
     define.h\
     mesh_moviment.h\
+    performance.h\
     provenance.h\
     sedimentation_deposition.h\
     sedimentation_flow.h\

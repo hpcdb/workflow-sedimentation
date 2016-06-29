@@ -1,0 +1,22 @@
+PROV:line1Extraction:Output
+      simulationID(1)
+      subTaskID(1)
+      elapsed-time: 0.511708 seconds.
+PROV:line1Extraction:Output
+      simulationID(1)
+      subTaskID(1)
+      time_step(1)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00001.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_1_1.csv)
+      elapsed-time: 1.551804 seconds.
+PROV:line1Extraction:Output
+      simulationID(1)
+      subTaskID(2)
+      elapsed-time: 0.453862 seconds.
+PROV:line1Extraction:Output
+      simulationID(1)
+      subTaskID(2)
+      time_step(2)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00002.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_1_2.csv)
+      elapsed-time: 1.424654 seconds.

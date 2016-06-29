@@ -1,0 +1,13 @@
+######################################################
+#################### Log Analysis ####################
+######################################################
+Total provenance elapsed time (seconds): 45.08
+Total raw data extraction elapsed time (seconds): 5.33
+Total solver elapsed time (seconds): 874.41
+------------------------------------------------------
+----------------- Percentual Analysis ----------------
+------------------------------------------------------
+provenance elapsed time (%): 4.87
+rde elapsed time (%): 0.58
+solver elapsed time (%): 94.55
+######################################################

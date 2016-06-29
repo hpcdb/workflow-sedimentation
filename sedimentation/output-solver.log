@@ -1,0 +1,159 @@
+Parameters: 
+  Reynolds: 2236.07
+  Grashof : 5e+06
+  Sc      : 1
+Opening file: 0
+ Mesh Information:
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=79821
+    n_local_nodes()=79821
+  n_elem()=72000
+    n_local_elem()=72000
+    n_active_elem()=72000
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=3
+   System #2, "deposition"
+    Type "Explicit"
+    Variables="d" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=79821
+    n_local_dofs()=79821
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=2
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+   System #0, "flow"
+    Type "TransientLinearImplicit"
+    Variables={ "u" "v" "w" "p" } 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=319284
+    n_local_dofs()=319284
+    n_constrained_dofs()=30503
+    n_local_constrained_dofs()=30503
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 100.879
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 108
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 30503
+      Average DoF Constraint Length= 0
+   System #1, "sediment"
+    Type "TransientLinearImplicit"
+    Variables="s" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=79821
+    n_local_dofs()=79821
+    n_constrained_dofs()=21
+    n_local_constrained_dofs()=21
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 25.2197
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 21
+      Average DoF Constraint Length= 0
+
+[WRITE] output_1_000_00000.h5 - output_1_00000.xmf
+[CATALYST] Time step: 0 ; Time: 0.0
+Data Extraction Cost: 2.722444
+Data Extraction Cost: 0.046883
+Data Extraction Cost: 0.055320
+Data Extraction Cost: 0.058486
+======================================================
+ Time step  0  simulation time = 0.0100...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+*** Warning, This code is deprecated, and likely to be removed in future library versions! /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/type_vector.h, line 878, compiled Jun 29 2016 at 09:11:33 ***
+0    140  4.11512e-06    32.6955        1              
+1    200  8.66551e-07    0.0305883      0.000935551    
+2    200  1.3323e-07     0.00709469     0.000216993    
+3    200  4.00873e-08    0.000851363    2.60392e-05    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    1    2.01246e-07    0.0314246      0.000451217    
+1    4    1.16848e-15    0.00157156     2.25655e-05    
+2    37   4.38347e-29    2.46714e-07    3.54248e-09    
+
+****************** Mesh Refinement ********************  
+Number of elements before AMR step: 72000
+Number of elements after AMR step: 80400
+*** Warning, This code is deprecated, and likely to be removed in future library versions! src/mesh/boundary_info.C, line 828, compiled May  5 2016 at 15:09:32 ***
+ Volume deposited statistics: 
+ Vol_{max}: 0.000200052
+ Vol_{min}: -5.23148e-08
+ Vol_{l2} : 0.00303952
+Warning:  This MeshOutput subclass only supports meshes which have been serialized!
+Warning:  This MeshOutput subclass only supports meshes which have been serialized!
+Warning!  Parallel xda/xdr is not yet implemented.
+Writing a serialized file instead.
+[WRITE] output_1_000_00001.h5 - output_1_00001.xmf
+[CATALYST] Time step: 1 ; Time: 0.01
+Data Extraction Cost: 1.034648
+Data Extraction Cost: 0.052595
+Data Extraction Cost: 0.052574
+Data Extraction Cost: 0.052545
+======================================================
+ Time step  1  simulation time = 0.0200...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    59   4.40255e-06    0.698411       0.0159671      
+1    200  6.85365e-08    0.00195309     4.46515e-05    
+2    200  5.96551e-09    0.000657191    1.50247e-05    
+------------------------------------------------------
+ Nonlinear solver converged at step 2
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    7.94982e-05    0.0993729      0.0010236      
+1    3    3.1904e-07     0.0163115      0.000168019    
+2    6    3.82102e-12    0.00116417     1.19916e-05    
+3    36   8.00989e-22    7.70872e-05    7.94045e-07    
+ Volume deposited statistics: 
+ Vol_{max}: 0.000400094
+ Vol_{min}: -8.7234e-08
+ Vol_{l2} : 0.0060787
+Warning!  Parallel xda/xdr is not yet implemented.
+Writing a serialized file instead.
+[WRITE] output_1_000_00002.h5 - output_1_00002.xmf
+[CATALYST] Time step: 2 ; Time: 0.02
+Data Extraction Cost: 1.099892
+Data Extraction Cost: 0.054997
+Data Extraction Cost: 0.050106
+Data Extraction Cost: 0.049683
+FLOW SOLVER - TOTAL LINEAR ITERATIONS : 1199
+TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 89
+[Provenance] Finish Data Ingestor

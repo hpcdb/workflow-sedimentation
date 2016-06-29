@@ -1,0 +1,84 @@
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(0)
+      time_step(0)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_0_0.csv)
+      elapsed-time: 2.722444 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(0)
+      time_step(0)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_1_0.csv)
+      elapsed-time: 0.046883 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(0)
+      time_step(0)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_2_0.csv)
+      elapsed-time: 0.055320 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(0)
+      time_step(0)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_3_0.csv)
+      elapsed-time: 0.058486 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(1)
+      time_step(1)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00001.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_0_1.csv)
+      elapsed-time: 1.034648 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(1)
+      time_step(1)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00001.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_1_1.csv)
+      elapsed-time: 0.052595 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(1)
+      time_step(1)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00001.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_2_1.csv)
+      elapsed-time: 0.052574 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(1)
+      time_step(1)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00001.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_3_1.csv)
+      elapsed-time: 0.052545 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(2)
+      time_step(2)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00002.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_0_2.csv)
+      elapsed-time: 1.099892 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(2)
+      time_step(2)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00002.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_1_2.csv)
+      elapsed-time: 0.054997 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(2)
+      time_step(2)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00002.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_2_2.csv)
+      elapsed-time: 0.050106 seconds.
+RDE:DataExtraction:Process
+      simulationID(1)
+      subTaskID(2)
+      time_step(2)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00002.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_line_3_2.csv)
+      elapsed-time: 0.049683 seconds.

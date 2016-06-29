@@ -1,7 +1,7 @@
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(1)
-      elapsed-time: 0.001534 seconds.
+      elapsed-time: 0.444794 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(1)
@@ -9,16 +9,16 @@ PROV:SolverSimulationFluid:Output
       time(0.010000)
       linear_step(0)
       n_linear_step(0)
-      n_linear_iterations(82)
-      linear_residual(0.000001)
-      norm_delta(7.134727)
+      n_linear_iterations(140)
+      linear_residual(0.000004)
+      norm_delta(32.695452)
       norm_delta_u(1.000000)
       converged(0)
-      elapsed-time: 0.002419 seconds.
+      elapsed-time: 0.666025 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(2)
-      elapsed-time: 0.001663 seconds.
+      elapsed-time: 0.464441 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(2)
@@ -27,15 +27,15 @@ PROV:SolverSimulationFluid:Output
       linear_step(0)
       n_linear_step(1)
       n_linear_iterations(200)
-      linear_residual(0.000000)
-      norm_delta(0.035151)
-      norm_delta_u(0.004912)
+      linear_residual(0.000001)
+      norm_delta(0.030588)
+      norm_delta_u(0.000936)
       converged(0)
-      elapsed-time: 0.002185 seconds.
+      elapsed-time: 0.677741 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(3)
-      elapsed-time: 0.001501 seconds.
+      elapsed-time: 0.473575 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(3)
@@ -45,14 +45,14 @@ PROV:SolverSimulationFluid:Output
       n_linear_step(2)
       n_linear_iterations(200)
       linear_residual(0.000000)
-      norm_delta(0.016101)
-      norm_delta_u(0.002253)
+      norm_delta(0.007095)
+      norm_delta_u(0.000217)
       converged(0)
-      elapsed-time: 0.002128 seconds.
+      elapsed-time: 0.665992 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(4)
-      elapsed-time: 0.001467 seconds.
+      elapsed-time: 0.511689 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
       subTaskID(4)
@@ -62,143 +62,58 @@ PROV:SolverSimulationFluid:Output
       n_linear_step(3)
       n_linear_iterations(200)
       linear_residual(0.000000)
-      norm_delta(0.007743)
-      norm_delta_u(0.001083)
-      converged(0)
-      elapsed-time: 0.002950 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(5)
-      elapsed-time: 0.001472 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(5)
-      time_step(0)
-      time(0.010000)
-      linear_step(0)
-      n_linear_step(4)
-      n_linear_iterations(200)
-      linear_residual(0.000000)
-      norm_delta(0.003754)
-      norm_delta_u(0.000525)
-      converged(0)
-      elapsed-time: 0.002230 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(6)
-      elapsed-time: 0.001503 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(6)
-      time_step(0)
-      time(0.010000)
-      linear_step(0)
-      n_linear_step(5)
-      n_linear_iterations(200)
-      linear_residual(0.000000)
-      norm_delta(0.001827)
-      norm_delta_u(0.000256)
-      converged(0)
-      elapsed-time: 0.002202 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(7)
-      elapsed-time: 0.001518 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(7)
-      time_step(0)
-      time(0.010000)
-      linear_step(0)
-      n_linear_step(6)
-      n_linear_iterations(200)
-      linear_residual(0.000000)
-      norm_delta(0.000891)
-      norm_delta_u(0.000125)
+      norm_delta(0.000851)
+      norm_delta_u(0.000026)
       converged(1)
-      elapsed-time: 0.002144 seconds.
+      elapsed-time: 0.718868 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
-      subTaskID(8)
-      elapsed-time: 0.001432 seconds.
+      subTaskID(5)
+      elapsed-time: 0.583696 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
-      subTaskID(8)
+      subTaskID(5)
       time_step(1)
       time(0.020000)
       linear_step(0)
       n_linear_step(0)
       n_linear_iterations(59)
-      linear_residual(0.000001)
-      norm_delta(0.107706)
-      norm_delta_u(0.013074)
+      linear_residual(0.000004)
+      norm_delta(0.698411)
+      norm_delta_u(0.015967)
       converged(0)
-      elapsed-time: 0.002257 seconds.
+      elapsed-time: 0.704087 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
-      subTaskID(9)
-      elapsed-time: 0.001512 seconds.
+      subTaskID(6)
+      elapsed-time: 0.480524 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
-      subTaskID(9)
+      subTaskID(6)
       time_step(1)
       time(0.020000)
       linear_step(0)
       n_linear_step(1)
       n_linear_iterations(200)
       linear_residual(0.000000)
-      norm_delta(0.012629)
-      norm_delta_u(0.001532)
+      norm_delta(0.001953)
+      norm_delta_u(0.000045)
       converged(0)
-      elapsed-time: 0.002303 seconds.
+      elapsed-time: 0.672296 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
-      subTaskID(10)
-      elapsed-time: 0.001561 seconds.
+      subTaskID(7)
+      elapsed-time: 0.445453 seconds.
 PROV:SolverSimulationFluid:Output
       simulationID(1)
-      subTaskID(10)
+      subTaskID(7)
       time_step(1)
       time(0.020000)
       linear_step(0)
       n_linear_step(2)
       n_linear_iterations(200)
       linear_residual(0.000000)
-      norm_delta(0.004855)
-      norm_delta_u(0.000589)
-      converged(0)
-      elapsed-time: 0.002130 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(11)
-      elapsed-time: 0.001493 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(11)
-      time_step(1)
-      time(0.020000)
-      linear_step(0)
-      n_linear_step(3)
-      n_linear_iterations(200)
-      linear_residual(0.000000)
-      norm_delta(0.002080)
-      norm_delta_u(0.000252)
-      converged(0)
-      elapsed-time: 0.002145 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(12)
-      elapsed-time: 0.001493 seconds.
-PROV:SolverSimulationFluid:Output
-      simulationID(1)
-      subTaskID(12)
-      time_step(1)
-      time(0.020000)
-      linear_step(0)
-      n_linear_step(4)
-      n_linear_iterations(200)
-      linear_residual(0.000000)
-      norm_delta(0.000920)
-      norm_delta_u(0.000112)
+      norm_delta(0.000657)
+      norm_delta_u(0.000015)
       converged(1)
-      elapsed-time: 0.002362 seconds.
+      elapsed-time: 0.691852 seconds.
