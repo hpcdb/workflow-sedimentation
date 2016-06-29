@@ -1,0 +1,9 @@
+PROV:initDataExtraction:Output
+      simulationID(1)
+      elapsed-time: 0.446456 seconds.
+PROV:initDataExtraction:Output
+      simulationID(1)
+      time_step(0)
+      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf)
+      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_plane_0.csv)
+      elapsed-time: 1.122816 seconds.

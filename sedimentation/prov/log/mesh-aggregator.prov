@@ -2,4 +2,4 @@ PROV:MeshAggregator:Output
       simulationID(1)
       xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/out_1.xmf)
       n_processors(1)
-      elapsed-time: 1.113292 seconds.
+      elapsed-time: 1.252022 seconds.

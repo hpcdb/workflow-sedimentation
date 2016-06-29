@@ -9,4 +9,4 @@ PROV:GetMaximumIterations:Output
       max_r_steps(1)
       write_interval(1)
       xdmf(output_1_00000.xmf)
-      elapsed-time: 0.684833 seconds.
+      elapsed-time: 0.715585 seconds.

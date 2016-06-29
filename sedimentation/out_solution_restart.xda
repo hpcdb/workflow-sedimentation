@@ -11,7 +11,7 @@ d	 #   Name, Variable No. 0, System "deposition"
 0	 # No. of Additional Vectors, System "deposition"
 flow	 # Name, System No. 0
 TransientLinearImplicit	 # Type, System No. 0
-4	 # No. of Variables in System "flow"
+3	 # No. of Variables in System "flow"
 u	 #   Name, Variable No. 0, System "flow"
 0	 # vector length
 	 #     Subdomains, Variable "u", System "flow"
@@ -22,12 +22,7 @@ v	 #   Name, Variable No. 1, System "flow"
 	 #     Subdomains, Variable "v", System "flow"
 1	 #     Approximation Order, Variable "v", System "flow"
 0	 #     FE Family, Variable "v", System "flow"
-w	 #   Name, Variable No. 2, System "flow"
-0	 # vector length
-	 #     Subdomains, Variable "w", System "flow"
-1	 #     Approximation Order, Variable "w", System "flow"
-0	 #     FE Family, Variable "w", System "flow"
-p	 #   Name, Variable No. 3, System "flow"
+p	 #   Name, Variable No. 2, System "flow"
 0	 # vector length
 	 #     Subdomains, Variable "p", System "flow"
 1	 #     Approximation Order, Variable "p", System "flow"

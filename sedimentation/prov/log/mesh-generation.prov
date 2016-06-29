@@ -1,6 +1,6 @@
 PROV:MeshGeneration:Input
       simulationID(1)
-      dim(3)
+      dim(2)
       ncellx(180)
       ncelly(20)
       ncellz(20)
@@ -11,11 +11,11 @@ PROV:MeshGeneration:Input
       ymax(2.000000)
       zmax(2.000000)
       ref_interval(3)
-      elapsed-time: 0.694811 seconds.
+      elapsed-time: 0.734268 seconds.
 PROV:MeshGeneration:Output
       simulationID(1)
       r_fraction(0.850000)
       c_fraction(0.050000)
       max_h_level(3.000000)
       hlevels(0)
-      elapsed-time: 1.019060 seconds.
+      elapsed-time: 1.047555 seconds.

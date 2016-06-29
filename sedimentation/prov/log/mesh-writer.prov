@@ -1,20 +1,20 @@
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(1)
-      elapsed-time: 0.454828 seconds.
+      elapsed-time: 0.430597 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(1)
       time_step(0)
       xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00001.xmf)
-      elapsed-time: 0.868226 seconds.
+      elapsed-time: 0.849149 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(2)
-      elapsed-time: 0.528970 seconds.
+      elapsed-time: 0.452550 seconds.
 PROV:MeshWriter:Output
       simulationID(1)
       subTaskID(2)
       time_step(1)
       xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00002.xmf)
-      elapsed-time: 0.956169 seconds.
+      elapsed-time: 0.942170 seconds.
