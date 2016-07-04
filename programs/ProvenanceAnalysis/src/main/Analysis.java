@@ -42,7 +42,7 @@ public class Analysis {
         }
         
         DecimalFormat df2 = new DecimalFormat("###.##");
-        System.out.println("Total provenance elapsed time (seconds): " + Double.valueOf(df2.format(totalElapsedTime)));
+        System.out.println("Provenance elapsed time (seconds): " + Double.valueOf(df2.format(totalElapsedTime)));
         return totalElapsedTime;
     }
     
@@ -73,7 +73,7 @@ public class Analysis {
         }
         
         DecimalFormat df2 = new DecimalFormat("###.##");
-        System.out.println("Total raw data extraction elapsed time (seconds): " + Double.valueOf(df2.format(totalElapsedTime)));
+        System.out.println("Raw data extraction elapsed time (seconds): " + Double.valueOf(df2.format(totalElapsedTime)));
         return totalElapsedTime;
     }
 
@@ -105,7 +105,8 @@ public class Analysis {
         
         DecimalFormat df2 = new DecimalFormat("###.##");
         double solverTime = totalElapsedTime - provenanceTime - rdeTime;
-        System.out.println("Total solver elapsed time (seconds): " + Double.valueOf(df2.format(solverTime)));
+        System.out.println("Solver elapsed time (seconds): " + Double.valueOf(df2.format(solverTime)));
+        System.out.println("Total elapsed time (seconds): " + Double.valueOf(df2.format(totalElapsedTime)));
         
         System.out.println("------------------------------------------------------");
         System.out.println("----------------- Percentual Analysis ----------------");
