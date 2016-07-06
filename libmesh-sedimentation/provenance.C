@@ -45,55 +45,50 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
 
 	Performance perf;
 	perf.start();
-	
-	// run PG
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshGeneration -id " 
-		+ to_string(simulationID) 
-		+ " -workspace " + directory + " -status FINISHED";
-	system(strdup(str.c_str()));
-	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation meshGeneration -task "
-	+  to_string(simulationID) 
-	+ " -computation libMeshSedimentation::MeshGeneration";
-	system(strdup(str.c_str()));
+        
+    // run PG
+    char buffer[4096];
+	sprintf(buffer, "%s-task -dataflow sedimentation -transformation meshGeneration -id %d -workspace %s -status FINISHED",pgCommandLine.c_str(),simulationID,directory.c_str());
+    system(strdup(buffer));
 
-	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshGeneration -id "
-	+  to_string(simulationID) 
-	+ " -set imeshgeneration -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ to_string(dim) + ";"
-	+ to_string(ncellx) + ";"
-	+ to_string(ncelly) + ";"
-	+ to_string(ncellz) + ";"
-	+ to_string(xmin) + ";"
-	+ to_string(ymin) + ";"
-	+ to_string(zmin) + ";"
-	+ to_string(xmax) + ";"
-	+ to_string(ymax) + ";"
-	+ to_string(zmax) + ";"
-	+ to_string(ref_interval)
-	+ "'}]";
-	system(strdup(str.c_str()));
+    sprintf(buffer, "%s-performance -starttime -dataflow sedimentation -transformation meshGeneration -task %d -computation libMeshSedimentation::MeshGeneration",pgCommandLine.c_str(),simulationID);
+	system(strdup(buffer));
+
+	sprintf(buffer, "%s-element -dataflow sedimentation -transformation meshGeneration -id %d -set imeshgeneration -element [{'%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d'}]",pgCommandLine.c_str(),simulationID,simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	ofstream file;
 	file.open("prov/log/mesh-generation.prov", ios_base::app);
-	file << "PROV:MeshGeneration:Input" << endl << 
-	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
-	    space << "dim(" + to_string(dim) + ")" << endl <<
-	    space << "ncellx(" + to_string(ncellx) + ")" << endl <<
-	    space << "ncelly(" + to_string(ncelly) + ")" << endl <<
-	    space << "ncellz(" + to_string(ncellz) + ")" << endl <<
-	    space << "xmin(" + to_string(xmin) + ")" << endl <<
-	    space << "ymin(" + to_string(ymin) + ")" << endl <<
-	    space << "zmin(" + to_string(zmin) + ")" << endl <<
-	    space << "xmax(" + to_string(xmax) + ")" << endl <<
-	    space << "ymax(" + to_string(ymax) + ")" << endl <<
-	    space << "zmax(" + to_string(zmax) + ")" << endl <<
-	    space << "ref_interval(" + to_string(ref_interval) + ")" << endl;
-
-	file << space << "elapsed-time: " << to_string(elapsedTime) << " seconds." << endl;
+	file << "PROV:MeshGeneration:Input" << endl;
+	sprintf(buffer, "%ssimulationID(%d)", space.c_str(), simulationID);
+	file << buffer << endl;
+	sprintf(buffer, "%sdim(%d)", space.c_str(), dim);
+	file << buffer << endl;
+	sprintf(buffer, "%smcellx(%d)", space.c_str(), ncellx);
+	file << buffer << endl;
+	sprintf(buffer, "%sncelly(%d)", space.c_str(), ncelly);
+	file << buffer << endl;
+	sprintf(buffer, "%sncellz(%d)", space.c_str(), ncellz);
+	file << buffer << endl;
+	sprintf(buffer, "%sxmin(%.2f)", space.c_str(), xmin);
+	file << buffer << endl;
+	sprintf(buffer, "%symin(%.2f)", space.c_str(), ymin);
+	file << buffer << endl;
+	sprintf(buffer, "%szmin(%.2f)", space.c_str(), zmin);
+	file << buffer << endl;
+	sprintf(buffer, "%sxmax(%.2f)", space.c_str(), xmax);
+	file << buffer << endl;
+	sprintf(buffer, "%symax(%.2f)", space.c_str(), ymax);
+	file << buffer << endl;
+	sprintf(buffer, "%szmax(%.2f)", space.c_str(), zmax);
+	file << buffer << endl;
+	sprintf(buffer, "%sref_interval(%d)", space.c_str(), ref_interval);
+	file << buffer << endl;
+	sprintf(buffer, "%selapsed-time: %.2f seconds.", space.c_str(), elapsedTime);
+	file << buffer << endl;
 	file.close();
 }
 
@@ -105,18 +100,11 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 
 	// run PG
 	// mesh generation
-	string str = pgCommandLine + "-element -dataflow sedimentation -transformation meshGeneration -id "
-	+  to_string(simulationID) 
-	+ " -set omeshgeneration -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ to_string(r_fraction) + ";"
-	+ to_string(c_fraction) + ";"
-	+ to_string(max_h_level) + ";"
-	+ to_string(hlevels)
-	+ "'}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	printf(buffer,"%s-element -dataflow sedimentation -transformation meshGeneration -id %d -set omeshgeneration -element [{'%d;%.2f;%.2f;%.2f;%d'}]",pgCommandLine.c_str(),simulationID,simulationID,r_fraction,c_fraction,max_h_level,hlevels);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshGeneration -task "
+	string str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshGeneration -task "
 	+  to_string(simulationID) 
 	+ " -computation libMeshSedimentation::MeshGeneration";
 	system(strdup(str.c_str()));
