@@ -6,6 +6,7 @@
   <xi:include href="output_1_00000.xmf" xpointer="xpointer(//Xdmf/Domain/Grid)" />
   <xi:include href="output_1_00001.xmf" xpointer="xpointer(//Xdmf/Domain/Grid)" />
   <xi:include href="output_1_00002.xmf" xpointer="xpointer(//Xdmf/Domain/Grid)" />
+  <xi:include href="output_1_00003.xmf" xpointer="xpointer(//Xdmf/Domain/Grid)" />
  </Grid>
 </Domain>
 </Xdmf>

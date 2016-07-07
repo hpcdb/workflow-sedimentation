@@ -1,21 +1,8 @@
 RDE:DataExtraction:Process
-      simulationID(1)
-      subTaskID(0)
-      time_step(0)
-      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf)
-      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_plane_0.csv)
-      elapsed-time: 1.477288 seconds.
+      elapsed-time: 2.56 seconds.
 RDE:DataExtraction:Process
-      simulationID(1)
-      subTaskID(1)
-      time_step(1)
-      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00001.xmf)
-      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_plane_1.csv)
-      elapsed-time: 0.117751 seconds.
+      elapsed-time: 0.12 seconds.
 RDE:DataExtraction:Process
-      simulationID(1)
-      subTaskID(2)
-      time_step(2)
-      xdmf(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00002.xmf)
-      rawDataFile(/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/ext_plane_2.csv)
-      elapsed-time: 0.120665 seconds.
+      elapsed-time: 0.12 seconds.
+RDE:DataExtraction:Process
+      elapsed-time: 0.12 seconds.

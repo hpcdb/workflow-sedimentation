@@ -59,6 +59,14 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
+
+  	ofstream file;
+	file.open("prov/log/MeshGeneration.prov", ios_base::app);
+	file << "PROV:MeshGeneration:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double c_fraction,double max_h_level,unsigned int hlevels){
@@ -83,6 +91,14 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 	sprintf(buffer,"%s-ingest -task sedimentation meshGeneration %d",pgCommandLine.c_str(),simulationID);
 	system(strdup(buffer));
 
+	ofstream file;
+	file.open("prov/log/MeshGeneration.prov", ios_base::app);
+	file << "PROV:MeshGeneration:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
+
 	perf.start();
 
 	// create equation systems
@@ -94,6 +110,13 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction,double
 
 	perf.end();
   	elapsedTime += perf.elapsedTime();
+
+  	file.open("prov/log/CreateEquationSystems.prov", ios_base::app);
+	file << "PROV:CreateEquationSystems:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds,Real Gr,Real Sc,Real Us,Real Diffusivity,Real xlock,Real fopc,
@@ -119,6 +142,14 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds,Rea
 	sprintf(buffer,"%s-ingest -task sedimentation createEquationSystems %d",pgCommandLine.c_str(),simulationID);
 	system(strdup(buffer));
 
+	ofstream file;
+	file.open("prov/log/CreateEquationSystems.prov", ios_base::app);
+	file << "PROV:CreateEquationSystems:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
+
 	perf.start();
 
 	// get maximum iterations
@@ -130,6 +161,13 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds,Rea
 
 	perf.end();
   	elapsedTime += perf.elapsedTime();
+
+  	file.open("prov/log/GetMaximumIterations.prov", ios_base::app);
+	file << "PROV:GetMaximumIterations:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, 
@@ -157,6 +195,14 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
 	// ingest
 	sprintf(buffer,"%s-ingest -task sedimentation getMaximumIterations %d",pgCommandLine.c_str(),simulationID);
 	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/GetMaximumIterations.prov", ios_base::app);
+	file << "PROV:GetMaximumIterations:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::inputInitDataExtraction(int simulationID, string transformation, string extractionFileName){
@@ -179,6 +225,14 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
 	// ingest
 	sprintf(buffer,"%s-ingest -task sedimentation %s %d",pgCommandLine.c_str(),transformation.c_str(),simulationID);
 	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/InitDataExtraction.prov", ios_base::app);
+	file << "PROV:InitDataExtraction:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::outputInitDataExtraction(int simulationID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile){
@@ -210,6 +264,14 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 	// ingest
 	sprintf(buffer,"%s-ingest -task sedimentation %s %d",pgCommandLine.c_str(),transformation.c_str(),simulationID);
 	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/InitDataExtraction.prov", ios_base::app);
+	file << "PROV:InitDataExtraction:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::inputSolverSimulationFluid(int simulationID, int subTaskID){
@@ -233,6 +295,14 @@ void Provenance::inputSolverSimulationFluid(int simulationID, int subTaskID){
 	// ingest
 	sprintf(buffer,"%s-ingest -task sedimentation solverSimulationFluid %d %d",pgCommandLine.c_str(),simulationID,subTaskID);
 	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/SolverSimulationFluid.prov", ios_base::app);
+	file << "PROV:SolverSimulationFluid:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::outputSolverSimulationFluid(int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, 
@@ -260,6 +330,14 @@ void Provenance::outputSolverSimulationFluid(int simulationID, int subTaskID, in
 	// ingest
 	sprintf(buffer,"%s-ingest -task sedimentation solverSimulationFluid %d %d",pgCommandLine.c_str(),simulationID,subTaskID);
 	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/SolverSimulationFluid.prov", ios_base::app);
+	file << "PROV:SolverSimulationFluid:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::inputSolverSimulationSediments(int simulationID, int subTaskID){
@@ -283,9 +361,18 @@ void Provenance::inputSolverSimulationSediments(int simulationID, int subTaskID)
 	// ingest
 	sprintf(buffer,"%s-ingest -task sedimentation solverSimulationSediments %d %d",pgCommandLine.c_str(),simulationID,subTaskID);
 	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/SolverSimulationSediments.prov", ios_base::app);
+	file << "PROV:SolverSimulationSediments:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
-void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, 
+void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID, int time_step, 
+	Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, 
 	Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged){
 	if(processor_id != 0) return; 
 	
@@ -294,41 +381,35 @@ void Provenance::outputSolverSimulationSediments(int simulationID, int subTaskID
 
 	// pg
 	// solver simulation to the sediments
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation solverSimulationSediments -id " 
-		+ to_string(simulationID) + " -status FINISHED"
-		+ " -workspace " + directory
-		+ " -subid " + to_string(subTaskID)
-		+ " -dependencies [{solverSimulationFluid},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	sprintf(buffer,"%s-task -dataflow sedimentation -transformation solverSimulationSediments -id %d -status FINISHED -workspace %s -subid %d -dependencies [{solverSimulationFluid},{%d}]",
+		pgCommandLine.c_str(),simulationID,directory.c_str(),subTaskID,simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation solverSimulationSediments -task "
-	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
-	+ " -computation libMeshSedimentation::SolverSimulationSediments-" + to_string(simulationID) + "-" + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -endtime -dataflow sedimentation -transformation solverSimulationSediments -task %d -subtask %d -computation libMeshSedimentation::SolverSimulationSediments-%d-%d",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,subTaskID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-element -dataflow sedimentation -transformation solverSimulationSediments -id "
-	+  to_string(simulationID) 
-	+ " -subid " + to_string(subTaskID)
-	+ " -set osolversimulationsediments -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ to_string(time_step) + ";"
-	+ to_string(time) + ";"
-	+ to_string(linear_step) + ";"
-	+ to_string(n_linear_step) + ";"
-	+ to_string(n_linear_iterations) + ";"
-	+ to_string(linear_residual) + ";"
-	+ to_string(norm_delta) + ";"
-	+ to_string(norm_delta_u) + ";"
-	+ to_string(converged)
-	+ "'}]";
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-element -dataflow sedimentation -transformation solverSimulationSediments -id %d -subid %d -set osolversimulationsediments -element [{'%d;%d;%.2f;%d;%d;%d;%.2f;%.2f;%.2f;%s'}]",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,time_step,time,linear_step,
+		n_linear_step,n_linear_iterations,linear_residual,norm_delta,norm_delta_u,converged ? "true" : "false");
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation solverSimulationSediments " + to_string(simulationID) + " " + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-ingest -task sedimentation solverSimulationSediments %d %d",
+		pgCommandLine.c_str(),simulationID,subTaskID);
+	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/SolverSimulationSediments.prov", ios_base::app);
+	file << "PROV:SolverSimulationSediments:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::outputMeshRefinement(int simulationID, int subTaskID, bool first_step_refinement, int time_step, int before_n_active_elem, int after_n_active_elem){
@@ -339,42 +420,39 @@ void Provenance::outputMeshRefinement(int simulationID, int subTaskID, bool firs
 
 	// run PG
 	// mesh refinement
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshRefinement -id " 
-		+ to_string(simulationID) 
-		+ " -workspace " + directory + " -status FINISHED"
-		+ " -subid " + to_string(subTaskID)
-		+ " -dependencies [{solverSimulationSediments},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	sprintf(buffer,"%s-task -dataflow sedimentation -transformation meshRefinement -id %d -workspace %s -status FINISHED -subid %d -dependencies [{solverSimulationSediments},{%d}]",
+		pgCommandLine.c_str(),simulationID,directory.c_str(),subTaskID,simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation meshRefinement -task "
-	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
-	+ " -computation libMeshSedimentation::MeshRefinement-" + to_string(simulationID) + "-" + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -starttime -dataflow sedimentation -transformation meshRefinement -task %d -subtask %d -computation libMeshSedimentation::MeshRefinement-%d-%d",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,subTaskID);
+	system(strdup(buffer));
 
 	// input element
-	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshRefinement -id "
-	+  to_string(simulationID) 
-	+ " -subid " + to_string(subTaskID)
-	+ " -set omeshrefinement -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ to_string(first_step_refinement) + ";"
-	+ to_string(time_step) + ";"
-	+ to_string(before_n_active_elem) + ";"
-	+ to_string(after_n_active_elem)
-	+ "'}]";
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-element -dataflow sedimentation -transformation meshRefinement -id %d -subid %d -set omeshrefinement -element [{'%d;%s;%d;%d;%d'}]",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,first_step_refinement ? "true" : "false",time_step,before_n_active_elem,after_n_active_elem);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshRefinement -task "
-	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
-	+ " -computation libMeshSedimentation::MeshRefinement-" + to_string(simulationID) + "-" + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -endtime -dataflow sedimentation -transformation meshRefinement -task %d -subtask %d -computation libMeshSedimentation::MeshRefinement-%d-%d",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,subTaskID);
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation meshRefinement " + to_string(simulationID) + " " + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-ingest -task sedimentation meshRefinement %d %d",
+		pgCommandLine.c_str(),simulationID,subTaskID);
+	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/MeshRefinement.prov", ios_base::app);
+	file << "PROV:MeshRefinement:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::inputMeshWriter(int simulationID, int subTaskID){
@@ -384,20 +462,31 @@ void Provenance::inputMeshWriter(int simulationID, int subTaskID){
 
 	// pg
 	// solver simulation to the fluid
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshWriter -id " 
-		+ to_string(simulationID) + " -status RUNNING"
-		+ " -workspace " + directory + " -invocation MeshWriter"
-		+ " -subid " + to_string(subTaskID)
-		+ " -dependencies [{solverSimulationSediments},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	sprintf(buffer,"%s-task -dataflow sedimentation -transformation meshWriter -id %d -status RUNNING -workspace %s -invocation MeshWriter -subid %d -dependencies [{solverSimulationSediments},{%d}]",
+		pgCommandLine.c_str(),simulationID,directory.c_str(),subTaskID,simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation meshWriter -task "
-	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
-	+ " -computation libMeshSedimentation::MeshWriter-" + to_string(simulationID) + "-" + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -starttime -dataflow sedimentation -transformation meshWriter -task %d -subtask %d -computation libMeshSedimentation::MeshWriter-%d-%d",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,subTaskID);
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
+
+  	// ingest
+  	sprintf(buffer,"%s-ingest -task sedimentation meshWriter %d %d",
+  		pgCommandLine.c_str(),simulationID,subTaskID);
+	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/MeshWriter.prov", ios_base::app);
+	file << "PROV:MeshWriter:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
+
   	return;
 }
 
@@ -408,39 +497,38 @@ void Provenance::outputMeshWriter(int simulationID, int subTaskID, int time_step
 
 	// pg
 	// solver simulation to the sediments
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshWriter -id " 
-		+ to_string(simulationID) + " -status FINISHED"
-		+ " -workspace " + directory
-		+ " -subid " + to_string(subTaskID)
-		+ " -dependencies [{solverSimulationSediments},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	sprintf(buffer,"%s-task -dataflow sedimentation -transformation meshWriter -id %d -status FINISHED -workspace %s -subid %d -dependencies [{solverSimulationSediments},{%d}]",
+		pgCommandLine.c_str(),simulationID,directory.c_str(),subTaskID,simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshWriter -task "
-	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
-	+ " -computation libMeshSedimentation::MeshWriter-" + to_string(simulationID) + "-" + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -endtime -dataflow sedimentation -transformation meshWriter -task %d -subtask %d -computation libMeshSedimentation::MeshWriter-%d-%d",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,subTaskID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-file -dataflow sedimentation -transformation meshWriter -id " +  to_string(simulationID) 
-	+ " -subid " + to_string(subTaskID)
-	+ " -name \"" + xdmf + "\" -path " + directory;
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s -file -dataflow sedimentation -transformation meshWriter -id %d -subid %d -name \"%s\" -path %s",
+		pgCommandLine.c_str(),simulationID,subTaskID,xdmf.c_str(),directory.c_str());
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshWriter -id "
-	+  to_string(simulationID) 
-	+ " -subid " + to_string(subTaskID)
-	+ " -set omeshwriter -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ to_string(time_step) + ";"
-	+ directory + "/" + xdmf
-	+ "'}]";
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-element -dataflow sedimentation -transformation meshWriter -id %d -subid %d -set omeshwriter -element [{'%d;%d;%s/%s'}]",
+		pgCommandLine.c_str(),simulationID,subTaskID,simulationID,time_step,directory.c_str(),xdmf.c_str());
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation meshWriter " + to_string(simulationID) + " " + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-ingest -task sedimentation meshWriter %d %d",
+		pgCommandLine.c_str(),simulationID,subTaskID);
+	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/MeshWriter.prov", ios_base::app);
+	file << "PROV:MeshWriter:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::inputDataExtraction(int simulationID, int subTaskID, string transformation, string extractionFileName){
@@ -450,24 +538,30 @@ void Provenance::inputDataExtraction(int simulationID, int subTaskID, string tra
 
 	// pg
 	// solver simulation to the sediments
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation " + transformation + " -id " 
-		+ to_string(simulationID) + " -status RUNNING"
-		+ " -workspace " + directory
-		+ " -subid " + to_string(subTaskID)
-		+ " -dependencies [{meshWriter},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	sprintf(buffer,"%s-task -dataflow sedimentation -transformation %s -id %d -status RUNNING -workspace %s -subid %d -dependencies [{meshWriter},{%d}]",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,directory.c_str(),subTaskID,simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation " + transformation + " -task "
-	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
-	+ " -computation libMeshSedimentation::" + transformation + "-" + to_string(simulationID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -starttime -dataflow sedimentation -transformation %s -task %d -subtask %d -computation libMeshSedimentation::%s-%d",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,subTaskID,transformation.c_str(),simulationID);
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation " + transformation + " " + to_string(simulationID) + " " + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-ingest -task sedimentation %s %d %d",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,subTaskID);
+	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/DataExtraction.prov", ios_base::app);
+	file << "PROV:DataExtraction:Input" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::outputDataExtraction(int simulationID, int subTaskID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile){
@@ -477,45 +571,42 @@ void Provenance::outputDataExtraction(int simulationID, int subTaskID, string tr
 
 	// pg
 	// solver simulation to the sediments
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation " + transformation + " -id " 
-		+ to_string(simulationID) + " -status FINISHED"
-		+ " -workspace " + directory
-		+ " -subid " + to_string(subTaskID)
-		+ " -dependencies [{meshWriter},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	sprintf(buffer,"%s-task -dataflow sedimentation -transformation %s -id %d -status FINISHED -workspace %s -subid %d -dependencies [{meshWriter},{%d}]",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,directory.c_str(),subTaskID,simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation " + transformation + " -task "
-	+  to_string(simulationID) + " -subtask " + to_string(subTaskID)
-	+ " -computation libMeshSedimentation::" + transformation + "-" + to_string(simulationID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -endtime -dataflow sedimentation -transformation %s -task %d -subtask %d -computation libMeshSedimentation::%s-%d",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,subTaskID,transformation.c_str(),simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-file -dataflow sedimentation -transformation " + transformation + " -id " +  to_string(simulationID) 
-	+ " -subid " + to_string(subTaskID)
-	+ " -name \"" + xdmf + "\" -path " + directory;
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-file -dataflow sedimentation -transformation %s -id %d -subid %d -name \"%s\" -path %s",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,subTaskID,xdmf.c_str(),directory.c_str());
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-file -dataflow sedimentation -transformation " + transformation + " -id " +  to_string(simulationID) 
-	+ " -subid " + to_string(subTaskID)
-	+ " -name \"" + rawDataFile + "\" -path " + directory;
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-file -dataflow sedimentation -transformation %s -id %d -subid %d -name \"%s\" -path %s",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,subTaskID,rawDataFile.c_str(),directory.c_str());
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-element -dataflow sedimentation -transformation " + transformation + " -id "
-	+  to_string(simulationID) 
-	+ " -subid " + to_string(subTaskID)
-	+ " -set " + outDataSet + " -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ to_string(time_step) + ";"
-	+ directory + "/" + xdmf + ";"
-	+ directory + "/" + rawDataFile
-	+ "'}]";
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-element -dataflow sedimentation -transformation %s -id %d -subid %d -set %s -element [{'%d;%d;%s/%s;%s/%s'}]",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,subTaskID,outDataSet.c_str(),simulationID,time_step,directory.c_str(),xdmf.c_str(),directory.c_str(),rawDataFile.c_str());
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation " + transformation + " " + to_string(simulationID) + " " + to_string(subTaskID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-ingest -task sedimentation %s %d %d",
+		pgCommandLine.c_str(),transformation.c_str(),simulationID,subTaskID);
+	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/DataExtraction.prov", ios_base::app);
+	file << "PROV:DataExtraction:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors){
@@ -525,55 +616,52 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors)
 
 	// pg
 	// solver simulation to the sediments
-	string str = pgCommandLine + "-task -dataflow sedimentation -transformation meshAggregator -id " 
-		+ to_string(simulationID) + " -status FINISHED"
-		+ " -workspace " + directory
-		+ " -dependencies [{meshWriter},{" + to_string(simulationID) + "}]";
-	system(strdup(str.c_str()));
+	char buffer[4096];
+	sprintf(buffer,"%s-task -dataflow sedimentation -transformation meshAggregator -id %d -status FINISHED -workspace %s -dependencies [{meshWriter},{%d}]",
+		pgCommandLine.c_str(),simulationID,directory.c_str(),simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -starttime -dataflow sedimentation -transformation meshAggregator -task "
-	+  to_string(simulationID)
-	+ " -computation libMeshSedimentation::MeshAggregator-" + to_string(simulationID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -starttime -dataflow sedimentation -transformation meshAggregator -task %d -computation libMeshSedimentation::MeshAggregator-%d",
+		pgCommandLine.c_str(),simulationID,simulationID);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-file -dataflow sedimentation -transformation meshAggregator -id " +  to_string(simulationID) 
-	+ " -name \"" + xdmf + "\" -path " + directory;
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-file -dataflow sedimentation -transformation meshAggregator -id %d -name \"%s\" -path %s",
+		pgCommandLine.c_str(),simulationID,xdmf.c_str(),directory.c_str());
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-element -dataflow sedimentation -transformation meshAggregator -id "
-	+  to_string(simulationID) 
-	+ " -set omeshaggregator -element [{'" 
-	+ to_string(simulationID) + ";"
-	+ directory + "/" + xdmf + ";"
-	+ to_string(n_processors)
-	+ "'}]";
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-element -dataflow sedimentation -transformation meshAggregator -id %d -set omeshaggregator -element [{'%d;%s/%s;%d'}]",
+		pgCommandLine.c_str(),simulationID,simulationID,directory.c_str(),xdmf.c_str(),n_processors);
+	system(strdup(buffer));
 
-	str = pgCommandLine + "-performance -endtime -dataflow sedimentation -transformation meshAggregator -task "
-	+  to_string(simulationID)
-	+ " -computation libMeshSedimentation::MeshAggregator-" + to_string(simulationID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-performance -endtime -dataflow sedimentation -transformation meshAggregator -task %d -computation libMeshSedimentation::MeshAggregator-%d",
+		pgCommandLine.c_str(),simulationID,simulationID);
+	system(strdup(buffer));
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	// ingest
-	str = pgCommandLine + "-ingest -task sedimentation meshAggregator " + to_string(simulationID);
-	system(strdup(str.c_str()));
+	sprintf(buffer,"%s-ingest -task sedimentation meshAggregator %d",
+		pgCommandLine.c_str(),simulationID);
+	system(strdup(buffer));
+
+	ofstream file;
+	file.open("prov/log/MeshAggregator.prov", ios_base::app);
+	file << "PROV:MeshAggregator:Output" << endl;
+	file << space << buffer << endl;
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
+	file.close();
 }
 
 void Provenance::storeDataExtractionCost(int simulationID, int subTaskID, int time_step, string xdmf, string rawDataFile, double elapsedTime){
 	if(processor_id != 0) return; 
 	ofstream file;
 	file.open("prov/rde/data-extraction.prov", ios_base::app);
-	file << "RDE:DataExtraction:Process" << endl << 
-	    space << "simulationID(" + to_string(simulationID) + ")" << endl <<
-	    space << "subTaskID(" + to_string(subTaskID) + ")" << endl <<
-	    space << "time_step(" + to_string(time_step) + ")" << endl <<
-	    space << "xdmf(" + directory + "/" + xdmf + ")" << endl <<
-	    space << "rawDataFile(" + directory + "/" + rawDataFile + ")" << endl;
-
-  	file << space << "elapsed-time: " << to_string(elapsedTime) << " seconds." << endl;
+	file << "RDE:DataExtraction:Process" << endl;
+	char buffer[1024];
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
   	file.close();
 }
 
@@ -582,7 +670,9 @@ void Provenance::storeSolverCost(double elapsedTime){
 	ofstream file;
 	file.open("prov/solver/time.prov", ios_base::app);
 	file << "Solver:Time:Process" << endl;
-  	file << space << "elapsed-time: " << to_string(elapsedTime) << " seconds." << endl;
+  	char buffer[1024];
+	sprintf(buffer,"%.2f",elapsedTime);
+	file << space << "elapsed-time: " << buffer << " seconds." << endl;
   	file.close();
 }
 

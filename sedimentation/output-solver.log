@@ -78,7 +78,7 @@ Opening file: 0
 
 [WRITE] output_1_000_00000.h5 - output_1_00000.xmf
 [CATALYST] Time step: 0 ; Time: 0.0
-Data Extraction Cost: 1.477288
+Data Extraction Cost: 2.56
 ======================================================
  Time step  0  simulation time = 0.0100...
 ======================================================
@@ -117,7 +117,34 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00001.h5 - output_1_00001.xmf
 [CATALYST] Time step: 1 ; Time: 0.01
-Data Extraction Cost: 0.117751
+Data Extraction Cost: 0.12
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    200  2.67686e-09    0.0413615      0.00503071     
+1    200  9.11602e-09    0.0202849      0.00246857     
+2    200  1.02924e-10    0.0087842      0.00106868     
+3    200  5.18192e-12    0.00398008     0.000484287    
+4    200  9.19091e-11    0.00184233     0.000224153    
+5    200  3.25906e-11    0.000864906    0.000105236    
+------------------------------------------------------
+ Nonlinear solver converged at step 5
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    3    8.76307e-07    0.00895992     0.000499194    
+1    6    9.43575e-13    0.000710699    3.9596e-05     
+ Volume deposited statistics: 
+ Vol_{max}: 0.000400042
+ Vol_{min}: -3.54995e-08
+ Vol_{l2} : 0.00132653
+Warning!  Parallel xda/xdr is not yet implemented.
+Writing a serialized file instead.
+[WRITE] output_1_000_00002.h5 - output_1_00002.xmf
+[CATALYST] Time step: 1 ; Time: 0.01
+Data Extraction Cost: 0.12
 ======================================================
  Time step  1  simulation time = 0.0200...
 ======================================================
@@ -125,29 +152,30 @@ Data Extraction Cost: 0.117751
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    53   1.11949e-06    0.107706       0.0130739      
-1    200  2.33249e-08    0.012636       0.00153328     
-2    200  5.67268e-10    0.00485366     0.000589044    
-3    200  3.95434e-10    0.00207896     0.000252287    
-4    200  2.05332e-11    0.000919674    0.000111608    
+0    53   1.15907e-06    0.106712       0.012962       
+1    200  2.84878e-08    0.0106103      0.00128786     
+2    200  3.42381e-09    0.00441046     0.000535522    
+3    200  1.48487e-10    0.00210487     0.000255532    
+4    200  1.55769e-10    0.00102457     0.000124393    
+5    200  3.5993e-11     0.000501876    6.09306e-05    
 ------------------------------------------------------
- Nonlinear solver converged at step 4
+ Nonlinear solver converged at step 5
  Solving sedimentation equation...
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    2    8.69755e-06    0.0154969      0.000863519    
-1    4    9.36252e-10    0.00231441     0.000128963    
-2    10   9.82118e-19    0.000149852    8.35005e-06    
+0    2    8.6614e-06     0.0156065      0.000869623    
+1    4    9.38623e-10    0.00231883     0.00012921     
+2    10   1.04521e-18    0.000154518    8.61002e-06    
  Volume deposited statistics: 
- Vol_{max}: 0.000400094
- Vol_{min}: -8.75102e-08
- Vol_{l2} : 0.00132648
+ Vol_{max}: 0.000600025
+ Vol_{min}: -6.58456e-10
+ Vol_{l2} : 0.0019897
 Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
-[WRITE] output_1_000_00002.h5 - output_1_00002.xmf
+[WRITE] output_1_000_00003.h5 - output_1_00003.xmf
 [CATALYST] Time step: 2 ; Time: 0.02
-Data Extraction Cost: 0.120665
-FLOW SOLVER - TOTAL LINEAR ITERATIONS : 2130
-TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 21
+Data Extraction Cost: 0.12
+FLOW SOLVER - TOTAL LINEAR ITERATIONS : 3530
+TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 30
 [Provenance] Finish Data Ingestor

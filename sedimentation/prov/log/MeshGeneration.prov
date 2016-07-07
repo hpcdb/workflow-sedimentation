@@ -1,0 +1,6 @@
+PROV:MeshGeneration:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -element -dataflow sedimentation -transformation meshGeneration -id 1 -set imeshgeneration -element [{'1;2;180;20;20;0.00;0.00;0.00;18.00;2.00;2.00;3'}]
+      elapsed-time: 0.78 seconds.
+PROV:MeshGeneration:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshGeneration 1
+      elapsed-time: 0.64 seconds.

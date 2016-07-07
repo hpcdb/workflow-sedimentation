@@ -162,16 +162,16 @@ int main (int argc, char** argv)
 
   bool first_step_refinement = true;
 
-// Create an equation systems object.
+  // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
   SedimentationFlow       sediment_flow(equation_systems);
   SedimentationTransport  sediment_transport(equation_systems);
   SedimentationDeposition sediment_deposition(equation_systems);
 
-#ifdef MESH_MOVIMENT
-  MeshMoviment            moving_mesh(equation_systems);
-#endif
+  #ifdef MESH_MOVIMENT
+    MeshMoviment moving_mesh(equation_systems);
+  #endif
 
   // INPUT: Physical parameters
   Real Reynolds = infile( "Reynolds", 1.0E03);
@@ -229,9 +229,9 @@ int main (int argc, char** argv)
   const unsigned int write_interval     = infile("write_interval", 10 );
   std::string rname                     = infile("output", "out");
 
-#ifdef XDMF_
-  XDMFWriter xdmf_writer(mesh);
-#endif
+  #ifdef XDMF_
+    XDMFWriter xdmf_writer(mesh);
+  #endif
 
   if( !is_file_exist("restart.in") || true) {
 
@@ -375,8 +375,10 @@ int main (int argc, char** argv)
 
   if(dim==2){
     // 2D analysis
-    string firstFilename = "init_ext_plane_" + to_string(t_step) + ".csv";
-    string finalFilename = "ext_plane_" + to_string(t_step) + ".csv";
+    char firstFilename[1024];
+    sprintf(firstFilename,"init_ext_plane_%d.csv",t_step);
+    char finalFilename[1024];
+    sprintf(finalFilename,"ext_plane_%d.csv",t_step);
     #ifdef PROV
       // Mesh Writer
       prov.inputInitDataExtraction(simulationID,"initDataExtraction","init-data-extraction");
@@ -392,8 +394,9 @@ int main (int argc, char** argv)
       FEAdaptor::Initialize(argc,argv);    
       FEAdaptor::CoProcess(argc,argv,equation_systems,0.0,t_step,false,false);
       if(libMesh::global_processor_id() == 0){
-       string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
-       system(strdup(commandLine.c_str()));
+        char commandLine[4096];
+        sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
+        system(strdup(commandLine));
       }
     #endif  
 
@@ -401,7 +404,9 @@ int main (int argc, char** argv)
       if(libMesh::global_processor_id() == 0){
         perf.end();
         double elapsedTime = perf.elapsedTime();
-        cout << "Data Extraction Cost: " + to_string(elapsedTime) << endl;
+        char buffer[1024];
+        sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
+        cout << buffer << endl;
         prov.storeDataExtractionCost(simulationID,0,0,current_files[1],finalFilename,elapsedTime);
       }
     #endif  
@@ -413,12 +418,18 @@ int main (int argc, char** argv)
   }else if(dim==3){
     // 3D analysis
     for(int ik=0; ik<=3; ik++){
-      string firstFilename = "init_ext_line_" + to_string(ik) + "_" + to_string(t_step) + ".csv";
-      string finalFilename = "ext_line_" + to_string(ik) + "_" + to_string(t_step) + ".csv";
+      char firstFilename[1024];
+      sprintf(firstFilename,"init_ext_line_%d_%d.csv",ik,t_step);
+      char finalFilename[1024];
+      sprintf(finalFilename,"ext_line_%d_%d.csv",ik,t_step);
 
       #ifdef PROV
         // Mesh Writer
-        prov.inputInitDataExtraction(simulationID,"iLine" + to_string(ik) + "Extraction","init-line-" + to_string(ik) + "-extraction");
+        char argument1[1024];
+        char argument2[1024];
+        sprintf(argument1,"iLine%dExtraction",ik);
+        sprintf(argument2,"init-line-%d-extraction",ik);
+        prov.inputInitDataExtraction(simulationID,argument1,argument2);
       #endif
 
       #ifdef PERFORMANCE
@@ -433,8 +444,9 @@ int main (int argc, char** argv)
           FEAdaptor::CoProcess(argc,argv,equation_systems,0.0,t_step,false,false);
         }
         if(libMesh::global_processor_id() == 0){
-         string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
-         system(strdup(commandLine.c_str()));
+          char commandLine[4096];
+          sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
+          system(strdup(commandLine));
         }
       #endif  
 
@@ -442,14 +454,20 @@ int main (int argc, char** argv)
         if(libMesh::global_processor_id() == 0){
           perf.end();
           double elapsedTime = perf.elapsedTime();
-          cout << "Data Extraction Cost: " + to_string(elapsedTime) << endl;
+          char buffer[1024];
+          sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
+          cout << buffer << endl;
           prov.storeDataExtractionCost(simulationID,0,0,current_files[1],finalFilename,elapsedTime);
         }
       #endif  
 
       #ifdef PROV
         // Mesh Writer
-        prov.outputInitDataExtraction(simulationID,"iLine" + to_string(ik) + "Extraction","init-line-" + to_string(ik) + "-extraction","oline" + to_string(ik) + "iextraction",0,current_files[1],finalFilename);
+        char argument3[1024];
+        sprintf(argument1,"iLine%dExtraction",ik);
+        sprintf(argument2,"init-line-%d-extraction",ik);
+        sprintf(argument3,"oline%diextraction",ik);
+        prov.outputInitDataExtraction(simulationID,argument1,argument2,argument3,0,current_files[1],finalFilename);
       #endif
     }
   }
@@ -800,7 +818,6 @@ int main (int argc, char** argv)
 
             first_step_refinement = false;
          }
-      }
 
       sediment_deposition.ComputeDeposition();
       sediment_deposition.print();
@@ -885,14 +902,17 @@ int main (int argc, char** argv)
               }
             #endif
 
-            string firstFilename = "init_ext_plane_" + to_string(step) + ".csv";
-            string finalFilename = "ext_plane_" + to_string(step) + ".csv";
+            char firstFilename[1024];
+            sprintf(firstFilename,"init_ext_plane_%d.csv",step);
+            char finalFilename[1024];
+            sprintf(finalFilename,"ext_plane_%d.csv",step);
 
             #ifdef USE_CATALYST
               FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,false,false);
               if(libMesh::global_processor_id() == 0){
-                string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
-                system(strdup(commandLine.c_str()));
+                char commandLine[4096];
+                sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
+                system(strdup(commandLine));
               }
             #endif
 
@@ -900,7 +920,9 @@ int main (int argc, char** argv)
               if(libMesh::global_processor_id() == 0){
                 perf.end();
                 double elapsedTime = perf.elapsedTime();
-                cout << "Data Extraction Cost: " + to_string(elapsedTime) << endl;
+                char buffer[1024];
+                sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
+                cout << buffer << endl;
                 prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
               }
             #endif
@@ -911,12 +933,18 @@ int main (int argc, char** argv)
           }else if(dim==3){
             // 3D analysis
             for(int ik=0; ik<=3; ik++){
-              string firstFilename = "init_ext_line_" + to_string(ik) + "_" + to_string(step) + ".csv";
-              string finalFilename = "ext_line_" + to_string(ik) + "_" + to_string(step) + ".csv";
+              char firstFilename[1024];
+              sprintf(firstFilename,"init_ext_line_%d_%d.csv",ik,step);
+              char finalFilename[1024];
+              sprintf(finalFilename,"ext_line_%d_%d.csv",ik,step);
 
               #ifdef PROV
                 // Mesh Writer
-                prov.inputDataExtraction(simulationID,numberOfWrites,"line" + to_string(ik) + "Extraction","line-" + to_string(ik) + "-extraction");
+                char argument1[1024];
+                char argument2[1024];
+                sprintf(argument1,"line%dExtraction",ik);
+                sprintf(argument2,"line-%d-extraction",ik);
+                prov.inputDataExtraction(simulationID,numberOfWrites,argument1,argument2);
               #endif
 
               #ifdef PERFORMANCE
@@ -930,8 +958,9 @@ int main (int argc, char** argv)
                   FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,false,false);
                 }
                 if(libMesh::global_processor_id() == 0){
-                 string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
-                 system(strdup(commandLine.c_str()));
+                  char commandLine[4096];
+                  sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
+                  system(strdup(commandLine));
                 }
               #endif  
 
@@ -939,14 +968,20 @@ int main (int argc, char** argv)
                 if(libMesh::global_processor_id() == 0){
                   perf.end();
                   double elapsedTime = perf.elapsedTime();
-                  cout << "Data Extraction Cost: " + to_string(elapsedTime) << endl;
+                  char buffer[1024];
+                  sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
+                  cout << buffer << endl;
                   prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
                 }
               #endif  
 
               #ifdef PROV
                 // Mesh Writer
-                prov.outputDataExtraction(simulationID,numberOfWrites,"line" + to_string(ik) + "Extraction","line-" + to_string(ik) + "-extraction","oline" + to_string(ik) + "extraction",step,current_files[1],finalFilename);
+                char argument3[1024];
+                sprintf(argument1,"line%dExtraction",ik);
+                sprintf(argument2,"line-%d-extraction",ik);
+                sprintf(argument3,"oline%dextraction",ik);
+                prov.outputInitDataExtraction(simulationID,argument1,argument2,argument3,0,current_files[1],finalFilename);
               #endif
             }
           }
@@ -984,80 +1019,99 @@ int main (int argc, char** argv)
 
       int step = t_step + 1;
       if(dim==2){
-        #ifdef PROV
-          prov.inputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction");
-        #endif
+            #ifdef PROV
+              prov.inputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction");
+            #endif
 
-        #ifdef PERFORMANCE
-          if(libMesh::global_processor_id() == 0){
-            perf.start();
-          }
-        #endif
+            #ifdef PERFORMANCE
+              if(libMesh::global_processor_id() == 0){
+                perf.start();
+              }
+            #endif
 
-        string firstFilename = "init_ext_plane_" + to_string(step) + ".csv";
-        string finalFilename = "ext_plane_" + to_string(step) + ".csv";
+            char firstFilename[1024];
+            sprintf(firstFilename,"init_ext_plane_%d.csv",step);
+            char finalFilename[1024];
+            sprintf(finalFilename,"ext_plane_%d.csv",step);
 
-        #ifdef USE_CATALYST
-          FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,true,false);
-          if(libMesh::global_processor_id() == 0){
-            string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
-            system(strdup(commandLine.c_str()));
-          }
-        #endif
-
-        #ifdef PERFORMANCE
-          if(libMesh::global_processor_id() == 0){
-            perf.end();
-            double elapsedTime = perf.elapsedTime();
-            cout << "Data Extraction Cost: " + to_string(elapsedTime) << endl;
-            prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
-          }
-        #endif
-
-        #ifdef PROV
-          prov.outputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction","odataextraction",step,current_files[1],finalFilename);
-        #endif
-      }else if(dim==3){
-        // 3D analysis
-        for(int ik=0; ik<=3; ik++){
-          string firstFilename = "init_ext_line_" + to_string(ik) + "_" + to_string(step) + ".csv";
-          string finalFilename = "ext_line_" + to_string(ik) + "_" + to_string(step) + ".csv";
-
-          #ifdef PROV
-            // Mesh Writer
-            prov.inputDataExtraction(simulationID,numberOfWrites,"line" + to_string(ik) + "Extraction","line-" + to_string(ik) + "-extraction");
-          #endif
-
-          #ifdef PERFORMANCE
-            if(libMesh::global_processor_id() == 0){
-              perf.start();
-            }
-          #endif
-             
-          #ifdef USE_CATALYST
-            if(ik==0){
+            #ifdef USE_CATALYST
               FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,true,false);
-            }
-            if(libMesh::global_processor_id() == 0){
-             string commandLine = "python clean-csv.py " + firstFilename + " " + finalFilename + ";rm " + firstFilename; 
-             system(strdup(commandLine.c_str()));
-            }
-          #endif  
+              if(libMesh::global_processor_id() == 0){
+                char commandLine[4096];
+                sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
+                system(strdup(commandLine));
+              }
+            #endif
 
-          #ifdef PERFORMANCE
-            if(libMesh::global_processor_id() == 0){
-              perf.end();
-              double elapsedTime = perf.elapsedTime();
-              cout << "Data Extraction Cost: " + to_string(elapsedTime) << endl;
-              prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
-            }
-          #endif  
+            #ifdef PERFORMANCE
+              if(libMesh::global_processor_id() == 0){
+                perf.end();
+                double elapsedTime = perf.elapsedTime();
+                char buffer[1024];
+                sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
+                cout << buffer << endl;
+                prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
+              }
+            #endif
 
-          #ifdef PROV
-            // Mesh Writer
-            prov.outputDataExtraction(simulationID,numberOfWrites,"line" + to_string(ik) + "Extraction","line-" + to_string(ik) + "-extraction","oline" + to_string(ik) + "extraction",step,current_files[1],finalFilename);
-          #endif
-        }
+            #ifdef PROV
+              prov.outputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction","odataextraction",step,current_files[1],finalFilename);
+            #endif
+          }else if(dim==3){
+            // 3D analysis
+            for(int ik=0; ik<=3; ik++){
+              char firstFilename[1024];
+              sprintf(firstFilename,"init_ext_line_%d_%d.csv",ik,step);
+              char finalFilename[1024];
+              sprintf(finalFilename,"ext_line_%d_%d.csv",ik,step);
+
+              #ifdef PROV
+                // Mesh Writer
+                char argument1[1024];
+                char argument2[1024];
+                sprintf(argument1,"line%dExtraction",ik);
+                sprintf(argument2,"line-%d-extraction",ik);
+                prov.inputDataExtraction(simulationID,numberOfWrites,argument1,argument2);
+              #endif
+
+              #ifdef PERFORMANCE
+                if(libMesh::global_processor_id() == 0){
+                  perf.start();
+                }
+              #endif
+                 
+              #ifdef USE_CATALYST
+                if(ik==0){
+                  FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,true,false);
+                }
+                if(libMesh::global_processor_id() == 0){
+                  char commandLine[4096];
+                  sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
+                  system(strdup(commandLine));
+                }
+              #endif  
+
+              #ifdef PERFORMANCE
+                if(libMesh::global_processor_id() == 0){
+                  perf.end();
+                  double elapsedTime = perf.elapsedTime();
+                  char buffer[1024];
+                  sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
+                  cout << buffer << endl;
+                  prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
+                }
+              #endif  
+
+              #ifdef PROV
+                // Mesh Writer
+                char argument3[1024];
+                sprintf(argument1,"line%dExtraction",ik);
+                sprintf(argument2,"line-%d-extraction",ik);
+                sprintf(argument3,"oline%dextraction",ik);
+                prov.outputInitDataExtraction(simulationID,argument1,argument2,argument3,0,current_files[1],finalFilename);
+              #endif
+            }
+          }
       }
     }
 
