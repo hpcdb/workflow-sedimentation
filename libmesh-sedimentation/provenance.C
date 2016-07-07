@@ -179,21 +179,32 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
 
 	// pg
 	// get maximum iterations
+	cout << "1" << endl;
 	char buffer[4096];
 	sprintf(buffer,"%s-element -dataflow sedimentation -transformation getMaximumIterations -id %d -set ogetmaximumiterations -element [{'%d;%.2f;%.2f;%d;%d;%.2f;%d;%d;%d;%s/%s'}]",pgCommandLine.c_str(),simulationID,simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval,directory.c_str(),xdmf.c_str());
+	cout << buffer << endl;
 	system(strdup(buffer));
 
+	cout << "2" << endl;
+
 	sprintf(buffer,"%s-file -dataflow sedimentation -transformation getMaximumIterations -id %d -name \"%s\" -path %s",pgCommandLine.c_str(),simulationID,xdmf.c_str(),directory.c_str());
+	cout << buffer << endl;
 	system(strdup(buffer));
+
+	cout << "3" << endl;
 	
 	sprintf(buffer,"%s-performance -endtime -dataflow sedimentation -transformation getMaximumIterations -task %d -computation libMeshSedimentation::GetMaximumIterations",pgCommandLine.c_str(),simulationID);
+	cout << buffer << endl;
 	system(strdup(buffer));
+
+	cout << "4" << endl;
 
 	perf.end();
   	double elapsedTime = perf.elapsedTime();
 
 	// ingest
 	sprintf(buffer,"%s-ingest -task sedimentation getMaximumIterations %d",pgCommandLine.c_str(),simulationID);
+	cout << buffer << endl;
 	system(strdup(buffer));
 
 	ofstream file;

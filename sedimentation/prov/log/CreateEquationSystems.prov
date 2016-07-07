@@ -1,6 +1,6 @@
 PROV:CreateEquationSystems:Input
       java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -performance -starttime -dataflow sedimentation -transformation createEquationSystems -task 1 -computation libMeshSedimentation::CreateEquationSystems
-      elapsed-time: 1.42 seconds.
+      elapsed-time: 0.65 seconds.
 PROV:CreateEquationSystems:Output
       java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation createEquationSystems 1
-      elapsed-time: 0.49 seconds.
+      elapsed-time: 0.34 seconds.

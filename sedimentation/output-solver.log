@@ -77,8 +77,16 @@ Opening file: 0
       Average DoF Constraint Length= 0
 
 [WRITE] output_1_000_00000.h5 - output_1_00000.xmf
+1
+java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -element -dataflow sedimentation -transformation getMaximumIterations -id 1 -set ogetmaximumiterations -element [{'1;0.01;0.02;500000;10;0.00;200;3;1;/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation/output_1_00000.xmf'}]
+2
+java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -file -dataflow sedimentation -transformation getMaximumIterations -id 1 -name "output_1_00000.xmf" -path /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation
+3
+java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -performance -endtime -dataflow sedimentation -transformation getMaximumIterations -task 1 -computation libMeshSedimentation::GetMaximumIterations
+4
+java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation getMaximumIterations 1
 [CATALYST] Time step: 0 ; Time: 0.0
-Data Extraction Cost: 2.56
+Data Extraction Cost: 0.73
 ======================================================
  Time step  0  simulation time = 0.0100...
 ======================================================
@@ -117,7 +125,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00001.h5 - output_1_00001.xmf
 [CATALYST] Time step: 1 ; Time: 0.01
-Data Extraction Cost: 0.12
+Data Extraction Cost: 0.08
  Solving Navier-Stokes equation...
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
@@ -144,7 +152,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00002.h5 - output_1_00002.xmf
 [CATALYST] Time step: 1 ; Time: 0.01
-Data Extraction Cost: 0.12
+Data Extraction Cost: 0.09
 ======================================================
  Time step  1  simulation time = 0.0200...
 ======================================================
@@ -175,7 +183,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00003.h5 - output_1_00003.xmf
 [CATALYST] Time step: 2 ; Time: 0.02
-Data Extraction Cost: 0.12
+Data Extraction Cost: 0.08
 FLOW SOLVER - TOTAL LINEAR ITERATIONS : 3530
 TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 30
 [Provenance] Finish Data Ingestor
