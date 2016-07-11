@@ -2,11 +2,13 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 
 # MacOS
-PGDIR=/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation
+#PGDIR=/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation
 # docker
-# PGDIR=/experiment/libmesh-sedimentation
+ PGDIR=/experiment/libmesh-sedimentation
 # Virtual Box - mint
 # PGDIR=/media/sf_shared/libmesh-sedimentation
+# Stampede
+#PGDIR=/work/03664/silva/experiments/sedimentation
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode

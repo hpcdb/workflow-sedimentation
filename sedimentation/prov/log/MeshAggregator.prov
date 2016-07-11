@@ -1,3 +1,0 @@
-PROV:MeshAggregator:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshAggregator 1
-      elapsed-time: 0.96 seconds.
