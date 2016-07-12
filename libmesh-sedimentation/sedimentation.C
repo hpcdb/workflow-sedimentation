@@ -981,7 +981,7 @@ int main (int argc, char** argv)
                 sprintf(argument1,"line%dExtraction",ik);
                 sprintf(argument2,"line-%d-extraction",ik);
                 sprintf(argument3,"oline%dextraction",ik);
-                prov.outputInitDataExtraction(simulationID,argument1,argument2,argument3,0,current_files[1],finalFilename);
+                prov.outputDataExtraction(simulationID,numberOfWrites,argument1,argument2,argument3,0,current_files[1],finalFilename);
               #endif
             }
           }
@@ -1108,7 +1108,7 @@ int main (int argc, char** argv)
                 sprintf(argument1,"line%dExtraction",ik);
                 sprintf(argument2,"line-%d-extraction",ik);
                 sprintf(argument3,"oline%dextraction",ik);
-                prov.outputInitDataExtraction(simulationID,argument1,argument2,argument3,0,current_files[1],finalFilename);
+                prov.outputDataExtraction(simulationID,numberOfWrites,argument1,argument2,argument3,0,current_files[1],finalFilename);
               #endif
             }
           }
