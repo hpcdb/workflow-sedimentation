@@ -1,0 +1,6 @@
+PROV:InitDataExtraction:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation initDataExtraction 1
+      elapsed-time: 0.49 seconds.
+PROV:InitDataExtraction:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation initDataExtraction 1
+      elapsed-time: 1.19 seconds.

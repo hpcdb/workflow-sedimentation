@@ -67,33 +67,33 @@ using namespace std;
 #include "performance.h"
 #include "FEAdaptor.h"
 
-double ramp(double t)
-{
+double ramp(double t) {
     double x[3];
     double y[3];
 
-    x[0] = 0.0;    y[0] = 0.01;
-    x[1] = 1.0;    y[1] = 1.0;
-    x[2] = 1.0E04; y[2] = 1.0;
+    x[0] = 0.0;
+    y[0] = 0.01;
+    x[1] = 1.0;
+    y[1] = 1.0;
+    x[2] = 1.0E04;
+    y[2] = 1.0;
 
-    double L0 = ((t - x[1])*(t-x[2]))/((x[0]-x[1])*(x[0]-x[2]));
-    double L1 = ((t - x[0])*(t-x[2]))/((x[1]-x[0])*(x[1]-x[2]));
-    double L2 = ((t - x[0])*(t-x[1]))/((x[2]-x[0])*(x[2]-x[1]));
+    double L0 = ((t - x[1])*(t - x[2])) / ((x[0] - x[1])*(x[0] - x[2]));
+    double L1 = ((t - x[0])*(t - x[2])) / ((x[1] - x[0])*(x[1] - x[2]));
+    double L2 = ((t - x[0])*(t - x[1])) / ((x[2] - x[0])*(x[2] - x[1]));
 
-    return (y[0]*L0 + y[1]*L1 + y[2]*L2);
+    return (y[0] * L0 + y[1] * L1 + y[2] * L2);
 }
 
-void WriteRestartFile(EquationSystems &es,int t_step, std::string rname)
-{
+void WriteRestartFile(EquationSystems &es, int t_step, std::string rname) {
     const std::string mesh_restart = rname + "_mesh_restart.xda";
-    const std::string solution_restart  = rname + "_solution_restart.xda";
+    const std::string solution_restart = rname + "_solution_restart.xda";
 
     Real time = es.parameters.get<Real> ("time");
-    Real dt   = es.parameters.get<Real> ("dt")  ;
+    Real dt = es.parameters.get<Real> ("dt");
 }
 
-bool is_file_exist(const char *fileName)
-{
+bool is_file_exist(const char *fileName) {
     std::ifstream infile(fileName);
     return infile.good();
 }
@@ -103,513 +103,512 @@ bool is_file_exist(const char *fileName)
 // We can now begin the main program.  Note that this
 // example will fail if you are using complex numbers
 // since it was designed to be run only with real numbers.
-int main (int argc, char** argv)
-{
-  Performance solverPerf;
 
-  #ifdef PERFORMANCE
-    if(libMesh::global_processor_id() == 0){
-      solverPerf.start();
+int main(int argc, char** argv) {
+    Performance solverPerf;
+
+#ifdef PERFORMANCE
+    if (libMesh::global_processor_id() == 0) {
+        solverPerf.start();
     }
-  #endif
-
-  int simulationID = 1;
-
-  // Initialize libMesh.
-  LibMeshInit init (argc, argv);
-
-  PerfLog perf_log("Sedimentation Solver");
-
-  // This example requires Adaptive Mesh Refinement support - although
-  // it only refines uniformly, the refinement code used is the same
-  // underneath
-  GetPot infile("sedimentation.in");
-
-  int init_tstep = 0;
-
-  int dim    = infile("dim", 2);
-  int ncellx = infile("ncellx", 10);
-  int ncelly = infile("ncelly", 10);
-  int ncellz = infile("ncellz", 10);
-  double xmin = infile("xmin", 0.0);
-  double ymin = infile("ymin", 0.0);
-  double zmin = infile("zmin", 0.0);
-  double xmax = infile("xmax", 1.0);
-  double ymax = infile("ymax", 1.0);
-  double zmax = infile("zmax", 1.0);
-  int ref_interval = infile("r_interval" , 1);
-
-  Provenance prov;
-
-  #ifdef PROV
-    // Mesh Generation
-    prov.inputMeshGeneration(simulationID,dim,ncellx,ncelly,ncellz,xmin,ymin,zmin,xmax,ymax,zmax,ref_interval);
-  #endif
-  // Create a mesh object, with dimension to be overridden later,
-  // distributed across the default MPI communicator.
-  Mesh mesh(init.comm());
-
-  double r_fraction = infile("r_fraction", 0.70);
-  double c_fraction = infile("c_fraction", 0.10);
-  double max_h_level = infile("max_h_level", 1);
-  const unsigned int hlevels = infile("hlevels" , 0);
-
-  MeshRefinement refinement(mesh);
-
-  refinement.refine_fraction()  = r_fraction;
-  refinement.coarsen_fraction() = c_fraction;
-  refinement.max_h_level()      = max_h_level;
-
-  bool first_step_refinement = true;
-
-  // Create an equation systems object.
-  EquationSystems equation_systems (mesh);
-
-  SedimentationFlow       sediment_flow(equation_systems);
-  SedimentationTransport  sediment_transport(equation_systems);
-  SedimentationDeposition sediment_deposition(equation_systems);
-
-  #ifdef MESH_MOVIMENT
-    MeshMoviment moving_mesh(equation_systems);
-  #endif
-
-  // INPUT: Physical parameters
-  Real Reynolds = infile( "Reynolds", 1.0E03);
-  Real Gr       = infile( "Grashof", 1.0E05);
-  Real Sc       = infile( "Sc", 0.71);
-  Real Us       = infile( "Us", 0.0);
-  Real xlock    = infile( "xlock", 1.0);
-  Real alfa     = infile( "alfa", 1.0);
-  Real theta    = infile( "theta", 0.5);
-  Real ex       = infile( "ex", 0.0);
-  Real ey       = infile( "ey", 0.0);
-  Real ez       = infile( "ez",-1.0);
-  Real c_factor  = infile( "c_factor",1.0);
-  Real fopc      = infile( "fopc",0.2);
-
-  if( Reynolds == 0.0 )
-      Reynolds = std::sqrt(Gr);
-
-  Real Diffusivity = 1.0/(Sc*Reynolds);
-
-  cout << "Parameters: " << endl;
-  cout << "  Reynolds: " << Reynolds << endl;
-  cout << "  Grashof : " << Gr   << endl;
-  cout << "  Sc      : " << Sc   << endl;
-
-  equation_systems.parameters.set<Real> ("Reynolds")    = Reynolds;
-  equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
-  equation_systems.parameters.set<Real> ("Us")          = Us;
-
-  /////// 
-  equation_systems.parameters.set<Real> ("xlock")       = xlock;
-  equation_systems.parameters.set<Real> ("theta")       = theta;
-  equation_systems.parameters.set<Real> ("ex")          = ex;
-  equation_systems.parameters.set<Real> ("ey")          = ey;
-  equation_systems.parameters.set<Real> ("ez")          = ez;
-  equation_systems.parameters.set<Real> ("c_factor")    = c_factor;
-  equation_systems.parameters.set<Real> ("fopc")        = fopc;
-  
-  ////
-
-  // LOOP 
-  Real init_time = 0.0;
-
-  // INPUT: TIME INTEGRATION
-  Real dt                               = infile( "deltat" , 0.005 );
-  Real tmax                             = infile( "tmax"   , 0.1 );
-  const unsigned int n_time_steps       = infile("n_time_steps", 10 );
-
-  //INPUT: NONLINEAR SOLVER
-  const unsigned int n_nonlinear_steps  = infile("n_nonlinear_steps", 10 );
-  double nonlinear_tolerance            = infile("nonlinear_tolerance", 1.0E-03);
-  int max_linear_iters                   = infile("max_linear_iterations" , 2000 );
-  int max_r_steps  = infile("max_r_steps" , 1);
-
-  const unsigned int write_interval     = infile("write_interval", 10 );
-  std::string rname                     = infile("output", "out");
-
-  #ifdef XDMF_
-    XDMFWriter xdmf_writer(mesh);
-  #endif
-
-  if( !is_file_exist("restart.in") || true) {
-
-    const string mesh_file = infile("mesh_file","0");
-
-    std::cout << "Opening file: " << mesh_file << endl;
-
-    if(dim == 2)
-    {
-        MeshTools::Generation::build_square (mesh,ncellx,ncelly,
-                                             xmin,  xmax,
-                                             ymin,  ymax, QUAD4);
-    } else {
-         MeshTools::Generation::build_cube (mesh,ncellx,ncelly,ncellz,
-                                        xmin,  xmax,
-                                        ymin,  ymax,
-                                        zmin,  zmax, HEX8);
-    }
-
-     refinement.uniformly_refine(hlevels);
-
-     sediment_flow.setup();
-     sediment_transport.setup();
-     sediment_deposition.setup();
-
-#ifdef MESH_MOVIMENT
-     moving_mesh.setup();
 #endif
 
-      #ifdef PROV
+    int simulationID = 1;
+
+    // Initialize libMesh.
+    LibMeshInit init(argc, argv);
+
+    PerfLog perf_log("Sedimentation Solver");
+
+    // This example requires Adaptive Mesh Refinement support - although
+    // it only refines uniformly, the refinement code used is the same
+    // underneath
+    GetPot infile("sedimentation.in");
+
+    int init_tstep = 0;
+
+    int dim = infile("dim", 2);
+    int ncellx = infile("ncellx", 10);
+    int ncelly = infile("ncelly", 10);
+    int ncellz = infile("ncellz", 10);
+    double xmin = infile("xmin", 0.0);
+    double ymin = infile("ymin", 0.0);
+    double zmin = infile("zmin", 0.0);
+    double xmax = infile("xmax", 1.0);
+    double ymax = infile("ymax", 1.0);
+    double zmax = infile("zmax", 1.0);
+    int ref_interval = infile("r_interval", 1);
+
+    Provenance prov;
+
+#ifdef PROV
+    // Mesh Generation
+    prov.inputMeshGeneration(simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
+#endif
+    // Create a mesh object, with dimension to be overridden later,
+    // distributed across the default MPI communicator.
+    Mesh mesh(init.comm());
+
+    double r_fraction = infile("r_fraction", 0.70);
+    double c_fraction = infile("c_fraction", 0.10);
+    double max_h_level = infile("max_h_level", 1);
+    const unsigned int hlevels = infile("hlevels", 0);
+
+    MeshRefinement refinement(mesh);
+
+    refinement.refine_fraction() = r_fraction;
+    refinement.coarsen_fraction() = c_fraction;
+    refinement.max_h_level() = max_h_level;
+
+    bool first_step_refinement = true;
+
+    // Create an equation systems object.
+    EquationSystems equation_systems(mesh);
+
+    SedimentationFlow sediment_flow(equation_systems);
+    SedimentationTransport sediment_transport(equation_systems);
+    SedimentationDeposition sediment_deposition(equation_systems);
+
+#ifdef MESH_MOVIMENT
+    MeshMoviment moving_mesh(equation_systems);
+#endif
+
+    // INPUT: Physical parameters
+    Real Reynolds = infile("Reynolds", 1.0E03);
+    Real Gr = infile("Grashof", 1.0E05);
+    Real Sc = infile("Sc", 0.71);
+    Real Us = infile("Us", 0.0);
+    Real xlock = infile("xlock", 1.0);
+    Real alfa = infile("alfa", 1.0);
+    Real theta = infile("theta", 0.5);
+    Real ex = infile("ex", 0.0);
+    Real ey = infile("ey", 0.0);
+    Real ez = infile("ez", -1.0);
+    Real c_factor = infile("c_factor", 1.0);
+    Real fopc = infile("fopc", 0.2);
+
+    if (Reynolds == 0.0)
+        Reynolds = std::sqrt(Gr);
+
+    Real Diffusivity = 1.0 / (Sc * Reynolds);
+
+    cout << "Parameters: " << endl;
+    cout << "  Reynolds: " << Reynolds << endl;
+    cout << "  Grashof : " << Gr << endl;
+    cout << "  Sc      : " << Sc << endl;
+
+    equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
+    equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
+    equation_systems.parameters.set<Real> ("Us") = Us;
+
+    /////// 
+    equation_systems.parameters.set<Real> ("xlock") = xlock;
+    equation_systems.parameters.set<Real> ("theta") = theta;
+    equation_systems.parameters.set<Real> ("ex") = ex;
+    equation_systems.parameters.set<Real> ("ey") = ey;
+    equation_systems.parameters.set<Real> ("ez") = ez;
+    equation_systems.parameters.set<Real> ("c_factor") = c_factor;
+    equation_systems.parameters.set<Real> ("fopc") = fopc;
+
+    ////
+
+    // LOOP 
+    Real init_time = 0.0;
+
+    // INPUT: TIME INTEGRATION
+    Real dt = infile("deltat", 0.005);
+    Real tmax = infile("tmax", 0.1);
+    const unsigned int n_time_steps = infile("n_time_steps", 10);
+
+    //INPUT: NONLINEAR SOLVER
+    const unsigned int n_nonlinear_steps = infile("n_nonlinear_steps", 10);
+    double nonlinear_tolerance = infile("nonlinear_tolerance", 1.0E-03);
+    int max_linear_iters = infile("max_linear_iterations", 2000);
+    int max_r_steps = infile("max_r_steps", 1);
+
+    const unsigned int write_interval = infile("write_interval", 10);
+    std::string rname = infile("output", "out");
+
+#ifdef XDMF_
+    XDMFWriter xdmf_writer(mesh);
+#endif
+
+    if (!is_file_exist("restart.in") || true) {
+
+        const string mesh_file = infile("mesh_file", "0");
+
+        std::cout << "Opening file: " << mesh_file << endl;
+
+        if (dim == 2) {
+            MeshTools::Generation::build_square(mesh, ncellx, ncelly,
+                    xmin, xmax,
+                    ymin, ymax, QUAD4);
+        } else {
+            MeshTools::Generation::build_cube(mesh, ncellx, ncelly, ncellz,
+                    xmin, xmax,
+                    ymin, ymax,
+                    zmin, zmax, HEX8);
+        }
+
+        refinement.uniformly_refine(hlevels);
+
+        sediment_flow.setup();
+        sediment_transport.setup();
+        sediment_deposition.setup();
+
+#ifdef MESH_MOVIMENT
+        moving_mesh.setup();
+#endif
+
+#ifdef PROV
         // Mesh Refinement
-        prov.outputMeshGeneration(simulationID,r_fraction,c_fraction,max_h_level,hlevels);
-      #endif
+        prov.outputMeshGeneration(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+#endif
 
-     // Initialize the data structures for the equation system.
-     equation_systems.init ();
+        // Initialize the data structures for the equation system.
+        equation_systems.init();
 
-      #ifdef PROV
+#ifdef PROV
         // Generate solver parameters
-        prov.outputCreateEquationSystems(simulationID,Reynolds,Gr,Sc,Us,Diffusivity,xlock,alfa,theta,ex,ey,ez,c_factor);
-      #endif
+        prov.outputCreateEquationSystems(simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
+#endif
 
-  } else
-  {
-      GetPot restart("restart.in");
-      const string mesh_restart = restart("mesh_restart","0");
-      const string solution_restart = restart("solution_restart","0");
-      init_time = restart("init_time",0.0);
-      dt        = restart("deltat",0.0);
+    } else {
+        GetPot restart("restart.in");
+        const string mesh_restart = restart("mesh_restart", "0");
+        const string solution_restart = restart("solution_restart", "0");
+        init_time = restart("init_time", 0.0);
+        dt = restart("deltat", 0.0);
 
 #ifdef LIBMESH_HAVE_HDF5
-      int xdmf_file_id =  restart("xdmf_file_id",0);
-      xdmf_writer.set_file_id(xdmf_file_id);
+        int xdmf_file_id = restart("xdmf_file_id", 0);
+        xdmf_writer.set_file_id(xdmf_file_id);
 #endif
 
-      mesh.read(mesh_restart);
+        mesh.read(mesh_restart);
 
-      #ifdef PROV
+#ifdef PROV
         // Mesh Refinement
-        prov.outputMeshGeneration(simulationID,r_fraction,c_fraction,max_h_level,hlevels);
-      #endif
+        prov.outputMeshGeneration(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+#endif
 
-      equation_systems.read(solution_restart, READ);
+        equation_systems.read(solution_restart, READ);
 
-      // Get a reference to the Convection-Diffusion system object.
-     TransientLinearImplicitSystem & transport_system =
-         equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
+        // Get a reference to the Convection-Diffusion system object.
+        TransientLinearImplicitSystem & transport_system =
+                equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
 
-     //transport_system.add_vector("volume");
+        //transport_system.add_vector("volume");
 
-     transport_system.update();
+        transport_system.update();
 
-     // Get a reference to the Convection-Diffusion system object.
-     TransientLinearImplicitSystem & flow_system =
-       equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
+        // Get a reference to the Convection-Diffusion system object.
+        TransientLinearImplicitSystem & flow_system =
+                equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
 
-     flow_system.update();
+        flow_system.update();
 
-     ExplicitSystem & deposition_system = equation_systems.get_system<ExplicitSystem>("deposition");
-     deposition_system.add_vector("deposition_rate");
+        ExplicitSystem & deposition_system = equation_systems.get_system<ExplicitSystem>("deposition");
+        deposition_system.add_vector("deposition_rate");
 
-     deposition_system.update();
+        deposition_system.update();
 
-      #ifdef PROV
+#ifdef PROV
         // Generate solver parameters
-        prov.outputCreateEquationSystems(simulationID,Reynolds,Gr,Sc,Us,Diffusivity,xlock,alfa,theta,ex,ey,ez,c_factor);
-      #endif
+        prov.outputCreateEquationSystems(simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
+#endif
 
-  }
+    }
 
-  // Print information about the mesh to the screen.
-  mesh.print_info();
-
-  // Get a reference to the Convection-Diffusion system object.
-  TransientLinearImplicitSystem & transport_system =
-     equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
+    // Print information about the mesh to the screen.
+    mesh.print_info();
 
     // Get a reference to the Convection-Diffusion system object.
-  TransientLinearImplicitSystem & flow_system =
-     equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
+    TransientLinearImplicitSystem & transport_system =
+            equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
+
+    // Get a reference to the Convection-Diffusion system object.
+    TransientLinearImplicitSystem & flow_system =
+            equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
 
 #ifdef MESH_MOVIMENT
-  LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
+    LinearImplicitSystem & mesh_system = equation_systems.get_system<LinearImplicitSystem> ("mesh_moviment");
 #endif
-  // Prints information about the system to the screen.
-  equation_systems.print_info();
+    // Prints information about the system to the screen.
+    equation_systems.print_info();
 
-  double time                           = init_time;
-  transport_system.time                 = time;
-  flow_system.time                      = time;
+    double time = init_time;
+    transport_system.time = time;
+    flow_system.time = time;
 
-  unsigned int t_step                           = 0;
-  unsigned int n_linear_iterations_flow         = 0;
-  unsigned int n_nonlinear_iterations_flow      = 0;
-  unsigned int n_nonlinear_iterations_transport = 0;
-  unsigned int n_linear_iterations_transport    = 0;
-  bool redo_nl;
+    unsigned int t_step = 0;
+    unsigned int n_linear_iterations_flow = 0;
+    unsigned int n_nonlinear_iterations_flow = 0;
+    unsigned int n_nonlinear_iterations_transport = 0;
+    unsigned int n_linear_iterations_transport = 0;
+    bool redo_nl;
 
-  string* current_files;
+    string* current_files;
 
-  #ifdef LIBMESH_HAVE_HDF5
+#ifdef LIBMESH_HAVE_HDF5
     current_files = xdmf_writer.write_time_step(equation_systems, time);
     cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-  #else
+#else
     int exodus_step = 0;
     {
-      std::ostringstream out;
-      out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
-      ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
-      exodus_step++;
+        std::ostringstream out;
+        out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
+        ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
+        exodus_step++;
     }
     //std::string exodus_filename = "output.e";
-  #endif
+#endif
 
-  #ifdef PROV
+#ifdef PROV
     // Generate loop iterations
-    prov.outputGetMaximumIterations(simulationID,dt,tmax,n_time_steps,n_nonlinear_steps,nonlinear_tolerance,max_linear_iters,max_r_steps,write_interval,current_files[1]);
-  #endif
+    prov.outputGetMaximumIterations(simulationID, dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
+#endif
 
-  Performance perf;
+    Performance perf;
 
-  if(dim==2){
-    // 2D analysis
-    char firstFilename[1024];
-    sprintf(firstFilename,"init_ext_plane_%d.csv",t_step);
-    char finalFilename[1024];
-    sprintf(finalFilename,"ext_plane_%d.csv",t_step);
-    #ifdef PROV
-      // Mesh Writer
-      prov.inputInitDataExtraction(simulationID,"initDataExtraction","init-data-extraction");
-    #endif
-
-    #ifdef PERFORMANCE
-      if(libMesh::global_processor_id() == 0){
-        perf.start();
-      }
-    #endif
-       
-    #ifdef USE_CATALYST
-      FEAdaptor::Initialize(argc,argv);    
-      FEAdaptor::CoProcess(argc,argv,equation_systems,0.0,t_step,false,false);
-      if(libMesh::global_processor_id() == 0){
-        char commandLine[4096];
-        sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
-        system(strdup(commandLine));
-      }
-    #endif  
-
-    #ifdef PERFORMANCE
-      if(libMesh::global_processor_id() == 0){
-        perf.end();
-        double elapsedTime = perf.elapsedTime();
-        char buffer[1024];
-        sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
-        cout << buffer << endl;
-        prov.storeDataExtractionCost(simulationID,0,0,current_files[1],finalFilename,elapsedTime);
-      }
-    #endif  
-
-    #ifdef PROV
-      // Mesh Writer
-      prov.outputInitDataExtraction(simulationID,"initDataExtraction","init-data-extraction","oinitdataextraction",0,current_files[1],finalFilename);
-    #endif
-  }else if(dim==3){
-    // 3D analysis
-    for(int ik=0; ik<=3; ik++){
-      char firstFilename[1024];
-      sprintf(firstFilename,"init_ext_line_%d_%d.csv",ik,t_step);
-      char finalFilename[1024];
-      sprintf(finalFilename,"ext_line_%d_%d.csv",ik,t_step);
-
-      #ifdef PROV
+    if (dim == 2) {
+        // 2D analysis
+        char firstFilename[1024];
+        sprintf(firstFilename, "init_ext_plane_%d.csv", t_step);
+        char finalFilename[1024];
+        sprintf(finalFilename, "ext_plane_%d.csv", t_step);
+#ifdef PROV
         // Mesh Writer
-        char argument1[1024];
-        char argument2[1024];
-        sprintf(argument1,"iLine%dExtraction",ik);
-        sprintf(argument2,"init-line-%d-extraction",ik);
-        prov.inputInitDataExtraction(simulationID,argument1,argument2);
-      #endif
+        prov.inputInitDataExtraction(simulationID, "initDataExtraction", "init-data-extraction");
+#endif
 
-      #ifdef PERFORMANCE
-        if(libMesh::global_processor_id() == 0){
-          perf.start();
+#ifdef PERFORMANCE
+        if (libMesh::global_processor_id() == 0) {
+            perf.start();
         }
-      #endif
-         
-      #ifdef USE_CATALYST
-        if(ik==0){
-          FEAdaptor::Initialize(argc,argv);    
-          FEAdaptor::CoProcess(argc,argv,equation_systems,0.0,t_step,false,false);
-        }
-        if(libMesh::global_processor_id() == 0){
-          char commandLine[4096];
-          sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
-          system(strdup(commandLine));
-        }
-      #endif  
+#endif
 
-      #ifdef PERFORMANCE
-        if(libMesh::global_processor_id() == 0){
-          perf.end();
-          double elapsedTime = perf.elapsedTime();
-          char buffer[1024];
-          sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
-          cout << buffer << endl;
-          prov.storeDataExtractionCost(simulationID,0,0,current_files[1],finalFilename,elapsedTime);
+#ifdef USE_CATALYST
+        FEAdaptor::Initialize(argc, argv);
+        FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+        if (libMesh::global_processor_id() == 0) {
+            char commandLine[4096];
+            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+            system(strdup(commandLine));
         }
-      #endif  
+#endif  
 
-      #ifdef PROV
+#ifdef PERFORMANCE
+        if (libMesh::global_processor_id() == 0) {
+            perf.end();
+            double elapsedTime = perf.elapsedTime();
+            char buffer[1024];
+            sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+            cout << buffer << endl;
+            prov.storeDataExtractionCost(simulationID, 0, 0, current_files[1], finalFilename, elapsedTime);
+        }
+#endif  
+
+#ifdef PROV
         // Mesh Writer
-        char argument3[1024];
-        sprintf(argument1,"iLine%dExtraction",ik);
-        sprintf(argument2,"init-line-%d-extraction",ik);
-        sprintf(argument3,"oline%diextraction",ik);
-        prov.outputInitDataExtraction(simulationID,argument1,argument2,argument3,0,current_files[1],finalFilename);
-      #endif
+        prov.outputInitDataExtraction(simulationID, "initDataExtraction", "init-data-extraction", "oinitdataextraction", 0, current_files[1], finalFilename);
+#endif
+    } else if (dim == 3) {
+        // 3D analysis
+        for (int ik = 0; ik <= 3; ik++) {
+            char firstFilename[1024];
+            sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, t_step);
+            char finalFilename[1024];
+            sprintf(finalFilename, "ext_line_%d_%d.csv", ik, t_step);
+
+#ifdef PROV
+            // Mesh Writer
+            char argument1[1024];
+            char argument2[1024];
+            sprintf(argument1, "iLine%dExtraction", ik);
+            sprintf(argument2, "init-line-%d-extraction", ik);
+            prov.inputInitDataExtraction(simulationID, argument1, argument2);
+#endif
+
+#ifdef PERFORMANCE
+            if (libMesh::global_processor_id() == 0) {
+                perf.start();
+            }
+#endif
+
+#ifdef USE_CATALYST
+            if (ik == 0) {
+                FEAdaptor::Initialize(argc, argv);
+                FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+            }
+            if (libMesh::global_processor_id() == 0) {
+                char commandLine[4096];
+                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                system(strdup(commandLine));
+            }
+#endif  
+
+#ifdef PERFORMANCE
+            if (libMesh::global_processor_id() == 0) {
+                perf.end();
+                double elapsedTime = perf.elapsedTime();
+                char buffer[1024];
+                sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                cout << buffer << endl;
+                prov.storeDataExtractionCost(simulationID, 0, 0, current_files[1], finalFilename, elapsedTime);
+            }
+#endif  
+
+#ifdef PROV
+            // Mesh Writer
+            char argument3[1024];
+            sprintf(argument1, "iLine%dExtraction", ik);
+            sprintf(argument2, "init-line-%d-extraction", ik);
+            sprintf(argument3, "oline%diextraction", ik);
+            prov.outputInitDataExtraction(simulationID, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+#endif
+        }
     }
-  }
 
 
-// STEP LOOP
-  // Loop in time steps
-  int numberIterationsFluid = 0;
-  int numberIterationsSediments = 0;
-  int numberIterationsMeshRefinements = 0;
-  int numberOfWrites = 0;
+    // STEP LOOP
+    // Loop in time steps
+    int taskID = 0;
+    int numberIterationsFluid = 0;
+    int numberIterationsSediments = 0;
+    int numberIterationsMeshRefinements = 0;
+    int numberOfWrites = 0;
+    char meshDependencies[4096];
+    bool hasOperationInTimeStep = false;
 
-  for (t_step = init_tstep; (t_step < n_time_steps)&&( time < tmax); t_step++)
-  {
-      if(is_file_exist("abort.run")) break;
+    for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
+        taskID++;
+        if (is_file_exist("abort.run")) break;
 
-      // Incremenet the time counter, set the time and the
-      // time step size as parameters in the EquationSystem.
-      time                  += dt;
-      flow_system.time      += dt;
-      transport_system.time += dt;
+        // Increment the time counter, set the time and the
+        // time step size as parameters in the EquationSystem.
+        time += dt;
+        flow_system.time += dt;
+        transport_system.time += dt;
 
-      Real tmp = Reynolds;
-      equation_systems.parameters.set<Real> ("Reynolds")    = tmp;
-      equation_systems.parameters.set<Real> ("Diffusivity") = 1.0/(Sc*tmp);
-      equation_systems.parameters.set<Real> ("time")        = time;
-      equation_systems.parameters.set<Real> ("dt")          = dt;
+        Real tmp = Reynolds;
+        equation_systems.parameters.set<Real> ("Reynolds") = tmp;
+        equation_systems.parameters.set<Real> ("Diffusivity") = 1.0 / (Sc * tmp);
+        equation_systems.parameters.set<Real> ("time") = time;
+        equation_systems.parameters.set<Real> ("dt") = dt;
 
-      // A pretty update message
-      std:: cout << std::setw(55)
-           << std::setfill('=')
-           << "\n";
-      std::cout << " Time step ";
-      {
+        // A pretty update message
+        std::cout << std::setw(55)
+                << std::setfill('=')
+                << "\n";
+        std::cout << " Time step ";
+        {
             std::ostringstream out;
 
             out << std::setw(2)
-            << std::right
-            << t_step
-            << "  simulation time = "
-            << std::fixed
-            << std::setw(6)
-            << std::setprecision(3)
-            << std::setfill('0')
-            << std::left
-            << transport_system.time
-            <<  "...";
+                    << std::right
+                    << t_step
+                    << "  simulation time = "
+                    << std::fixed
+                    << std::setw(6)
+                    << std::setprecision(3)
+                    << std::setfill('0')
+                    << std::left
+                    << transport_system.time
+                    << "...";
 
             std::cout << out.str() << std::endl;
-       }
-      std:: cout << std::setw(55)
-           << std::setfill('=')
-           << "\n";
+        }
+        std::cout << std::setw(55)
+                << std::setfill('=')
+                << "\n";
 
-       // At the beginning of each solve, reset the linear solver tolerance
-       // to a "reasonable" starting value.
-       const Real initial_linear_solver_tol                                              = 1.e-6;
-       equation_systems.parameters.set<Real> ("linear solver tolerance")                 = initial_linear_solver_tol;
-       equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iters;
+        // At the beginning of each solve, reset the linear solver tolerance
+        // to a "reasonable" starting value.
+        const Real initial_linear_solver_tol = 1.e-6;
+        equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+        equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iters;
 
-      // AMR/C Loop
-      redo_nl  = true;
-      *flow_system.old_local_solution      = *flow_system.current_local_solution;
-      *transport_system.old_local_solution = *transport_system.current_local_solution;
+        // AMR/C Loop
+        redo_nl = true;
+        *flow_system.old_local_solution = *flow_system.current_local_solution;
+        *transport_system.old_local_solution = *transport_system.current_local_solution;
 
-      // Loop in linear steps
-      for  (unsigned int r = 0; r < max_r_steps; r++)
-      {
-          if(!redo_nl) break;
-            std::cout << " Solving Navier-Stokes equation..." <<std::endl;
+        // Loop in linear steps
+        for (unsigned int r = 0; r < max_r_steps; r++) {
+            if (!redo_nl) break;
+            std::cout << " Solving Navier-Stokes equation..." << std::endl;
             {
                 std::ostringstream out;
 
-              // We write the file in the ExodusII format.
+                // We write the file in the ExodusII format.
                 out << std::setw(55)
-                 << std::setfill('-')
-                 << "\n"
-                 << std::setfill(' ')
-                 << std::setw(5)
-                 << std::left
-                 << "STEP"
-                 << std::setw(5)
-                 << "NLI"
-                 << std::setw(15)
-                 << "|b-AX|"
-                 << std::setw(15)
-                 << "|du|"
-                 << std::setw(15)
-                 << "|du|/|u|"
-                 << "\n"
-                 <<std::right
-                 << std::setw(55)
-                 << std::setfill('-')
-                 << "\n";
-                 std::cout << out.str() << std::flush;
+                        << std::setfill('-')
+                        << "\n"
+                        << std::setfill(' ')
+                        << std::setw(5)
+                        << std::left
+                        << "STEP"
+                        << std::setw(5)
+                        << "NLI"
+                        << std::setw(15)
+                        << "|b-AX|"
+                        << std::setw(15)
+                        << "|du|"
+                        << std::setw(15)
+                        << "|du|/|u|"
+                        << "\n"
+                        << std::right
+                        << std::setw(55)
+                        << std::setfill('-')
+                        << "\n";
+                std::cout << out.str() << std::flush;
             }
 
             // determine if we can exit the nonlinear loop.
             UniquePtr<NumericVector<Number> >
-                flow_last_nonlinear_soln (flow_system.solution->clone());
+                    flow_last_nonlinear_soln(flow_system.solution->clone());
 
             // Fluid
             // FLOW NONLINEAR LOOP
-            for (unsigned int l=0; l< n_nonlinear_steps; ++l)
-            {
-              numberIterationsFluid++;
-              #ifdef PROV
-              // Fluids
-              prov.inputSolverSimulationFluid(simulationID,numberIterationsFluid);
-              #endif
+            for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
+                numberIterationsFluid++;
+#ifdef PROV
+                // Fluids
+                prov.inputSolverSimulationFluid(taskID, simulationID, numberIterationsFluid);
+#endif
 
-              // Update the nonlinear solution.
-              flow_last_nonlinear_soln->zero();
-              flow_last_nonlinear_soln->add(*flow_system.solution);
+                // Update the nonlinear solution.
+                flow_last_nonlinear_soln->zero();
+                flow_last_nonlinear_soln->add(*flow_system.solution);
 
-              // Assemble & solve the linear system.
-              flow_system.solve();
+                // Assemble & solve the linear system.
+                flow_system.solve();
 
-              // Compute the difference between this solution and the last
-              // nonlinear iterate.
-              flow_last_nonlinear_soln->add (-1., *flow_system.solution);
+                // Compute the difference between this solution and the last
+                // nonlinear iterate.
+                flow_last_nonlinear_soln->add(-1., *flow_system.solution);
 
-              // Close the vector before computing its norm
-              flow_last_nonlinear_soln->close();
+                // Close the vector before computing its norm
+                flow_last_nonlinear_soln->close();
 
-              // Compute the l2 norm of the difference
-              const Real norm_delta = flow_last_nonlinear_soln->l2_norm();
-              const Real u_norm     = flow_system.solution->l2_norm();
+                // Compute the l2 norm of the difference
+                const Real norm_delta = flow_last_nonlinear_soln->l2_norm();
+                const Real u_norm = flow_system.solution->l2_norm();
 
-              // How many iterations were required to solve the linear system?
-              const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
-              //Total number of linear iterations (so far)
-              n_linear_iterations_flow = n_linear_iterations_flow + n_linear_iterations;
+                // How many iterations were required to solve the linear system?
+                const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
+                //Total number of linear iterations (so far)
+                n_linear_iterations_flow = n_linear_iterations_flow + n_linear_iterations;
 
-              // What was the final residual of the linear system?
-              const Real final_linear_residual = flow_system.final_linear_residual();
+                // What was the final residual of the linear system?
+                const Real final_linear_residual = flow_system.final_linear_residual();
 
-              {
-                        std::ostringstream out;
+                {
+                    std::ostringstream out;
 
-                        // We write the file in the ExodusII format.
-                        out << std::setw(5)
+                    // We write the file in the ExodusII format.
+                    out << std::setw(5)
                             << std::left
                             << l
                             << std::setw(5)
@@ -619,126 +618,124 @@ int main (int argc, char** argv)
                             << std::setw(15)
                             << norm_delta
                             << std::setw(15)
-                            << norm_delta/u_norm
+                            << norm_delta / u_norm
                             << "\n";
 
-                            std::cout << out.str() << std::flush ;
+                    std::cout << out.str() << std::flush;
                 }
 
-              bool converged = (norm_delta < nonlinear_tolerance);
+                bool converged = (norm_delta < nonlinear_tolerance);
 
-              //Total number of non-linear iterations (so far)
-              n_nonlinear_iterations_flow++;
+                //Total number of non-linear iterations (so far)
+                n_nonlinear_iterations_flow++;
 
-              #ifdef PROV
+#ifdef PROV
                 // Fluids
-                prov.outputSolverSimulationFluid(simulationID,numberIterationsFluid,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-              #endif  
+                prov.outputSolverSimulationFluid(taskID, simulationID, numberIterationsFluid, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
+#endif  
 
-              // Terminate the solution iteration if the difference between
-              // this nonlinear iterate and the last is sufficiently small, AND
-              // if the most recent linear system was solved to a sufficient tolerance.
-              if ((norm_delta < nonlinear_tolerance)
-                   // && (flow_system.final_linear_residual() < nonlinear_tolerance)
-                      )
-                {
-                  std::ostringstream out;
-                   // We write the file in the ExodusII format.
-                   out << std::setw(55)
-                       << std::setfill('-')
-                       << "\n";
-                   std::cout << out.str()
+                // Terminate the solution iteration if the difference between
+                // this nonlinear iterate and the last is sufficiently small, AND
+                // if the most recent linear system was solved to a sufficient tolerance.
+                if ((norm_delta < nonlinear_tolerance)
+                        // && (flow_system.final_linear_residual() < nonlinear_tolerance)
+                        ) {
+                    std::ostringstream out;
+                    // We write the file in the ExodusII format.
+                    out << std::setw(55)
+                            << std::setfill('-')
+                            << "\n";
+                    std::cout << out.str()
                             << " Nonlinear solver converged at step "
                             << l
                             << std::endl;
-                  break;
+                    break;
                 }
 
-              // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-              // method, the linear solver tolerance needs to decrease as we get closer to
-              // the solution to ensure quadratic convergence.  The new linear solver tolerance
-              // is chosen (heuristically) as the square of the previous linear system residual norm.
-              //Real flr2 = final_linear_residual*final_linear_residual;
-              equation_systems.parameters.set<Real> ("linear solver tolerance") =
-                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+                // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+                // method, the linear solver tolerance needs to decrease as we get closer to
+                // the solution to ensure quadratic convergence.  The new linear solver tolerance
+                // is chosen (heuristically) as the square of the previous linear system residual norm.
+                //Real flr2 = final_linear_residual*final_linear_residual;
+                equation_systems.parameters.set<Real> ("linear solver tolerance") =
+                        std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
             } // end nonlinear loop
 
-            std::cout << " Solving sedimentation equation..." <<std::endl;
+            std::cout << " Solving sedimentation equation..." << std::endl;
             {
                 std::ostringstream out;
 
-              // We write the file in the ExodusII format.
+                // We write the file in the ExodusII format.
                 out << std::setw(55)
-                 << std::setfill('-')
-                 << "\n"
-                 << std::setfill(' ')
-                 << std::setw(5)
-                 << std::left
-                 << "STEP"
-                 << std::setw(5)
-                 << "NLI"
-                 << std::setw(15)
-                 << "|b-AX|"
-                 << std::setw(15)
-                 << "|du|"
-                 << std::setw(15)
-                 << "|du|/|u|"
-                 << "\n"
-                 <<std::right
-                 << std::setw(55)
-                 << std::setfill('-')
-                 << "\n";
-                 std::cout << out.str() << std::flush;
-              }
+                        << std::setfill('-')
+                        << "\n"
+                        << std::setfill(' ')
+                        << std::setw(5)
+                        << std::left
+                        << "STEP"
+                        << std::setw(5)
+                        << "NLI"
+                        << std::setw(15)
+                        << "|b-AX|"
+                        << std::setw(15)
+                        << "|du|"
+                        << std::setw(15)
+                        << "|du|/|u|"
+                        << "\n"
+                        << std::right
+                        << std::setw(55)
+                        << std::setfill('-')
+                        << "\n";
+                std::cout << out.str() << std::flush;
+            }
 
             equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
 
             // determine if we can exit the nonlinear loop.
-            UniquePtr<NumericVector<Number> > sed_last_nonlinear_soln (transport_system.solution->clone());
+            UniquePtr<NumericVector<Number> > sed_last_nonlinear_soln(transport_system.solution->clone());
 
             // Sediments
             // FLOW NON-LINEAR LOOP
-            for (unsigned int l=0; l< n_nonlinear_steps; ++l)
-            {
-              numberIterationsSediments++;
-              
-              #ifdef PROV
-              // Fluids
-              prov.inputSolverSimulationSediments(simulationID,numberIterationsSediments);
-              #endif
+            for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
+                numberIterationsSediments++;
 
-              // Update the nonlinear solution.
-              sed_last_nonlinear_soln->zero();
-              sed_last_nonlinear_soln->add(*transport_system.solution);
+#ifdef PROV
+                // Fluids
+                prov.inputSolverSimulationSediments(taskID, simulationID, numberIterationsSediments);
+#endif
 
-              // Assemble & solve the linear system.
-              transport_system.solve();
+                // Update the nonlinear solution.
+                sed_last_nonlinear_soln->zero();
+                sed_last_nonlinear_soln->add(*transport_system.solution);
 
-              // Compute the difference between this solution and the last
-              // nonlinear iterate.
-              sed_last_nonlinear_soln->add (-1., *transport_system.solution);
+                // Assemble & solve the linear system.
+                transport_system.solve();
 
-              // Close the vector before computing its norm
-              sed_last_nonlinear_soln->close();
+                // Compute the difference between this solution and the last
+                // nonlinear iterate.
+                sed_last_nonlinear_soln->add(-1., *transport_system.solution);
 
-              // Compute the l2 norm of the difference
-              const Real norm_delta = sed_last_nonlinear_soln->l2_norm();
-              const Real u_norm     = transport_system.solution->l2_norm();
+                // Close the vector before computing its norm
+                sed_last_nonlinear_soln->close();
 
-              // How many iterations were required to solve the linear system?
-              const unsigned int n_linear_iterations = transport_system.n_linear_iterations();
-              //Total number of linear iterations (so far)
-              n_linear_iterations_transport += n_linear_iterations;
+                // Compute the l2 norm of the difference
+                const Real norm_delta = sed_last_nonlinear_soln->l2_norm();
+                const Real u_norm = transport_system.solution->l2_norm();
 
-              // What was the final residual of the linear system?
-              const Real final_linear_residual = transport_system.final_linear_residual();
+                // How many iterations were required to solve the linear system?
+                const unsigned int n_linear_iterations = transport_system.n_linear_iterations();
+                //Total number of linear iterations (so far)
+                n_linear_iterations_transport += n_linear_iterations;
 
-              {
-                        std::ostringstream out;
+                // What was the final residual of the linear system?
+                const Real final_linear_residual = transport_system.final_linear_residual();
 
-                        // We write the file in the ExodusII format.
-                        out << std::setw(5)
+                {
+                    std::ostringstream out;
+
+                    // We write the file in the ExodusII format.
+                    out << std::setw(5)
                             << std::left
                             << l
                             << std::setw(5)
@@ -748,392 +745,402 @@ int main (int argc, char** argv)
                             << std::setw(15)
                             << norm_delta
                             << std::setw(15)
-                            << norm_delta/u_norm
+                            << norm_delta / u_norm
                             << "\n";
 
-                            std::cout << out.str() << std::flush ;
+                    std::cout << out.str() << std::flush;
                 }
 
                 bool converged = (norm_delta < nonlinear_tolerance) &&
-                  (transport_system.final_linear_residual() < nonlinear_tolerance);
+                        (transport_system.final_linear_residual() < nonlinear_tolerance);
 
-              //Total number of non-linear iterations (so far)
-              n_nonlinear_iterations_transport++;
+                //Total number of non-linear iterations (so far)
+                n_nonlinear_iterations_transport++;
 
-              #ifdef PROV
+#ifdef PROV
                 // Sediments
-                prov.outputSolverSimulationSediments(simulationID,numberIterationsSediments,t_step,transport_system.time,r,l,n_linear_iterations,final_linear_residual,norm_delta,norm_delta/u_norm,converged);
-              #endif
-
-              // Terminate the solution iteration if the difference between
-              // this nonlinear iterate and the last is sufficiently small, AND
-              // if the most recent linear system was solved to a sufficient tolerance.
-              if ((norm_delta < nonlinear_tolerance) &&
-                  (transport_system.final_linear_residual() < nonlinear_tolerance))
-                {
-                  // std::ostringstream out;
-                  //  // We write the file in the ExodusII format.
-                  //  out << std::setw(55)
-                  //      << std::setfill('-')
-                  //      << "\n";
-                  //  std::cout << out.str()
-                  //           << " Nonlinear solver converged at step "
-                  //           << l
-                  //           << std::endl;
-                  break;
-                }
-
-              // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-              // method, the linear solver tolerance needs to decrease as we get closer to
-              // the solution to ensure quadratic convergence.  The new linear solver tolerance
-              // is chosen (heuristically) as the square of the previous linear system residual norm.
-              //Real flr2 = final_linear_residual*final_linear_residual;
-              equation_systems.parameters.set<Real> ("linear solver tolerance") =
-                std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-
-          } // end nonlinear loop
-
-          redo_nl = false;
-
-          if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) )
-          {
-            std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
-            numberIterationsMeshRefinements++;
-            int beforeNActiveElem = mesh.n_active_elem();
-            std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
-            Real H1norm = transport_system.calculate_norm(*transport_system.solution, SystemNorm(H1));
-            ErrorVector error;
-            KellyErrorEstimator error_estimator;
-            error_estimator.estimate_error (transport_system, error);
-            refinement.flag_elements_by_error_fraction (error);
-            refinement.refine_and_coarsen_elements();
-            equation_systems.reinit ();
-            redo_nl = true;
-            std::cout << "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
-
-            #ifdef PROV
-              // Mesh Refinement
-              prov.outputMeshRefinement(simulationID,numberIterationsMeshRefinements,first_step_refinement,t_step,beforeNActiveElem,mesh.n_active_elem());
-            #endif
-
-            first_step_refinement = false;
-         }
-
-      sediment_deposition.ComputeDeposition();
-      sediment_deposition.print();
-
-#ifdef MESH_MOVIMENT
-      std::cout << "Solving Mesh moviment..." << std::endl;
-
-      equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
-      mesh_system.solve();
-
-      // How many iterations were required to solve the linear system?
-      const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
-      std::cout << " Number of iterations: " <<  n_linear_iterations << std::endl;
-
-
-      // What was the final residual of the linear system?
-      const Real final_linear_residual = flow_system.final_linear_residual();
-      std::cout << " final residual " <<  final_linear_residual << std::endl;
-
-      moving_mesh.updateMesh();
+                prov.outputSolverSimulationSediments(taskID, simulationID, numberIterationsSediments, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
 #endif
 
-      // Output every 10 timesteps to file.
-      if ((t_step+1)%write_interval == 0)
-      {
-          numberOfWrites++;
-          const std::string mesh_restart      = rname + "_mesh_restart.xda";
-          const std::string solution_restart  = rname + "_solution_restart.xda";
+                // Terminate the solution iteration if the difference between
+                // this nonlinear iterate and the last is sufficiently small, AND
+                // if the most recent linear system was solved to a sufficient tolerance.
+                if ((norm_delta < nonlinear_tolerance) &&
+                        (transport_system.final_linear_residual() < nonlinear_tolerance)) {
+                    // std::ostringstream out;
+                    //  // We write the file in the ExodusII format.
+                    //  out << std::setw(55)
+                    //      << std::setfill('-')
+                    //      << "\n";
+                    //  std::cout << out.str()
+                    //           << " Nonlinear solver converged at step "
+                    //           << l
+                    //           << std::endl;
+                    break;
+                }
 
-          mesh.write(mesh_restart);
-          equation_systems.write(solution_restart, WRITE);
+                // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+                // method, the linear solver tolerance needs to decrease as we get closer to
+                // the solution to ensure quadratic convergence.  The new linear solver tolerance
+                // is chosen (heuristically) as the square of the previous linear system residual norm.
+                //Real flr2 = final_linear_residual*final_linear_residual;
+                equation_systems.parameters.set<Real> ("linear solver tolerance") =
+                        std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
-          std::ofstream fout;
-          fout.open("restart.in");
-          fout << "#Restart file: "     << std::endl;
-          fout << "time = "             << time             << std::endl;
-          fout << "dt   = "             << dt               << std::endl;
-          fout << "init_tstep = "       << t_step           << std::endl;
-          fout << "mesh_restart = "     << mesh_restart     << std::endl;
-          fout << "solution_restart = " << solution_restart << std::endl;
-          
-          #ifdef LIBMESH_HAVE_HDF5
-            fout << "xdmf_file_id = "     << xdmf_writer.get_file_id() << std::endl;
-          #endif
-          
-          fout.close();
+            } // end nonlinear loop
 
-          #ifdef PROV
-            // Mesh Writer
-            prov.inputMeshWriter(simulationID,numberOfWrites);
-          #endif
+            redo_nl = false;
 
-          #ifdef LIBMESH_HAVE_HDF5
-            current_files = xdmf_writer.write_time_step(equation_systems, time);
-            cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-          #else
-            //ExodusII_IO exo(mesh);
-            //exo.append(true);
-            //exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
+            if (first_step_refinement || (((r + 1) != max_r_steps) && (t_step + 1) % ref_interval == 0)) {
+                std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
+                numberIterationsMeshRefinements++;
+                int beforeNActiveElem = mesh.n_active_elem();
+                std::cout << "Number of elements before AMR step: " << mesh.n_active_elem() << std::endl;
+                Real H1norm = transport_system.calculate_norm(*transport_system.solution, SystemNorm(H1));
+                ErrorVector error;
+                KellyErrorEstimator error_estimator;
+                error_estimator.estimate_error(transport_system, error);
+                refinement.flag_elements_by_error_fraction(error);
+                refinement.refine_and_coarsen_elements();
+                equation_systems.reinit();
+                redo_nl = true;
+                std::cout << "Number of elements after AMR step: " << mesh.n_active_elem() << std::endl;
 
-            {
-              std::ostringstream out;
-              out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
-              ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
-              exodus_step++;
+#ifdef PROV
+                // Mesh Refinement
+                prov.outputMeshRefinement(taskID, simulationID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
+#endif
+
+                first_step_refinement = false;
             }
-          #endif
 
-          #ifdef PROV
-            prov.outputMeshWriter(simulationID,numberOfWrites,t_step,current_files[1]);
-          #endif
+            sediment_deposition.ComputeDeposition();
+            sediment_deposition.print();
 
-          int step = t_step + 1;
-          if(dim==2){
-            #ifdef PROV
-              prov.inputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction");
-            #endif
+#ifdef MESH_MOVIMENT
+            std::cout << "Solving Mesh moviment..." << std::endl;
 
-            #ifdef PERFORMANCE
-              if(libMesh::global_processor_id() == 0){
-                perf.start();
-              }
-            #endif
+            equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+            mesh_system.solve();
 
-            char firstFilename[1024];
-            sprintf(firstFilename,"init_ext_plane_%d.csv",step);
-            char finalFilename[1024];
-            sprintf(finalFilename,"ext_plane_%d.csv",step);
+            // How many iterations were required to solve the linear system?
+            const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
+            std::cout << " Number of iterations: " << n_linear_iterations << std::endl;
 
-            #ifdef USE_CATALYST
-              FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,false,false);
-              if(libMesh::global_processor_id() == 0){
-                char commandLine[4096];
-                sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
-                system(strdup(commandLine));
-              }
-            #endif
 
-            #ifdef PERFORMANCE
-              if(libMesh::global_processor_id() == 0){
-                perf.end();
-                double elapsedTime = perf.elapsedTime();
-                char buffer[1024];
-                sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
-                cout << buffer << endl;
-                prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
-              }
-            #endif
+            // What was the final residual of the linear system?
+            const Real final_linear_residual = flow_system.final_linear_residual();
+            std::cout << " final residual " << final_linear_residual << std::endl;
 
-            #ifdef PROV
-              prov.outputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction","odataextraction",step,current_files[1],finalFilename);
-            #endif
-          }else if(dim==3){
-            // 3D analysis
-            for(int ik=0; ik<=3; ik++){
-              char firstFilename[1024];
-              sprintf(firstFilename,"init_ext_line_%d_%d.csv",ik,step);
-              char finalFilename[1024];
-              sprintf(finalFilename,"ext_line_%d_%d.csv",ik,step);
+            moving_mesh.updateMesh();
+#endif
 
-              #ifdef PROV
+            // Output every 10 timesteps to file.
+            if ((t_step + 1) % write_interval == 0) {
+                numberOfWrites++;
+                const std::string mesh_restart = rname + "_mesh_restart.xda";
+                const std::string solution_restart = rname + "_solution_restart.xda";
+
+                mesh.write(mesh_restart);
+                equation_systems.write(solution_restart, WRITE);
+
+                std::ofstream fout;
+                fout.open("restart.in");
+                fout << "#Restart file: " << std::endl;
+                fout << "time = " << time << std::endl;
+                fout << "dt   = " << dt << std::endl;
+                fout << "init_tstep = " << t_step << std::endl;
+                fout << "mesh_restart = " << mesh_restart << std::endl;
+                fout << "solution_restart = " << solution_restart << std::endl;
+
+#ifdef LIBMESH_HAVE_HDF5
+                fout << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
+#endif
+
+                fout.close();
+
+#ifdef PROV
                 // Mesh Writer
-                char argument1[1024];
-                char argument2[1024];
-                sprintf(argument1,"line%dExtraction",ik);
-                sprintf(argument2,"line-%d-extraction",ik);
-                prov.inputDataExtraction(simulationID,numberOfWrites,argument1,argument2);
-              #endif
-
-              #ifdef PERFORMANCE
-                if(libMesh::global_processor_id() == 0){
-                  perf.start();
+                prov.inputMeshWriter(taskID, simulationID, numberOfWrites);
+                if (!hasOperationInTimeStep) {
+                    hasOperationInTimeStep = true;
                 }
-              #endif
-                 
-              #ifdef USE_CATALYST
-                if(ik==0){
-                  FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,false,false);
-                }
-                if(libMesh::global_processor_id() == 0){
-                  char commandLine[4096];
-                  sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
-                  system(strdup(commandLine));
-                }
-              #endif  
+#endif
 
-              #ifdef PERFORMANCE
-                if(libMesh::global_processor_id() == 0){
-                  perf.end();
-                  double elapsedTime = perf.elapsedTime();
-                  char buffer[1024];
-                  sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
-                  cout << buffer << endl;
-                  prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
-                }
-              #endif  
-
-              #ifdef PROV
-                // Mesh Writer
-                char argument3[1024];
-                sprintf(argument1,"line%dExtraction",ik);
-                sprintf(argument2,"line-%d-extraction",ik);
-                sprintf(argument3,"oline%dextraction",ik);
-                prov.outputDataExtraction(simulationID,numberOfWrites,argument1,argument2,argument3,0,current_files[1],finalFilename);
-              #endif
-            }
-          }
-
-      }
-    }
-
-    if (t_step%write_interval != 0)
-    {
-      numberOfWrites++;
-      #ifdef PROV
-        // Mesh Writer
-        prov.inputMeshWriter(simulationID,numberOfWrites);
-      #endif
-
-      #ifdef LIBMESH_HAVE_HDF5
+#ifdef LIBMESH_HAVE_HDF5
                 current_files = xdmf_writer.write_time_step(equation_systems, time);
                 cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-      #else
-      //        ExodusII_IO exo(mesh);
-      //        exo.append(true);
-      //        exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
-                 {
+#else
+                //ExodusII_IO exo(mesh);
+                //exo.append(true);
+                //exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
+
+                {
                     std::ostringstream out;
-                    out << rname << "_"<< std::setw(5) << std::setfill('0') << exodus_step << ".e";
-                    ExodusII_IO(mesh).write_equation_systems (out.str(), equation_systems);
+                    out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
+                    ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
                     exodus_step++;
-                  }
-      #endif
-
-      #ifdef PROV
-        // Mesh Writer
-        prov.outputMeshWriter(simulationID,numberOfWrites,t_step,current_files[1]);
-      #endif
-
-      int step = t_step + 1;
-      if(dim==2){
-            #ifdef PROV
-              prov.inputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction");
-            #endif
-
-            #ifdef PERFORMANCE
-              if(libMesh::global_processor_id() == 0){
-                perf.start();
-              }
-            #endif
-
-            char firstFilename[1024];
-            sprintf(firstFilename,"init_ext_plane_%d.csv",step);
-            char finalFilename[1024];
-            sprintf(finalFilename,"ext_plane_%d.csv",step);
-
-            #ifdef USE_CATALYST
-              FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,true,false);
-              if(libMesh::global_processor_id() == 0){
-                char commandLine[4096];
-                sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
-                system(strdup(commandLine));
-              }
-            #endif
-
-            #ifdef PERFORMANCE
-              if(libMesh::global_processor_id() == 0){
-                perf.end();
-                double elapsedTime = perf.elapsedTime();
-                char buffer[1024];
-                sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
-                cout << buffer << endl;
-                prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
-              }
-            #endif
-
-            #ifdef PROV
-              prov.outputDataExtraction(simulationID,numberOfWrites,"dataExtraction","data-extraction","odataextraction",step,current_files[1],finalFilename);
-            #endif
-          }else if(dim==3){
-            // 3D analysis
-            for(int ik=0; ik<=3; ik++){
-              char firstFilename[1024];
-              sprintf(firstFilename,"init_ext_line_%d_%d.csv",ik,step);
-              char finalFilename[1024];
-              sprintf(finalFilename,"ext_line_%d_%d.csv",ik,step);
-
-              #ifdef PROV
-                // Mesh Writer
-                char argument1[1024];
-                char argument2[1024];
-                sprintf(argument1,"line%dExtraction",ik);
-                sprintf(argument2,"line-%d-extraction",ik);
-                prov.inputDataExtraction(simulationID,numberOfWrites,argument1,argument2);
-              #endif
-
-              #ifdef PERFORMANCE
-                if(libMesh::global_processor_id() == 0){
-                  perf.start();
                 }
-              #endif
-                 
-              #ifdef USE_CATALYST
-                if(ik==0){
-                  FEAdaptor::CoProcess(argc,argv,equation_systems,transport_system.time,step,true,false);
-                }
-                if(libMesh::global_processor_id() == 0){
-                  char commandLine[4096];
-                  sprintf(commandLine,"python clean-csv.py %s %s;rm %s",firstFilename,finalFilename,firstFilename); 
-                  system(strdup(commandLine));
-                }
-              #endif  
+#endif
 
-              #ifdef PERFORMANCE
-                if(libMesh::global_processor_id() == 0){
-                  perf.end();
-                  double elapsedTime = perf.elapsedTime();
-                  char buffer[1024];
-                  sprintf(buffer,"Data Extraction Cost: %.2f",elapsedTime);
-                  cout << buffer << endl;
-                  prov.storeDataExtractionCost(simulationID,numberOfWrites,step,current_files[1],finalFilename,elapsedTime);
-                }
-              #endif  
+#ifdef PROV
+                prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
+#endif
 
-              #ifdef PROV
-                // Mesh Writer
-                char argument3[1024];
-                sprintf(argument1,"line%dExtraction",ik);
-                sprintf(argument2,"line-%d-extraction",ik);
-                sprintf(argument3,"oline%dextraction",ik);
-                prov.outputDataExtraction(simulationID,numberOfWrites,argument1,argument2,argument3,0,current_files[1],finalFilename);
-              #endif
+                int step = t_step + 1;
+                if (dim == 2) {
+#ifdef PROV
+                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction");
+#endif
+
+#ifdef PERFORMANCE
+                    if (libMesh::global_processor_id() == 0) {
+                        perf.start();
+                    }
+#endif
+
+                    char firstFilename[1024];
+                    sprintf(firstFilename, "init_ext_plane_%d.csv", step);
+                    char finalFilename[1024];
+                    sprintf(finalFilename, "ext_plane_%d.csv", step);
+
+#ifdef USE_CATALYST
+                    FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                    if (libMesh::global_processor_id() == 0) {
+                        char commandLine[4096];
+                        sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                        system(strdup(commandLine));
+                    }
+#endif
+
+#ifdef PERFORMANCE
+                    if (libMesh::global_processor_id() == 0) {
+                        perf.end();
+                        double elapsedTime = perf.elapsedTime();
+                        char buffer[1024];
+                        sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                        cout << buffer << endl;
+                        prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                    }
+#endif
+
+#ifdef PROV
+                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+#endif
+                } else if (dim == 3) {
+                    // 3D analysis
+                    for (int ik = 0; ik <= 3; ik++) {
+                        char firstFilename[1024];
+                        sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
+                        char finalFilename[1024];
+                        sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
+
+#ifdef PROV
+                        // Mesh Writer
+                        char argument1[1024];
+                        char argument2[1024];
+                        sprintf(argument1, "line%dExtraction", ik);
+                        sprintf(argument2, "line-%d-extraction", ik);
+                        prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
+#endif
+
+#ifdef PERFORMANCE
+                        if (libMesh::global_processor_id() == 0) {
+                            perf.start();
+                        }
+#endif
+
+#ifdef USE_CATALYST
+                        if (ik == 0) {
+                            FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                        }
+                        if (libMesh::global_processor_id() == 0) {
+                            char commandLine[4096];
+                            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                            system(strdup(commandLine));
+                        }
+#endif  
+
+#ifdef PERFORMANCE
+                        if (libMesh::global_processor_id() == 0) {
+                            perf.end();
+                            double elapsedTime = perf.elapsedTime();
+                            char buffer[1024];
+                            sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                            cout << buffer << endl;
+                            prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                        }
+#endif  
+
+#ifdef PROV
+                        // Mesh Writer
+                        char argument3[1024];
+                        sprintf(argument1, "line%dExtraction", ik);
+                        sprintf(argument2, "line-%d-extraction", ik);
+                        sprintf(argument3, "oline%dextraction", ik);
+                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+#endif
+                    }
+                }
+
             }
-          }
-      }
+        }
+
+        if (t_step % write_interval != 0) {
+            numberOfWrites++;
+#ifdef PROV
+            // Mesh Writer
+            prov.inputMeshWriter(taskID, simulationID, numberOfWrites);
+            if (!hasOperationInTimeStep) {
+                hasOperationInTimeStep = true;
+            }
+#endif
+
+#ifdef LIBMESH_HAVE_HDF5
+            current_files = xdmf_writer.write_time_step(equation_systems, time);
+            cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
+#else
+            //        ExodusII_IO exo(mesh);
+            //        exo.append(true);
+            //        exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
+            {
+                std::ostringstream out;
+                out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
+                ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
+                exodus_step++;
+            }
+#endif
+
+#ifdef PROV
+            // Mesh Writer
+            prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
+#endif
+
+            int step = t_step + 1;
+            if (dim == 2) {
+#ifdef PROV
+                prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction");
+#endif
+
+#ifdef PERFORMANCE
+                if (libMesh::global_processor_id() == 0) {
+                    perf.start();
+                }
+#endif
+
+                char firstFilename[1024];
+                sprintf(firstFilename, "init_ext_plane_%d.csv", step);
+                char finalFilename[1024];
+                sprintf(finalFilename, "ext_plane_%d.csv", step);
+
+#ifdef USE_CATALYST
+                FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                if (libMesh::global_processor_id() == 0) {
+                    char commandLine[4096];
+                    sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                    system(strdup(commandLine));
+                }
+#endif
+
+#ifdef PERFORMANCE
+                if (libMesh::global_processor_id() == 0) {
+                    perf.end();
+                    double elapsedTime = perf.elapsedTime();
+                    char buffer[1024];
+                    sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                    cout << buffer << endl;
+                    prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                }
+#endif
+
+#ifdef PROV
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+#endif
+            } else if (dim == 3) {
+                // 3D analysis
+                for (int ik = 0; ik <= 3; ik++) {
+                    char firstFilename[1024];
+                    sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
+                    char finalFilename[1024];
+                    sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
+
+#ifdef PROV
+                    // Mesh Writer
+                    char argument1[1024];
+                    char argument2[1024];
+                    sprintf(argument1, "line%dExtraction", ik);
+                    sprintf(argument2, "line-%d-extraction", ik);
+                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
+#endif
+
+#ifdef PERFORMANCE
+                    if (libMesh::global_processor_id() == 0) {
+                        perf.start();
+                    }
+#endif
+
+#ifdef USE_CATALYST
+                    if (ik == 0) {
+                        FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                    }
+                    if (libMesh::global_processor_id() == 0) {
+                        char commandLine[4096];
+                        sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                        system(strdup(commandLine));
+                    }
+#endif  
+
+#ifdef PERFORMANCE
+                    if (libMesh::global_processor_id() == 0) {
+                        perf.end();
+                        double elapsedTime = perf.elapsedTime();
+                        char buffer[1024];
+                        sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                        cout << buffer << endl;
+                        prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                    }
+#endif  
+
+#ifdef PROV
+                    // Mesh Writer
+                    char argument3[1024];
+                    sprintf(argument1, "line%dExtraction", ik);
+                    sprintf(argument2, "line-%d-extraction", ik);
+                    sprintf(argument3, "oline%dextraction", ik);
+                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+#endif
+                }
+            }
+        }
+
+        if (hasOperationInTimeStep) {
+            if(strlen(meshDependencies) == 0){
+                sprintf(meshDependencies,"%d",taskID);
+            }else{
+                sprintf(meshDependencies,"%s,%d",meshDependencies,taskID);
+            }
+        }
     }
 
-  std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_flow << std::endl;
-  std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : "<< n_linear_iterations_transport << std::endl;
+    std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
+    std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_transport << std::endl;
 
-  #ifdef PROV
+#ifdef PROV
     // Mesh Aggregator
     char out_filename[256];
-    sprintf(out_filename,"%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
-    prov.meshAggregator(simulationID,out_filename,libMesh::global_n_processors());
+    sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
+    prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(),meshDependencies);
     prov.finishDataIngestor();
-  #endif
+#endif
 
-  #ifdef PERFORMANCE
-    if(libMesh::global_processor_id() == 0){
-      solverPerf.end();
-      double elapsedTime = solverPerf.elapsedTime();
-      prov.storeSolverCost(elapsedTime);
+#ifdef PERFORMANCE
+    if (libMesh::global_processor_id() == 0) {
+        solverPerf.end();
+        double elapsedTime = solverPerf.elapsedTime();
+        prov.storeSolverCost(elapsedTime);
     }
-  #endif
+#endif
 
-  // All done.
-  return 0;
+    // All done.
+    return 0;
 }

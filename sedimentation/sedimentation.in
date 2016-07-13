@@ -4,7 +4,7 @@
 #------------------------------------------------------
 
 # The coarse grid size from which to start adaptivity
-dim    =  3
+dim    =  2
 ncellx = 180
 ncelly = 20
 ncellz = 20
@@ -38,7 +38,7 @@ n_time_steps = 500000
 max_linear_iterations = 200
 
 # maximum time - test case (25.000)
-tmax    = 0.090
+tmax    = 0.020
 
 #------------------------------------------------------
 # EQUATION PARAMETERS
