@@ -14,6 +14,7 @@ rm -rf log.*.err
 rm -rf *.conf
 rm -rf nodes.txt
 rm -rf *.dump
+rm -rf data
 
 mkdir prov/log
 mkdir prov/rde

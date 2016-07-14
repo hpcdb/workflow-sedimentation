@@ -3,11 +3,12 @@
 
 conf=$1
 cpath=$2
+datapath=$3
 lines=`cat $conf  | egrep -v "#"`
 dir=`pwd`
 
 for i in `echo $lines`; do 
   host=`echo $i`
-  echo "cd $cpath;monetdb-start-all;java -jar /work/03664/silva/experiments/dfa/DI-1.0.jar -daemon start"
-  ssh $host "cd $cpath;monetdb-start-all;java -jar /work/03664/silva/experiments/dfa/DI-1.0.jar -daemon start" &
+  echo "cd $cpath;monetdbd start $datapath;monetdbd get all $datapath;monetdb start dataflow_analyzer;monetdb status;java -jar /work/03664/silva/experiments/dfa/DI-1.0.jar -daemon start"
+  ssh $host "cd $cpath;monetdbd start $datapath;monetdbd get all $datapath;monetdb start dataflow_analyzer;monetdb status;java -jar /work/03664/silva/experiments/dfa/DI-1.0.jar -daemon start" &
 done
