@@ -78,7 +78,7 @@ Opening file: 0
 
 [WRITE] output_1_000_00000.h5 - output_1_00000.xmf
 [CATALYST] Time step: 0 ; Time: 0.0
-Data Extraction Cost: 1.28
+Data Extraction Cost: 2.55
 ======================================================
  Time step  0  simulation time = 0.0100...
 ======================================================
@@ -146,7 +146,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00002.h5 - output_1_00002.xmf
 [CATALYST] Time step: 2 ; Time: 0.02
-Data Extraction Cost: 0.14
+Data Extraction Cost: 0.16
 FLOW SOLVER - TOTAL LINEAR ITERATIONS : 2130
 TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 21
 [Provenance] Finish Data Ingestor
