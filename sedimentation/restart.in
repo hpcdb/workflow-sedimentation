@@ -1,7 +1,7 @@
 #Restart file: 
-time = 0.02
+time = 0.04
 dt   = 0.01
-init_tstep = 1
+init_tstep = 3
 mesh_restart = out_mesh_restart.xda
 solution_restart = out_solution_restart.xda
 xdmf_file_id = 2

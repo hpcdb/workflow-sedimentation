@@ -479,7 +479,6 @@ int main(int argc, char** argv) {
     int numberIterationsMeshRefinements = 0;
     int numberOfWrites = 0;
     char meshDependencies[4096];
-    bool hasOperationInTimeStep = false;
 
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
         taskID++;
@@ -862,9 +861,6 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 // Mesh Writer
                 prov.inputMeshWriter(taskID, simulationID, numberOfWrites);
-                if (!hasOperationInTimeStep) {
-                    hasOperationInTimeStep = true;
-                }
 #endif
 
 #ifdef LIBMESH_HAVE_HDF5
@@ -983,43 +979,97 @@ int main(int argc, char** argv) {
                     }
                 }
 
+                if (strlen(meshDependencies) == 0) {
+                    sprintf(meshDependencies, "%d", taskID);
+                } else {
+                    sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
+                }
             }
         }
+    }
 
-        if (t_step % write_interval != 0) {
-            numberOfWrites++;
+    if ((t_step + 1) % write_interval == 0) {
+        numberOfWrites++;
 #ifdef PROV
-            // Mesh Writer
-            prov.inputMeshWriter(taskID, simulationID, numberOfWrites);
-            if (!hasOperationInTimeStep) {
-                hasOperationInTimeStep = true;
-            }
+        // Mesh Writer
+        prov.inputMeshWriter(taskID, simulationID, numberOfWrites);
 #endif
 
 #ifdef LIBMESH_HAVE_HDF5
-            current_files = xdmf_writer.write_time_step(equation_systems, time);
-            cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
+        current_files = xdmf_writer.write_time_step(equation_systems, time);
+        cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 #else
-            //        ExodusII_IO exo(mesh);
-            //        exo.append(true);
-            //        exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
-            {
-                std::ostringstream out;
-                out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
-                ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
-                exodus_step++;
+        //        ExodusII_IO exo(mesh);
+        //        exo.append(true);
+        //        exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
+        {
+            std::ostringstream out;
+            out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
+            ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
+            exodus_step++;
+        }
+#endif
+
+#ifdef PROV
+        // Mesh Writer
+        prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
+#endif
+
+        int step = t_step + 1;
+        if (dim == 2) {
+#ifdef PROV
+            prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction");
+#endif
+
+#ifdef PERFORMANCE
+            if (libMesh::global_processor_id() == 0) {
+                perf.start();
+            }
+#endif
+
+            char firstFilename[1024];
+            sprintf(firstFilename, "init_ext_plane_%d.csv", step);
+            char finalFilename[1024];
+            sprintf(finalFilename, "ext_plane_%d.csv", step);
+
+#ifdef USE_CATALYST
+            FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+            if (libMesh::global_processor_id() == 0) {
+                char commandLine[4096];
+                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                system(strdup(commandLine));
+            }
+#endif
+
+#ifdef PERFORMANCE
+            if (libMesh::global_processor_id() == 0) {
+                perf.end();
+                double elapsedTime = perf.elapsedTime();
+                char buffer[1024];
+                sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                cout << buffer << endl;
+                prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
             }
 #endif
 
 #ifdef PROV
-            // Mesh Writer
-            prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
+            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
 #endif
+        } else if (dim == 3) {
+            // 3D analysis
+            for (int ik = 0; ik <= 3; ik++) {
+                char firstFilename[1024];
+                sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
+                char finalFilename[1024];
+                sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
 
-            int step = t_step + 1;
-            if (dim == 2) {
 #ifdef PROV
-                prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction");
+                // Mesh Writer
+                char argument1[1024];
+                char argument2[1024];
+                sprintf(argument1, "line%dExtraction", ik);
+                sprintf(argument2, "line-%d-extraction", ik);
+                prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
 #endif
 
 #ifdef PERFORMANCE
@@ -1028,19 +1078,16 @@ int main(int argc, char** argv) {
                 }
 #endif
 
-                char firstFilename[1024];
-                sprintf(firstFilename, "init_ext_plane_%d.csv", step);
-                char finalFilename[1024];
-                sprintf(finalFilename, "ext_plane_%d.csv", step);
-
 #ifdef USE_CATALYST
-                FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                if (ik == 0) {
+                    FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                }
                 if (libMesh::global_processor_id() == 0) {
                     char commandLine[4096];
                     sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
                     system(strdup(commandLine));
                 }
-#endif
+#endif  
 
 #ifdef PERFORMANCE
                 if (libMesh::global_processor_id() == 0) {
@@ -1051,77 +1098,26 @@ int main(int argc, char** argv) {
                     cout << buffer << endl;
                     prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
                 }
-#endif
-
-#ifdef PROV
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
-#endif
-            } else if (dim == 3) {
-                // 3D analysis
-                for (int ik = 0; ik <= 3; ik++) {
-                    char firstFilename[1024];
-                    sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
-                    char finalFilename[1024];
-                    sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
-
-#ifdef PROV
-                    // Mesh Writer
-                    char argument1[1024];
-                    char argument2[1024];
-                    sprintf(argument1, "line%dExtraction", ik);
-                    sprintf(argument2, "line-%d-extraction", ik);
-                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
-#endif
-
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.start();
-                    }
-#endif
-
-#ifdef USE_CATALYST
-                    if (ik == 0) {
-                        FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
-                    }
-                    if (libMesh::global_processor_id() == 0) {
-                        char commandLine[4096];
-                        sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                        system(strdup(commandLine));
-                    }
-#endif  
-
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.end();
-                        double elapsedTime = perf.elapsedTime();
-                        char buffer[1024];
-                        sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
-                        cout << buffer << endl;
-                        prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
-                    }
 #endif  
 
 #ifdef PROV
-                    // Mesh Writer
-                    char argument3[1024];
-                    sprintf(argument1, "line%dExtraction", ik);
-                    sprintf(argument2, "line-%d-extraction", ik);
-                    sprintf(argument3, "oline%dextraction", ik);
-                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+                // Mesh Writer
+                char argument3[1024];
+                sprintf(argument1, "line%dExtraction", ik);
+                sprintf(argument2, "line-%d-extraction", ik);
+                sprintf(argument3, "oline%dextraction", ik);
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
 #endif
-                }
             }
         }
-
-        if (hasOperationInTimeStep) {
-            if(strlen(meshDependencies) == 0){
-                sprintf(meshDependencies,"%d",taskID);
-            }else{
-                sprintf(meshDependencies,"%s,%d",meshDependencies,taskID);
-            }
+        
+        if (strlen(meshDependencies) == 0) {
+            sprintf(meshDependencies, "%d", taskID);
+        } else {
+            sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
         }
     }
-
+    
     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
     std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_transport << std::endl;
 
@@ -1129,7 +1125,7 @@ int main(int argc, char** argv) {
     // Mesh Aggregator
     char out_filename[256];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
-    prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(),meshDependencies);
+    prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(), meshDependencies);
     prov.finishDataIngestor();
 #endif
 
