@@ -984,11 +984,12 @@ int main(int argc, char** argv) {
                 } else {
                     sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
                 }
+                cout << meshDependencies << endl;
             }
         }
     }
 
-    if ((t_step + 1) % write_interval == 0) {
+    if ((t_step + 1) % write_interval != 0) {
         numberOfWrites++;
 #ifdef PROV
         // Mesh Writer
@@ -1116,6 +1117,7 @@ int main(int argc, char** argv) {
         } else {
             sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
         }
+        cout << meshDependencies << endl;
     }
     
     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
@@ -1124,6 +1126,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
     // Mesh Aggregator
     char out_filename[256];
+    cout << meshDependencies << endl;
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
     prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(), meshDependencies);
     prov.finishDataIngestor();

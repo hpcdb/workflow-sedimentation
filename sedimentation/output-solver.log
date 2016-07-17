@@ -4,13 +4,13 @@ Parameters:
   Sc      : 1
 Opening file: 0
  Mesh Information:
-  elem_dimensions()={2}
-  spatial_dimension()=2
-  n_nodes()=3801
-    n_local_nodes()=3801
-  n_elem()=3600
-    n_local_elem()=3600
-    n_active_elem()=3600
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=79821
+    n_local_nodes()=79821
+  n_elem()=72000
+    n_local_elem()=72000
+    n_active_elem()=72000
   n_subdomains()=1
   n_partitions()=1
   n_processors()=1
@@ -24,8 +24,8 @@ Opening file: 0
     Variables="d" 
     Finite Element Types="LAGRANGE" 
     Approximation Orders="FIRST" 
-    n_dofs()=3801
-    n_local_dofs()=3801
+    n_dofs()=79821
+    n_local_dofs()=79821
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=2
@@ -39,46 +39,49 @@ Opening file: 0
       Number of DoF Constraints = 0
    System #0, "flow"
     Type "TransientLinearImplicit"
-    Variables={ "u" "v" "p" } 
+    Variables={ "u" "v" "w" "p" } 
     Finite Element Types="LAGRANGE" 
     Approximation Orders="FIRST" 
-    n_dofs()=11403
-    n_local_dofs()=11403
-    n_constrained_dofs()=763
-    n_local_constrained_dofs()=763
+    n_dofs()=319284
+    n_local_dofs()=319284
+    n_constrained_dofs()=30503
+    n_local_constrained_dofs()=30503
     n_vectors()=3
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 26.0466
+      Average  On-Processor Bandwidth <= 100.879
       Average Off-Processor Bandwidth <= 0
-      Maximum  On-Processor Bandwidth <= 27
+      Maximum  On-Processor Bandwidth <= 108
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
-      Number of DoF Constraints = 763
+      Number of DoF Constraints = 30503
       Average DoF Constraint Length= 0
    System #1, "sediment"
     Type "TransientLinearImplicit"
     Variables="s" 
     Finite Element Types="LAGRANGE" 
     Approximation Orders="FIRST" 
-    n_dofs()=3801
-    n_local_dofs()=3801
-    n_constrained_dofs()=1
-    n_local_constrained_dofs()=1
+    n_dofs()=79821
+    n_local_dofs()=79821
+    n_constrained_dofs()=21
+    n_local_constrained_dofs()=21
     n_vectors()=3
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 8.68219
+      Average  On-Processor Bandwidth <= 25.2197
       Average Off-Processor Bandwidth <= 0
-      Maximum  On-Processor Bandwidth <= 9
+      Maximum  On-Processor Bandwidth <= 27
       Maximum Off-Processor Bandwidth <= 0
     DofMap Constraints
-      Number of DoF Constraints = 1
+      Number of DoF Constraints = 21
       Average DoF Constraint Length= 0
 
 [WRITE] output_1_000_00000.h5 - output_1_00000.xmf
 [CATALYST] Time step: 0 ; Time: 0.0
-Data Extraction Cost: 1.05
+Data Extraction Cost: 3.42
+Data Extraction Cost: 0.05
+Data Extraction Cost: 0.05
+Data Extraction Cost: 0.05
 ======================================================
  Time step  0  simulation time = 0.0100...
 ======================================================
@@ -87,29 +90,27 @@ Data Extraction Cost: 1.05
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
 *** Warning, This code is deprecated, and likely to be removed in future library versions! /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/type_vector.h, line 878, compiled Jul 13 2016 at 08:50:36 ***
-0    77   1.16362e-06    7.13473        1              
-1    200  8.89662e-08    0.0352293      0.00492309     
-2    200  2.08056e-08    0.0161318      0.00225757     
-3    200  1.2105e-08     0.00775003     0.00108382     
-4    200  4.48052e-09    0.00375547     0.000525371    
-5    200  7.85866e-10    0.00182719     0.000255571    
-6    200  4.32773e-10    0.000891074    0.000124646    
+0    140  4.11512e-06    32.6955        1              
+1    200  8.66551e-07    0.0305883      0.000935551    
+2    200  1.3323e-07     0.00709469     0.000216993    
+3    200  4.00873e-08    0.000851363    2.60392e-05    
 ------------------------------------------------------
- Nonlinear solver converged at step 6
+ Nonlinear solver converged at step 3
  Solving sedimentation equation...
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    1    2.9976e-08     0.0068635      0.000451617    
-1    4    1.01189e-16    0.000317771    2.09093e-05    
+0    1    2.01246e-07    0.0314246      0.000451217    
+1    4    1.16848e-15    0.00157156     2.25655e-05    
+2    37   4.38347e-29    2.46714e-07    3.54248e-09    
 
 ****************** Mesh Refinement ********************  
-Number of elements before AMR step: 3600
-Number of elements after AMR step: 3780
+Number of elements before AMR step: 72000
+Number of elements after AMR step: 80400
  Volume deposited statistics: 
  Vol_{max}: 0.000200052
- Vol_{min}: -5.23155e-08
- Vol_{l2} : 0.000699936
+ Vol_{min}: -5.23148e-08
+ Vol_{l2} : 0.00358976
 ======================================================
  Time step  1  simulation time = 0.0200...
 ======================================================
@@ -117,31 +118,23 @@ Number of elements after AMR step: 3780
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    53   1.11949e-06    0.107706       0.0130739      
-1    200  2.33249e-08    0.012636       0.00153328     
-2    200  5.67268e-10    0.00485366     0.000589044    
-3    200  3.95434e-10    0.00207896     0.000252287    
-4    200  2.05332e-11    0.000919674    0.000111608    
+0    59   4.40255e-06    0.698411       0.0159671      
+1    200  6.85365e-08    0.00195309     4.46515e-05    
+2    200  5.96551e-09    0.000657191    1.50247e-05    
 ------------------------------------------------------
- Nonlinear solver converged at step 4
+ Nonlinear solver converged at step 2
  Solving sedimentation equation...
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    2    8.69755e-06    0.0154969      0.000863519    
-1    4    9.36252e-10    0.00231441     0.000128963    
-2    10   9.82118e-19    0.000149852    8.35005e-06    
+0    2    7.94982e-05    0.0993729      0.0010236      
+1    3    3.1904e-07     0.0163115      0.000168019    
+2    6    3.82102e-12    0.00116417     1.19916e-05    
+3    36   8.00989e-22    7.70872e-05    7.94045e-07    
  Volume deposited statistics: 
  Vol_{max}: 0.000400094
- Vol_{min}: -8.75102e-08
- Vol_{l2} : 0.00139981
-Warning:  This MeshOutput subclass only supports meshes which have been serialized!
-Warning:  This MeshOutput subclass only supports meshes which have been serialized!
-Warning!  Parallel xda/xdr is not yet implemented.
-Writing a serialized file instead.
-[WRITE] output_1_000_00001.h5 - output_1_00001.xmf
-[CATALYST] Time step: 2 ; Time: 0.02
-Data Extraction Cost: 0.12
+ Vol_{min}: -8.7234e-08
+ Vol_{l2} : 0.00717904
 ======================================================
  Time step  2  simulation time = 0.0300...
 ======================================================
@@ -149,23 +142,24 @@ Data Extraction Cost: 0.12
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    53   1.12955e-06    0.10552        0.0127966      
-1    200  3.23131e-08    0.00630513     0.000764515    
-2    200  2.44693e-09    0.00193608     0.000234769    
-3    200  6.1676e-10     0.000787619    9.55042e-05    
+0    58   4.79163e-06    0.665083       0.0152117      
+1    200  1.30439e-07    0.00278897     6.37889e-05    
+2    200  1.9963e-08     0.00114994     2.63011e-05    
+3    200  4.675e-10      0.000205199    4.69327e-06    
 ------------------------------------------------------
  Nonlinear solver converged at step 3
  Solving sedimentation equation...
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    2    9.15068e-06    0.0178313      0.000993735    
-1    4    1.15166e-09    0.00251071     0.000139921    
-2    10   1.51986e-18    0.000218792    1.21932e-05    
+0    2    7.87392e-05    0.114351       0.00117812     
+1    3    3.5844e-07     0.0177016      0.000182373    
+2    6    5.36206e-12    0.00169664     1.74799e-05    
+3    36   7.75534e-22    8.25499e-05    8.50481e-07    
  Volume deposited statistics: 
- Vol_{max}: 0.000600128
- Vol_{min}: -1.04362e-07
- Vol_{l2} : 0.00209963
+ Vol_{max}: 0.000600129
+ Vol_{min}: -1.03573e-07
+ Vol_{l2} : 0.0107678
 ======================================================
  Time step  3  simulation time = 0.0400...
 ======================================================
@@ -173,27 +167,218 @@ STEP NLI  |b-AX|         |du|           |du|/|u|
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    52   1.16304e-06    0.104912       0.0127125      
-1    200  3.38789e-08    0.00415439     0.000503352    
-2    200  1.22962e-09    0.000907354    0.00010994     
+0    56   5.00268e-06    0.632683       0.0144586      
+1    200  1.18274e-07    0.00385775     8.81604e-05    
+2    200  3.43719e-09    0.00121487     2.77631e-05    
+3    200  7.58382e-10    2.82597e-05    6.45811e-07    
 ------------------------------------------------------
- Nonlinear solver converged at step 2
+ Nonlinear solver converged at step 3
  Solving sedimentation equation...
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-0    2    9.56866e-06    0.0206979      0.00115365     
-1    4    1.40225e-09    0.00276912     0.000154344    
-2    10   2.03037e-18    0.000288681    1.60903e-05    
+0    2    7.83969e-05    0.132721       0.00136765     
+1    3    4.08218e-07    0.0195283      0.000201233    
+2    6    6.9449e-12     0.0022365      2.30463e-05    
+3    36   8.50486e-22    9.01483e-05    9.28946e-07    
  Volume deposited statistics: 
- Vol_{max}: 0.000800157
- Vol_{min}: -2.01302e-07
- Vol_{l2} : 0.00279939
+ Vol_{max}: 0.000800159
+ Vol_{min}: -2.05786e-07
+ Vol_{l2} : 0.0143562
+======================================================
+ Time step  4  simulation time = 0.0500...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    54   5.34512e-06    0.630277       0.0143888      
+1    200  1.91084e-07    0.00461074     0.00010526     
+2    200  5.12221e-08    0.00145491     3.32145e-05    
+3    200  3.47225e-10    0.000536076    1.22382e-05    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    7.83337e-05    0.153148       0.00157844     
+1    3    4.64055e-07    0.0216686      0.000223331    
+2    6    8.47475e-12    0.00276682     2.85166e-05    
+3    36   8.03616e-22    0.000101891    1.05015e-06    
+ Volume deposited statistics: 
+ Vol_{max}: 0.00100026
+ Vol_{min}: -4.60268e-07
+ Vol_{l2} : 0.0179442
+======================================================
+ Time step  5  simulation time = 0.0600...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    52   5.73715e-06    0.62876        0.0143367      
+1    200  2.32138e-07    0.00556102     0.000126799    
+2    200  2.80202e-08    0.00213053     4.85792e-05    
+3    200  3.38282e-09    0.000259735    5.92233e-06    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    7.84304e-05    0.174796       0.00180191     
+1    3    5.19534e-07    0.0239797      0.000247198    
+2    6    9.90162e-12    0.00327176     3.37273e-05    
+3    13   7.18223e-21    0.000121813    1.25572e-06    
+ Volume deposited statistics: 
+ Vol_{max}: 0.00120048
+ Vol_{min}: -7.95786e-07
+ Vol_{l2} : 0.0215318
+======================================================
+ Time step  6  simulation time = 0.0700...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    50   6.52598e-06    0.627479       0.0142872      
+1    200  2.44391e-07    0.0067333      0.000153312    
+2    200  1.01138e-08    0.00245986     5.60093e-05    
+3    200  9.72094e-10    8.59278e-05    1.95651e-06    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    7.85978e-05    0.197166       0.0020329      
+1    3    5.66061e-07    0.0262935      0.000271102    
+2    6    1.10382e-11    0.00371205     3.82733e-05    
+3    14   1.11477e-20    0.000163462    1.68539e-06    
+ Volume deposited statistics: 
+ Vol_{max}: 0.00140075
+ Vol_{min}: -1.21375e-06
+ Vol_{l2} : 0.0251191
+======================================================
+ Time step  7  simulation time = 0.0800...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    49   6.98501e-06    0.626332       0.0142382      
+1    200  2.31739e-07    0.00800728     0.000182027    
+2    200  1.85262e-08    0.00225445     5.12497e-05    
+3    200  4.51714e-09    0.000144322    3.28083e-06    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    7.8816e-05     0.219954       0.00226828     
+1    3    5.87767e-07    0.0282895      0.000291736    
+2    6    1.23851e-11    0.0040508      4.17739e-05    
+3    36   7.8196e-22     0.000248561    2.56329e-06    
+ Volume deposited statistics: 
+ Vol_{max}: 0.00160106
+ Vol_{min}: -1.71806e-06
+ Vol_{l2} : 0.0287063
+======================================================
+ Time step  8  simulation time = 0.0900...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    48   7.45171e-06    0.625288       0.014189       
+1    200  2.51092e-07    0.00919782     0.000208716    
+2    200  6.46423e-08    0.0019812      4.49572e-05    
+3    200  1.12498e-08    0.00056247     1.27635e-05    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    7.92203e-05    0.242956       0.00250596     
+1    3    5.77564e-07    0.0295983      0.00030529     
+2    6    1.60096e-11    0.00435564     4.49259e-05    
+3    36   7.80513e-22    0.00037285     3.84574e-06    
+ Volume deposited statistics: 
+ Vol_{max}: 0.00180142
+ Vol_{min}: -2.31754e-06
+ Vol_{l2} : 0.0322932
+======================================================
+ Time step  9  simulation time = 0.1000...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    47   7.85165e-06    0.624332       0.0141392      
+1    200  3.09923e-07    0.0101529      0.000229931    
+2    200  7.58412e-08    0.002475       5.60509e-05    
+3    200  1.11336e-09    0.000790015    1.78914e-05    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    8.02897e-05    0.266          0.00274415     
+1    3    6.04365e-07    0.0308202      0.000317951    
+2    6    1.77029e-11    0.00462221     4.76842e-05    
+3    36   8.2368e-22     0.000484776    5.0011e-06     
+ Volume deposited statistics: 
+ Vol_{max}: 0.00200181
+ Vol_{min}: -3.0108e-06
+ Vol_{l2} : 0.0358802
+Warning:  This MeshOutput subclass only supports meshes which have been serialized!
+Warning:  This MeshOutput subclass only supports meshes which have been serialized!
 Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
+[WRITE] output_1_000_00001.h5 - output_1_00001.xmf
+[CATALYST] Time step: 10 ; Time: 0.1
+Data Extraction Cost: 1.17
+Data Extraction Cost: 0.05
+Data Extraction Cost: 0.05
+Data Extraction Cost: 0.05
+10
+======================================================
+ Time step 10  simulation time = 0.1100...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    46   8.62607e-06    0.62346        0.0140888      
+1    200  3.5853e-07     0.0109793      0.000248108    
+2    200  6.00435e-08    0.00316476     7.15165e-05    
+3    200  6.27171e-09    0.000566122    1.27931e-05    
+------------------------------------------------------
+ Nonlinear solver converged at step 3
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    8.13853e-05    0.28908        0.00298278     
+1    3    6.39707e-07    0.0323908      0.000334214    
+2    6    1.93978e-11    0.0049616      5.11946e-05    
+3    35   3.27274e-20    0.000585962    6.04606e-06    
+ Volume deposited statistics: 
+ Vol_{max}: 0.00220224
+ Vol_{min}: -3.79466e-06
+ Vol_{l2} : 0.0394671
 [WRITE] output_1_000_00002.h5 - output_1_00002.xmf
-[CATALYST] Time step: 4 ; Time: 0.04
-Data Extraction Cost: 0.12
-FLOW SOLVER - TOTAL LINEAR ITERATIONS : 3235
-TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 53
+[CATALYST] Time step: 12 ; Time: 0.11
+Data Extraction Cost: 1.01
+Data Extraction Cost: 0.05
+Data Extraction Cost: 0.05
+Data Extraction Cost: 0.05
+10,11
+FLOW SOLVER - TOTAL LINEAR ITERATIONS : 7059
+TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 466
+10,11
 [Provenance] Finish Data Ingestor

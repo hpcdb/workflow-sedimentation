@@ -1,3 +1,3 @@
 PROV:MeshRefinement:Input
       java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshRefinement 1 1
-      elapsed-time: 1.11 seconds.
+      elapsed-time: 0.87 seconds.

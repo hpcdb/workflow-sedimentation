@@ -1,114 +1,258 @@
 PROV:SolverSimulationFluid:Input
       java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 1
-      elapsed-time: 0.52 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 1
-      elapsed-time: 0.80 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 2
-      elapsed-time: 0.60 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 2
-      elapsed-time: 0.80 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 3
-      elapsed-time: 0.53 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 3
-      elapsed-time: 0.80 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 4
-      elapsed-time: 0.60 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 4
-      elapsed-time: 0.81 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 5
-      elapsed-time: 0.53 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 5
-      elapsed-time: 0.79 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 6
-      elapsed-time: 0.57 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 6
-      elapsed-time: 0.79 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 7
-      elapsed-time: 0.58 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 7
-      elapsed-time: 0.77 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 8
-      elapsed-time: 0.47 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 8
-      elapsed-time: 0.61 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 9
-      elapsed-time: 0.44 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 9
-      elapsed-time: 0.65 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 10
-      elapsed-time: 0.43 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 10
-      elapsed-time: 0.66 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 11
-      elapsed-time: 0.52 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 11
-      elapsed-time: 0.64 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 12
-      elapsed-time: 0.44 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 12
-      elapsed-time: 0.63 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 13
-      elapsed-time: 0.48 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 13
-      elapsed-time: 0.81 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 14
-      elapsed-time: 0.55 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 14
-      elapsed-time: 0.82 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 15
-      elapsed-time: 0.54 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 15
-      elapsed-time: 0.80 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 16
-      elapsed-time: 0.53 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 16
-      elapsed-time: 0.79 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 17
-      elapsed-time: 0.56 seconds.
-PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 17
-      elapsed-time: 0.76 seconds.
-PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 18
       elapsed-time: 0.51 seconds.
 PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 18
-      elapsed-time: 0.78 seconds.
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 1
+      elapsed-time: 0.62 seconds.
 PROV:SolverSimulationFluid:Input
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 19
-      elapsed-time: 0.52 seconds.
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 2
+      elapsed-time: 0.43 seconds.
 PROV:SolverSimulationFluid:Output
-      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 19
-      elapsed-time: 0.77 seconds.
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 2
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 3
+      elapsed-time: 0.46 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 3
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 4
+      elapsed-time: 0.43 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 1 4
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 5
+      elapsed-time: 0.48 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 5
+      elapsed-time: 0.61 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 6
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 6
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 7
+      elapsed-time: 0.45 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 2 7
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 8
+      elapsed-time: 0.44 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 8
+      elapsed-time: 0.67 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 9
+      elapsed-time: 0.43 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 9
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 10
+      elapsed-time: 0.44 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 10
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 11
+      elapsed-time: 0.47 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 3 11
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 12
+      elapsed-time: 0.46 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 12
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 13
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 13
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 14
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 14
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 15
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 4 15
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 16
+      elapsed-time: 0.43 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 16
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 17
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 17
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 18
+      elapsed-time: 0.41 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 18
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 19
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 5 19
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 20
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 20
+      elapsed-time: 0.65 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 21
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 21
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 22
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 22
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 23
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 6 23
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 24
+      elapsed-time: 0.43 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 24
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 25
+      elapsed-time: 0.41 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 25
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 26
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 26
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 27
+      elapsed-time: 0.41 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 7 27
+      elapsed-time: 0.66 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 28
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 28
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 29
+      elapsed-time: 0.44 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 29
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 30
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 30
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 31
+      elapsed-time: 0.43 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 8 31
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 32
+      elapsed-time: 0.43 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 32
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 33
+      elapsed-time: 0.41 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 33
+      elapsed-time: 0.61 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 34
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 34
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 35
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 9 35
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 36
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 36
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 37
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 37
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 38
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 38
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 39
+      elapsed-time: 0.45 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 10 39
+      elapsed-time: 0.64 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 40
+      elapsed-time: 0.45 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 40
+      elapsed-time: 0.62 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 41
+      elapsed-time: 0.43 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 41
+      elapsed-time: 0.61 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 42
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 42
+      elapsed-time: 0.63 seconds.
+PROV:SolverSimulationFluid:Input
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 43
+      elapsed-time: 0.42 seconds.
+PROV:SolverSimulationFluid:Output
+      java -jar /Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar -ingest -task sedimentation solverSimulationFluid 11 43
+      elapsed-time: 0.64 seconds.
