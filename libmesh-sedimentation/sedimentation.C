@@ -478,7 +478,7 @@ int main(int argc, char** argv) {
     int numberIterationsSediments = 0;
     int numberIterationsMeshRefinements = 0;
     int numberOfWrites = 0;
-    char meshDependencies[4096];
+    static char meshDependencies[4096];
 
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
         taskID++;
@@ -984,6 +984,7 @@ int main(int argc, char** argv) {
                 } else {
                     sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
                 }
+                cout << "[meshAggregator] current dependencies: ";
                 cout << meshDependencies << endl;
             }
         }
@@ -1111,12 +1112,13 @@ int main(int argc, char** argv) {
 #endif
             }
         }
-        
+
         if (strlen(meshDependencies) == 0) {
             sprintf(meshDependencies, "%d", taskID);
         } else {
             sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
         }
+        cout << "[meshAggregator] current dependencies: ";
         cout << meshDependencies << endl;
     }
     
@@ -1126,6 +1128,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
     // Mesh Aggregator
     char out_filename[256];
+    cout << "[meshAggregator] current dependencies: ";
     cout << meshDependencies << endl;
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
     prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(), meshDependencies);
