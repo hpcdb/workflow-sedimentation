@@ -15,7 +15,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
-#include <json/writer.h>
+
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 #include "libmesh/libmesh.h"
 

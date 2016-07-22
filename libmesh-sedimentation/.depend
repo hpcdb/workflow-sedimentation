@@ -252,7 +252,10 @@ provenance.$(obj-suffix):\
     /home/vitor/src/libmesh-install/include/libmesh/threads_pthread.h\
     /home/vitor/src/libmesh-install/include/libmesh/threads_tbb.h\
     performance.h\
-    provenance.h
+    provenance.h\
+    rapidjson/document.h\
+    rapidjson/stringbuffer.h\
+    rapidjson/writer.h
 sedimentation.$(obj-suffix):\
     sedimentation.C\
     /home/vitor/src/libmesh-install/include/boost/move/unique_ptr.hpp\
