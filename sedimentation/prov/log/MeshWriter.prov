@@ -1,0 +1,30 @@
+PROV:MeshWriter:Input
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 1 1
+      elapsed-time: 0.41 seconds.
+PROV:MeshWriter:Output
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 1 1
+      elapsed-time: 0.94 seconds.
+PROV:MeshWriter:Input
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 2 2
+      elapsed-time: 0.38 seconds.
+PROV:MeshWriter:Output
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 2 2
+      elapsed-time: 0.75 seconds.
+PROV:MeshWriter:Input
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 3 3
+      elapsed-time: 0.43 seconds.
+PROV:MeshWriter:Output
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 3 3
+      elapsed-time: 0.95 seconds.
+PROV:MeshWriter:Input
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 4 4
+      elapsed-time: 0.37 seconds.
+PROV:MeshWriter:Output
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 4 4
+      elapsed-time: 0.75 seconds.
+PROV:MeshWriter:Input
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 5 5
+      elapsed-time: 0.51 seconds.
+PROV:MeshWriter:Output
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshWriter 5 5
+      elapsed-time: 0.91 seconds.

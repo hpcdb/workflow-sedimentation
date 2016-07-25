@@ -1,0 +1,6 @@
+PROV:GetMaximumIterations:Input
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -performance -starttime -dataflow sedimentation -transformation getMaximumIterations -task 1 -computation libMeshSedimentation::GetMaximumIterations
+      elapsed-time: 0.66 seconds.
+PROV:GetMaximumIterations:Output
+      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation getMaximumIterations 1
+      elapsed-time: 0.54 seconds.

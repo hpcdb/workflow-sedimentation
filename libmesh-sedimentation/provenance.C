@@ -20,6 +20,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include "dfanalyzer/task.h"
+
 #include "libmesh/libmesh.h"
 
 #include "libmesh/getpot.h"
@@ -40,6 +42,12 @@ Provenance::Provenance() {
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar");
     pgCommandLine = "java -jar " + pgFilePath + " ";
     processor_id = libMesh::global_processor_id();
+
+    //to test dfanalyzer
+    Task t(1);
+    cout << t.getID() << endl;
+    t.setID(10);
+    cout << t.getID() << endl;
 }
 
 void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int ncelly, int ncellz,

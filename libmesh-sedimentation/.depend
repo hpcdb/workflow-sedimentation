@@ -251,6 +251,7 @@ provenance.$(obj-suffix):\
     /home/vitor/src/libmesh-install/include/libmesh/threads_none.h\
     /home/vitor/src/libmesh-install/include/libmesh/threads_pthread.h\
     /home/vitor/src/libmesh-install/include/libmesh/threads_tbb.h\
+    dfanalyzer/task.h\
     performance.h\
     provenance.h\
     rapidjson/document.h\
