@@ -80,7 +80,7 @@ Opening file: 0
 
 [WRITE] output_1_000_00000.h5 - output_1_00000.xmf
 [CATALYST] Time step: 0 ; Time: 0.0
-Data Extraction Cost: 2.12
+Data Extraction Cost: 0.41
 ======================================================
  Time step  0  simulation time = 0.0100...
 ======================================================
@@ -118,7 +118,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00001.h5 - output_1_00001.xmf
 [CATALYST] Time step: 1 ; Time: 0.01
-Data Extraction Cost: 0.13
+Data Extraction Cost: 0.04
 [meshAggregator] current dependencies: 1
 ======================================================
  Time step  1  simulation time = 0.0200...
@@ -149,7 +149,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00002.h5 - output_1_00002.xmf
 [CATALYST] Time step: 2 ; Time: 0.02
-Data Extraction Cost: 0.09
+Data Extraction Cost: 0.11
 [meshAggregator] current dependencies: 1,2
 ======================================================
  Time step  2  simulation time = 0.0300...
@@ -179,7 +179,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00003.h5 - output_1_00003.xmf
 [CATALYST] Time step: 3 ; Time: 0.03
-Data Extraction Cost: 0.10
+Data Extraction Cost: 0.08
 [meshAggregator] current dependencies: 1,2,3
 ======================================================
  Time step  3  simulation time = 0.0400...
@@ -208,7 +208,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00004.h5 - output_1_00004.xmf
 [CATALYST] Time step: 4 ; Time: 0.04
-Data Extraction Cost: 0.15
+Data Extraction Cost: 0.05
 [meshAggregator] current dependencies: 1,2,3,4
 ======================================================
  Time step  4  simulation time = 0.0500...
@@ -237,7 +237,7 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] output_1_000_00005.h5 - output_1_00005.xmf
 [CATALYST] Time step: 5 ; Time: 0.05
-Data Extraction Cost: 0.08
+Data Extraction Cost: 0.10
 [meshAggregator] current dependencies: 1,2,3,4,5
 FLOW SOLVER - TOTAL LINEAR ITERATIONS : 3687
 TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 68
