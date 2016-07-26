@@ -101,6 +101,8 @@ FEAdaptor.$(obj-suffix):\
     FEAdaptor.h
 dfanalyzer/provenance_object.$(obj-suffix):\
     dfanalyzer/provenance_object.C
+dfanalyzer/task.$(obj-suffix):\
+    dfanalyzer/task.C
 mesh_moviment.$(obj-suffix):\
     mesh_moviment.C\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/analytic_function.h\
@@ -253,7 +255,7 @@ provenance.$(obj-suffix):\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/threads_pthread.h\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/threads_tbb.h\
     /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/unique_ptr.hpp\
-    dfanalyzer/provenance_object.h\
+    dfanalyzer/task.h\
     performance.h\
     provenance.h\
     rapidjson/document.h\
