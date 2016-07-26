@@ -20,7 +20,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include "dfanalyzer/task.h"
+#include "dfanalyzer/provenance_object.h"
 
 #include "libmesh/libmesh.h"
 
@@ -44,7 +44,7 @@ Provenance::Provenance() {
     processor_id = libMesh::global_processor_id();
 
     //to test dfanalyzer
-    Task t(1);
+    ProvenanceObject t(1);
     cout << t.getID() << endl;
     t.setID(10);
     cout << t.getID() << endl;

@@ -7,7 +7,7 @@ class ProvenanceObject {
 	int ID;
 
   public:
-  	ProvenanceObject(int initID){ ID = initID; };
-    int setID(int newID){ ID = newID; }
-	int getID(){ return ID; }
+  	ProvenanceObject(int initID);
+    int setID(int newID);
+	int getID();
 };
