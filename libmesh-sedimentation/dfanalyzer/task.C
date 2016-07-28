@@ -86,7 +86,13 @@ void Task::writeJSON(string filename) {
         Value elements(kArrayType);
         for (string e : currentElements) {
             Value ve;
-            ve.SetString(StringRef(e.c_str()));
+            // ve.SetString(StringRef(e.c_str()));
+
+            // char vs[1024];
+            // int len = sprintf(vs, "%s", e);
+            // Value v;
+            ve.SetString(e.c_str(), e.size(), document.GetAllocator());
+
             elements.PushBack(ve, document.GetAllocator());
         }
         p.AddMember("elements", elements, document.GetAllocator());
