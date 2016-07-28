@@ -1,0 +1,22 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "meshgeneration",
+    "workspace": "/home/vitor/dev/workflow-sedimentation/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::meshgeneration",
+            "method": "COMPUTATION"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "imeshgeneration",
+            "elements": [
+                "1;2;180;20;20;0.00;0.00;0.00;18.00;2.00;2.00;3"
+            ]
+        }
+    ]
+}

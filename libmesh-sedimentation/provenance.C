@@ -23,7 +23,6 @@
 #include "dfanalyzer/task.h"
 
 #include "libmesh/libmesh.h"
-
 #include "libmesh/getpot.h"
 
 #include "provenance.h"
@@ -35,12 +34,15 @@ using namespace libMesh;
 string space = "      ";
 string directory = "";
 string pgCommandLine = "";
+string dataflow = "sedimentation";
+string jsonDirectory = "";
 
 Provenance::Provenance() {
     GetPot infile("provenance.in");
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar");
     pgCommandLine = "java -jar " + pgFilePath + " ";
+    jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     processor_id = libMesh::global_processor_id();
 }
 
@@ -48,37 +50,45 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
         double xmin, double ymin, double zmin, double xmax, double ymax, double zmax, int ref_interval) {
     if (processor_id != 0) return;
     
-    Task t(simulationID);
-    t.writeJSON("/Users/vitor/Desktop/test.json");
-
     Performance perf;
     perf.start();
 
-    // run PG
-    char buffer[4096];
-    char* bPointer = (char*) malloc (sizeof(buffer));
-    sprintf(bPointer, 
-            "%s-task -dataflow sedimentation -transformation meshGeneration -id %d -workspace %s -status FINISHED", 
-            pgCommandLine.c_str(), simulationID, directory.c_str());
-    //cout << buffer << endl;
-
-    sprintf(bPointer, "%s-performance -starttime -dataflow sedimentation -transformation meshGeneration -task %d -computation libMeshSedimentation::MeshGeneration", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
-
-    sprintf(bPointer, "%s-element -dataflow sedimentation -transformation meshGeneration -id %d -set imeshgeneration -element [{'%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d'}]", pgCommandLine.c_str(), simulationID, simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
-    //cout << buffer << endl;
+    string transformation = "meshgeneration";
+    Task t(simulationID);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("FINISHED");
     
+    PerformanceMetric p;
+    p.SetDescription("libMeshSedimentation::" + transformation);
+    p.SetMethod("COMPUTATION");
+    t.addPerformance(p);
+//    falta starttime e endtime
+    
+    char* element = (char*) malloc(4096);
+    sprintf(element, "%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d", simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
+    cout << element << endl;
+    vector<string> e = {element};
+    t.addSet("i" + transformation,e);
+    free(element);
+    
+    char* buffer = (char*) malloc(4096);
+    sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    cout << buffer << endl;
+    t.writeJSON(buffer);
+    free(buffer);
+
     perf.end();
     double elapsedTime = perf.elapsedTime();
 
+    char* bPointer = (char*) malloc(512);
     ofstream file;
-    file.open("prov/log/MeshGeneration.prov", ios_base::app);
-    file << "PROV:MeshGeneration:Input" << endl;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Input" << endl;
     file << space << *bPointer << endl;
-    sprintf(bPointer, "%.2f", elapsedTime);
     file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
     file.close();
-    
     free(bPointer);
 }
 
@@ -328,15 +338,15 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
     // pg
     // solver simulation to the fluid
     char buffer[4096];
-    sprintf(buffer, "%s-task -dataflow sedimentation -transformation solverSimulationFluid -id %d -status FINISHED -workspace %s -subid %d -dependencies [{getMaximumIterations},{%d}]", 
+    sprintf(buffer, "%s-task -dataflow sedimentation -transformation solverSimulationFluid -id %d -status FINISHED -workspace %s -subid %d -dependencies [{getMaximumIterations},{%d}]",
             pgCommandLine.c_str(), taskID, directory.c_str(), subTaskID, simulationID);
     //cout << buffer << endl;
 
-    sprintf(buffer, "%s-performance -endtime -dataflow sedimentation -transformation solverSimulationFluid -task %d -subtask %d -computation libMeshSedimentation::SolverSimulationFluid-%d-%d", 
+    sprintf(buffer, "%s-performance -endtime -dataflow sedimentation -transformation solverSimulationFluid -task %d -subtask %d -computation libMeshSedimentation::SolverSimulationFluid-%d-%d",
             pgCommandLine.c_str(), taskID, subTaskID, simulationID, subTaskID);
     //cout << buffer << endl;
 
-    sprintf(buffer, "%s-element -dataflow sedimentation -transformation solverSimulationFluid -id %d -subid %d -set osolversimulationfluid -element [{'%d;%d;%.2f;%d;%d;%d;%.2f;%.2f;%.2f;%s'}]", 
+    sprintf(buffer, "%s-element -dataflow sedimentation -transformation solverSimulationFluid -id %d -subid %d -set osolversimulationfluid -element [{'%d;%d;%.2f;%d;%d;%d;%.2f;%.2f;%.2f;%s'}]",
             pgCommandLine.c_str(), taskID, subTaskID, simulationID, time_step, time, linear_step, n_linear_step, n_linear_iterations, linear_residual, norm_delta, norm_delta_u, converged ? "true" : "false");
     //cout << buffer << endl;
 
@@ -369,7 +379,7 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
             pgCommandLine.c_str(), taskID, directory.c_str(), subTaskID, taskID);
     //cout << buffer << endl;
 
-    sprintf(buffer, "%s-performance -starttime -dataflow sedimentation -transformation solverSimulationSediments -task %d -subtask %d -computation libMeshSedimentation::SolverSimulationSediments-%d-%d", 
+    sprintf(buffer, "%s-performance -starttime -dataflow sedimentation -transformation solverSimulationSediments -task %d -subtask %d -computation libMeshSedimentation::SolverSimulationSediments-%d-%d",
             pgCommandLine.c_str(), taskID, subTaskID, simulationID, subTaskID);
     //cout << buffer << endl;
 

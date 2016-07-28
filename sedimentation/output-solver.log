@@ -1,5 +1,5 @@
-1
-10
+1;2;180;20;20;0.00;0.00;0.00;18.00;2.00;2.00;3
+/home/vitor/dev/workflow-sedimentation/sedimentation/prov/di/sedimentation/meshgeneration-1-F.json
 Parameters: 
   Reynolds: 2236.07
   Grashof : 5e+06
@@ -80,7 +80,7 @@ Opening file: 0
 
 [WRITE] output_1_000_00000.h5 - output_1_00000.xmf
 [CATALYST] Time step: 0 ; Time: 0.0
-Data Extraction Cost: 0.41
+Data Extraction Cost: 0.57
 ======================================================
  Time step  0  simulation time = 0.0100...
 ======================================================
@@ -88,7 +88,7 @@ Data Extraction Cost: 0.41
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-*** Warning, This code is deprecated, and likely to be removed in future library versions! /home/vitor/src/libmesh-install/include/libmesh/type_vector.h, line 879, compiled Jul 25 2016 at 19:54:24 ***
+*** Warning, This code is deprecated, and likely to be removed in future library versions! /home/vitor/src/libmesh-install/include/libmesh/type_vector.h, line 879, compiled Jul 26 2016 at 17:04:15 ***
 0    77   1.16362e-06    7.13473        1              
 1    200  8.89662e-08    0.0352293      0.00492309     
 2    200  2.08056e-08    0.0161318      0.00225757     
@@ -107,139 +107,3 @@ STEP NLI  |b-AX|         |du|           |du|/|u|
 
 ****************** Mesh Refinement ********************  
 Number of elements before AMR step: 3600
-Number of elements after AMR step: 3780
- Volume deposited statistics: 
- Vol_{max}: 0.000200052
- Vol_{min}: -5.23155e-08
- Vol_{l2} : 0.000699936
-Warning:  This MeshOutput subclass only supports meshes which have been serialized!
-Warning:  This MeshOutput subclass only supports meshes which have been serialized!
-Warning!  Parallel xda/xdr is not yet implemented.
-Writing a serialized file instead.
-[WRITE] output_1_000_00001.h5 - output_1_00001.xmf
-[CATALYST] Time step: 1 ; Time: 0.01
-Data Extraction Cost: 0.04
-[meshAggregator] current dependencies: 1
-======================================================
- Time step  1  simulation time = 0.0200...
-======================================================
- Solving Navier-Stokes equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    53   1.11949e-06    0.107706       0.0130739      
-1    200  2.33249e-08    0.012636       0.00153328     
-2    200  5.67268e-10    0.00485366     0.000589044    
-3    200  3.95434e-10    0.00207896     0.000252287    
-4    200  2.05331e-11    0.000919674    0.000111608    
-------------------------------------------------------
- Nonlinear solver converged at step 4
- Solving sedimentation equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    2    8.69755e-06    0.0154969      0.000863519    
-1    4    9.36252e-10    0.00231441     0.000128963    
-2    10   9.91855e-19    0.000149852    8.35005e-06    
- Volume deposited statistics: 
- Vol_{max}: 0.000400094
- Vol_{min}: -8.75102e-08
- Vol_{l2} : 0.00139981
-Warning!  Parallel xda/xdr is not yet implemented.
-Writing a serialized file instead.
-[WRITE] output_1_000_00002.h5 - output_1_00002.xmf
-[CATALYST] Time step: 2 ; Time: 0.02
-Data Extraction Cost: 0.11
-[meshAggregator] current dependencies: 1,2
-======================================================
- Time step  2  simulation time = 0.0300...
-======================================================
- Solving Navier-Stokes equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    53   1.12955e-06    0.10552        0.0127966      
-1    200  3.23131e-08    0.00630513     0.000764515    
-2    200  2.44693e-09    0.00193608     0.000234769    
-3    200  6.1676e-10     0.000787619    9.55042e-05    
-------------------------------------------------------
- Nonlinear solver converged at step 3
- Solving sedimentation equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    2    9.15068e-06    0.0178313      0.000993735    
-1    4    1.15166e-09    0.00251071     0.000139921    
-2    10   1.51591e-18    0.000218792    1.21932e-05    
- Volume deposited statistics: 
- Vol_{max}: 0.000600128
- Vol_{min}: -1.04362e-07
- Vol_{l2} : 0.00209963
-Warning!  Parallel xda/xdr is not yet implemented.
-Writing a serialized file instead.
-[WRITE] output_1_000_00003.h5 - output_1_00003.xmf
-[CATALYST] Time step: 3 ; Time: 0.03
-Data Extraction Cost: 0.08
-[meshAggregator] current dependencies: 1,2,3
-======================================================
- Time step  3  simulation time = 0.0400...
-======================================================
- Solving Navier-Stokes equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    52   1.16304e-06    0.104912       0.0127125      
-1    200  3.38789e-08    0.00415439     0.000503352    
-2    200  1.22962e-09    0.000907354    0.00010994     
-------------------------------------------------------
- Nonlinear solver converged at step 2
- Solving sedimentation equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    2    9.56866e-06    0.0206979      0.00115365     
-1    4    1.40225e-09    0.00276912     0.000154344    
-2    10   2.0248e-18     0.000288681    1.60903e-05    
- Volume deposited statistics: 
- Vol_{max}: 0.000800157
- Vol_{min}: -2.01302e-07
- Vol_{l2} : 0.00279939
-Warning!  Parallel xda/xdr is not yet implemented.
-Writing a serialized file instead.
-[WRITE] output_1_000_00004.h5 - output_1_00004.xmf
-[CATALYST] Time step: 4 ; Time: 0.04
-Data Extraction Cost: 0.05
-[meshAggregator] current dependencies: 1,2,3,4
-======================================================
- Time step  4  simulation time = 0.0500...
-======================================================
- Solving Navier-Stokes equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    52   1.18117e-06    0.104655       0.01267        
-1    200  5.51628e-08    0.00325662     0.000394234    
-2    200  3.76961e-09    0.000489588    5.92689e-05    
-------------------------------------------------------
- Nonlinear solver converged at step 2
- Solving sedimentation equation...
-------------------------------------------------------
-STEP NLI  |b-AX|         |du|           |du|/|u|       
-------------------------------------------------------
-0    2    9.94029e-06    0.0238816      0.00133128     
-1    4    1.66266e-09    0.00307032     0.000171155    
-2    9    4.73006e-17    0.000356182    1.98554e-05    
- Volume deposited statistics: 
- Vol_{max}: 0.00100026
- Vol_{min}: -4.52891e-07
- Vol_{l2} : 0.0034991
-Warning!  Parallel xda/xdr is not yet implemented.
-Writing a serialized file instead.
-[WRITE] output_1_000_00005.h5 - output_1_00005.xmf
-[CATALYST] Time step: 5 ; Time: 0.05
-Data Extraction Cost: 0.10
-[meshAggregator] current dependencies: 1,2,3,4,5
-FLOW SOLVER - TOTAL LINEAR ITERATIONS : 3687
-TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 68
-[meshAggregator] current dependencies: 1,2,3,4,5
-[Provenance] Finish Data Ingestor

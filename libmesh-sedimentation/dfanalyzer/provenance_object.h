@@ -22,5 +22,12 @@ public:
     ProvenanceObject(int newID);
 
     virtual void writeJSON(string filename);
+    
+    int getID() const {
+        return ID;
+    }
 
+    void setID(int ID) {
+        this->ID = ID;
+    }
 };
