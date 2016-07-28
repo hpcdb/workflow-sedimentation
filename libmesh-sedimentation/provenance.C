@@ -49,7 +49,7 @@ Provenance::Provenance() {
 void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int ncelly, int ncellz,
         double xmin, double ymin, double zmin, double xmax, double ymax, double zmax, int ref_interval) {
     if (processor_id != 0) return;
-    
+
     Performance perf;
     perf.start();
 
@@ -58,24 +58,16 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
-    t.setStatus("FINISHED");
-    
-    PerformanceMetric p;
-    p.SetDescription("libMeshSedimentation::" + transformation);
-    p.SetMethod("COMPUTATION");
-    t.addPerformance(p);
-//    falta starttime e endtime
-    
+    t.setStatus("RUNNING");
+
     char* element = (char*) malloc(4096);
     sprintf(element, "%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d", simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
-    cout << element << endl;
     vector<string> e = {element};
-    t.addSet("i" + transformation,e);
+    t.addSet("i" + transformation, e);
     free(element);
-    
+
     char* buffer = (char*) malloc(4096);
-    sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    cout << buffer << endl;
+    sprintf(buffer, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(buffer);
     free(buffer);
 
@@ -86,6 +78,7 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     ofstream file;
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
+    sprintf(bPointer, "%.2f", elapsedTime);
     file << space << *bPointer << endl;
     file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
     file.close();
@@ -96,50 +89,87 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     if (processor_id != 0) return;
 
     Performance perf;
-    perf.start();
+    {
+        perf.start();
 
-    // run PG
-    // mesh generation
-    char buffer[4096];
-    sprintf(buffer, "%s-element -dataflow sedimentation -transformation meshGeneration -id %d -set omeshgeneration -element [{'%d;%.2f;%.2f;%.2f;%d'}]", pgCommandLine.c_str(), simulationID, simulationID, r_fraction, c_fraction, max_h_level, hlevels);
-    //cout << buffer << endl;
+        string transformation = "meshgeneration";
+        Task t(simulationID);
+        t.setDataflow(dataflow);
+        t.setTransformation(transformation);
+        t.setWorkspace(directory);
+        t.setStatus("FINISHED");
 
-    sprintf(buffer, "%s-performance -endtime -dataflow sedimentation -transformation meshGeneration -task %d -computation libMeshSedimentation::MeshGeneration", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
+        char* element = (char*) malloc(4096);
+        sprintf(element, "%d;%.2f;%.2f;%.2f;%d", simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+        vector<string> e = {element};
+        t.addSet("o" + transformation, e);
+        free(element);
 
-    perf.end();
-    double elapsedTime = perf.elapsedTime();
+        PerformanceMetric p;
+        p.SetDescription("libMeshSedimentation::" + transformation);
+        p.SetMethod("COMPUTATION");
+        t.addPerformance(p);
+        //    missing starttime and endtime
 
-    // ingest
-    sprintf(buffer, "%s-ingest -task sedimentation meshGeneration %d", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
+        char* buffer = (char*) malloc(4096);
+        sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(buffer);
+        free(buffer);
 
-    ofstream file;
-    file.open("prov/log/MeshGeneration.prov", ios_base::app);
-    file << "PROV:MeshGeneration:Output" << endl;
-    file << space << buffer << endl;
-    sprintf(buffer, "%.2f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
 
-    perf.start();
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Output" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+    }
 
-    // create equation systems
-    sprintf(buffer, "%s-task -dataflow sedimentation -transformation createEquationSystems -id %d -workspace %s -status FINISHED -dependencies [{meshGeneration},{%d}]", pgCommandLine.c_str(), simulationID, directory.c_str(), simulationID);
-    //cout << buffer << endl;
+    {
+        //    Create Equation Systems
+        perf.start();
 
-    sprintf(buffer, "%s-performance -starttime -dataflow sedimentation -transformation createEquationSystems -task %d -computation libMeshSedimentation::CreateEquationSystems", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
+        string transformation = "createequationsystems";
+        Task t(simulationID);
+        t.setDataflow(dataflow);
+        t.setTransformation(transformation);
+        t.setWorkspace(directory);
+        t.setStatus("RUNNING");
+        t.addDtDependency("meshgeneration");
+        char* vs = (char*) malloc(4096);
+        sprintf(vs, "%d", simulationID);
+        t.addIdDependency(vs);
+        free(vs);
 
-    perf.end();
-    elapsedTime += perf.elapsedTime();
+        PerformanceMetric p;
+        p.SetDescription("libMeshSedimentation::" + transformation);
+        p.SetMethod("COMPUTATION");
+        t.addPerformance(p);
+        //    missing starttime and endtime
 
-    file.open("prov/log/CreateEquationSystems.prov", ios_base::app);
-    file << "PROV:CreateEquationSystems:Input" << endl;
-    file << space << buffer << endl;
-    sprintf(buffer, "%.2f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
+        char* buffer = (char*) malloc(4096);
+        sprintf(buffer, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(buffer);
+        free(buffer);
+
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
+
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Input" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+    }
 }
 
 void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc,
@@ -147,154 +177,237 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
     if (processor_id != 0) return;
 
     Performance perf;
-    perf.start();
+    {
+        //        Create Equation Systems
+        perf.start();
 
-    // run PG
-    // create equation systems
-    char buffer[4096];
-    sprintf(buffer, "%s-element -dataflow sedimentation -transformation createEquationSystems -id %d -set ocreateequationsystems -element [{'%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f'}]", pgCommandLine.c_str(), simulationID, simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, fopc, theta, ex, ey, ez, c_factor);
-    //cout << buffer << endl;
+        string transformation = "createequationsystems";
+        Task t(simulationID);
+        t.setDataflow(dataflow);
+        t.setTransformation(transformation);
+        t.setWorkspace(directory);
+        t.setStatus("FINISHED");
 
-    sprintf(buffer, "%s-performance -endtime -dataflow sedimentation -transformation createEquationSystems -task %d -computation libMeshSedimentation::createEquationSystems -dependencies [{meshGeneration},{%d}]", pgCommandLine.c_str(), simulationID, simulationID);
-    //cout << buffer << endl;
+        char* element = (char*) malloc(4096);
+        sprintf(element, "%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f",
+                simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, fopc, theta, ex, ey, ez, c_factor);
+        vector<string> e = {element};
+        t.addSet("o" + transformation, e);
+        free(element);
 
-    perf.end();
-    double elapsedTime = perf.elapsedTime();
+        PerformanceMetric p;
+        p.SetDescription("libMeshSedimentation::" + transformation);
+        p.SetMethod("COMPUTATION");
+        t.addPerformance(p);
+        //    missing starttime and endtime
 
-    // ingest
-    sprintf(buffer, "%s-ingest -task sedimentation createEquationSystems %d", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
+        char* buffer = (char*) malloc(4096);
+        sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(buffer);
+        free(buffer);
 
-    ofstream file;
-    file.open("prov/log/CreateEquationSystems.prov", ios_base::app);
-    file << "PROV:CreateEquationSystems:Output" << endl;
-    file << space << buffer << endl;
-    sprintf(buffer, "%.2f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
 
-    perf.start();
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Output" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+    }
 
-    // get maximum iterations
-    sprintf(buffer, "%s-task -dataflow sedimentation -transformation getMaximumIterations -id %d -workspace %s -status FINISHED -dependencies [{createEquationSystems},{%d}]", pgCommandLine.c_str(), simulationID, directory.c_str(), simulationID);
-    //cout << buffer << endl;
+    {
+        perf.start();
 
-    sprintf(buffer, "%s-performance -starttime -dataflow sedimentation -transformation getMaximumIterations -task %d -computation libMeshSedimentation::GetMaximumIterations", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
+        string transformation = "getmaximumiterations";
+        Task t(simulationID);
+        t.setDataflow(dataflow);
+        t.setTransformation(transformation);
+        t.setWorkspace(directory);
+        t.setStatus("RUNNING");
+        t.addDtDependency("createequationsystems");
+        char* vs = (char*) malloc(4096);
+        sprintf(vs, "%d", simulationID);
+        t.addIdDependency(vs);
+        free(vs);
 
-    perf.end();
-    elapsedTime += perf.elapsedTime();
+        PerformanceMetric p;
+        p.SetDescription("libMeshSedimentation::" + transformation);
+        p.SetMethod("COMPUTATION");
+        t.addPerformance(p);
+        //    missing starttime and endtime
 
-    file.open("prov/log/GetMaximumIterations.prov", ios_base::app);
-    file << "PROV:GetMaximumIterations:Input" << endl;
-    file << space << buffer << endl;
-    sprintf(buffer, "%.2f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
+        char* buffer = (char*) malloc(4096);
+        sprintf(buffer, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(buffer);
+        free(buffer);
+
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
+
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Input" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+    }
 }
 
-void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance,
+void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax,
+        unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance,
         int max_linear_iters, int max_r_steps, unsigned int write_interval, string xdmf) {
     if (processor_id != 0) return;
 
     Performance perf;
-    perf.start();
+    {
+        perf.start();
 
-    // pg
-    // get maximum iterations
-    char buffer[4096];
-    sprintf(buffer, "%s-element -dataflow sedimentation -transformation getMaximumIterations -id %d -set ogetmaximumiterations -element [{'%d;%.2f;%.2f;%d;%d;%.2f;%d;%d;%d;%s/%s'}]", pgCommandLine.c_str(), simulationID, simulationID, dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, directory.c_str(), xdmf.c_str());
-    //cout << buffer << endl;
+        string transformation = "getmaximumiterations";
+        Task t(simulationID);
+        t.setDataflow(dataflow);
+        t.setTransformation(transformation);
+        t.setWorkspace(directory);
+        t.setStatus("FINISHED");
 
-    sprintf(buffer, "%s-file -dataflow sedimentation -transformation getMaximumIterations -id %d -name \"%s\" -path %s", pgCommandLine.c_str(), simulationID, xdmf.c_str(), directory.c_str());
-    //cout << buffer << endl;
+        char* element = (char*) malloc(4096);
+        sprintf(element, "%d;%.2f;%.2f;%d;%d;%.2f;%d;%d;%d;%s/%s",
+                simulationID, dt, tmax, n_time_steps, n_nonlinear_steps,
+                nonlinear_tolerance, max_linear_iters, max_r_steps,
+                write_interval, directory.c_str(), xdmf.c_str());
+        vector<string> e = {element};
+        t.addSet("o" + transformation, e);
+        free(element);
 
-    sprintf(buffer, "%s-performance -endtime -dataflow sedimentation -transformation getMaximumIterations -task %d -computation libMeshSedimentation::GetMaximumIterations", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
+        PerformanceMetric p;
+        p.SetDescription("libMeshSedimentation::" + transformation);
+        p.SetMethod("COMPUTATION");
+        t.addPerformance(p);
+        //    missing starttime and endtime
 
-    perf.end();
-    double elapsedTime = perf.elapsedTime();
+        File f(directory, xdmf);
+        t.addFile(f);
 
-    // ingest
-    sprintf(buffer, "%s-ingest -task sedimentation getMaximumIterations %d", pgCommandLine.c_str(), simulationID);
-    //cout << buffer << endl;
+        char* buffer = (char*) malloc(4096);
+        sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(buffer);
+        free(buffer);
 
-    ofstream file;
-    file.open("prov/log/GetMaximumIterations.prov", ios_base::app);
-    file << "PROV:GetMaximumIterations:Output" << endl;
-    file << space << buffer << endl;
-    sprintf(buffer, "%.2f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
+
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Output" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+    }
 }
 
 void Provenance::inputInitDataExtraction(int simulationID, string transformation, string extractionFileName) {
     if (processor_id != 0) return;
     Performance perf;
-    perf.start();
+    {
+        perf.start();
 
-    // pg
-    // solver simulation to the sediments
-    char buffer[4096];
-    sprintf(buffer, "%s-task -dataflow sedimentation -transformation %s -id %d -status RUNNING -workspace %s -dependencies [{getMaximumIterations},{%d}]", pgCommandLine.c_str(), transformation.c_str(), simulationID, directory.c_str(), simulationID);
-    //cout << buffer << endl;
+        Task t(simulationID);
+        t.setDataflow(dataflow);
+        t.setTransformation(transformation);
+        t.setWorkspace(directory);
+        t.setStatus("RUNNING");
+        t.addDtDependency("getmaximumiterations");
+        char* vs = (char*) malloc(4096);
+        sprintf(vs, "%d", simulationID);
+        t.addIdDependency(vs);
+        free(vs);
 
-    sprintf(buffer, "%s-performance -starttime -dataflow sedimentation -transformation %s -task %d -computation libMeshSedimentation::%s-%d", pgCommandLine.c_str(), transformation.c_str(), simulationID, transformation.c_str(), simulationID);
-    //cout << buffer << endl;
+        char* buffer = (char*) malloc(4096);
+        sprintf(buffer, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(buffer);
+        free(buffer);
 
-    perf.end();
-    double elapsedTime = perf.elapsedTime();
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
 
-    // ingest
-    sprintf(buffer, "%s-ingest -task sedimentation %s %d", pgCommandLine.c_str(), transformation.c_str(), simulationID);
-    //cout << buffer << endl;
-
-    ofstream file;
-    file.open("prov/log/InitDataExtraction.prov", ios_base::app);
-    file << "PROV:InitDataExtraction:Input" << endl;
-    file << space << buffer << endl;
-    sprintf(buffer, "%.2f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Input" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+    }
 }
 
 void Provenance::outputInitDataExtraction(int simulationID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile) {
     if (processor_id != 0) return;
     Performance perf;
-    perf.start();
+    {
+        perf.start();
 
-    // pg
-    // solver simulation to the sediments
-    char buffer[4096];
-    sprintf(buffer, "%s-task -dataflow sedimentation -transformation %s -id %d -status FINISHED -workspace %s -dependencies [{getMaximumIterations},{%d}]", pgCommandLine.c_str(), transformation.c_str(), simulationID, directory.c_str(), simulationID);
-    //cout << buffer << endl;
+        Task t(simulationID);
+        t.setDataflow(dataflow);
+        t.setTransformation(transformation);
+        t.setWorkspace(directory);
+        t.setStatus("FINISHED");
+        t.addDtDependency("getmaximumiterations");
+        char* vs = (char*) malloc(4096);
+        sprintf(vs, "%d", simulationID);
+        t.addIdDependency(vs);
+        free(vs);
 
-    sprintf(buffer, "%s-file -dataflow sedimentation -transformation %s -id %d -name \"%s\" -path %s", pgCommandLine.c_str(), transformation.c_str(), simulationID, xdmf.c_str(), directory.c_str());
-    //cout << buffer << endl;
+        char* element = (char*) malloc(4096);
+        sprintf(element, "%d;%d;%s/%s;%s/%s",
+                simulationID, time_step, directory.c_str(), xdmf.c_str(),
+                directory.c_str(), rawDataFile.c_str());
+        vector<string> e = {element};
+        t.addSet("o" + transformation, e);
+        free(element);
 
-    sprintf(buffer, "%s-file -dataflow sedimentation -transformation %s -id %d -name \"%s\" -path %s", pgCommandLine.c_str(), transformation.c_str(), simulationID, rawDataFile.c_str(), directory.c_str());
-    //cout << buffer << endl;
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        t.addPerformance(p);
+        //    missing starttime and endtime
 
-    sprintf(buffer, "%s-element -dataflow sedimentation -transformation %s -id %d -set %s -element [{'%d;%d;%s/%s;%s/%s'}]", pgCommandLine.c_str(), transformation.c_str(), simulationID, outDataSet.c_str(), simulationID, time_step, directory.c_str(), xdmf.c_str(), directory.c_str(), rawDataFile.c_str());
-    //cout << buffer << endl;
+        File f1(directory, xdmf);
+        t.addFile(f1);
+        File f2(directory, rawDataFile);
+        t.addFile(f2);
 
-    sprintf(buffer, "%s-performance -endtime -dataflow sedimentation -transformation %s -task %d -computation libMeshSedimentation::%s-%d", pgCommandLine.c_str(), transformation.c_str(), simulationID, transformation.c_str(), simulationID);
-    //cout << buffer << endl;
+        char* buffer = (char*) malloc(4096);
+        sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(buffer);
+        free(buffer);
 
-    perf.end();
-    double elapsedTime = perf.elapsedTime();
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
 
-    // ingest
-    sprintf(buffer, "%s-ingest -task sedimentation %s %d", pgCommandLine.c_str(), transformation.c_str(), simulationID);
-    //cout << buffer << endl;
-
-    ofstream file;
-    file.open("prov/log/InitDataExtraction.prov", ios_base::app);
-    file << "PROV:InitDataExtraction:Output" << endl;
-    file << space << buffer << endl;
-    sprintf(buffer, "%.2f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Output" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+    }
 }
 
 void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int subTaskID) {

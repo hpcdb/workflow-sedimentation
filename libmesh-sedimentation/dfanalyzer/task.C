@@ -5,10 +5,10 @@ void Task::writeJSON(string filename) {
     document.SetObject();
 
     if (ID != 0) {
-        char* vs = (char*) malloc(4096);
-        sprintf(vs, "%d", ID);
+        char vs[10];
+        int len = sprintf(vs, "%d", ID);
         Value v;
-        v.SetString(StringRef(vs));
+        v.SetString(vs, static_cast<SizeType>(len), document.GetAllocator());
         document.AddMember("id", v, document.GetAllocator());
     }
 
@@ -92,6 +92,40 @@ void Task::writeJSON(string filename) {
         asets.PushBack(p, document.GetAllocator());
     }
     document.AddMember("sets", asets, document.GetAllocator());
+
+    Value adeps;
+    adeps.SetObject();
+    if (this->dtDependencies.size() > 0) {
+        Value adts(kArrayType);
+        for (string dt : this->dtDependencies) {
+            Value cv;
+            cv.SetObject();
+
+            Value cvalue;
+            cvalue.SetString(dt.c_str(), dt.size(), document.GetAllocator());
+            cv.AddMember("tag", cvalue, document.GetAllocator());
+
+            adts.PushBack(cv, document.GetAllocator());
+        }
+        adeps.AddMember("tags", adts, document.GetAllocator());
+    }
+
+    if (this->idDependencies.size() > 0) {
+        Value aids(kArrayType);
+        for (string id : this->idDependencies) {
+            Value cv;
+            cv.SetObject();
+
+            Value cvalue;
+            cvalue.SetString(id.c_str(), id.size(), document.GetAllocator());
+            cv.AddMember("id", cvalue, document.GetAllocator());
+
+            aids.PushBack(cv, document.GetAllocator());
+        }
+        adeps.AddMember("ids", aids, document.GetAllocator());
+    }
+
+    document.AddMember("dependency", adeps, document.GetAllocator());
 
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer2(sb);

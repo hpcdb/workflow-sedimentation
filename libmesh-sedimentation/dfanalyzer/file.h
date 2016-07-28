@@ -13,21 +13,23 @@
 using namespace std;
 using namespace rapidjson;
 
-class ProvenanceObject {
-protected:
-    int ID = 0;
-
+class File {
+    string path;
+    string filename;
+    
 public:
 
-    ProvenanceObject(int newID);
+    File(string path, string filename) {
+        this->path = path;
+        this->filename = filename;
+    };
 
-    virtual void writeJSON(string filename);
+    string GetPath(){
+        return path;
+    }
     
-    int getID() const {
-        return ID;
+    string GetFileName(){
+        return filename;
     }
 
-    void setID(int ID) {
-        this->ID = ID;
-    }
 };

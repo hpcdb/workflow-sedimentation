@@ -379,7 +379,7 @@ int main(int argc, char** argv) {
         sprintf(finalFilename, "ext_plane_%d.csv", t_step);
 #ifdef PROV
         // Mesh Writer
-        prov.inputInitDataExtraction(simulationID, "initDataExtraction", "init-data-extraction");
+        prov.inputInitDataExtraction(simulationID, "initdataextraction", "init-data-extraction");
 #endif
 
 #ifdef PERFORMANCE
@@ -411,7 +411,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Writer
-        prov.outputInitDataExtraction(simulationID, "initDataExtraction", "init-data-extraction", "oinitdataextraction", 0, current_files[1], finalFilename);
+        prov.outputInitDataExtraction(simulationID, "initdataextraction", "init-data-extraction", "oinitdataextraction", 0, current_files[1], finalFilename);
 #endif
     } else if (dim == 3) {
         // 3D analysis

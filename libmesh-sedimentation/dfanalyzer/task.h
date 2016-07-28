@@ -2,6 +2,7 @@
 #include <string>
 
 #include "provenance_object.h"
+#include "file.h"
 #include "performance_metric.h"
 #include "../rapidjson/document.h"
 #include "../rapidjson/filewritestream.h"
@@ -20,7 +21,7 @@ using namespace rapidjson;
 
 class Task : public ProvenanceObject {
 protected:
-    int subID;
+    int subID = 0;
     string dataflow;
     string transformation;
     string workspace;
@@ -28,6 +29,9 @@ protected:
     string resource;
     string status;
     vector<PerformanceMetric> performances;
+    vector<string> dtDependencies; 
+    vector<string> idDependencies; 
+    vector<File> files;
 
 public:
 
@@ -108,5 +112,40 @@ public:
         this->workspace = workspace;
     }
 
+    vector<string> getDtDependencies() const {
+        return dtDependencies;
+    }
+    
+    void addDtDependency(string dtDependency) {
+        this->dtDependencies.push_back(dtDependency);
+    }
+
+    void setDtDependencies(vector<string> dtDependencies) {
+        this->dtDependencies = dtDependencies;
+    }
+
+    vector<string> getIdDependencies() const {
+        return idDependencies;
+    }
+    
+    void addIdDependency(string idDependency) {
+        this->idDependencies.push_back(idDependency);
+    }
+
+    void setIdDependencies(vector<string> idDependencies) {
+        this->idDependencies = idDependencies;
+    }
+    
+    vector<File> getFiles() const {
+        return files;
+    }
+    
+    void addFile(File file) {
+        this->files.push_back(file);
+    }
+
+    void setFiles(vector<File> files) {
+        this->files = files;
+    }
 
 };
