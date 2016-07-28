@@ -5,6 +5,7 @@
       <df name=".libs">
       </df>
       <df name="dfanalyzer">
+        <in>file.h</in>
         <in>performance_metric.C</in>
         <in>performance_metric.h</in>
         <in>provenance_object.C</in>

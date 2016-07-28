@@ -1,3 +1,0 @@
-PROV:MeshGeneration:Output
-      java -jar /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar -ingest -task sedimentation meshGeneration 1
-      elapsed-time: 0.00 seconds.

@@ -13,8 +13,10 @@ void Task::writeJSON(string filename) {
     }
 
     if (subID != 0) {
+        char vs[10];
+        int len = sprintf(vs, "%d", subID);
         Value v;
-        v.SetInt(subID);
+        v.SetString(vs, static_cast<SizeType>(len), document.GetAllocator());
         document.AddMember("subid", v, document.GetAllocator());
     } else {
         Value v;

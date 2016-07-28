@@ -886,7 +886,7 @@ int main(int argc, char** argv) {
                 int step = t_step + 1;
                 if (dim == 2) {
 #ifdef PROV
-                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction");
+                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction");
 #endif
 
 #ifdef PERFORMANCE
@@ -921,7 +921,7 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef PROV
-                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
 #endif
                 } else if (dim == 3) {
                     // 3D analysis
@@ -1020,7 +1020,7 @@ int main(int argc, char** argv) {
         int step = t_step + 1;
         if (dim == 2) {
 #ifdef PROV
-            prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction");
+            prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction");
 #endif
 
 #ifdef PERFORMANCE
@@ -1055,7 +1055,7 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef PROV
-            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataExtraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
 #endif
         } else if (dim == 3) {
             // 3D analysis
