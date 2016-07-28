@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
+#include <vector>
 
 #include "libmesh/libmesh.h"
 
@@ -50,7 +51,7 @@ public:
     void inputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string extractionFileName);
     void outputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile);
 
-    void meshAggregator(int simulationID, string xdmf, int n_processors, string meshDependencies);
+    void meshAggregator(int simulationID, string xdmf, int n_processors, vector<string> meshDependencies);
 
     void finishDataIngestor();
 

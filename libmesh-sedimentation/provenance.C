@@ -677,7 +677,7 @@ void Provenance::inputMeshWriter(int taskID, int simulationID, int subTaskID) {
         t.setStatus("RUNNING");
         t.addDtDependency("solversimulationsediments");
         char* vs = (char*) malloc(4096);
-        sprintf(vs, "%d", simulationID);
+        sprintf(vs, "%d", taskID);
         t.addIdDependency(vs);
         free(vs);
 
@@ -716,7 +716,7 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
         t.setStatus("FINISHED");
         t.addDtDependency("solversimulationsediments");
         char* vs = (char*) malloc(4096);
-        sprintf(vs, "%d", simulationID);
+        sprintf(vs, "%d", taskID);
         t.addIdDependency(vs);
         free(vs);
 
@@ -773,7 +773,7 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
         t.setStatus("RUNNING");
         t.addDtDependency("meshwriter");
         char* vs = (char*) malloc(4096);
-        sprintf(vs, "%d", simulationID);
+        sprintf(vs, "%d", taskID);
         t.addIdDependency(vs);
         free(vs);
 
@@ -811,7 +811,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         t.setStatus("FINISHED");
         t.addDtDependency("meshwriter");
         char* vs = (char*) malloc(4096);
-        sprintf(vs, "%d", simulationID);
+        sprintf(vs, "%d", taskID);
         t.addIdDependency(vs);
         free(vs);
 
@@ -857,7 +857,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     }
 }
 
-void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors, string meshDependencies) {
+void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors, vector<string> meshDependencies) {
     if (processor_id != 0) return;
     Performance perf;
     {
@@ -870,11 +870,10 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
         t.setWorkspace(directory);
         t.setStatus("FINISHED");
         t.addDtDependency("meshwriter");
-        char* vs = (char*) malloc(4096);
-        sprintf(vs, "%d", simulationID);
-        t.addIdDependency(vs);
-        free(vs);
-
+        for(string dep : meshDependencies){
+            t.addIdDependency(dep);
+        }
+        
         File f1(directory, xdmf);
         t.addFile(f1);
 

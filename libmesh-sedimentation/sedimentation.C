@@ -12,6 +12,7 @@
 #include <math.h>
 #include <string>
 #include <unistd.h>
+#include <vector>
 
 // Basic include file needed for the mesh functionality.
 #include "libmesh/libmesh.h"
@@ -478,7 +479,7 @@ int main(int argc, char** argv) {
     int numberIterationsSediments = 0;
     int numberIterationsMeshRefinements = 0;
     int numberOfWrites = 0;
-    static char meshDependencies[4096];
+    vector<string> meshDependencies;
 
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
         taskID++;
@@ -979,13 +980,10 @@ int main(int argc, char** argv) {
                     }
                 }
 
-                if (strlen(meshDependencies) == 0) {
-                    sprintf(meshDependencies, "%d", taskID);
-                } else {
-                    sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
-                }
-                cout << "[meshAggregator] current dependencies: ";
-                cout << meshDependencies << endl;
+                char* depID = (char*) malloc(4096);
+                sprintf(depID, "%d", taskID);
+                meshDependencies.push_back(depID);
+                free(depID);
             }
         }
     }
@@ -1113,23 +1111,18 @@ int main(int argc, char** argv) {
             }
         }
 
-        if (strlen(meshDependencies) == 0) {
-            sprintf(meshDependencies, "%d", taskID);
-        } else {
-            sprintf(meshDependencies, "%s,%d", meshDependencies, taskID);
-        }
-        cout << "[meshAggregator] current dependencies: ";
-        cout << meshDependencies << endl;
+        char* depID = (char*) malloc(4096);
+        sprintf(depID, "%d", taskID);
+        meshDependencies.push_back(depID);
+        free(depID);
     }
-    
+
     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
     std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_transport << std::endl;
 
 #ifdef PROV
     // Mesh Aggregator
     char out_filename[256];
-    cout << "[meshAggregator] current dependencies: ";
-    cout << meshDependencies << endl;
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
     prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(), meshDependencies);
     prov.finishDataIngestor();
