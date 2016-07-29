@@ -18,6 +18,7 @@ rm -rf data
 
 mkdir prov
 mkdir prov/di
+mkdir prov/pg
 mkdir prov/log
 mkdir prov/rde
 mkdir prov/solver
