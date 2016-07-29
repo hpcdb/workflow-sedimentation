@@ -426,7 +426,7 @@ int main(int argc, char** argv) {
             // Mesh Writer
             char argument1[1024];
             char argument2[1024];
-            sprintf(argument1, "iLine%dExtraction", ik);
+            sprintf(argument1, "iline%dextraction", ik);
             sprintf(argument2, "init-line-%d-extraction", ik);
             prov.inputInitDataExtraction(simulationID, argument1, argument2);
 #endif
@@ -463,7 +463,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
             // Mesh Writer
             char argument3[1024];
-            sprintf(argument1, "iLine%dExtraction", ik);
+            sprintf(argument1, "iline%dextraction", ik);
             sprintf(argument2, "init-line-%d-extraction", ik);
             sprintf(argument3, "oline%diextraction", ik);
             prov.outputInitDataExtraction(simulationID, argument1, argument2, argument3, 0, current_files[1], finalFilename);
@@ -936,7 +936,7 @@ int main(int argc, char** argv) {
                         // Mesh Writer
                         char argument1[1024];
                         char argument2[1024];
-                        sprintf(argument1, "line%dExtraction", ik);
+                        sprintf(argument1, "line%dextraction", ik);
                         sprintf(argument2, "line-%d-extraction", ik);
                         prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
 #endif
@@ -972,7 +972,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
                         // Mesh Writer
                         char argument3[1024];
-                        sprintf(argument1, "line%dExtraction", ik);
+                        sprintf(argument1, "line%dextraction", ik);
                         sprintf(argument2, "line-%d-extraction", ik);
                         sprintf(argument3, "oline%dextraction", ik);
                         prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
@@ -1067,7 +1067,7 @@ int main(int argc, char** argv) {
                 // Mesh Writer
                 char argument1[1024];
                 char argument2[1024];
-                sprintf(argument1, "line%dExtraction", ik);
+                sprintf(argument1, "line%dextraction", ik);
                 sprintf(argument2, "line-%d-extraction", ik);
                 prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
 #endif
@@ -1103,7 +1103,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 // Mesh Writer
                 char argument3[1024];
-                sprintf(argument1, "line%dExtraction", ik);
+                sprintf(argument1, "line%dextraction", ik);
                 sprintf(argument2, "line-%d-extraction", ik);
                 sprintf(argument3, "oline%dextraction", ik);
                 prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
