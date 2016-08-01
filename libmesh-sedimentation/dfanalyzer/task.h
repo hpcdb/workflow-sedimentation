@@ -60,7 +60,7 @@ public:
         return performances;
     }
     
-    void addPerformance(PerformanceMetric perf) {
+    void addPerformanceMetric(PerformanceMetric perf) {
         this->performances.push_back(perf);
     }
 

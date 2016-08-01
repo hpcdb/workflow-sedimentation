@@ -102,6 +102,7 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation i
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points1 -type numeric -extractor irde
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points2 -type numeric -extractor irde
 
+
 # 3D Analysis
 # echo "Initial Horizontal Line Extraction"
 # java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine0Extraction

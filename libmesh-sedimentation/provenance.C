@@ -52,9 +52,15 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
 
     Performance perf;
     perf.start();
-
+    
     string transformation = "meshgeneration";
+    PerformanceMetric p;
+    p.SetDescription("libMeshSedimentation::" + transformation);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyStartTime();
+
     Task t(simulationID);
+    t.addPerformanceMetric(p);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
@@ -85,7 +91,8 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     free(bPointer);
 }
 
-void Provenance::outputMeshGeneration(int simulationID, double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels) {
+void Provenance::outputMeshGeneration(int simulationID, double r_fraction, double c_fraction, 
+        double max_h_level, unsigned int hlevels) {
     if (processor_id != 0) return;
 
     Performance perf;
@@ -108,8 +115,8 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
         PerformanceMetric p;
         p.SetDescription("libMeshSedimentation::" + transformation);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
@@ -135,7 +142,13 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
         perf.start();
 
         string transformation = "createequationsystems";
+        PerformanceMetric p;
+        p.SetDescription("libMeshSedimentation::" + transformation);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
+        
         Task t(simulationID);
+        t.addPerformanceMetric(p);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
         t.setWorkspace(directory);
@@ -145,12 +158,6 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
         sprintf(vs, "%d", simulationID);
         t.addIdDependency(vs);
         free(vs);
-
-        PerformanceMetric p;
-        p.SetDescription("libMeshSedimentation::" + transformation);
-        p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
@@ -172,7 +179,8 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     }
 }
 
-void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc,
+void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Real Gr, 
+        Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc,
         Real theta, Real ex, Real ey, Real ez, Real c_factor) {
     if (processor_id != 0) return;
 
@@ -198,8 +206,8 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
         PerformanceMetric p;
         p.SetDescription("libMeshSedimentation::" + transformation);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
@@ -224,7 +232,13 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
         perf.start();
 
         string transformation = "getmaximumiterations";
+        PerformanceMetric p;
+        p.SetDescription("libMeshSedimentation::" + transformation);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
+        
         Task t(simulationID);
+        t.addPerformanceMetric(p);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
         t.setWorkspace(directory);
@@ -234,12 +248,6 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
         sprintf(vs, "%d", simulationID);
         t.addIdDependency(vs);
         free(vs);
-
-        PerformanceMetric p;
-        p.SetDescription("libMeshSedimentation::" + transformation);
-        p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
@@ -289,8 +297,8 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
         PerformanceMetric p;
         p.SetDescription("libMeshSedimentation::" + transformation);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         File f(directory, xdmf);
         t.addFile(f);
@@ -315,13 +323,21 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
     }
 }
 
-void Provenance::inputInitDataExtraction(int simulationID, string transformation, string extractionFileName) {
+void Provenance::inputInitDataExtraction(int simulationID, string transformation) {
     if (processor_id != 0) return;
     Performance perf;
     {
         perf.start();
+        
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
 
         Task t(simulationID);
+        t.addPerformanceMetric(p);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
         t.setWorkspace(directory);
@@ -352,7 +368,8 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
     }
 }
 
-void Provenance::outputInitDataExtraction(int simulationID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile) {
+void Provenance::outputInitDataExtraction(int simulationID, string transformation, 
+        int time_step, string xdmf, string rawDataFile) {
     if (processor_id != 0) return;
     Performance perf;
     {
@@ -376,14 +393,14 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         vector<string> e = {element};
         t.addSet("o" + transformation, e);
         free(element);
-
+        
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(4096);
         sprintf(perfbuffer, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         File f1(directory, xdmf);
         t.addFile(f1);
@@ -415,9 +432,18 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
     Performance perf;
     {
         perf.start();
-
+        
         string transformation = "solversimulationfluid";
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
+                transformation.c_str(), simulationID, subTaskID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
+        
         Task t(taskID);
+        t.addPerformanceMetric(p);
         t.setSubID(subTaskID);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
@@ -449,7 +475,8 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
     }
 }
 
-void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations,
+void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int subTaskID, 
+        int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations,
         Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
     if (processor_id != 0) return;
     Performance perf;
@@ -484,8 +511,8 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
                 transformation.c_str(), simulationID, subTaskID);
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
@@ -514,7 +541,16 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
         perf.start();
 
         string transformation = "solversimulationsediments";
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
+                transformation.c_str(), simulationID, subTaskID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
+        
         Task t(taskID);
+        t.addPerformanceMetric(p);
         t.setSubID(subTaskID);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
@@ -575,15 +611,15 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
         vector<string> e = {element};
         t.addSet("o" + transformation, e);
         free(element);
-
+        
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(4096);
         sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
                 transformation.c_str(), simulationID, subTaskID);
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
@@ -613,6 +649,14 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
         perf.start();
 
         string transformation = "meshrefinement";
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
+                transformation.c_str(), simulationID, subTaskID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
+        
         Task t(taskID);
         t.setSubID(subTaskID);
         t.setDataflow(dataflow);
@@ -633,15 +677,9 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
         t.addSet("o" + transformation, e);
         free(element);
 
-        PerformanceMetric p;
-        char* perfbuffer = (char*) malloc(4096);
-        sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
-                transformation.c_str(), simulationID, subTaskID);
-        p.SetDescription(perfbuffer);
-        p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
-
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
+        
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
         t.writeJSON(buffer);
@@ -669,7 +707,16 @@ void Provenance::inputMeshWriter(int taskID, int simulationID, int subTaskID) {
         perf.start();
 
         string transformation = "meshwriter";
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
+                transformation.c_str(), simulationID, subTaskID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
+        
         Task t(taskID);
+        t.addPerformanceMetric(p);
         t.setSubID(subTaskID);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
@@ -736,9 +783,9 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
                 transformation.c_str(), simulationID, subTaskID);
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
-
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
+        
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
         t.writeJSON(buffer);
@@ -759,13 +806,23 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
     }
 }
 
-void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string extractionFileName) {
+void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID, 
+        string transformation) {
     if (processor_id != 0) return;
     Performance perf;
     {
         perf.start();
+        
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
+                transformation.c_str(), simulationID, subTaskID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
 
         Task t(taskID);
+        t.addPerformanceMetric(p);
         t.setSubID(subTaskID);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
@@ -797,7 +854,9 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
     }
 }
 
-void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string extractionFileName, string outDataSet, int time_step, string xdmf, string rawDataFile) {
+void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskID, 
+        string transformation, string extractionFileName, string outDataSet, int time_step, 
+        string xdmf, string rawDataFile) {
     if (processor_id != 0) return;
     Performance perf;
     {
@@ -834,8 +893,8 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
                 transformation.c_str(), simulationID, subTaskID);
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
@@ -864,6 +923,14 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
         perf.start();
 
         string transformation = "meshaggregator";
+        PerformanceMetric p;
+        char* perfbuffer = (char*) malloc(4096);
+        sprintf(perfbuffer, "libMeshSedimentation::%s-%d",
+                transformation.c_str(), simulationID);
+        p.SetDescription(perfbuffer);
+        p.SetMethod("COMPUTATION");
+        p.IdentifyStartTime();
+        
         Task t(simulationID);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
@@ -884,14 +951,8 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
         t.addSet("o" + transformation, e);
         free(element);
 
-        PerformanceMetric p;
-        char* perfbuffer = (char*) malloc(4096);
-        sprintf(perfbuffer, "libMeshSedimentation::%s-%d",
-                transformation.c_str(), simulationID);
-        p.SetDescription(perfbuffer);
-        p.SetMethod("COMPUTATION");
-        t.addPerformance(p);
-        //    missing starttime and endtime
+        p.IdentifyEndTime();
+        t.addPerformanceMetric(p);
 
         char* buffer = (char*) malloc(4096);
         sprintf(buffer, "%s%s-%d-F.json", 
@@ -914,7 +975,7 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     }
 }
 
-void Provenance::storeDataExtractionCost(int simulationID, int subTaskID, int time_step, string xdmf, string rawDataFile, double elapsedTime) {
+void Provenance::storeDataExtractionCost(double elapsedTime) {
     if (processor_id != 0) return;
     ofstream file;
     file.open("prov/rde/data-extraction.prov", ios_base::app);

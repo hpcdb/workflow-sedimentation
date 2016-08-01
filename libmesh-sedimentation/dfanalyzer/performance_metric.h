@@ -1,14 +1,19 @@
-#include <iostream>
-#include <string>
-
 #include "../rapidjson/document.h"
 #include "../rapidjson/filewritestream.h"
 #include "../rapidjson/stringbuffer.h"
 #include "../rapidjson/writer.h"
 #include "../rapidjson/prettywriter.h"
+#include "date.h"
+
+#include <string>
 #include <cstdio>
-#include <sstream>
+#include <iostream>
 #include <fstream>
+#include <sstream>
+
+#include <chrono>
+#include <string>
+#include <sstream>
 
 using namespace std;
 using namespace rapidjson;
@@ -55,5 +60,9 @@ public:
     void SetStartTime(string startTime) {
         this->startTime = startTime;
     }
+    
+    void IdentifyStartTime();
+    
+    void IdentifyEndTime();
 
 };

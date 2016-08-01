@@ -65,6 +65,18 @@ void Task::writeJSON(string filename) {
         Value method;
         method.SetString(pm.GetMethod().c_str(), pm.GetMethod().size(), document.GetAllocator());
         p.AddMember("method", method, document.GetAllocator());
+        
+        if(!pm.GetStartTime().empty()){
+            Value time;
+            time.SetString(pm.GetStartTime().c_str(), pm.GetStartTime().size(), document.GetAllocator());
+            p.AddMember("startTime", time, document.GetAllocator());
+        }
+        
+        if(!pm.GetEndTime().empty()){
+            Value time;
+            time.SetString(pm.GetEndTime().c_str(), pm.GetEndTime().size(), document.GetAllocator());
+            p.AddMember("endTime", time, document.GetAllocator());
+        }
 
         aperfs.PushBack(p, document.GetAllocator());
     }

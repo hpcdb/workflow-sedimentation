@@ -380,7 +380,7 @@ int main(int argc, char** argv) {
         sprintf(finalFilename, "ext_plane_%d.csv", t_step);
 #ifdef PROV
         // Mesh Writer
-        prov.inputInitDataExtraction(simulationID, "initdataextraction", "init-data-extraction");
+        prov.inputInitDataExtraction(simulationID, "initdataextraction");
 #endif
 
 #ifdef PERFORMANCE
@@ -406,13 +406,13 @@ int main(int argc, char** argv) {
             char buffer[1024];
             sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
             cout << buffer << endl;
-            prov.storeDataExtractionCost(simulationID, 0, 0, current_files[1], finalFilename, elapsedTime);
+            prov.storeDataExtractionCost(elapsedTime);
         }
 #endif  
 
 #ifdef PROV
         // Mesh Writer
-        prov.outputInitDataExtraction(simulationID, "initdataextraction", "init-data-extraction", "oinitdataextraction", 0, current_files[1], finalFilename);
+        prov.outputInitDataExtraction(simulationID, "initdataextraction", 0, current_files[1], finalFilename);
 #endif
     } else if (dim == 3) {
         // 3D analysis
@@ -425,10 +425,8 @@ int main(int argc, char** argv) {
 #ifdef PROV
             // Mesh Writer
             char argument1[1024];
-            char argument2[1024];
             sprintf(argument1, "iline%dextraction", ik);
-            sprintf(argument2, "init-line-%d-extraction", ik);
-            prov.inputInitDataExtraction(simulationID, argument1, argument2);
+            prov.inputInitDataExtraction(simulationID, argument1);
 #endif
 
 #ifdef PERFORMANCE
@@ -456,17 +454,14 @@ int main(int argc, char** argv) {
                 char buffer[1024];
                 sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
                 cout << buffer << endl;
-                prov.storeDataExtractionCost(simulationID, 0, 0, current_files[1], finalFilename, elapsedTime);
+                prov.storeDataExtractionCost(elapsedTime);
             }
 #endif  
 
 #ifdef PROV
             // Mesh Writer
-            char argument3[1024];
             sprintf(argument1, "iline%dextraction", ik);
-            sprintf(argument2, "init-line-%d-extraction", ik);
-            sprintf(argument3, "oline%diextraction", ik);
-            prov.outputInitDataExtraction(simulationID, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+            prov.outputInitDataExtraction(simulationID, argument1, 0, current_files[1], finalFilename);
 #endif
         }
     }
@@ -887,7 +882,7 @@ int main(int argc, char** argv) {
                 int step = t_step + 1;
                 if (dim == 2) {
 #ifdef PROV
-                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction");
+                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction");
 #endif
 
 #ifdef PERFORMANCE
@@ -917,7 +912,7 @@ int main(int argc, char** argv) {
                         char buffer[1024];
                         sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
                         cout << buffer << endl;
-                        prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                        prov.storeDataExtractionCost(elapsedTime);
                     }
 #endif
 
@@ -935,10 +930,8 @@ int main(int argc, char** argv) {
 #ifdef PROV
                         // Mesh Writer
                         char argument1[1024];
-                        char argument2[1024];
                         sprintf(argument1, "line%dextraction", ik);
-                        sprintf(argument2, "line-%d-extraction", ik);
-                        prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
+                        prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
 
 #ifdef PERFORMANCE
@@ -965,12 +958,13 @@ int main(int argc, char** argv) {
                             char buffer[1024];
                             sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
                             cout << buffer << endl;
-                            prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                            prov.storeDataExtractionCost(elapsedTime);
                         }
 #endif  
 
 #ifdef PROV
                         // Mesh Writer
+                        char argument2[1024];
                         char argument3[1024];
                         sprintf(argument1, "line%dextraction", ik);
                         sprintf(argument2, "line-%d-extraction", ik);
@@ -1018,7 +1012,7 @@ int main(int argc, char** argv) {
         int step = t_step + 1;
         if (dim == 2) {
 #ifdef PROV
-            prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction");
+            prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction");
 #endif
 
 #ifdef PERFORMANCE
@@ -1048,7 +1042,7 @@ int main(int argc, char** argv) {
                 char buffer[1024];
                 sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
                 cout << buffer << endl;
-                prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                prov.storeDataExtractionCost(elapsedTime);
             }
 #endif
 
@@ -1066,10 +1060,8 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 // Mesh Writer
                 char argument1[1024];
-                char argument2[1024];
                 sprintf(argument1, "line%dextraction", ik);
-                sprintf(argument2, "line-%d-extraction", ik);
-                prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2);
+                prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
 
 #ifdef PERFORMANCE
@@ -1096,12 +1088,13 @@ int main(int argc, char** argv) {
                     char buffer[1024];
                     sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
                     cout << buffer << endl;
-                    prov.storeDataExtractionCost(simulationID, numberOfWrites, step, current_files[1], finalFilename, elapsedTime);
+                    prov.storeDataExtractionCost(elapsedTime);
                 }
 #endif  
 
 #ifdef PROV
                 // Mesh Writer
+                char argument2[1024];
                 char argument3[1024];
                 sprintf(argument1, "line%dextraction", ik);
                 sprintf(argument2, "line-%d-extraction", ik);
