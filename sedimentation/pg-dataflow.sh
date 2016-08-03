@@ -2,11 +2,11 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 
 # MacOS
-PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation
+#PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation
 # docker
 # PGDIR=/experiment/libmesh-sedimentation
 # Virtual Box - mint
-# PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
+PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
 
