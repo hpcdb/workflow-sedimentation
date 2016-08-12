@@ -21,6 +21,7 @@
 #include "rapidjson/stringbuffer.h"
 
 #include "dfanalyzer/task.h"
+#include "dfanalyzer/extractor.h"
 
 #include "libmesh/libmesh.h"
 #include "libmesh/getpot.h"
@@ -34,6 +35,7 @@ using namespace libMesh;
 string space = "      ";
 string directory = "";
 string pgCommandLine = "";
+string rdeCommandLine = "";
 string dataflow = "sedimentation";
 string jsonDirectory = "";
 
@@ -41,7 +43,9 @@ Provenance::Provenance() {
     GetPot infile("provenance.in");
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar");
+    string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/RDE-1.0.jar");
     pgCommandLine = "java -jar " + pgFilePath + " ";
+    rdeCommandLine = "java -jar " + rdeFilePath + " ";
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     processor_id = libMesh::global_processor_id();
 }
@@ -411,6 +415,10 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
         t.writeJSON(buffer);
         free(buffer);
+        
+        //extraction/indexing
+        Extractor ext(rdeCommandLine,"EXTRACTION","CSV","test");
+        ext.addAttribute("att1","numeric",true);
 
         perf.end();
         double elapsedTime = perf.elapsedTime();
