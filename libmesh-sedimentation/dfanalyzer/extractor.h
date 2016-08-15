@@ -42,7 +42,7 @@ public:
     }
 
     void extract(string path, string filename) {
-        string execCmd = commandLine + " " + method + ":" + extension + ":EXTRACT " + name + " " + path + " " + filename + " [";
+        string execCmd = commandLine + method + ":" + extension + ":EXTRACT " + name + " " + path + " " + filename + " [";
         
         bool first = true;
         for (Attribute att : this->attributes) {
@@ -57,6 +57,7 @@ public:
             }
         }
         execCmd += "] -delimiter=\"" + this->delimeter + "\"";
+        cout << execCmd << endl;
         system(strdup(execCmd.c_str()));
     }
 

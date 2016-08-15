@@ -22,6 +22,7 @@ mkdir prov/pg
 mkdir prov/log
 mkdir prov/rde
 mkdir prov/solver
+mkdir prov/pg/sedimentation
 mkdir prov/di/sedimentation
 cp dataflow.json prov/pg/sedimentation/
 cp dataflow.json prov/di/sedimentation/

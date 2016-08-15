@@ -42,8 +42,8 @@ string jsonDirectory = "";
 Provenance::Provenance() {
     GetPot infile("provenance.in");
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
-    string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/PG-1.0.jar");
-    string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/dfa/RDE-1.0.jar");
+    string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar");
+    string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar");
     pgCommandLine = "java -jar " + pgFilePath + " ";
     rdeCommandLine = "java -jar " + rdeFilePath + " ";
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
@@ -389,11 +389,25 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(vs, "%d", simulationID);
         t.addIdDependency(vs);
         free(vs);
+        
+        //extraction/indexing
+        Extractor ext(rdeCommandLine,"INDEXING","CSV","irdi");
+        ext.addAttribute("time_step","numeric",false);
+        ext.addAttribute("xdmf","file",false);
+        ext.addAttribute("u","numeric",false);
+        ext.addAttribute("v","numeric",false);
+        ext.addAttribute("p","numeric",false);
+        ext.addAttribute("s","numeric",false);
+        ext.addAttribute("d","numeric",false);
+        ext.addAttribute("points0","numeric",false);
+        ext.addAttribute("points1","numeric",false);
+        ext.addAttribute("points2","numeric",false);
+        ext.extract(directory,rawDataFile);
 
         char* element = (char*) malloc(jsonArraySize);
         sprintf(element, "%d;%d;%s/%s;%s/%s",
                 simulationID, time_step, directory.c_str(), xdmf.c_str(),
-                directory.c_str(), rawDataFile.c_str());
+                directory.c_str(), "irdi.index");
         vector<string> e = {element};
         t.addSet("o" + transformation, e);
         free(element);
@@ -415,10 +429,6 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
         t.writeJSON(buffer);
         free(buffer);
-        
-        //extraction/indexing
-        Extractor ext(rdeCommandLine,"EXTRACTION","CSV","test");
-        ext.addAttribute("att1","numeric",true);
 
         perf.end();
         double elapsedTime = perf.elapsedTime();

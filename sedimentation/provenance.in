@@ -1,2 +1,3 @@
-directory = /home/vitor/dev/workflow-sedimentation/sedimentation
-pgFilePath = /home/vitor/dev/workflow-sedimentation/dfa/PG-1.0.jar
+directory = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation
+pgFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar
+rdeFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar
