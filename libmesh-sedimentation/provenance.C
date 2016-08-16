@@ -393,12 +393,27 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(vs, "%d", simulationID);
         t.addIdDependency(vs);
         free(vs);
+        
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
 
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Output" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+
+        Performance rdePerf;
+        rdePerf.start();
+        
         string extension = "data";
         if (rawDataAccess == "INDEXING") {
             extension = "index";
             Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
-            cout << extractorName << endl;
             ext.addAttribute("u", "numeric", false);
             ext.addAttribute("v", "numeric", false);
             if (dimension == 3) {
@@ -416,6 +431,11 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
             ext.addAttribute("points2", "numeric", false);
             ext.extract(directory, rawDataFile);
         }
+        
+        rdePerf.end();
+        storeRDEComponentCost(rdePerf.elapsedTime());
+        
+        perf.start();
 
         char* element = (char*) malloc(jsonArraySize);
         char* extractedFileName = (char*) malloc(jsonArraySize);
@@ -428,8 +448,6 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(element, "%d;%d;%s/%s;%s/%s",
                 simulationID, time_step, directory.c_str(), xdmf.c_str(),
                 directory.c_str(), extractedFileName);
-        cout << transformation << endl;
-        cout << element << endl;
         vector<string> e = {element};
         t.addSet(dataSet, e);
         free(element);
@@ -452,10 +470,9 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         free(buffer);
 
         perf.end();
-        double elapsedTime = perf.elapsedTime();
+        elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
-        ofstream file;
+        bPointer = (char*) malloc(512);
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
         sprintf(bPointer, "%.2f", elapsedTime);
@@ -912,12 +929,27 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         sprintf(vs, "%d", taskID);
         t.addIdDependency(vs);
         free(vs);
+        
+        perf.end();
+        double elapsedTime = perf.elapsedTime();
+
+        char* bPointer = (char*) malloc(512);
+        ofstream file;
+        file.open("prov/log/" + transformation + ".prov", ios_base::app);
+        file << "PROV:" + transformation + ":Output" << endl;
+        sprintf(bPointer, "%.2f", elapsedTime);
+        file << space << *bPointer << endl;
+        file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
+        file.close();
+        free(bPointer);
+        
+        Performance rdePerf;
+        rdePerf.start();
 
         string extension = "data";
         if (rawDataAccess == "INDEXING") {
             extension = "index";
             Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
-            cout << extractorName << endl;
             ext.addAttribute("u", "numeric", false);
             ext.addAttribute("v", "numeric", false);
             if (dimension == 3) {
@@ -935,6 +967,11 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
             ext.addAttribute("points2", "numeric", false);
             ext.extract(directory, rawDataFile);
         }
+        
+        rdePerf.end();
+        storeRDEComponentCost(rdePerf.elapsedTime());
+        
+        perf.start();
 
         char* element = (char*) malloc(jsonArraySize);
         char* extractedFileName = (char*) malloc(jsonArraySize);
@@ -949,7 +986,6 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
                 directory.c_str(), extractedFileName);
         vector<string> e = {element};
         t.addSet(dataSet, e);
-        cout << transformation << endl;
         free(element);
 
         File f1(directory, xdmf);
@@ -971,10 +1007,9 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         free(buffer);
 
         perf.end();
-        double elapsedTime = perf.elapsedTime();
+        elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
-        ofstream file;
+        bPointer = (char*) malloc(512);
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
         sprintf(bPointer, "%.2f", elapsedTime);
@@ -1049,6 +1084,17 @@ void Provenance::storeDataExtractionCost(double elapsedTime) {
     ofstream file;
     file.open("prov/rde/data-extraction.prov", ios_base::app);
     file << "RDE:DataExtraction:Process" << endl;
+    char buffer[textArraySize];
+    sprintf(buffer, "%.2f", elapsedTime);
+    file << space << "elapsed-time: " << buffer << " seconds." << endl;
+    file.close();
+}
+
+void Provenance::storeRDEComponentCost(double elapsedTime) {
+    if (processor_id != 0) return;
+    ofstream file;
+    file.open("prov/indexing/rde-component.prov", ios_base::app);
+    file << "RDEComponent:DataExtraction:Process" << endl;
     char buffer[textArraySize];
     sprintf(buffer, "%.2f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;

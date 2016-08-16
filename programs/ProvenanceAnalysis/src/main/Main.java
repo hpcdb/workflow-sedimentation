@@ -17,7 +17,8 @@ public class Main {
             System.out.println("######################################################");
             double provenanceTime = Analysis.provenance(logDirectory);
             double rdeTime = Analysis.rawDataExtraction(logDirectory);
-            Analysis.solver(logDirectory, provenanceTime, rdeTime);
+            double indexing = Analysis.indexing(logDirectory);
+            Analysis.solver(logDirectory, provenanceTime, rdeTime, indexing);
             System.out.println("######################################################");
         }
     }

@@ -56,6 +56,7 @@ public:
     void finishDataIngestor();
 
     void storeDataExtractionCost(double elapsedTime);
+    void storeRDEComponentCost(double elapsedTime);
     void storeSolverCost(double elapsedTime);
 private:
     int processor_id;

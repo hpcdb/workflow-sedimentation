@@ -11,7 +11,7 @@ PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentat
 #PGDIR=/work/03664/silva/experiments/sedimentation
 
 # Sedimentation Solver
-dimension="3"
+dimension="2"
 access="indexing"
 cartridge="csv"
 

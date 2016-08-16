@@ -9,6 +9,7 @@ rm -rf prov/rde/*
 rm -rf prov/solver/*
 rm -rf prov/pg/*
 rm -rf prov/di/*
+rm -rf prov/indexing/*
 rm -rf log.*.out
 rm -rf log.*.err
 rm -rf *.conf
@@ -24,6 +25,7 @@ mkdir prov/pg
 mkdir prov/log
 mkdir prov/rde
 mkdir prov/solver
+mkdir prov/indexing
 mkdir prov/pg/sedimentation
 mkdir prov/di/sedimentation
 cp dataflow.json prov/pg/sedimentation/

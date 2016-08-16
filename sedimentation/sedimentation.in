@@ -4,7 +4,7 @@
 #------------------------------------------------------
 
 # The coarse grid size from which to start adaptivity
-dim    =  3
+dim    =  2
 ncellx = 180
 ncelly = 20
 ncellz = 20
