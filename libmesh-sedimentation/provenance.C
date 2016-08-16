@@ -38,12 +38,16 @@ string pgCommandLine = "";
 string rdeCommandLine = "";
 string dataflow = "sedimentation";
 string jsonDirectory = "";
+string rawDataAccess = "";
+string cartridge = "";
 
 Provenance::Provenance() {
     GetPot infile("provenance.in");
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar");
     string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar");
+    rawDataAccess = infile("access", "EXTRACTION");
+    cartridge = infile("cartridge", "CSV");
     pgCommandLine = "java -jar " + pgFilePath + " ";
     rdeCommandLine = "java -jar " + rdeFilePath + " ";
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
@@ -56,7 +60,7 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
 
     Performance perf;
     perf.start();
-    
+
     string transformation = "meshgeneration";
     PerformanceMetric p;
     p.SetDescription("libMeshSedimentation::" + transformation);
@@ -95,7 +99,7 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     free(bPointer);
 }
 
-void Provenance::outputMeshGeneration(int simulationID, double r_fraction, double c_fraction, 
+void Provenance::outputMeshGeneration(int simulationID, double r_fraction, double c_fraction,
         double max_h_level, unsigned int hlevels) {
     if (processor_id != 0) return;
 
@@ -150,7 +154,7 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
         p.SetDescription("libMeshSedimentation::" + transformation);
         p.SetMethod("COMPUTATION");
         p.IdentifyStartTime();
-        
+
         Task t(simulationID);
         t.addPerformanceMetric(p);
         t.setDataflow(dataflow);
@@ -183,7 +187,7 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     }
 }
 
-void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Real Gr, 
+void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Real Gr,
         Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc,
         Real theta, Real ex, Real ey, Real ez, Real c_factor) {
     if (processor_id != 0) return;
@@ -240,7 +244,7 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
         p.SetDescription("libMeshSedimentation::" + transformation);
         p.SetMethod("COMPUTATION");
         p.IdentifyStartTime();
-        
+
         Task t(simulationID);
         t.addPerformanceMetric(p);
         t.setDataflow(dataflow);
@@ -332,7 +336,7 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
     Performance perf;
     {
         perf.start();
-        
+
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(jsonArraySize);
         sprintf(perfbuffer, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
@@ -372,8 +376,8 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
     }
 }
 
-void Provenance::outputInitDataExtraction(int simulationID, string transformation, 
-        int time_step, string xdmf, string rawDataFile) {
+void Provenance::outputInitDataExtraction(int simulationID, string transformation, string dataSet,
+        int time_step, string xdmf, string rawDataFile, int dimension, string extractorName) {
     if (processor_id != 0) return;
     Performance perf;
     {
@@ -389,29 +393,47 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(vs, "%d", simulationID);
         t.addIdDependency(vs);
         free(vs);
-        
-        //extraction/indexing
-        Extractor ext(rdeCommandLine,"INDEXING","CSV","irdi");
-        ext.addAttribute("time_step","numeric",false);
-        ext.addAttribute("xdmf","file",false);
-        ext.addAttribute("u","numeric",false);
-        ext.addAttribute("v","numeric",false);
-        ext.addAttribute("p","numeric",false);
-        ext.addAttribute("s","numeric",false);
-        ext.addAttribute("d","numeric",false);
-        ext.addAttribute("points0","numeric",false);
-        ext.addAttribute("points1","numeric",false);
-        ext.addAttribute("points2","numeric",false);
-        ext.extract(directory,rawDataFile);
+
+        string extension = "data";
+        if (rawDataAccess == "INDEXING") {
+            extension = "index";
+            Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
+            cout << extractorName << endl;
+            ext.addAttribute("u", "numeric", false);
+            ext.addAttribute("v", "numeric", false);
+            if (dimension == 3) {
+                ext.addAttribute("w", "numeric", false);
+            }
+            ext.addAttribute("p", "numeric", false);
+            ext.addAttribute("s", "numeric", false);
+            ext.addAttribute("d", "numeric", false);
+            if (dimension == 3) {
+                ext.addAttribute("vtkvalidpointmask", "numeric", false);
+                ext.addAttribute("arc_length", "numeric", false);
+            }
+            ext.addAttribute("points0", "numeric", false);
+            ext.addAttribute("points1", "numeric", false);
+            ext.addAttribute("points2", "numeric", false);
+            ext.extract(directory, rawDataFile);
+        }
 
         char* element = (char*) malloc(jsonArraySize);
+        char* extractedFileName = (char*) malloc(jsonArraySize);
+        if (rawDataAccess == "INDEXING") {
+            sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
+        }else{
+            sprintf(extractedFileName, "%s", rawDataFile.c_str());
+        }
+
         sprintf(element, "%d;%d;%s/%s;%s/%s",
                 simulationID, time_step, directory.c_str(), xdmf.c_str(),
-                directory.c_str(), "irdi.index");
+                directory.c_str(), extractedFileName);
+        cout << transformation << endl;
+        cout << element << endl;
         vector<string> e = {element};
-        t.addSet("o" + transformation, e);
+        t.addSet(dataSet, e);
         free(element);
-        
+
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(jsonArraySize);
         sprintf(perfbuffer, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
@@ -422,8 +444,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 
         File f1(directory, xdmf);
         t.addFile(f1);
-        File f2(directory, rawDataFile);
-        t.addFile(f2);
+        free(extractedFileName);
 
         char* buffer = (char*) malloc(jsonArraySize);
         sprintf(buffer, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
@@ -450,7 +471,7 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
     Performance perf;
     {
         perf.start();
-        
+
         string transformation = "solversimulationfluid";
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(jsonArraySize);
@@ -459,7 +480,7 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
         p.IdentifyStartTime();
-        
+
         Task t(taskID);
         t.addPerformanceMetric(p);
         t.setSubID(subTaskID);
@@ -493,7 +514,7 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
     }
 }
 
-void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int subTaskID, 
+void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int subTaskID,
         int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations,
         Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
     if (processor_id != 0) return;
@@ -566,7 +587,7 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
         p.IdentifyStartTime();
-        
+
         Task t(taskID);
         t.addPerformanceMetric(p);
         t.setSubID(subTaskID);
@@ -629,7 +650,7 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
         vector<string> e = {element};
         t.addSet("o" + transformation, e);
         free(element);
-        
+
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(jsonArraySize);
         sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
@@ -674,7 +695,7 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
         p.IdentifyStartTime();
-        
+
         Task t(taskID);
         t.setSubID(subTaskID);
         t.setDataflow(dataflow);
@@ -697,7 +718,7 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
 
         p.IdentifyEndTime();
         t.addPerformanceMetric(p);
-        
+
         char* buffer = (char*) malloc(jsonArraySize);
         sprintf(buffer, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
         t.writeJSON(buffer);
@@ -732,7 +753,7 @@ void Provenance::inputMeshWriter(int taskID, int simulationID, int subTaskID) {
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
         p.IdentifyStartTime();
-        
+
         Task t(taskID);
         t.addPerformanceMetric(p);
         t.setSubID(subTaskID);
@@ -803,7 +824,7 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
         p.SetMethod("COMPUTATION");
         p.IdentifyEndTime();
         t.addPerformanceMetric(p);
-        
+
         char* buffer = (char*) malloc(jsonArraySize);
         sprintf(buffer, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
         t.writeJSON(buffer);
@@ -824,13 +845,13 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
     }
 }
 
-void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID, 
+void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID,
         string transformation) {
     if (processor_id != 0) return;
     Performance perf;
     {
         perf.start();
-        
+
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(jsonArraySize);
         sprintf(perfbuffer, "libMeshSedimentation::%s-%d-%d",
@@ -872,9 +893,9 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
     }
 }
 
-void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskID, 
-        string transformation, string extractionFileName, string outDataSet, int time_step, 
-        string xdmf, string rawDataFile) {
+void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskID,
+        string transformation, string dataSet, int time_step,
+        string xdmf, string rawDataFile, int dimension, string extractorName) {
     if (processor_id != 0) return;
     Performance perf;
     {
@@ -892,18 +913,48 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         t.addIdDependency(vs);
         free(vs);
 
-        File f1(directory, xdmf);
-        t.addFile(f1);
-        File f2(directory, rawDataFile);
-        t.addFile(f2);
+        string extension = "data";
+        if (rawDataAccess == "INDEXING") {
+            extension = "index";
+            Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
+            cout << extractorName << endl;
+            ext.addAttribute("u", "numeric", false);
+            ext.addAttribute("v", "numeric", false);
+            if (dimension == 3) {
+                ext.addAttribute("w", "numeric", false);
+            }
+            ext.addAttribute("p", "numeric", false);
+            ext.addAttribute("s", "numeric", false);
+            ext.addAttribute("d", "numeric", false);
+            if (dimension == 3) {
+                ext.addAttribute("vtkvalidpointmask", "numeric", false);
+                ext.addAttribute("arc_length", "numeric", false);
+            }
+            ext.addAttribute("points0", "numeric", false);
+            ext.addAttribute("points1", "numeric", false);
+            ext.addAttribute("points2", "numeric", false);
+            ext.extract(directory, rawDataFile);
+        }
 
         char* element = (char*) malloc(jsonArraySize);
+        char* extractedFileName = (char*) malloc(jsonArraySize);
+        if (rawDataAccess == "INDEXING") {
+            sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
+        }else{
+            sprintf(extractedFileName, "%s", rawDataFile.c_str());
+        }
+
         sprintf(element, "%d;%d;%s/%s;%s/%s",
                 simulationID, time_step, directory.c_str(), xdmf.c_str(),
-                directory.c_str(), rawDataFile.c_str());
+                directory.c_str(), extractedFileName);
         vector<string> e = {element};
-        t.addSet("o" + transformation, e);
+        t.addSet(dataSet, e);
+        cout << transformation << endl;
         free(element);
+
+        File f1(directory, xdmf);
+        t.addFile(f1);
+        free(extractedFileName);
 
         PerformanceMetric p;
         char* perfbuffer = (char*) malloc(jsonArraySize);
@@ -948,17 +999,17 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
         p.SetDescription(perfbuffer);
         p.SetMethod("COMPUTATION");
         p.IdentifyStartTime();
-        
+
         Task t(simulationID);
         t.setDataflow(dataflow);
         t.setTransformation(transformation);
         t.setWorkspace(directory);
         t.setStatus("FINISHED");
         t.addDtDependency("meshwriter");
-        for(string dep : meshDependencies){
+        for (string dep : meshDependencies) {
             t.addIdDependency(dep);
         }
-        
+
         File f1(directory, xdmf);
         t.addFile(f1);
 
@@ -973,7 +1024,7 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
         t.addPerformanceMetric(p);
 
         char* buffer = (char*) malloc(jsonArraySize);
-        sprintf(buffer, "%s%s-%d-F.json", 
+        sprintf(buffer, "%s%s-%d-F.json",
                 jsonDirectory.c_str(), transformation.c_str(), simulationID);
         t.writeJSON(buffer);
         free(buffer);

@@ -415,7 +415,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Writer
-        prov.outputInitDataExtraction(simulationID, "initdataextraction", 0, current_files[1], finalFilename);
+        prov.outputInitDataExtraction(simulationID, "initdataextraction", "oinitdataextraction", 0, current_files[1], finalFilename, dim, "irde");
 #endif
     } else if (dim == 3) {
         // 3D analysis
@@ -464,7 +464,12 @@ int main(int argc, char** argv) {
 #ifdef PROV
             // Mesh Writer
             sprintf(argument1, "iline%dextraction", ik);
-            prov.outputInitDataExtraction(simulationID, argument1, 0, current_files[1], finalFilename);
+            char argument2[textArraySize];
+            sprintf(argument2, "oline%diextraction", ik);
+            char* extractorName = (char*) malloc(jsonArraySize);
+            sprintf(extractorName, "iline%d", ik);
+            prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, extractorName);
+            free(extractorName);
 #endif
         }
     }
@@ -920,7 +925,9 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef PROV
-                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+                    char* extractorName = (char*) malloc(jsonArraySize);
+                    sprintf(extractorName, "rde%d", numberOfWrites);
+                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, extractorName);
 #endif
                 } else if (dim == 3) {
                     // 3D analysis
@@ -967,12 +974,13 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
                         // Mesh Writer
-                        char argument2[textArraySize];
-                        char argument3[textArraySize];
                         sprintf(argument1, "line%dextraction", ik);
-                        sprintf(argument2, "line-%d-extraction", ik);
-                        sprintf(argument3, "oline%dextraction", ik);
-                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+                        char* extractorName = (char*) malloc(jsonArraySize);
+                        sprintf(extractorName, "line%d%d", ik, numberOfWrites);
+                        char argument2[textArraySize];
+                        sprintf(argument2, "oline%dextraction", ik);
+                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, extractorName);
+                        free(extractorName);
 #endif
                     }
                 }
@@ -1050,7 +1058,9 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef PROV
-            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+            char* extractorName = (char*) malloc(jsonArraySize);
+            sprintf(extractorName, "rde%d", numberOfWrites);
+            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, extractorName);
 #endif
         } else if (dim == 3) {
             // 3D analysis
@@ -1097,12 +1107,13 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
                 // Mesh Writer
-                char argument2[textArraySize];
-                char argument3[textArraySize];
                 sprintf(argument1, "line%dextraction", ik);
-                sprintf(argument2, "line-%d-extraction", ik);
-                sprintf(argument3, "oline%dextraction", ik);
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+                char argument2[textArraySize];
+                sprintf(argument2, "oline%diextraction", ik);
+                char* extractorName = (char*) malloc(jsonArraySize);
+                sprintf(extractorName, "line%d%d", ik, numberOfWrites);
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, extractorName);
+                free(extractorName);
 #endif
             }
         }

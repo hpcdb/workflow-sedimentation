@@ -15,6 +15,8 @@ rm -rf *.conf
 rm -rf nodes.txt
 rm -rf *.dump
 rm -rf data
+rm -rf *.data
+rm -rf *.index
 
 mkdir prov
 mkdir prov/di
