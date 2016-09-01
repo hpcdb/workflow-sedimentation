@@ -947,7 +947,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         rdePerf.start();
 
         string extension = "data";
-        if (rawDataAccess == "INDEXING") {
+        if (rawDataAccess.compare("INDEXING")) {
             extension = "index";
             Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
             ext.addAttribute("u", "numeric", false);
