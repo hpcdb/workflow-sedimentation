@@ -61,7 +61,7 @@ public:
 private:
     int processor_id;
     const int textArraySize = 64;
-    const int jsonArraySize = 512;
+    const int jsonArraySize = 128;
 };
 
 

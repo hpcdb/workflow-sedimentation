@@ -407,7 +407,7 @@ int main(int argc, char** argv) {
             perf.end();
             double elapsedTime = perf.elapsedTime();
             char buffer[textArraySize];
-            sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+            sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
             cout << buffer << endl;
             prov.storeDataExtractionCost(elapsedTime);
         }
@@ -455,7 +455,7 @@ int main(int argc, char** argv) {
                 perf.end();
                 double elapsedTime = perf.elapsedTime();
                 char buffer[textArraySize];
-                sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                 cout << buffer << endl;
                 prov.storeDataExtractionCost(elapsedTime);
             }
@@ -918,7 +918,7 @@ int main(int argc, char** argv) {
                         perf.end();
                         double elapsedTime = perf.elapsedTime();
                         char buffer[textArraySize];
-                        sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                        sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                         cout << buffer << endl;
                         prov.storeDataExtractionCost(elapsedTime);
                     }
@@ -966,7 +966,7 @@ int main(int argc, char** argv) {
                             perf.end();
                             double elapsedTime = perf.elapsedTime();
                             char buffer[textArraySize];
-                            sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                            sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                             cout << buffer << endl;
                             prov.storeDataExtractionCost(elapsedTime);
                         }
@@ -1051,7 +1051,7 @@ int main(int argc, char** argv) {
                 perf.end();
                 double elapsedTime = perf.elapsedTime();
                 char buffer[textArraySize];
-                sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                 cout << buffer << endl;
                 prov.storeDataExtractionCost(elapsedTime);
             }
@@ -1099,7 +1099,7 @@ int main(int argc, char** argv) {
                     perf.end();
                     double elapsedTime = perf.elapsedTime();
                     char buffer[textArraySize];
-                    sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                    sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                     cout << buffer << endl;
                     prov.storeDataExtractionCost(elapsedTime);
                 }

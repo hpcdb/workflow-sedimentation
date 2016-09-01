@@ -3,9 +3,9 @@
 # Template libMesh application Makefile
 
 # MacOS
-LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh-git/build
+#LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh-git/build
 # docker
-#LIBMESH_DIR ?=/programs/libmesh/build
+LIBMESH_DIR ?=/programs/libmesh/build
 # Virtual Box
 #LIBMESH_DIR ?=/home/vitor/src/libmesh-install
 # Stampede
@@ -32,9 +32,9 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 
 # MacOS
-PARAVIEW_DIR=/Users/vitor/Documents/Program_Installations/ParaView-v5.0.1-source/build/CMakeFiles/__macos_install
+#PARAVIEW_DIR=/Users/vitor/Documents/Program_Installations/ParaView-v5.0.1-source/build/CMakeFiles/__macos_install
 # docker
-# PARAVIEW_DIR=/programs/paraview-install
+PARAVIEW_DIR=/programs/paraview-install
 # Stampede
 # PARAVIEW_DIR=/work/03664/silva/programs/paraview
 

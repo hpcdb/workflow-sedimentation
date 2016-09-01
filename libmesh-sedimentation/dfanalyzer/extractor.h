@@ -36,29 +36,31 @@ public:
         Attribute att(name, type, key);
         this->attributes.push_back(att);
     }
-    
-    void setDelimiter(string delimeter){
+
+    void setDelimiter(string delimeter) {
         this->delimeter = delimeter;
     }
 
     void extract(string path, string filename) {
-        string execCmd = commandLine + method + ":" + extension + ":EXTRACT " + name + " " + path + " " + filename + " [";
+        char* buffer = (char*) malloc(512);
+        sprintf(buffer, "%s%s:%s:EXTRACT %s %s %s [", commandLine.c_str(), method.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
         
         bool first = true;
         for (Attribute att : this->attributes) {
-            if(first){
+            if (first) {
                 first = false;
-            }else{
-                execCmd += ",";
+            } else {
+                sprintf(buffer, "%s,", buffer);
             }
-            execCmd += att.GetName() + ":" + att.GetType();
-            if(att.IsKey()){
-                execCmd += ":key";
+            sprintf(buffer, "%s%s:%s", buffer, att.GetName().c_str(), att.GetType().c_str());
+            if (att.IsKey()) {
+                sprintf(buffer, "%s:key", buffer);
             }
         }
-        execCmd += "] -delimiter=\"" + this->delimeter + "\"";
-        cout << execCmd << endl;
-        system(strdup(execCmd.c_str()));
+        sprintf(buffer, "%s] -delimiter=\"%s\"", buffer, this->delimeter.c_str());
+        cout << strdup(buffer) << endl;
+        system(strdup(buffer));
+        free(buffer);
     }
 
 };

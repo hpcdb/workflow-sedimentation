@@ -49,7 +49,7 @@ Provenance::Provenance() {
     rawDataAccess = infile("access", "EXTRACTION");
     cartridge = infile("cartridge", "CSV");
     pgCommandLine = "java -jar " + pgFilePath + " ";
-    rdeCommandLine = "java -jar " + rdeFilePath + " ";
+    rdeCommandLine = "/usr/bin/java -jar " + rdeFilePath + " ";
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     processor_id = libMesh::global_processor_id();
 }
@@ -88,11 +88,11 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     perf.end();
     double elapsedTime = perf.elapsedTime();
 
-    char* bPointer = (char*) malloc(512);
+    char* bPointer = (char*) malloc(textArraySize);
     ofstream file;
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(bPointer, "%.2f", elapsedTime);
+    sprintf(bPointer, "%.5f", elapsedTime);
     file << space << *bPointer << endl;
     file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
     file.close();
@@ -134,11 +134,11 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -175,11 +175,11 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Input" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -225,11 +225,11 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -265,11 +265,11 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Input" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -319,11 +319,11 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -364,11 +364,11 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Input" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -397,11 +397,11 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -411,7 +411,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         rdePerf.start();
         
         string extension = "data";
-        if (rawDataAccess == "INDEXING") {
+        if (rawDataAccess.compare("INDEXING")) {
             extension = "index";
             Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
             ext.addAttribute("u", "numeric", false);
@@ -439,7 +439,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 
         char* element = (char*) malloc(jsonArraySize);
         char* extractedFileName = (char*) malloc(jsonArraySize);
-        if (rawDataAccess == "INDEXING") {
+        if (rawDataAccess.compare("INDEXING")) {
             sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
         }else{
             sprintf(extractedFileName, "%s", rawDataFile.c_str());
@@ -472,10 +472,10 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         perf.end();
         elapsedTime = perf.elapsedTime();
 
-        bPointer = (char*) malloc(512);
+        bPointer = (char*) malloc(textArraySize);
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -519,11 +519,11 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Input" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -578,11 +578,11 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -626,11 +626,11 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Input" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -685,11 +685,11 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -744,11 +744,11 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -792,11 +792,11 @@ void Provenance::inputMeshWriter(int taskID, int simulationID, int subTaskID) {
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Input" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -850,11 +850,11 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -898,11 +898,11 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Input" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -933,11 +933,11 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -1009,10 +1009,10 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         perf.end();
         elapsedTime = perf.elapsedTime();
 
-        bPointer = (char*) malloc(512);
+        bPointer = (char*) malloc(textArraySize);
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -1067,11 +1067,11 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
         perf.end();
         double elapsedTime = perf.elapsedTime();
 
-        char* bPointer = (char*) malloc(512);
+        char* bPointer = (char*) malloc(textArraySize);
         ofstream file;
         file.open("prov/log/" + transformation + ".prov", ios_base::app);
         file << "PROV:" + transformation + ":Output" << endl;
-        sprintf(bPointer, "%.2f", elapsedTime);
+        sprintf(bPointer, "%.5f", elapsedTime);
         file << space << *bPointer << endl;
         file << space << "elapsed-time: " << *bPointer << " seconds." << endl;
         file.close();
@@ -1085,7 +1085,7 @@ void Provenance::storeDataExtractionCost(double elapsedTime) {
     file.open("prov/rde/data-extraction.prov", ios_base::app);
     file << "RDE:DataExtraction:Process" << endl;
     char buffer[textArraySize];
-    sprintf(buffer, "%.2f", elapsedTime);
+    sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
 }
@@ -1096,7 +1096,7 @@ void Provenance::storeRDEComponentCost(double elapsedTime) {
     file.open("prov/indexing/rde-component.prov", ios_base::app);
     file << "RDEComponent:DataExtraction:Process" << endl;
     char buffer[textArraySize];
-    sprintf(buffer, "%.2f", elapsedTime);
+    sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
 }
@@ -1107,7 +1107,7 @@ void Provenance::storeSolverCost(double elapsedTime) {
     file.open("prov/solver/time.prov", ios_base::app);
     file << "Solver:Time:Process" << endl;
     char buffer[textArraySize];
-    sprintf(buffer, "%.2f", elapsedTime);
+    sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
 }
