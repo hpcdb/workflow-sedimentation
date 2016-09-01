@@ -49,7 +49,7 @@ Provenance::Provenance() {
     rawDataAccess = infile("access", "EXTRACTION");
     cartridge = infile("cartridge", "CSV");
     pgCommandLine = "java -jar " + pgFilePath + " ";
-    rdeCommandLine = "/usr/bin/java -jar " + rdeFilePath + " ";
+    rdeCommandLine = "java -jar " + rdeFilePath + " ";
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     processor_id = libMesh::global_processor_id();
 }

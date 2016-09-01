@@ -1,2 +1,3 @@
+#!/bin/bash
 rm -rf /experiment/*
-cp -rf /shared/experiment/* /experiment
+cp -rf /shared/workflow-sedimentation/* /experiment

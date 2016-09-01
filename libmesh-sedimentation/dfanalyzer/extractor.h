@@ -43,7 +43,7 @@ public:
 
     void extract(string path, string filename) {
         char* buffer = (char*) malloc(512);
-        sprintf(buffer, "%s%s:%s:EXTRACT %s %s %s [", commandLine.c_str(), method.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
+        sprintf(buffer, "#!/bin/bash;%s%s:%s:EXTRACT %s %s %s [", commandLine.c_str(), method.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
         
         bool first = true;
         for (Attribute att : this->attributes) {
@@ -58,8 +58,8 @@ public:
             }
         }
         sprintf(buffer, "%s] -delimiter=\"%s\"", buffer, this->delimeter.c_str());
-        cout << strdup(buffer) << endl;
-        system(strdup(buffer));
+        cout << buffer << endl;
+        system(buffer);
         free(buffer);
     }
 

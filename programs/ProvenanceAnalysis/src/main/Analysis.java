@@ -125,7 +125,7 @@ public class Analysis {
             }
         }
         
-        DecimalFormat df2 = new DecimalFormat("###.#####");
+        DecimalFormat df2 = new DecimalFormat("###.##");
         double solverTime = totalElapsedTime - provenanceTime - rdeTime - indexingTime;
         System.out.println("Solver elapsed time (seconds): " + Double.valueOf(df2.format(solverTime)));
         System.out.println("Provenance elapsed time (seconds): " + Double.valueOf(df2.format(provenanceTime)));
