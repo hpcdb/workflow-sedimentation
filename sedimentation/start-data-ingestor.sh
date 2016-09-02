@@ -11,6 +11,9 @@ cd ../sedimentation
 cd ../sedimentation
 java -jar ../dfa/DI-1.0.jar -daemon start
 
+# commandline
+#clear;monetdb-start-all;cd ../dfa;./restart-monetdb.sh;cd ../sedimentation;java -jar ../dfa/DI-1.0.jar -daemon start
+
 
 # Back up database
 # rm prov-db.dump

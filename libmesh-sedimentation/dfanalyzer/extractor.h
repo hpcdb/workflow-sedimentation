@@ -60,7 +60,7 @@ public:
         sprintf(buffer, "%s] -delimiter=\"%s\"", buffer, this->delimeter.c_str());
         cout << buffer << endl;
         system(buffer);
-        free(buffer);
+        //buffer);
     }
 
 };
