@@ -2,6 +2,9 @@
 # delete files from the previous execution
 rm restart.in
 rm out*
+rm err.txt
+rm db-out.txt
+rm db-err.txt
 rm temp*
 rm *.csv
 rm -rf prov/log/*
@@ -17,6 +20,7 @@ rm -rf *.dump
 rm -rf data
 rm -rf solver*
 rm -rf mpirun.sh
+rm -rf *.index
 
 mkdir prov/log
 mkdir prov/rde

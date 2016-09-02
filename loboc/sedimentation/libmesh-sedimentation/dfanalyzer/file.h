@@ -15,21 +15,21 @@ using namespace rapidjson;
 
 class File {
     string path;
-    string filename;
+    string name;
     
 public:
 
-    File(string path, string filename) {
+    File(string path, string name) {
         this->path = path;
-        this->filename = filename;
+        this->name = name;
     };
 
     string GetPath(){
         return path;
     }
     
-    string GetFileName(){
-        return filename;
+    string GetName(){
+        return name;
     }
 
 };

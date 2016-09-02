@@ -372,7 +372,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     rdePerf.start();
 
     string extension = "data";
-    if (rawDataAccess.compare("INDEXING")) {
+    if (rawDataAccess == "INDEXING") {
         extension = "index";
         Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
         ext.addAttribute("u", "numeric", false);
@@ -399,7 +399,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     perf.start();
 
     char* extractedFileName = (char*) malloc(jsonArraySize);
-    if (rawDataAccess.compare("INDEXING")) {
+    if (rawDataAccess == "INDEXING") {
         sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
     } else {
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
@@ -858,7 +858,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     rdePerf.start();
 
     string extension = "data";
-    if (rawDataAccess.compare("INDEXING")) {
+    if (rawDataAccess == "INDEXING") {
         extension = "index";
         Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
         ext.addAttribute("u", "numeric", false);

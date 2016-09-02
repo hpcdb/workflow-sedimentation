@@ -68,8 +68,8 @@ using namespace std;
 #include "performance.h"
 #include "FEAdaptor.h"
 
-const int textArraySize = 64;
-const int jsonArraySize = 512;
+const int textArraySize = 128;
+const int jsonArraySize = 1024;
 
 double ramp(double t) {
     double x[3];
@@ -110,6 +110,7 @@ bool is_file_exist(const char *fileName) {
 
 int main(int argc, char** argv) {
     Performance solverPerf;
+    char* memalloc = (char*) malloc(jsonArraySize);
 
 #ifdef PERFORMANCE
     if (libMesh::global_processor_id() == 0) {
@@ -407,7 +408,7 @@ int main(int argc, char** argv) {
             perf.end();
             double elapsedTime = perf.elapsedTime();
             char buffer[textArraySize];
-            sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+            sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
             cout << buffer << endl;
             prov.storeDataExtractionCost(elapsedTime);
         }
@@ -415,7 +416,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Writer
-        prov.outputInitDataExtraction(simulationID, "initdataextraction", 0, current_files[1], finalFilename);
+        prov.outputInitDataExtraction(simulationID, "initdataextraction", "oinitdataextraction", 0, current_files[1], finalFilename, dim, "irde");
 #endif
     } else if (dim == 3) {
         // 3D analysis
@@ -455,7 +456,7 @@ int main(int argc, char** argv) {
                 perf.end();
                 double elapsedTime = perf.elapsedTime();
                 char buffer[textArraySize];
-                sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                 cout << buffer << endl;
                 prov.storeDataExtractionCost(elapsedTime);
             }
@@ -464,7 +465,10 @@ int main(int argc, char** argv) {
 #ifdef PROV
             // Mesh Writer
             sprintf(argument1, "iline%dextraction", ik);
-            prov.outputInitDataExtraction(simulationID, argument1, 0, current_files[1], finalFilename);
+            char argument2[textArraySize];
+            sprintf(argument2, "oline%diextraction", ik);
+            sprintf(memalloc, "iline%d", ik);
+            prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
 #endif
         }
     }
@@ -913,14 +917,15 @@ int main(int argc, char** argv) {
                         perf.end();
                         double elapsedTime = perf.elapsedTime();
                         char buffer[textArraySize];
-                        sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                        sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                         cout << buffer << endl;
                         prov.storeDataExtractionCost(elapsedTime);
                     }
 #endif
 
 #ifdef PROV
-                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+                    sprintf(memalloc, "rde%d", numberOfWrites);
+                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc);
 #endif
                 } else if (dim == 3) {
                     // 3D analysis
@@ -959,7 +964,7 @@ int main(int argc, char** argv) {
                             perf.end();
                             double elapsedTime = perf.elapsedTime();
                             char buffer[textArraySize];
-                            sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                            sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                             cout << buffer << endl;
                             prov.storeDataExtractionCost(elapsedTime);
                         }
@@ -967,20 +972,17 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
                         // Mesh Writer
-                        char argument2[textArraySize];
-                        char argument3[textArraySize];
                         sprintf(argument1, "line%dextraction", ik);
-                        sprintf(argument2, "line-%d-extraction", ik);
-                        sprintf(argument3, "oline%dextraction", ik);
-                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+                        sprintf(memalloc, "line%d%d", ik, numberOfWrites);
+                        char argument2[textArraySize];
+                        sprintf(argument2, "oline%dextraction", ik);
+                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
 #endif
                     }
                 }
 
-                char* depID = (char*) malloc(jsonArraySize);
-                sprintf(depID, "%d", taskID);
-                meshDependencies.push_back(depID);
-                free(depID);
+                sprintf(memalloc, "%d", taskID);
+                meshDependencies.push_back(memalloc);
             }
         }
     }
@@ -1043,14 +1045,15 @@ int main(int argc, char** argv) {
                 perf.end();
                 double elapsedTime = perf.elapsedTime();
                 char buffer[textArraySize];
-                sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                 cout << buffer << endl;
                 prov.storeDataExtractionCost(elapsedTime);
             }
 #endif
 
 #ifdef PROV
-            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "data-extraction", "odataextraction", step, current_files[1], finalFilename);
+            sprintf(memalloc, "rde%d", numberOfWrites);
+            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc);
 #endif
         } else if (dim == 3) {
             // 3D analysis
@@ -1089,7 +1092,7 @@ int main(int argc, char** argv) {
                     perf.end();
                     double elapsedTime = perf.elapsedTime();
                     char buffer[textArraySize];
-                    sprintf(buffer, "Data Extraction Cost: %.2f", elapsedTime);
+                    sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                     cout << buffer << endl;
                     prov.storeDataExtractionCost(elapsedTime);
                 }
@@ -1097,20 +1100,17 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
                 // Mesh Writer
-                char argument2[textArraySize];
-                char argument3[textArraySize];
                 sprintf(argument1, "line%dextraction", ik);
-                sprintf(argument2, "line-%d-extraction", ik);
-                sprintf(argument3, "oline%dextraction", ik);
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, argument3, 0, current_files[1], finalFilename);
+                char argument2[textArraySize];
+                sprintf(argument2, "oline%diextraction", ik);
+                sprintf(memalloc, "line%d%d", ik, numberOfWrites);
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
 #endif
             }
         }
 
-        char* depID = (char*) malloc(jsonArraySize);
-        sprintf(depID, "%d", taskID);
-        meshDependencies.push_back(depID);
-        free(depID);
+        sprintf(memalloc, "%d", taskID);
+        meshDependencies.push_back(memalloc);
     }
 
     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
@@ -1133,5 +1133,6 @@ int main(int argc, char** argv) {
 #endif
 
     // All done.
+    free(memalloc);
     return 0;
 }

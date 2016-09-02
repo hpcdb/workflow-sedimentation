@@ -144,13 +144,29 @@ void Task::writeJSON(string filename) {
         }
         adeps.AddMember("ids", aids, document.GetAllocator());
     }
-
     document.AddMember("dependency", adeps, document.GetAllocator());
+    
+    Value afiles(kArrayType);
+    for (File pfile : this->files) {
+        Value p;
+        p.SetObject();
+
+        Value name;
+        name.SetString(pfile.GetName().c_str(), pfile.GetName().size(), document.GetAllocator());
+        p.AddMember("name", name, document.GetAllocator());
+
+        Value path;
+        path.SetString(pfile.GetPath().c_str(), pfile.GetPath().size(), document.GetAllocator());
+        p.AddMember("path", path, document.GetAllocator());
+        
+        afiles.PushBack(p, document.GetAllocator());
+    }
+    document.AddMember("files", afiles, document.GetAllocator());
 
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer2(sb);
     document.Accept(writer2); // Accept() traverses the DOM and generates Handler events.
-    //puts(sb.GetString());
+//    puts(sb.GetString());
 
     ofstream file;
     file.open(filename, ios_base::out);

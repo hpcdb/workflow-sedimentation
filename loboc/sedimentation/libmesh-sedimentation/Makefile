@@ -7,7 +7,7 @@
 # docker
 #LIBMESH_DIR ?=/programs/libmesh/build
 # Virtual Box
-# LIBMESH_DIR ?=/home/vitor/programs/libmesh-install
+# LIBMESH_DIR ?=/home/vitor/src/libmesh-install
 # Stampede
 #LIBMESH_DIR ?=/work/03664/silva/programs/libmesh/build
 # LoboC
