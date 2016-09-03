@@ -68,8 +68,8 @@ using namespace std;
 #include "performance.h"
 #include "FEAdaptor.h"
 
-const int textArraySize = 128;
-const int jsonArraySize = 1024;
+const int textArraySize = 16;
+const int jsonArraySize = 64;
 
 double ramp(double t) {
     double x[3];
