@@ -21,6 +21,7 @@ rm -rf data
 rm -rf solver*
 rm -rf mpirun.sh
 rm -rf *.index
+rm -rf *.data
 
 mkdir prov/log
 mkdir prov/rde
