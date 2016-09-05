@@ -1,0 +1,158 @@
+Parameters: 
+  Reynolds: 2236.07
+  Grashof : 5e+06
+  Sc      : 1
+Opening file: 0
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=1001
+    n_local_nodes()=1001
+  n_elem()=900
+    n_local_elem()=900
+    n_active_elem()=900
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=3
+   System #2, "deposition"
+    Type "Explicit"
+    Variables="d" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=1001
+    n_local_dofs()=1001
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=2
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+   System #0, "flow"
+    Type "TransientLinearImplicit"
+    Variables={ "u" "v" "p" } 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=3003
+    n_local_dofs()=3003
+    n_constrained_dofs()=383
+    n_local_constrained_dofs()=383
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 25.1778
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 383
+      Average DoF Constraint Length= 0
+   System #1, "sediment"
+    Type "TransientLinearImplicit"
+    Variables="s" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=1001
+    n_local_dofs()=1001
+    n_constrained_dofs()=1
+    n_local_constrained_dofs()=1
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 8.39261
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 1
+      Average DoF Constraint Length= 0
+
+[WRITE] output_1_000_00000.h5 - output_1_00000.xmf
+[CATALYST] Time step: 0 ; Time: 0.0
+Data Extraction Cost: 2.91795
+java -jar /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar INDEXING:CSV:EXTRACT irde /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation ext_plane_0.csv [u:numeric,v:numeric,p:numeric,s:numeric,d:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/irde.index
+======================================================
+ Time step  0  simulation time = 0.0100...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+*** Warning, This code is deprecated, and likely to be removed in future library versions! /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/type_vector.h, line 878, compiled Sep  5 2016 at 10:50:30 ***
+0    60   1.05685e-06    4.08495        1              
+1    180  1.10705e-12    0.0425471      0.0103522      
+2    200  1.15443e-14    0.0176126      0.00429737     
+3    200  1.9562e-15     0.00812805     0.00198056     
+4    200  2.02012e-15    0.00383232     0.000934419    
+5    200  4.47625e-17    0.00182222     0.000444166    
+6    200  1.24145e-16    0.000870686    0.000212262    
+------------------------------------------------------
+ Nonlinear solver converged at step 6
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    1    2.62504e-06    0.001346       0.000165686    
+1    3    1.25581e-12    0.000103698    1.27647e-05    
+
+****************** Mesh Refinement ********************  
+Number of elements before AMR step: 900
+Number of elements after AMR step: 990
+ Volume deposited statistics: 
+ Vol_{max}: 0.000200013
+ Vol_{min}: -1.31333e-08
+ Vol_{l2} : 0.000538496
+Warning:  This MeshOutput subclass only supports meshes which have been serialized!
+Warning:  This MeshOutput subclass only supports meshes which have been serialized!
+Warning!  Parallel xda/xdr is not yet implemented.
+Writing a serialized file instead.
+[WRITE] output_1_000_00001.h5 - output_1_00001.xmf
+[CATALYST] Time step: 1 ; Time: 0.01
+Data Extraction Cost: 0.06879
+java -jar /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar INDEXING:CSV:EXTRACT rde1 /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation ext_plane_1.csv [u:numeric,v:numeric,p:numeric,s:numeric,d:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/rde1.index
+======================================================
+ Time step  1  simulation time = 0.0200...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    34   1.49226e-06    0.0682948      0.0133703      
+1    200  2.85563e-10    0.0175073      0.00342745     
+2    200  1.70439e-11    0.00651754     0.00127588     
+3    200  9.46069e-12    0.00274417     0.00053722     
+4    200  7.86199e-12    0.00119268     0.000233484    
+5    200  6.64188e-12    0.000528348    0.000103433    
+------------------------------------------------------
+ Nonlinear solver converged at step 5
+ Solving sedimentation equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+0    2    2.21999e-06    0.00350664     0.000331011    
+1    5    1.9421e-11     0.000481611    4.5462e-05     
+ Volume deposited statistics: 
+ Vol_{max}: 0.000400024
+ Vol_{min}: -2.1623e-08
+ Vol_{l2} : 0.00107697
+Warning!  Parallel xda/xdr is not yet implemented.
+Writing a serialized file instead.
+[WRITE] output_1_000_00002.h5 - output_1_00002.xmf
+[CATALYST] Time step: 2 ; Time: 0.02
+Data Extraction Cost: 0.06220
+java -jar /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar INDEXING:CSV:EXTRACT rde2 /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation ext_plane_2.csv [u:numeric,v:numeric,p:numeric,s:numeric,d:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/rde2.index
+FLOW SOLVER - TOTAL LINEAR ITERATIONS : 2274
+TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 11
+[Provenance] Finish Data Ingestor

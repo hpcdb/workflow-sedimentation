@@ -68,8 +68,7 @@ using namespace std;
 #include "performance.h"
 #include "FEAdaptor.h"
 
-const int textArraySize = 16;
-const int jsonArraySize = 64;
+const int jsonArraySize = 512;
 
 double ramp(double t) {
     double x[3];
@@ -110,18 +109,19 @@ bool is_file_exist(const char *fileName) {
 
 int main(int argc, char** argv) {
     Performance solverPerf;
-    char* memalloc = (char*) malloc(jsonArraySize);
+    char memalloc[jsonArraySize];
+    char finalFilename[jsonArraySize];
+
+    int simulationID = 1;
+
+    // Initialize libMesh.
+    LibMeshInit init(argc, argv);
 
 #ifdef PERFORMANCE
     if (libMesh::global_processor_id() == 0) {
         solverPerf.start();
     }
 #endif
-
-    int simulationID = 1;
-
-    // Initialize libMesh.
-    LibMeshInit init(argc, argv);
 
     PerfLog perf_log("Sedimentation Solver");
 
@@ -378,9 +378,8 @@ int main(int argc, char** argv) {
 
     if (dim == 2) {
         // 2D analysis
-        char firstFilename[textArraySize];
+        char firstFilename[jsonArraySize];
         sprintf(firstFilename, "init_ext_plane_%d.csv", t_step);
-        char finalFilename[textArraySize];
         sprintf(finalFilename, "ext_plane_%d.csv", t_step);
 #ifdef PROV
         // Mesh Writer
@@ -407,7 +406,7 @@ int main(int argc, char** argv) {
         if (libMesh::global_processor_id() == 0) {
             perf.end();
             double elapsedTime = perf.elapsedTime();
-            char buffer[textArraySize];
+            char buffer[jsonArraySize];
             sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
             cout << buffer << endl;
             prov.storeDataExtractionCost(elapsedTime);
@@ -421,14 +420,13 @@ int main(int argc, char** argv) {
     } else if (dim == 3) {
         // 3D analysis
         for (int ik = 0; ik <= 3; ik++) {
-            char firstFilename[textArraySize];
+            char firstFilename[jsonArraySize];
             sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, t_step);
-            char finalFilename[textArraySize];
             sprintf(finalFilename, "ext_line_%d_%d.csv", ik, t_step);
 
 #ifdef PROV
             // Mesh Writer
-            char argument1[textArraySize];
+            char argument1[jsonArraySize];
             sprintf(argument1, "iline%dextraction", ik);
             prov.inputInitDataExtraction(simulationID, argument1);
 #endif
@@ -455,7 +453,7 @@ int main(int argc, char** argv) {
             if (libMesh::global_processor_id() == 0) {
                 perf.end();
                 double elapsedTime = perf.elapsedTime();
-                char buffer[textArraySize];
+                char buffer[jsonArraySize];
                 sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                 cout << buffer << endl;
                 prov.storeDataExtractionCost(elapsedTime);
@@ -465,7 +463,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
             // Mesh Writer
             sprintf(argument1, "iline%dextraction", ik);
-            char argument2[textArraySize];
+            char argument2[jsonArraySize];
             sprintf(argument2, "oline%diextraction", ik);
             sprintf(memalloc, "iline%d", ik);
             prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
@@ -898,9 +896,8 @@ int main(int argc, char** argv) {
                     }
 #endif
 
-                    char firstFilename[textArraySize];
+                    char firstFilename[jsonArraySize];
                     sprintf(firstFilename, "init_ext_plane_%d.csv", step);
-                    char finalFilename[textArraySize];
                     sprintf(finalFilename, "ext_plane_%d.csv", step);
 
 #ifdef USE_CATALYST
@@ -916,7 +913,7 @@ int main(int argc, char** argv) {
                     if (libMesh::global_processor_id() == 0) {
                         perf.end();
                         double elapsedTime = perf.elapsedTime();
-                        char buffer[textArraySize];
+                        char buffer[jsonArraySize];
                         sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                         cout << buffer << endl;
                         prov.storeDataExtractionCost(elapsedTime);
@@ -930,14 +927,13 @@ int main(int argc, char** argv) {
                 } else if (dim == 3) {
                     // 3D analysis
                     for (int ik = 0; ik <= 3; ik++) {
-                        char firstFilename[textArraySize];
+                        char firstFilename[jsonArraySize];
                         sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
-                        char finalFilename[textArraySize];
                         sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
 
 #ifdef PROV
                         // Mesh Writer
-                        char argument1[textArraySize];
+                        char argument1[jsonArraySize];
                         sprintf(argument1, "line%dextraction", ik);
                         prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
@@ -963,7 +959,7 @@ int main(int argc, char** argv) {
                         if (libMesh::global_processor_id() == 0) {
                             perf.end();
                             double elapsedTime = perf.elapsedTime();
-                            char buffer[textArraySize];
+                            char buffer[jsonArraySize];
                             sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                             cout << buffer << endl;
                             prov.storeDataExtractionCost(elapsedTime);
@@ -974,7 +970,7 @@ int main(int argc, char** argv) {
                         // Mesh Writer
                         sprintf(argument1, "line%dextraction", ik);
                         sprintf(memalloc, "line%d%d", ik, numberOfWrites);
-                        char argument2[textArraySize];
+                        char argument2[jsonArraySize];
                         sprintf(argument2, "oline%dextraction", ik);
                         prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
 #endif
@@ -1026,9 +1022,8 @@ int main(int argc, char** argv) {
             }
 #endif
 
-            char firstFilename[textArraySize];
+            char firstFilename[jsonArraySize];
             sprintf(firstFilename, "init_ext_plane_%d.csv", step);
-            char finalFilename[textArraySize];
             sprintf(finalFilename, "ext_plane_%d.csv", step);
 
 #ifdef USE_CATALYST
@@ -1044,7 +1039,7 @@ int main(int argc, char** argv) {
             if (libMesh::global_processor_id() == 0) {
                 perf.end();
                 double elapsedTime = perf.elapsedTime();
-                char buffer[textArraySize];
+                char buffer[jsonArraySize];
                 sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                 cout << buffer << endl;
                 prov.storeDataExtractionCost(elapsedTime);
@@ -1058,14 +1053,13 @@ int main(int argc, char** argv) {
         } else if (dim == 3) {
             // 3D analysis
             for (int ik = 0; ik <= 3; ik++) {
-                char firstFilename[textArraySize];
+                char firstFilename[jsonArraySize];
                 sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
-                char finalFilename[textArraySize];
                 sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
 
 #ifdef PROV
                 // Mesh Writer
-                char argument1[textArraySize];
+                char argument1[jsonArraySize];
                 sprintf(argument1, "line%dextraction", ik);
                 prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
@@ -1091,7 +1085,7 @@ int main(int argc, char** argv) {
                 if (libMesh::global_processor_id() == 0) {
                     perf.end();
                     double elapsedTime = perf.elapsedTime();
-                    char buffer[textArraySize];
+                    char buffer[jsonArraySize];
                     sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
                     cout << buffer << endl;
                     prov.storeDataExtractionCost(elapsedTime);
@@ -1101,7 +1095,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 // Mesh Writer
                 sprintf(argument1, "line%dextraction", ik);
-                char argument2[textArraySize];
+                char argument2[jsonArraySize];
                 sprintf(argument2, "oline%diextraction", ik);
                 sprintf(memalloc, "line%d%d", ik, numberOfWrites);
                 prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
@@ -1133,6 +1127,5 @@ int main(int argc, char** argv) {
 #endif
 
     // All done.
-    free(memalloc);
     return 0;
 }

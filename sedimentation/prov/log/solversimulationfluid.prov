@@ -1,0 +1,78 @@
+PROV:solversimulationfluid:Input
+      0.00013
+      elapsed-time: 0.00013 seconds.
+PROV:solversimulationfluid:Output
+      0.00035
+      elapsed-time: 0.00035 seconds.
+PROV:solversimulationfluid:Input
+      0.00021
+      elapsed-time: 0.00021 seconds.
+PROV:solversimulationfluid:Output
+      0.00031
+      elapsed-time: 0.00031 seconds.
+PROV:solversimulationfluid:Input
+      0.00019
+      elapsed-time: 0.00019 seconds.
+PROV:solversimulationfluid:Output
+      0.00027
+      elapsed-time: 0.00027 seconds.
+PROV:solversimulationfluid:Input
+      0.00021
+      elapsed-time: 0.00021 seconds.
+PROV:solversimulationfluid:Output
+      0.00035
+      elapsed-time: 0.00035 seconds.
+PROV:solversimulationfluid:Input
+      0.00014
+      elapsed-time: 0.00014 seconds.
+PROV:solversimulationfluid:Output
+      0.00048
+      elapsed-time: 0.00048 seconds.
+PROV:solversimulationfluid:Input
+      0.00016
+      elapsed-time: 0.00016 seconds.
+PROV:solversimulationfluid:Output
+      0.00031
+      elapsed-time: 0.00031 seconds.
+PROV:solversimulationfluid:Input
+      0.00016
+      elapsed-time: 0.00016 seconds.
+PROV:solversimulationfluid:Output
+      0.00179
+      elapsed-time: 0.00179 seconds.
+PROV:solversimulationfluid:Input
+      0.00017
+      elapsed-time: 0.00017 seconds.
+PROV:solversimulationfluid:Output
+      0.00028
+      elapsed-time: 0.00028 seconds.
+PROV:solversimulationfluid:Input
+      0.00015
+      elapsed-time: 0.00015 seconds.
+PROV:solversimulationfluid:Output
+      0.00047
+      elapsed-time: 0.00047 seconds.
+PROV:solversimulationfluid:Input
+      0.00015
+      elapsed-time: 0.00015 seconds.
+PROV:solversimulationfluid:Output
+      0.00031
+      elapsed-time: 0.00031 seconds.
+PROV:solversimulationfluid:Input
+      0.00015
+      elapsed-time: 0.00015 seconds.
+PROV:solversimulationfluid:Output
+      0.00028
+      elapsed-time: 0.00028 seconds.
+PROV:solversimulationfluid:Input
+      0.00019
+      elapsed-time: 0.00019 seconds.
+PROV:solversimulationfluid:Output
+      0.00038
+      elapsed-time: 0.00038 seconds.
+PROV:solversimulationfluid:Input
+      0.00015
+      elapsed-time: 0.00015 seconds.
+PROV:solversimulationfluid:Output
+      0.00099
+      elapsed-time: 0.00099 seconds.

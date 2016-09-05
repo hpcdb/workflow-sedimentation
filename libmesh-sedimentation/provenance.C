@@ -32,20 +32,10 @@
 using namespace std;
 using namespace libMesh;
 
-string space = "      ";
-string directory = "";
-string pgCommandLine = "";
-string rdeCommandLine = "";
-string dataflow = "sedimentation";
-string jsonDirectory = "";
-string rawDataAccess = "";
-string cartridge = "";
-char* memalloc;
-
 Provenance::Provenance() {
     GetPot infile("provenance.in");
-    memalloc = (char*) malloc(jsonArraySize);
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
+    outputDirectory = infile("outputDirectory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar");
     string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar");
     rawDataAccess = infile("access", "EXTRACTION");
@@ -79,6 +69,7 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d", simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
     vector<string> e = {memalloc};
     t.addSet("i" + transformation, e);
@@ -93,8 +84,8 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -115,6 +106,7 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d;%.2f;%.2f;%.2f;%d", simulationID, r_fraction, c_fraction, max_h_level, hlevels);
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
@@ -135,8 +127,8 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
     //    Create Equation Systems
@@ -167,8 +159,8 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -191,6 +183,7 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f",
             simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, fopc, theta, ex, ey, ez, c_factor);
     vector<string> e = {memalloc};
@@ -212,8 +205,8 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
     perf.start();
@@ -243,8 +236,8 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -266,6 +259,7 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d;%.2f;%.2f;%d;%d;%.2f;%d;%d;%d;%s/%s",
             simulationID, dt, tmax, n_time_steps, n_nonlinear_steps,
             nonlinear_tolerance, max_linear_iters, max_r_steps,
@@ -292,8 +286,8 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -307,6 +301,7 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
     perf.start();
 
     PerformanceMetric p;
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
@@ -333,8 +328,8 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -354,6 +349,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     t.setStatus("FINISHED");
     t.addDtDependency("getmaximumiterations");
 
+    char memalloc[4096];
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
@@ -364,8 +360,8 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
     Performance rdePerf;
@@ -398,7 +394,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 
     perf.start();
 
-    char* extractedFileName = (char*) malloc(jsonArraySize);
+    char extractedFileName[jsonArraySize];
     if (rawDataAccess == "INDEXING") {
         sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
     } else {
@@ -420,7 +416,6 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 
     File f1(directory, xdmf);
     t.addFile(f1);
-    free(extractedFileName);
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
@@ -431,8 +426,8 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -447,6 +442,7 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
 
     string transformation = "solversimulationfluid";
     PerformanceMetric p;
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
             transformation.c_str(), simulationID, subTaskID);
     p.SetDescription(memalloc);
@@ -475,8 +471,8 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -500,6 +496,7 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
     t.setStatus("FINISHED");
     t.addDtDependency("getmaximumiterations");
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
@@ -528,8 +525,8 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -543,6 +540,7 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
 
     string transformation = "solversimulationsediments";
     PerformanceMetric p;
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
             transformation.c_str(), simulationID, subTaskID);
     p.SetDescription(memalloc);
@@ -571,8 +569,8 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -596,6 +594,7 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
     t.setStatus("FINISHED");
     t.addDtDependency("solversimulationfluid");
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
@@ -624,8 +623,8 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -640,6 +639,7 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
 
     string transformation = "meshrefinement";
     PerformanceMetric p;
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
             transformation.c_str(), simulationID, subTaskID);
     p.SetDescription(memalloc);
@@ -676,8 +676,8 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -692,6 +692,7 @@ void Provenance::inputMeshWriter(int taskID, int simulationID, int subTaskID) {
 
     string transformation = "meshwriter";
     PerformanceMetric p;
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
             transformation.c_str(), simulationID, subTaskID);
     p.SetDescription(memalloc);
@@ -720,8 +721,8 @@ void Provenance::inputMeshWriter(int taskID, int simulationID, int subTaskID) {
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -743,6 +744,7 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
     t.setStatus("FINISHED");
     t.addDtDependency("solversimulationsediments");
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
@@ -772,8 +774,8 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -788,6 +790,7 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
     perf.start();
 
     PerformanceMetric p;
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
             transformation.c_str(), simulationID, subTaskID);
     p.SetDescription(memalloc);
@@ -816,8 +819,8 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -840,6 +843,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     t.setStatus("FINISHED");
     t.addDtDependency("meshwriter");
 
+    char memalloc[4096];
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
@@ -850,8 +854,8 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
     Performance rdePerf;
@@ -884,7 +888,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
 
     perf.start();
 
-    char* extractedFileName = (char*) malloc(jsonArraySize);
+    char extractedFileName[jsonArraySize];
     if (rawDataAccess == "INDEXING") {
         sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
     } else {
@@ -899,7 +903,6 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
 
     File f1(directory, xdmf);
     t.addFile(f1);
-    free(extractedFileName);
 
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
@@ -918,8 +921,8 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -934,6 +937,7 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
 
     string transformation = "meshaggregator";
     PerformanceMetric p;
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d",
             transformation.c_str(), simulationID);
     p.SetDescription(memalloc);
@@ -972,8 +976,8 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << *memalloc << endl;
-    file << space << "elapsed-time: " << *memalloc << " seconds." << endl;
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 }
 
@@ -982,7 +986,7 @@ void Provenance::storeDataExtractionCost(double elapsedTime) {
     ofstream file;
     file.open("prov/rde/data-extraction.prov", ios_base::app);
     file << "RDE:DataExtraction:Process" << endl;
-    char buffer[textArraySize];
+    char buffer[jsonArraySize];
     sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
@@ -993,7 +997,7 @@ void Provenance::storeRDEComponentCost(double elapsedTime) {
     ofstream file;
     file.open("prov/indexing/rde-component.prov", ios_base::app);
     file << "RDEComponent:DataExtraction:Process" << endl;
-    char buffer[textArraySize];
+    char buffer[jsonArraySize];
     sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
@@ -1004,7 +1008,7 @@ void Provenance::storeSolverCost(double elapsedTime) {
     ofstream file;
     file.open("prov/solver/time.prov", ios_base::app);
     file << "Solver:Time:Process" << endl;
-    char buffer[textArraySize];
+    char buffer[jsonArraySize];
     sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
@@ -1017,7 +1021,6 @@ void Provenance::finishDataIngestor() {
     system(strdup(str.c_str()));
 
     cout << "[Provenance] Finish Data Ingestor" << endl;
-    free(memalloc);
 }
 
 

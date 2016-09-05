@@ -63,6 +63,15 @@ private:
     int processor_id;
     const int textArraySize = 64;
     const int jsonArraySize = 128;
+    string space = "      ";
+    string directory = "";
+    string outputDirectory = "";
+    string pgCommandLine = "";
+    string rdeCommandLine = "";
+    string dataflow = "sedimentation";
+    string jsonDirectory = "";
+    string rawDataAccess = "";
+    string cartridge = "";
 };
 
 

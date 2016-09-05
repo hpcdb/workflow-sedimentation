@@ -1,0 +1,41 @@
+{
+    "id": "1",
+    "subid": "1",
+    "dataflow": "sedimentation",
+    "transformation": "meshwriter",
+    "workspace": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::meshwriter-1-1",
+            "method": "COMPUTATION",
+            "endTime": "05.09.2016-11:28:33"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "omeshwriter",
+            "elements": [
+                "1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output_1_00001.xmf"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationsediments"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": [
+        {
+            "name": "output_1_00001.xmf",
+            "path": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation"
+        }
+    ]
+}

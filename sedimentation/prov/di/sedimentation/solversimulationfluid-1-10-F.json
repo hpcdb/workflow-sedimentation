@@ -1,0 +1,36 @@
+{
+    "id": "2",
+    "subid": "10",
+    "dataflow": "sedimentation",
+    "transformation": "solversimulationfluid",
+    "workspace": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::solversimulationfluid-1-10",
+            "method": "COMPUTATION",
+            "endTime": "05.09.2016-11:28:33"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "osolversimulationfluid",
+            "elements": [
+                "1;1;0.02;0;2;200;0.00;0.01;0.00;false"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "getmaximumiterations"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

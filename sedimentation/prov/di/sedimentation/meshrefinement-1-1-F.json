@@ -1,0 +1,37 @@
+{
+    "id": "1",
+    "subid": "1",
+    "dataflow": "sedimentation",
+    "transformation": "meshrefinement",
+    "workspace": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::meshrefinement-1-1",
+            "method": "COMPUTATION",
+            "startTime": "05.09.2016-11:28:32",
+            "endTime": "05.09.2016-11:28:32"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "omeshrefinement",
+            "elements": [
+                "1;true;0;900;990"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationsediments"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}
