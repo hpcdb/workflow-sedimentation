@@ -259,7 +259,7 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
 
-    char memalloc[jsonArraySize];
+    char memalloc[1000];
     sprintf(memalloc, "%d;%.2f;%.2f;%d;%d;%.2f;%d;%d;%d;%s/%s",
             simulationID, dt, tmax, n_time_steps, n_nonlinear_steps,
             nonlinear_tolerance, max_linear_iters, max_r_steps,
@@ -929,21 +929,16 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
 void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors, vector<string> meshDependencies) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Mesh Aggregator" << endl;
+    cout << "Output Mesh Writer" << endl;
 #endif
 
     Performance perf;
     perf.start();
+    
+    PerformanceMetric ptemp;
+    ptemp.IdentifyStartTime();
 
     string transformation = "meshaggregator";
-    PerformanceMetric p;
-    char memalloc[jsonArraySize];
-    sprintf(memalloc, "libMeshSedimentation::%s-%d",
-            transformation.c_str(), simulationID);
-    p.SetDescription(memalloc);
-    p.SetMethod("COMPUTATION");
-    p.IdentifyStartTime();
-
     Task t(simulationID);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
@@ -957,16 +952,22 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     File f1(directory, xdmf);
     t.addFile(f1);
 
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d;%s/%s;%d",
             simulationID, directory.c_str(), xdmf.c_str(), n_processors);
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
+    PerformanceMetric p;
+    sprintf(memalloc, "libMeshSedimentation::%s-%d",
+            transformation.c_str(), simulationID);
+    p.SetDescription(memalloc);
+    p.SetMethod("COMPUTATION");
+    p.SetStartTime(ptemp.GetStartTime());
     p.IdentifyEndTime();
     t.addPerformanceMetric(p);
 
-    sprintf(memalloc, "%s%s-%d-F.json",
-            jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
 
     perf.end();
@@ -979,6 +980,52 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
+    
+//    if (processor_id != 0) return;
+//    Performance perf;
+//    perf.start();
+//
+//    string transformation = "meshaggregator";
+//    PerformanceMetric p;
+//    char memalloc[jsonArraySize];
+//    sprintf(memalloc, "libMeshSedimentation::%s-%d",
+//            transformation.c_str(), simulationID);
+//    p.SetDescription(memalloc);
+//    p.SetMethod("COMPUTATION");
+//    p.IdentifyStartTime();
+//
+//    Task t(simulationID);
+//    t.setDataflow(dataflow);
+//    t.setTransformation(transformation);
+//    t.setWorkspace(directory);
+//    t.setStatus("FINISHED");
+    
+//
+//    File f1(directory, xdmf);
+//    t.addFile(f1);
+//
+//    sprintf(memalloc, "%d;%s/%s;%d",
+//            simulationID, directory.c_str(), xdmf.c_str(), n_processors);
+//    vector<string> e = {memalloc};
+//    t.addSet("o" + transformation, e);
+//
+//    p.IdentifyEndTime();
+//    t.addPerformanceMetric(p);
+//
+//    sprintf(memalloc, "%s%s-%d-F.json",
+//            jsonDirectory.c_str(), transformation.c_str(), simulationID);
+//    t.writeJSON(memalloc);
+//
+//    perf.end();
+//    double elapsedTime = perf.elapsedTime();
+//
+//    ofstream file;
+//    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+//    file << "PROV:" + transformation + ":Output" << endl;
+//    sprintf(memalloc, "%.5f", elapsedTime);
+//    file << space << memalloc << endl;
+//    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+//    file.close();
 }
 
 void Provenance::storeDataExtractionCost(double elapsedTime) {

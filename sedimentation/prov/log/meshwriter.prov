@@ -1,12 +1,12 @@
 PROV:meshwriter:Input
-      0.00032
-      elapsed-time: 0.00032 seconds.
+      0.00040
+      elapsed-time: 0.00040 seconds.
 PROV:meshwriter:Output
-      0.00018
-      elapsed-time: 0.00018 seconds.
+      0.00029
+      elapsed-time: 0.00029 seconds.
 PROV:meshwriter:Input
       0.00022
       elapsed-time: 0.00022 seconds.
 PROV:meshwriter:Output
-      0.00020
-      elapsed-time: 0.00020 seconds.
+      0.00034
+      elapsed-time: 0.00034 seconds.

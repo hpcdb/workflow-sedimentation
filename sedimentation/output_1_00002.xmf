@@ -5,26 +5,29 @@
  <Grid Name="output_1_00002" GridType="Collection" CollectionType="Spatial">
   <Time Type="Single" Value="0.020000" />
  <Grid Name="output_1_000" Type="Uniform"> 
-  <Topology Type="Quadrilateral" NumberOfElements="990"  BaseOffset="0">
-    <DataItem Dimensions="3960" NumberType="Int" Format="HDF"> output_1_000_00002.h5:/conn</DataItem>
+  <Topology Type="Hexahedron" NumberOfElements="11100"  BaseOffset="0">
+    <DataItem Dimensions="88800" NumberType="Int" Format="HDF"> output_1_000_00002.h5:/conn</DataItem>
   </Topology>
   <Geometry Type="XYZ">
-    <DataItem Dimensions="3312" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/coords</DataItem>
+    <DataItem Dimensions="40842" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/coords</DataItem>
   </Geometry>
   <Attribute Name="u" AttributeType="Scalar" Center="Node">
-    <DataItem Dimensions="1104" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/u</DataItem>
+    <DataItem Dimensions="13614" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/u</DataItem>
   </Attribute>
   <Attribute Name="v" AttributeType="Scalar" Center="Node">
-    <DataItem Dimensions="1104" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/v</DataItem>
+    <DataItem Dimensions="13614" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/v</DataItem>
+  </Attribute>
+  <Attribute Name="w" AttributeType="Scalar" Center="Node">
+    <DataItem Dimensions="13614" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/w</DataItem>
   </Attribute>
   <Attribute Name="p" AttributeType="Scalar" Center="Node">
-    <DataItem Dimensions="1104" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/p</DataItem>
+    <DataItem Dimensions="13614" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/p</DataItem>
   </Attribute>
   <Attribute Name="s" AttributeType="Scalar" Center="Node">
-    <DataItem Dimensions="1104" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/s</DataItem>
+    <DataItem Dimensions="13614" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/s</DataItem>
   </Attribute>
   <Attribute Name="d" AttributeType="Scalar" Center="Node">
-    <DataItem Dimensions="1104" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/d</DataItem>
+    <DataItem Dimensions="13614" NumberType="Float" Precision="8" Format="HDF">output_1_000_00002.h5:/d</DataItem>
   </Attribute>
   </Grid>
  </Grid>

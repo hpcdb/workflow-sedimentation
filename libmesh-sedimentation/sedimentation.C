@@ -68,7 +68,7 @@ using namespace std;
 #include "performance.h"
 #include "FEAdaptor.h"
 
-const int jsonArraySize = 512;
+const int jsonArraySize = 64;
 
 double ramp(double t) {
     double x[3];
@@ -114,14 +114,14 @@ int main(int argc, char** argv) {
 
     int simulationID = 1;
 
-    // Initialize libMesh.
-    LibMeshInit init(argc, argv);
-
 #ifdef PERFORMANCE
     if (libMesh::global_processor_id() == 0) {
         solverPerf.start();
     }
 #endif
+
+    // Initialize libMesh.
+    LibMeshInit init(argc, argv);
 
     PerfLog perf_log("Sedimentation Solver");
 
@@ -236,6 +236,7 @@ int main(int argc, char** argv) {
 
 #ifdef XDMF_
     XDMFWriter xdmf_writer(mesh);
+//    xdmf_writer.set_file_name(rname);
 #endif
 
     if (!is_file_exist("restart.in") || true) {
@@ -982,7 +983,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-
+    
     if ((t_step + 1) % write_interval != 0) {
         numberOfWrites++;
 #ifdef PROV
@@ -1112,7 +1113,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
     // Mesh Aggregator
-    char out_filename[256];
+    char out_filename[jsonArraySize];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
     prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(), meshDependencies);
     prov.finishDataIngestor();

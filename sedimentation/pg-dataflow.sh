@@ -12,7 +12,7 @@ PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentat
 
 # Sedimentation Solver
 dimension="3"
-access="indexing"
+access="extraction"
 cartridge="csv"
 
 echo "Dataflow - libMesh Sedimentation"

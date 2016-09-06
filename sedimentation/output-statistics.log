@@ -1,16 +1,16 @@
 ######################################################
 #################### Log Analysis ####################
 ######################################################
-Solver elapsed time (seconds): 3.33345
-Provenance elapsed time (seconds): 0.02171
-Raw data extraction elapsed time (seconds): 3.04894
-Indexing elapsed time (seconds): 0.69488
-Total elapsed time (seconds): 7.09898
+Solver elapsed time (seconds): 97.09937
+Provenance elapsed time (seconds): 0.01986
+Raw data extraction elapsed time (seconds): 2.5586
+Indexing elapsed time (seconds): 1.0E-5
+Total elapsed time (seconds): 99.67784
 ------------------------------------------------------
 ----------------- Percentual Analysis ----------------
 ------------------------------------------------------
-Solver elapsed time (%): 46.95675
-Provenance elapsed time (%): 0.30582
-RDE elapsed time (%): 42.94899
-Indexing elapsed time (%): 9.78845
+Solver elapsed time (%): 97.4132
+Provenance elapsed time (%): 0.01992
+RDE elapsed time (%): 2.56687
+Indexing elapsed time (%): 1.0E-5
 ######################################################

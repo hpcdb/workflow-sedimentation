@@ -4,7 +4,7 @@
 #------------------------------------------------------
 
 # The coarse grid size from which to start adaptivity
-dim    =  2
+dim    =  3
 ncellx = 90
 ncelly = 10
 ncellz = 10
@@ -59,3 +59,4 @@ is_gravitational_current = 0
 
 # Write out every nth timestep to file.
 write_interval = 1
+output = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output_

@@ -1,0 +1,18 @@
+PROV:line2extraction:Input
+      0.00041
+      elapsed-time: 0.00041 seconds.
+PROV:line2extraction:Output
+      0.00002
+      elapsed-time: 0.00002 seconds.
+PROV:line2extraction:Output
+      0.00023
+      elapsed-time: 0.00023 seconds.
+PROV:line2extraction:Input
+      0.00042
+      elapsed-time: 0.00042 seconds.
+PROV:line2extraction:Output
+      0.00001
+      elapsed-time: 0.00001 seconds.
+PROV:line2extraction:Output
+      0.00030
+      elapsed-time: 0.00030 seconds.
