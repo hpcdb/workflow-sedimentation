@@ -1,5 +1,6 @@
 directory = /home/user4/sedimentation/exp1
+outputDirectory = /mnt/scratch/user4/sc16
 pgFilePath = /home/user4/sedimentation/dfa/PG-1.0.jar
 rdeFilePath = /home/user4/sedimentation/dfa/RDE-1.0.jar
-access=INDEXING
+access=EXTRACTION
 cartridge=CSV

@@ -180,7 +180,6 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     
 #endif
     
-    
     solution.resize(this->n_local_nodes);
     
 #ifdef LIBMESH_HAVE_HDF5

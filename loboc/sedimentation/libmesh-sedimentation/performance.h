@@ -37,7 +37,7 @@ class Performance
       }
 
       double elapsedTime(){
-        return double(double(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count())/1000000.00);
+          return double(double(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count())/1000000.00);
       }
 
     private:

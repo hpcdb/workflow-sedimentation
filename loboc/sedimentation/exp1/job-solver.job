@@ -1,4 +1,4 @@
-#PBS -l select=160:ncpus=48:mpiprocs=24
+#PBS -l select=50:ncpus=48:mpiprocs=24
 #PBS -l walltime=999:00:00
 #PBS -j oe  
 #PBS -N solver-exp1 
