@@ -744,7 +744,7 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
     t.setStatus("FINISHED");
     t.addDtDependency("solversimulationsediments");
 
-    char memalloc[jsonArraySize];
+    char memalloc[4096];
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
@@ -952,7 +952,7 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     File f1(directory, xdmf);
     t.addFile(f1);
 
-    char memalloc[jsonArraySize];
+    char memalloc[4096];
     sprintf(memalloc, "%d;%s/%s;%d",
             simulationID, directory.c_str(), xdmf.c_str(), n_processors);
     vector<string> e = {memalloc};

@@ -236,7 +236,7 @@ int main(int argc, char** argv) {
 
 #ifdef XDMF_
     XDMFWriter xdmf_writer(mesh);
-//    xdmf_writer.set_file_name(rname);
+    xdmf_writer.set_file_name(rname);
 #endif
 
     if (!is_file_exist("restart.in") || true) {
@@ -1128,5 +1128,6 @@ int main(int argc, char** argv) {
 #endif
 
     // All done.
+    cout << "All done!" << endl;
     return 0;
 }
