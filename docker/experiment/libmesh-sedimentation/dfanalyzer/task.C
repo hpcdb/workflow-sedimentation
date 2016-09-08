@@ -166,7 +166,7 @@ void Task::writeJSON(string filename) {
     StringBuffer sb;
     PrettyWriter<StringBuffer> writer2(sb);
     document.Accept(writer2); // Accept() traverses the DOM and generates Handler events.
-    // puts(sb.GetString());
+//    puts(sb.GetString());
 
     ofstream file;
     file.open(filename, ios_base::out);

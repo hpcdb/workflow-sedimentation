@@ -20,7 +20,7 @@
 #include "libmesh/libmesh.h"
 
 #define PROV
-#define VERBOSE
+//#define VERBOSE
 
 using namespace std;
 using namespace libMesh;
@@ -66,10 +66,10 @@ private:
     string space = "      ";
     string directory = "";
     string outputDirectory = "";
-    char pgCommandLine[64];
-    char rdeCommandLine[64];
+    string pgCommandLine = "";
+    string rdeCommandLine = "";
     string dataflow = "sedimentation";
-    char jsonDirectory[64];
+    string jsonDirectory = "";
     string rawDataAccess = "";
     string cartridge = "";
 };
