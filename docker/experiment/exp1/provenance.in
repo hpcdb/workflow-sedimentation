@@ -1,0 +1,6 @@
+directory = /shared/experiment/exp1
+outputDirectory = /shared/experiment/exp1
+pgFilePath = /shared/experiment/dfa/PG-1.0.jar
+rdeFilePath = /shared/experiment/dfa/RDE-1.0.jar
+access=EXTRACTION
+cartridge=CSV

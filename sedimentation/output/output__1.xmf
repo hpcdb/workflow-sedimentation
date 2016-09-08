@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!-- DOCTYPE Xdmf SYSTEM "Xdmf.dtd" [] --> 
+<Xdmf xmlns:xi="http://www.w3.org/2001/XInclude" Version="2.0"> 
+<Domain Name="libMesh">
+ <Grid GridType="Collection" CollectionType="Temporal">
+  <xi:include href="/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00000.xmf" xpointer="xpointer(//Xdmf/Domain/Grid)" />
+  <xi:include href="/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00001.xmf" xpointer="xpointer(//Xdmf/Domain/Grid)" />
+  <xi:include href="/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00002.xmf" xpointer="xpointer(//Xdmf/Domain/Grid)" />
+ </Grid>
+</Domain>
+</Xdmf>

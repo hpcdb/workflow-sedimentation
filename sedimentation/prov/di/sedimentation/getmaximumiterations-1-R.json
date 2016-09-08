@@ -1,0 +1,30 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "getmaximumiterations",
+    "workspace": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::getmaximumiterations",
+            "method": "COMPUTATION",
+            "startTime": "08.09.2016-11:14:44",
+            "endTime": "08.09.2016-11:14:44"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "createequationsystems"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

@@ -1,0 +1,29 @@
+{
+    "id": "1",
+    "subid": "1",
+    "dataflow": "sedimentation",
+    "transformation": "line1extraction",
+    "workspace": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::line1extraction-1-1",
+            "method": "COMPUTATION",
+            "startTime": "08.09.2016-11:15:32"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "meshwriter"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

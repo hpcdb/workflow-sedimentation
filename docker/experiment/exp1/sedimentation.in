@@ -1,0 +1,58 @@
+# Input file for transport simulation
+#######################################################
+# Mesh Parameters
+#------------------------------------------------------
+
+# The coarse grid size from which to start adaptivity
+dim    =  3
+ncellx = 80
+ncelly =  20
+ncellz =  20
+
+xmin =  0.0
+xmax = 18.0
+ymin =  0.0
+ymax =  2.0
+zmin =  0.0
+zmax =  2.0
+
+
+# refinement parameters
+hlevels     = 0
+max_r_steps = 1
+r_fraction  = 0.85
+c_fraction  = 0.05
+max_h_level = 2
+r_interval  = 10
+fopc        = 0.3
+
+
+#----------------------------------------------------
+# TIME INTEGRATION PARAMETERS
+# The interval between our timesteps
+deltat = 0.005
+
+# And the number of timesteps to take
+n_time_steps          = 200000
+max_linear_iterations = 250
+
+# maximun time
+tmax    = 0.010
+
+
+#------------------------------------------------------
+# EQUATION PARAMETERS
+Reynolds    =  0.0
+Grashof     =  5E06
+Sc          =  1.0
+Us          =  0.02
+ex          =  0.0
+ey          =  0.0
+ez          = -1.0
+is_gravitational_current = 0
+
+
+# Write out every nth timestep to file.
+write_interval = 50
+output = /shared/experiment/exp1/output_
+

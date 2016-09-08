@@ -1,0 +1,9 @@
+PROV:iline1extraction:Input
+      0.00025
+      elapsed-time: 0.00025 seconds.
+PROV:iline1extraction:Output
+      0.00001
+      elapsed-time: 0.00001 seconds.
+PROV:iline1extraction:Output
+      0.00027
+      elapsed-time: 0.00027 seconds.
