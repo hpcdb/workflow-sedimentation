@@ -22,10 +22,15 @@ rm -rf solver*
 rm -rf mpirun.sh
 rm -rf *.index
 rm -rf *.data
+rm -rf /mnt/scratch/user4/sc16/*
 
+mkdir prov
+mkdir prov/di
+mkdir prov/pg
 mkdir prov/log
 mkdir prov/rde
 mkdir prov/solver
+mkdir prov/indexing
 mkdir prov/pg/sedimentation
 mkdir prov/di/sedimentation
 cp dataflow.json prov/pg/sedimentation/

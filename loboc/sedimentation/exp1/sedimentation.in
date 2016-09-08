@@ -38,7 +38,7 @@ n_time_steps          = 200000
 max_linear_iterations = 250
 
 # maximun time
-tmax    = 30.00
+tmax    = 0.010
 
 
 #------------------------------------------------------

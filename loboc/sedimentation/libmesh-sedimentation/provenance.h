@@ -20,7 +20,7 @@
 #include "libmesh/libmesh.h"
 
 #define PROV
-#define VERBOSE
+//#define VERBOSE
 
 using namespace std;
 using namespace libMesh;

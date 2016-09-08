@@ -13,7 +13,7 @@ export DATAPATH=$MONETDB/data
 export DATAFLOW_TAG=sedimentation
 cd $CPATH
 
-#echo "Specifying dataflow generation..."
+echo "Specifying dataflow generation..."
 ./pg-dataflow.sh
 
 echo "Configuring the lists of machines for the solver and database system..."
