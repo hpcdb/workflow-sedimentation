@@ -140,8 +140,8 @@ void XDMFWriter::set_file_name(std::string filename)
 
 string* XDMFWriter::write_time_step(EquationSystems& es, double time)
 {
-    char filename[4096];
-    char xdmf_filename[4096];
+    char filename[511];
+    char xdmf_filename[511];
     string* files = new string[2];
         
     std::vector<double> coords;

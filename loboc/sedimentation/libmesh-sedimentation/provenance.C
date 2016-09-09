@@ -29,7 +29,7 @@
 #include "provenance.h"
 #include "performance.h"
 
-//#define LINUX
+#define LINUX
 
 using namespace std;
 using namespace libMesh;
@@ -39,19 +39,6 @@ Provenance::Provenance() {
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
     outputDirectory = infile("outputDirectory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
 
-#ifdef LINUX
-    /* Locate the substring to replace. */
-    int index = directory.find("\r", index);
-    /* Make the replacement. */
-    directory.replace(index, 2, "");
-
-    /* Locate the substring to replace. */
-    index = outputDirectory.find("\r", index);
-    /* Make the replacement. */
-    outputDirectory.replace(index, 2, "");
-#endif
-
-
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar");
     string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar");
     rawDataAccess = infile("access", "EXTRACTION");
@@ -60,6 +47,10 @@ Provenance::Provenance() {
     rdeCommandLine = "java -jar " + rdeFilePath + " ";
 
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
+#ifdef LINUX
+    jsonDirectory = "prov/di/" + dataflow + "/";
+#endif
+    
     processor_id = libMesh::global_processor_id();
 }
 
