@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
     // underneath
     GetPot infile("sedimentation.in");
 
-    int init_tstep = 0;
+    int init_tstep = 1;
 
     int dim = infile("dim", 2);
     int ncellx = infile("ncellx", 10);

@@ -277,7 +277,7 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
     t.setStatus("FINISHED");
 
     char memalloc[1000];
-    sprintf(memalloc, "%d;%.2f;%.2f;%d;%d;%.2f;%d;%d;%d;%s",
+    sprintf(memalloc, "%d;%.7f;%.7f;%d;%d;%.9f;%d;%d;%d;%s",
             simulationID, dt, tmax, n_time_steps, n_nonlinear_steps,
             nonlinear_tolerance, max_linear_iters, max_r_steps,
             write_interval, xdmf.c_str());
@@ -518,7 +518,7 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%d;%.2f;%d;%d;%d;%.2f;%.2f;%.2f;%s",
+    sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
             simulationID, time_step, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta,
             norm_delta_u, converged ? "true" : "false");
@@ -616,7 +616,7 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%d;%.2f;%d;%d;%d;%.2f;%.2f;%.2f;%s",
+    sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
             simulationID, time_step, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta, norm_delta_u,
             converged ? "true" : "false");

@@ -29,6 +29,8 @@
 #include "provenance.h"
 #include "performance.h"
 
+//#define LINUX
+
 using namespace std;
 using namespace libMesh;
 
@@ -36,12 +38,27 @@ Provenance::Provenance() {
     GetPot infile("provenance.in");
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
     outputDirectory = infile("outputDirectory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
+
+#ifdef LINUX
+    /* Locate the substring to replace. */
+    int index = directory.find("\r", index);
+    /* Make the replacement. */
+    directory.replace(index, 2, "");
+
+    /* Locate the substring to replace. */
+    index = outputDirectory.find("\r", index);
+    /* Make the replacement. */
+    outputDirectory.replace(index, 2, "");
+#endif
+
+
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar");
     string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar");
     rawDataAccess = infile("access", "EXTRACTION");
     cartridge = infile("cartridge", "CSV");
     pgCommandLine = "java -jar " + pgFilePath + " ";
     rdeCommandLine = "java -jar " + rdeFilePath + " ";
+
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     processor_id = libMesh::global_processor_id();
 }
@@ -260,10 +277,10 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
     t.setStatus("FINISHED");
 
     char memalloc[1000];
-    sprintf(memalloc, "%d;%.2f;%.2f;%d;%d;%.2f;%d;%d;%d;%s/%s",
+    sprintf(memalloc, "%d;%.7f;%.7f;%d;%d;%.9f;%d;%d;%d;%s",
             simulationID, dt, tmax, n_time_steps, n_nonlinear_steps,
             nonlinear_tolerance, max_linear_iters, max_r_steps,
-            write_interval, directory.c_str(), xdmf.c_str());
+            write_interval, xdmf.c_str());
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -401,9 +418,10 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }
 
-    sprintf(memalloc, "%d;%d;%s/%s;%s/%s",
-            simulationID, time_step, directory.c_str(), xdmf.c_str(),
+    sprintf(memalloc, "%d;%d;%s;%s/%s",
+            simulationID, time_step, xdmf.c_str(),
             directory.c_str(), extractedFileName);
+
     vector<string> e = {memalloc};
     t.addSet(dataSet, e);
 
@@ -500,7 +518,7 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%d;%.2f;%d;%d;%d;%.2f;%.2f;%.2f;%s",
+    sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
             simulationID, time_step, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta,
             norm_delta_u, converged ? "true" : "false");
@@ -598,7 +616,7 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%d;%.2f;%d;%d;%d;%.2f;%.2f;%.2f;%s",
+    sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
             simulationID, time_step, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta, norm_delta_u,
             converged ? "true" : "false");
@@ -751,8 +769,9 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
     File f1(directory, xdmf);
     t.addFile(f1);
 
-    sprintf(memalloc, "%d;%d;%s/%s",
-            simulationID, time_step, directory.c_str(), xdmf.c_str());
+    sprintf(memalloc, "%d;%d;%s",
+            simulationID, time_step, xdmf.c_str());
+
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -895,9 +914,10 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }
 
-    sprintf(memalloc, "%d;%d;%s/%s;%s/%s",
-            simulationID, time_step, directory.c_str(), xdmf.c_str(),
+    sprintf(memalloc, "%d;%d;%s;%s/%s",
+            simulationID, time_step, xdmf.c_str(),
             directory.c_str(), extractedFileName);
+
     vector<string> e = {memalloc};
     t.addSet(dataSet, e);
 
@@ -934,7 +954,7 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
 
     Performance perf;
     perf.start();
-    
+
     PerformanceMetric ptemp;
     ptemp.IdentifyStartTime();
 
@@ -953,8 +973,10 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     t.addFile(f1);
 
     char memalloc[4096];
-    sprintf(memalloc, "%d;%s/%s;%d",
-            simulationID, directory.c_str(), xdmf.c_str(), n_processors);
+
+    sprintf(memalloc, "%d;%s;%d",
+            simulationID, xdmf.c_str(), n_processors);
+
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -980,52 +1002,6 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
-    
-//    if (processor_id != 0) return;
-//    Performance perf;
-//    perf.start();
-//
-//    string transformation = "meshaggregator";
-//    PerformanceMetric p;
-//    char memalloc[jsonArraySize];
-//    sprintf(memalloc, "libMeshSedimentation::%s-%d",
-//            transformation.c_str(), simulationID);
-//    p.SetDescription(memalloc);
-//    p.SetMethod("COMPUTATION");
-//    p.IdentifyStartTime();
-//
-//    Task t(simulationID);
-//    t.setDataflow(dataflow);
-//    t.setTransformation(transformation);
-//    t.setWorkspace(directory);
-//    t.setStatus("FINISHED");
-    
-//
-//    File f1(directory, xdmf);
-//    t.addFile(f1);
-//
-//    sprintf(memalloc, "%d;%s/%s;%d",
-//            simulationID, directory.c_str(), xdmf.c_str(), n_processors);
-//    vector<string> e = {memalloc};
-//    t.addSet("o" + transformation, e);
-//
-//    p.IdentifyEndTime();
-//    t.addPerformanceMetric(p);
-//
-//    sprintf(memalloc, "%s%s-%d-F.json",
-//            jsonDirectory.c_str(), transformation.c_str(), simulationID);
-//    t.writeJSON(memalloc);
-//
-//    perf.end();
-//    double elapsedTime = perf.elapsedTime();
-//
-//    ofstream file;
-//    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-//    file << "PROV:" + transformation + ":Output" << endl;
-//    sprintf(memalloc, "%.5f", elapsedTime);
-//    file << space << memalloc << endl;
-//    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-//    file.close();
 }
 
 void Provenance::storeDataExtractionCost(double elapsedTime) {
