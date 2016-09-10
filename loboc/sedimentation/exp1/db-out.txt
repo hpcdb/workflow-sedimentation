@@ -1,0 +1,607 @@
+Starting daemon process...
+Dataflow - sedimentation
+  Transformation - meshgeneration
+  Program - libmesh-sedimentation-opt::MeshGeneration
+  Set - imeshgeneration
+  Attribute - simulationid
+  Attribute - dim
+  Attribute - ncellx
+  Attribute - ncelly
+  Attribute - ncellz
+  Attribute - xmin
+  Attribute - ymin
+  Attribute - zmin
+  Attribute - xmax
+  Attribute - ymax
+  Attribute - zmax
+  Attribute - ref_interval
+  Set - omeshgeneration
+  Attribute - simulationid
+  Attribute - r_fraction
+  Attribute - c_fraction
+  Attribute - max_h_level
+  Attribute - hlevels
+  Transformation - createequationsystems
+  Program - libmesh-sedimentation-opt::CreateEquationSystems
+  Set - omeshgeneration
+  Attribute - simulationid
+  Attribute - r_fraction
+  Attribute - c_fraction
+  Attribute - max_h_level
+  Attribute - hlevels
+  Set - ocreateequationsystems
+  Attribute - simulationid
+  Attribute - reynolds
+  Attribute - gr
+  Attribute - sc
+  Attribute - us
+  Attribute - diffusivity
+  Attribute - xlock
+  Attribute - fopc
+  Attribute - theta
+  Attribute - ex
+  Attribute - ey
+  Attribute - ez
+  Attribute - c_factor
+  Transformation - getmaximumiterations
+  Program - libmesh-sedimentation-opt::getMaximumIterations
+  Set - ocreateequationsystems
+  Attribute - simulationid
+  Attribute - reynolds
+  Attribute - gr
+  Attribute - sc
+  Attribute - us
+  Attribute - diffusivity
+  Attribute - xlock
+  Attribute - fopc
+  Attribute - theta
+  Attribute - ex
+  Attribute - ey
+  Attribute - ez
+  Attribute - c_factor
+  Set - ogetmaximumiterations
+  Attribute - simulationid
+  Attribute - dt
+  Attribute - tmax
+  Attribute - n_time_steps
+  Attribute - n_nonlinear_steps
+  Attribute - nonlinear_tolerance
+  Attribute - max_linear_iters
+  Attribute - max_r_steps
+  Attribute - write_interval
+  Attribute - xdmf
+  Transformation - iline0extraction
+  Program - libmesh-sedimentation-opt::iLine0Extraction
+  Set - ogetmaximumiterations
+  Attribute - simulationid
+  Attribute - dt
+  Attribute - tmax
+  Attribute - n_time_steps
+  Attribute - n_nonlinear_steps
+  Attribute - nonlinear_tolerance
+  Attribute - max_linear_iters
+  Attribute - max_r_steps
+  Attribute - write_interval
+  Attribute - xdmf
+  Set - oline0iextraction
+  Extractor - iline0
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - iline1extraction
+  Program - libmesh-sedimentation-opt::iLine1Extraction
+  Set - ogetmaximumiterations
+  Attribute - simulationid
+  Attribute - dt
+  Attribute - tmax
+  Attribute - n_time_steps
+  Attribute - n_nonlinear_steps
+  Attribute - nonlinear_tolerance
+  Attribute - max_linear_iters
+  Attribute - max_r_steps
+  Attribute - write_interval
+  Attribute - xdmf
+  Set - oline1iextraction
+  Extractor - iline1
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - iline2extraction
+  Program - libmesh-sedimentation-opt::iLine2Extraction
+  Set - ogetmaximumiterations
+  Attribute - simulationid
+  Attribute - dt
+  Attribute - tmax
+  Attribute - n_time_steps
+  Attribute - n_nonlinear_steps
+  Attribute - nonlinear_tolerance
+  Attribute - max_linear_iters
+  Attribute - max_r_steps
+  Attribute - write_interval
+  Attribute - xdmf
+  Set - oline2iextraction
+  Extractor - iline2
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - iline3extraction
+  Program - libmesh-sedimentation-opt::iLine3Extraction
+  Set - ogetmaximumiterations
+  Attribute - simulationid
+  Attribute - dt
+  Attribute - tmax
+  Attribute - n_time_steps
+  Attribute - n_nonlinear_steps
+  Attribute - nonlinear_tolerance
+  Attribute - max_linear_iters
+  Attribute - max_r_steps
+  Attribute - write_interval
+  Attribute - xdmf
+  Set - oline3iextraction
+  Extractor - iline3
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - solversimulationfluid
+  Program - libmesh-sedimentation-opt::SolverSimulationFluid
+  Set - ogetmaximumiterations
+  Attribute - simulationid
+  Attribute - dt
+  Attribute - tmax
+  Attribute - n_time_steps
+  Attribute - n_nonlinear_steps
+  Attribute - nonlinear_tolerance
+  Attribute - max_linear_iters
+  Attribute - max_r_steps
+  Attribute - write_interval
+  Attribute - xdmf
+  Set - osolversimulationfluid
+  Attribute - simulationid
+  Attribute - t_step
+  Attribute - time
+  Attribute - r
+  Attribute - l
+  Attribute - n_linear_iterations
+  Attribute - final_linear_residual
+  Attribute - norm_delta
+  Attribute - norm_delta_u
+  Attribute - converged
+  Transformation - solversimulationsediments
+  Program - libmesh-sedimentation-opt::SolverSimulationSediments
+  Set - osolversimulationfluid
+  Attribute - simulationid
+  Attribute - t_step
+  Attribute - time
+  Attribute - r
+  Attribute - l
+  Attribute - n_linear_iterations
+  Attribute - final_linear_residual
+  Attribute - norm_delta
+  Attribute - norm_delta_u
+  Attribute - converged
+  Set - osolversimulationsediments
+  Attribute - simulationid
+  Attribute - t_step
+  Attribute - time
+  Attribute - r
+  Attribute - l
+  Attribute - n_linear_iterations
+  Attribute - final_linear_residual
+  Attribute - norm_delta
+  Attribute - norm_delta_u
+  Attribute - converged
+  Transformation - meshrefinement
+  Program - libmesh-sedimentation-opt::MeshRefinement
+  Set - osolversimulationsediments
+  Attribute - simulationid
+  Attribute - t_step
+  Attribute - time
+  Attribute - r
+  Attribute - l
+  Attribute - n_linear_iterations
+  Attribute - final_linear_residual
+  Attribute - norm_delta
+  Attribute - norm_delta_u
+  Attribute - converged
+  Set - omeshrefinement
+  Attribute - simulationid
+  Attribute - first_step_refinement
+  Attribute - t_step
+  Attribute - before_n_active_elem
+  Attribute - after_n_active_elem
+  Transformation - meshwriter
+  Program - libmesh-sedimentation-opt::MeshWriter
+  Set - osolversimulationsediments
+  Attribute - simulationid
+  Attribute - t_step
+  Attribute - time
+  Attribute - r
+  Attribute - l
+  Attribute - n_linear_iterations
+  Attribute - final_linear_residual
+  Attribute - norm_delta
+  Attribute - norm_delta_u
+  Attribute - converged
+  Set - omeshwriter
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Transformation - line0extraction
+  Program - libmesh-sedimentation-opt::Line0Extraction
+  Set - omeshwriter
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Set - oline0extraction
+  Extractor - line0
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - line1extraction
+  Program - libmesh-sedimentation-opt::Line1Extraction
+  Set - omeshwriter
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Set - oline1extraction
+  Extractor - line1
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - line2extraction
+  Program - libmesh-sedimentation-opt::Line2Extraction
+  Set - omeshwriter
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Set - oline2extraction
+  Extractor - line2
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - line3extraction
+  Program - libmesh-sedimentation-opt::Line3Extraction
+  Set - omeshwriter
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Set - oline3extraction
+  Extractor - line3
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Attribute - u
+  Attribute - v
+  Attribute - w
+  Attribute - p
+  Attribute - s
+  Attribute - d
+  Attribute - vtkvalidpointmask
+  Attribute - arc_length
+  Attribute - points0
+  Attribute - points1
+  Attribute - points2
+  Transformation - meshaggregator
+  Program - libmesh-sedimentation-opt::MeshAggregator
+  Set - omeshwriter
+  Attribute - simulationid
+  Attribute - time_step
+  Attribute - xdmf
+  Set - omeshaggregator
+  Attribute - simulationid
+  Attribute - xdmf
+  Attribute - n_processors
+  Data set table - imeshgeneration
+  Data set table - omeshgeneration
+  Data set table - ocreateequationsystems
+  Data set table - ogetmaximumiterations
+  Data set table - oline0iextraction
+  Data set table - oline1iextraction
+  Data set table - oline2iextraction
+  Data set table - oline3iextraction
+  Data set table - osolversimulationfluid
+  Data set table - osolversimulationsediments
+  Data set table - omeshrefinement
+  Data set table - omeshwriter
+  Data set table - oline0extraction
+  Data set table - oline1extraction
+  Data set table - oline2extraction
+  Data set table - oline3extraction
+  Data set table - omeshaggregator
+Current amount elapsed time: 12.54
+Task - sedimentation - meshgeneration - 1 - null
+  Elements to Data Set - imeshgeneration
+  Elements to Data Set - omeshgeneration
+Current amount elapsed time: 12.71
+Task - sedimentation - meshgeneration - 1 - null
+  Elements to Data Set - imeshgeneration
+  Elements to Data Set - omeshgeneration
+Current amount elapsed time: 12.82
+Task - sedimentation - createequationsystems - 1 - null
+Current amount elapsed time: 12.94
+Task - sedimentation - createequationsystems - 1 - null
+  Elements to Data Set - omeshgeneration
+  Elements to Data Set - ocreateequationsystems
+Current amount elapsed time: 13.06
+Task - sedimentation - getmaximumiterations - 1 - null
+Current amount elapsed time: 13.18
+Task - sedimentation - getmaximumiterations - 1 - null
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00000.xmf
+  Elements to Data Set - ocreateequationsystems
+  Elements to Data Set - ogetmaximumiterations
+Current amount elapsed time: 13.37
+Task - sedimentation - iline0extraction - 1 - null
+Current amount elapsed time: 13.5
+Task - sedimentation - iline0extraction - 1 - null
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00000.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_0_0.csv
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - oline0iextraction
+Current amount elapsed time: 16.07
+Task - sedimentation - iline1extraction - 1 - null
+Current amount elapsed time: 16.18
+Task - sedimentation - iline1extraction - 1 - null
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00000.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_1_0.csv
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - oline1iextraction
+Current amount elapsed time: 19.83
+Task - sedimentation - iline2extraction - 1 - null
+Current amount elapsed time: 19.96
+Task - sedimentation - iline2extraction - 1 - null
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00000.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_2_0.csv
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - oline2iextraction
+Current amount elapsed time: 22.74
+Task - sedimentation - iline3extraction - 1 - null
+Current amount elapsed time: 22.87
+Task - sedimentation - iline3extraction - 1 - null
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00000.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_3_0.csv
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - oline3iextraction
+Current amount elapsed time: 26.0
+Task - sedimentation - solversimulationfluid - 1 - 1
+Current amount elapsed time: 26.16
+Task - sedimentation - solversimulationfluid - 1 - 1
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 26.34
+Task - sedimentation - solversimulationfluid - 1 - 2
+Current amount elapsed time: 26.44
+Task - sedimentation - solversimulationfluid - 1 - 2
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 26.59
+Task - sedimentation - solversimulationfluid - 1 - 3
+Current amount elapsed time: 26.69
+Task - sedimentation - solversimulationfluid - 1 - 3
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 26.86
+Task - sedimentation - solversimulationfluid - 1 - 4
+Current amount elapsed time: 26.97
+Task - sedimentation - solversimulationfluid - 1 - 4
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 27.14
+Task - sedimentation - solversimulationfluid - 1 - 5
+Current amount elapsed time: 27.29
+Task - sedimentation - solversimulationfluid - 1 - 5
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 27.44
+Task - sedimentation - solversimulationsediments - 1 - 1
+Current amount elapsed time: 27.57
+Task - sedimentation - solversimulationsediments - 1 - 1
+  Elements to Data Set - osolversimulationfluid
+  Elements to Data Set - osolversimulationsediments
+Current amount elapsed time: 27.68
+Task - sedimentation - solversimulationsediments - 1 - 2
+Current amount elapsed time: 27.75
+Task - sedimentation - solversimulationsediments - 1 - 2
+  Elements to Data Set - osolversimulationfluid
+  Elements to Data Set - osolversimulationsediments
+Current amount elapsed time: 27.89
+Task - sedimentation - meshrefinement - 1 - 1
+  Elements to Data Set - osolversimulationsediments
+  Elements to Data Set - omeshrefinement
+Current amount elapsed time: 28.15
+Task - sedimentation - meshwriter - 1 - 1
+Current amount elapsed time: 28.28
+Task - sedimentation - meshwriter - 1 - 1
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00001.xmf
+  Elements to Data Set - osolversimulationsediments
+  Elements to Data Set - omeshwriter
+Current amount elapsed time: 28.48
+Task - sedimentation - line0extraction - 1 - 1
+Current amount elapsed time: 28.59
+Task - sedimentation - line0extraction - 1 - 1
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00001.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_0_2.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline0extraction
+Current amount elapsed time: 30.88
+Task - sedimentation - line1extraction - 1 - 1
+Current amount elapsed time: 30.97
+Task - sedimentation - line1extraction - 1 - 1
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00001.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_1_2.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline1extraction
+Current amount elapsed time: 33.12
+Task - sedimentation - line2extraction - 1 - 1
+Current amount elapsed time: 33.22
+Task - sedimentation - line2extraction - 1 - 1
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00001.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_2_2.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline2extraction
+Current amount elapsed time: 35.41
+Task - sedimentation - line3extraction - 1 - 1
+Current amount elapsed time: 35.51
+Task - sedimentation - line3extraction - 1 - 1
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00001.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_3_2.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline3extraction
+Current amount elapsed time: 37.71
+Task - sedimentation - solversimulationfluid - 2 - 6
+Current amount elapsed time: 37.8
+Task - sedimentation - solversimulationfluid - 2 - 6
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 37.92
+Task - sedimentation - solversimulationfluid - 2 - 7
+Current amount elapsed time: 38.0
+Task - sedimentation - solversimulationfluid - 2 - 7
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 38.13
+Task - sedimentation - solversimulationfluid - 2 - 8
+Current amount elapsed time: 38.2
+Task - sedimentation - solversimulationfluid - 2 - 8
+  Elements to Data Set - ogetmaximumiterations
+  Elements to Data Set - osolversimulationfluid
+Current amount elapsed time: 38.3
+Task - sedimentation - solversimulationsediments - 2 - 3
+Current amount elapsed time: 38.39
+Task - sedimentation - solversimulationsediments - 2 - 3
+  Elements to Data Set - osolversimulationfluid
+  Elements to Data Set - osolversimulationsediments
+Current amount elapsed time: 38.51
+Task - sedimentation - solversimulationsediments - 2 - 4
+Current amount elapsed time: 38.59
+Task - sedimentation - solversimulationsediments - 2 - 4
+  Elements to Data Set - osolversimulationfluid
+  Elements to Data Set - osolversimulationsediments
+Current amount elapsed time: 38.72
+Task - sedimentation - solversimulationsediments - 2 - 5
+Current amount elapsed time: 38.8
+Task - sedimentation - solversimulationsediments - 2 - 5
+  Elements to Data Set - osolversimulationfluid
+  Elements to Data Set - osolversimulationsediments
+Current amount elapsed time: 38.93
+Task - sedimentation - meshwriter - 2 - 2
+Current amount elapsed time: 39.02
+Task - sedimentation - meshwriter - 2 - 2
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00002.xmf
+  Elements to Data Set - osolversimulationsediments
+  Elements to Data Set - omeshwriter
+Current amount elapsed time: 39.19
+Task - sedimentation - line0extraction - 2 - 2
+Current amount elapsed time: 39.28
+Task - sedimentation - line0extraction - 2 - 2
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00002.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_0_3.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline0extraction
+Current amount elapsed time: 41.48
+Task - sedimentation - line1extraction - 2 - 2
+Current amount elapsed time: 41.58
+Task - sedimentation - line1extraction - 2 - 2
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00002.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_1_3.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline1extraction
+Current amount elapsed time: 43.72
+Task - sedimentation - line2extraction - 2 - 2
+Current amount elapsed time: 43.82
+Task - sedimentation - line2extraction - 2 - 2
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00002.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_2_3.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline2extraction
+Current amount elapsed time: 45.96
+Task - sedimentation - line3extraction - 2 - 2
+Current amount elapsed time: 46.05
+Task - sedimentation - line3extraction - 2 - 2
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48_00002.xmf
+  File - /home/user4/sedimentation/exp1 - ext_line_3_3.csv
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - oline3extraction
+Current amount elapsed time: 48.29
+Task - sedimentation - meshaggregator - 1 - null
+  File - /home/user4/sedimentation/exp1 - /mnt/scratch/user4/sc16/output__48.xmf
+  Elements to Data Set - omeshwriter
+  Elements to Data Set - omeshaggregator
+Current amount elapsed time: 48.5
+rm -rf /home/user4/sedimentation/exp1/prov/di/sedimentation

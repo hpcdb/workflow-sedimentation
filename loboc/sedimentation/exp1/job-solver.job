@@ -1,10 +1,10 @@
 #PBS -l select=50:ncpus=48:mpiprocs=24
 #PBS -l walltime=999:00:00
 #PBS -j oe  
-#PBS -N solver-exp1 
+#PBS -N sc16-solver
 #PBS -V 
 echo "Starting job..."
-#module list
+module list 
 
 echo "Configuring workspace..."
 export CPATH=/home/user4/sedimentation/exp1
@@ -34,6 +34,7 @@ echo "Executing sedimentation solver..."
 echo -n " -np 24 /home/user4/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt analysis3D.py" >> mpirun.sh 
 chmod 774 mpirun.sh
 ./mpirun.sh >> out.txt 2>> err.txt
+#/home/user4/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt analysis3D.py >> out.txt 2>> err.txt
 
 echo "Calculating total elapsed times based on log files..."
 java -jar /home/user4/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt

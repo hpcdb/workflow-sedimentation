@@ -144,9 +144,8 @@ int main(int argc, char** argv) {
     double zmax = infile("zmax", 1.0);
     int ref_interval = infile("r_interval", 1);
 
-    Provenance prov;
-
 #ifdef PROV
+    Provenance prov;
     // Mesh Generation
     prov.inputMeshGeneration(simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
 #endif

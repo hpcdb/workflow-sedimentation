@@ -65,7 +65,6 @@ private:
     const int jsonArraySize = 128;
     string space = "      ";
     string directory = "";
-    string outputDirectory = "";
     string pgCommandLine = "";
     string rdeCommandLine = "";
     string dataflow = "sedimentation";

@@ -1,5 +1,6 @@
 #!/bin/bash
 # delete files from the previous execution
+rm *solver.o*
 rm restart.in
 rm out*
 rm err.txt

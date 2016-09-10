@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
     // underneath
     GetPot infile("sedimentation.in");
 
-    int init_tstep = 0;
+    int init_tstep = 1;
 
     int dim = infile("dim", 2);
     int ncellx = infile("ncellx", 10);
@@ -144,9 +144,8 @@ int main(int argc, char** argv) {
     double zmax = infile("zmax", 1.0);
     int ref_interval = infile("r_interval", 1);
 
-    Provenance prov;
-
 #ifdef PROV
+    Provenance prov;
     // Mesh Generation
     prov.inputMeshGeneration(simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
 #endif
