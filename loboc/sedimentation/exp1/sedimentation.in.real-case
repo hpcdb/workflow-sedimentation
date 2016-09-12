@@ -16,6 +16,8 @@ ymax =  2.0
 zmin =  0.0
 zmax =  2.0
 
+mesh_file=/mnt/scratch/user2/mesh/sed/p240/sedp240.nem
+
 # refinement parameters
 hlevels     = 0
 max_r_steps = 1
@@ -36,7 +38,7 @@ n_time_steps          = 200000
 max_linear_iterations = 250
 
 # maximun time
-tmax    = 0.500
+tmax    = 30.000
 
 
 #------------------------------------------------------
@@ -53,5 +55,5 @@ is_gravitational_current = 0
 
 # Write out every nth timestep to file.
 write_interval = 50
-output = /home/user4/sedimentation/exp1/output/output_
+output = /mnt/scratch/user4/sc16/output_
 

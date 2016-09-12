@@ -266,6 +266,7 @@ int main(int argc, char** argv) {
         moving_mesh.setup();
 #endif
 
+
 #ifdef PROV
         // Mesh Refinement
         prov.outputMeshGeneration(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
@@ -347,7 +348,7 @@ int main(int argc, char** argv) {
     transport_system.time = time;
     flow_system.time = time;
 
-    unsigned int t_step = 0;
+    unsigned int t_step = 1;
     unsigned int n_linear_iterations_flow = 0;
     unsigned int n_nonlinear_iterations_flow = 0;
     unsigned int n_nonlinear_iterations_transport = 0;
@@ -482,7 +483,7 @@ int main(int argc, char** argv) {
     int numberOfWrites = 0;
     vector<string> meshDependencies;
 
-    for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
+    for (t_step = init_tstep; (t_step <= n_time_steps)&&(time <= tmax); t_step++) {
         taskID++;
         if (is_file_exist("abort.run")) break;
 

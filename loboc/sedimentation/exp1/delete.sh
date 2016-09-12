@@ -23,7 +23,9 @@ rm -rf solver*
 rm -rf mpirun.sh
 rm -rf *.index
 rm -rf *.data
-rm -rf /mnt/scratch/user4/sc16/*
+#rm -rf /mnt/scratch/user4/sc16/*
+rm -rf output
+mkdir output
 
 mkdir prov
 mkdir prov/di
