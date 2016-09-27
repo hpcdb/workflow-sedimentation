@@ -397,12 +397,6 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
         FEAdaptor::Initialize(argc, argv);
         FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
-        if (libMesh::global_processor_id() == 0) {
-            char commandLine[jsonArraySize];
-            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-	    cout << commandLine << endl;
-            system(strdup(commandLine));
-        }
 #endif  
 
 #ifdef PERFORMANCE
@@ -444,12 +438,6 @@ int main(int argc, char** argv) {
             if (ik == 0) {
                 FEAdaptor::Initialize(argc, argv);
                 FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
-            }
-            if (libMesh::global_processor_id() == 0) {
-                char commandLine[jsonArraySize];
-                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-         	cout << commandLine << endl;
-                system(strdup(commandLine));
             }
 #endif  
 
@@ -906,12 +894,6 @@ int main(int argc, char** argv) {
 
 #ifdef USE_CATALYST
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
-                    if (libMesh::global_processor_id() == 0) {
-                        char commandLine[jsonArraySize];
-                        sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-               	        cout << commandLine << endl;
-                        system(strdup(commandLine));
-                    }
 #endif
 
 #ifdef PERFORMANCE
@@ -952,12 +934,6 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
                         if (ik == 0) {
                             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
-                        }
-                        if (libMesh::global_processor_id() == 0) {
-                            char commandLine[jsonArraySize];
-                            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                            cout << commandLine << endl;
-                            system(strdup(commandLine));
                         }
 #endif  
 
@@ -1034,12 +1010,6 @@ int main(int argc, char** argv) {
 
 #ifdef USE_CATALYST
             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
-            if (libMesh::global_processor_id() == 0) {
-                char commandLine[jsonArraySize];
-                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                cout << commandLine << endl;
-                system(strdup(commandLine));
-            }
 #endif
 
 #ifdef PERFORMANCE
@@ -1080,12 +1050,6 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
                 if (ik == 0) {
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
-                }
-                if (libMesh::global_processor_id() == 0) {
-                    char commandLine[jsonArraySize];
-                    sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                    cout << commandLine << endl;
-                    system(strdup(commandLine));
                 }
 #endif  
 

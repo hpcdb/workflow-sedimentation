@@ -1,4 +1,4 @@
-directory = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation
+directory = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/
 pgFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar
 rdeFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar
 access=EXTRACTION
