@@ -1,4 +1,7 @@
-from paraview.simple import *
+
+try: paraview.simple
+except: from paraview.simple import *
+
 from paraview import coprocessing
 
 
@@ -60,19 +63,19 @@ def CreateCoProcessor():
       plotOverLine2.Source.Point2 = [9.0, 2.0, 0.0]
 
       # save data
-      SaveData('init_ext_line_0_' + str(timeStep) + ".csv", proxy=plotOverLine1, Precision=5,
+      SaveData('ext_line_0_' + str(timeStep) + ".csv", proxy=plotOverLine1, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
-      SaveData('init_ext_line_1_' + str(timeStep) + ".csv", proxy=plotOverLine3, Precision=5,
+      SaveData('ext_line_1_' + str(timeStep) + ".csv", proxy=plotOverLine3, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
-      SaveData('init_ext_line_2_' + str(timeStep) + ".csv", proxy=plotOverLine2, Precision=5,
+      SaveData('ext_line_2_' + str(timeStep) + ".csv", proxy=plotOverLine2, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
-      SaveData('init_ext_line_3_' + str(timeStep) + ".csv", proxy=plotOverLine4, Precision=5,
+      SaveData('ext_line_3_' + str(timeStep) + ".csv", proxy=plotOverLine4, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')
