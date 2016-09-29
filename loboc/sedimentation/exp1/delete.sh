@@ -13,6 +13,7 @@ rm -rf prov/rde/*
 rm -rf prov/solver/*
 rm -rf prov/pg/*
 rm -rf prov/di/*
+rm -rf prov/indexing/*
 rm -rf log.*.out
 rm -rf log.*.err
 rm -rf *.conf

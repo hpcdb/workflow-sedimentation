@@ -111,3 +111,10 @@ apt-get install libphonon-dev libphonon4 qt4-dev-tools libqt4-core libqt4-gui qt
 cmake /programs/ParaView-v5.0.1-source -DBUILD_SHARED_LIBS=1 -DPARAVIEW_ENABLE_PYTHON=1 -DPARAVIEW_USE_MPI=1 -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_ENABLE_CATALYST=1 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=1 -DPARAVIEW_BUILD_QT_GUI=0 -DVTK_OPENGL_HAS_OSMESA=1 -DVTK_USE_X=0 -DOSMESA_INCLUDE_DIR=/programs/mesa-build/include -DOSMESA_LIBRARY=/programs/mesa-build/lib/libOSMesa.so -DVTK_USE_OFFSCREEN=1 -DCMAKE_INSTALL_PREFIX=/programs/paraview-install -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi -DOPENGL_INCLUDE_DIR= -DOPENGL_gl_LIBRARY= -DOPENGL_glu_LIBRARY= -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi
 make
 make install
+
+--------------------------------------------
+
+SETUP PYTHON ENVIRONMENT - LoboC
+export PYTHONPATH=/home/user2/sources/ParaView-v5.1.0/build/lib:/home/user2/sources/ParaView-v5.1.0/build/lib/site-packages
+export LD_LIBRARY_PATH=/home/user2/sources/ParaView-v5.1.0/build/lib:$LD_LIBRARY_PATH
+export PATH=$PATH:/home/user2/sources/ParaView-v5.1.0/build/bin
