@@ -1,0 +1,30 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "createequationsystems",
+    "workspace": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::createequationsystems",
+            "method": "COMPUTATION",
+            "startTime": "11.10.2016-05:22:34",
+            "endTime": "11.10.2016-05:22:34"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "meshgeneration"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

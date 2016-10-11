@@ -1,0 +1,41 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "iline3extraction",
+    "workspace": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::iline3extraction-1",
+            "method": "COMPUTATION",
+            "endTime": "11.10.2016-05:22:36"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "oline3iextraction",
+            "elements": [
+                "1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00000.xmf;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/ext_line_3_1.csv"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "getmaximumiterations"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": [
+        {
+            "name": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00000.xmf",
+            "path": "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation"
+        }
+    ]
+}
