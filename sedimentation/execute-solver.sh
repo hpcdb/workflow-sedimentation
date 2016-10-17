@@ -3,6 +3,7 @@
 
 # mac
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/Program_Installations/ParaView-v5.1.2/build/CMakeFiles/__macos_install/lib/paraview-5.1
+# export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/Program_Installations/ParaView-v5.1.2/build/CMakeFiles/__macos_install/lib/paraview-5.1:/usr/local/opt/gcc/lib/gcc/6/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/Users/vitor/Documents/Program_Installations/ParaView-v5.1.2/build/lib/paraview-5.1
 
 # virtual box - mint

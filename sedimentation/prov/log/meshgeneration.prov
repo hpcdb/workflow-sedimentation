@@ -1,6 +1,6 @@
 PROV:meshgeneration:Input
-      0.00045
-      elapsed-time: 0.00045 seconds.
-PROV:meshgeneration:Output
       0.00050
       elapsed-time: 0.00050 seconds.
+PROV:meshgeneration:Output
+      0.00045
+      elapsed-time: 0.00045 seconds.

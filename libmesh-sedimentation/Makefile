@@ -3,7 +3,7 @@
 # Template libMesh application Makefile
 
 # MacOS
-LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh-git/build
+LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh/build
 # docker
 #LIBMESH_DIR ?=/programs/libmesh/build
 # Virtual Box

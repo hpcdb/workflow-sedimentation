@@ -78,7 +78,7 @@ Opening file: 0
 
 [WRITE] /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_000_00000.h5 - /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00000.xmf
 Error: Cannot import vtkPVServerManagerApplication
-Data Extraction Cost: 0.81821
+Data Extraction Cost: 1.28362
 1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00000.xmf;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/ext_line_0_1.csv
 Data Extraction Cost: 0.00000
 1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/output/output__1_00000.xmf;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation/ext_line_1_1.csv
@@ -93,4 +93,4 @@ Data Extraction Cost: 0.00000
 ------------------------------------------------------
 STEP NLI  |b-AX|         |du|           |du|/|u|       
 ------------------------------------------------------
-*** Warning, This code is deprecated, and likely to be removed in future library versions! /Users/vitor/Documents/Program_Installations/libmesh-git/build/include/libmesh/type_vector.h, line 878, compiled Oct 11 2016 at 17:13:20 ***
+*** Warning, This code is deprecated, and likely to be removed in future library versions! /Users/vitor/Documents/Program_Installations/libmesh/build/include/libmesh/type_vector.h, line 878, compiled Oct 17 2016 at 16:56:50 ***
