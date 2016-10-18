@@ -68,7 +68,7 @@ using namespace std;
 #include "performance.h"
 #include "FEAdaptor.h"
 
-const int jsonArraySize = 64;
+const int jsonArraySize = 256;
 
 double ramp(double t) {
     double x[3];
@@ -88,7 +88,7 @@ double ramp(double t) {
     return (y[0] * L0 + y[1] * L1 + y[2] * L2);
 }
 
-void WriteRestartFile(EquationSystems &es, int t_step, std::string rname) {
+void WriteRestartFile(EquationSystems &es, std::string rname) {
     const std::string mesh_restart = rname + "_mesh_restart.xda";
     const std::string solution_restart = rname + "_solution_restart.xda";
 
@@ -473,7 +473,7 @@ int main(int argc, char** argv) {
     int numberOfWrites = 0;
     vector<string> meshDependencies;
 
-    for (t_step = init_tstep; (t_step <= n_time_steps)&&(time <= tmax); t_step++) {
+    for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
         taskID++;
         if (is_file_exist("abort.run")) break;
 
