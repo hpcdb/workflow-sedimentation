@@ -69,6 +69,7 @@ private:
     string rdeCommandLine = "";
     string dataflow = "sedimentation";
     string jsonDirectory = "";
+    string pgDirectory = "";
     string rawDataAccess = "";
     string cartridge = "";
 };

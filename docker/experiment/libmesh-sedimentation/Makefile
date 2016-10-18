@@ -3,7 +3,7 @@
 # Template libMesh application Makefile
 
 # MacOS
-# LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh-git/build
+# LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh/build
 # docker
 LIBMESH_DIR ?=/programs/libmesh/build
 # Virtual Box
@@ -36,7 +36,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 
 # MacOS
-# PARAVIEW_DIR=/Users/vitor/Documents/Program_Installations/ParaView-v5.0.1-source/build/CMakeFiles/__macos_install
+# PARAVIEW_DIR=/Users/vitor/Documents/Program_Installations/ParaView-v5.1.2/build/CMakeFiles/__macos_install
 # docker
 PARAVIEW_DIR=/programs/paraview-install
 # Stampede
@@ -59,7 +59,7 @@ libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) -I../../xdmf
 libmesh_LDFLAGS+=$(PARAVIEW_LIBS)
 
 # Virtual Box
-# PARAVIEW_DIR=/home/vitor/programs/paraview
+# PARAVIEW_DIR=/home/vitor/src/paraview
 
 # PARAVIEW_LIB_DIR=$(PARAVIEW_DIR)/lib/paraview-5.1
 # PARAVIEW_LIBS =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv5.1 -lvtkPVCatalyst-pv5.1 -lvtkPVServerManagerApplication-pv5.1 -lvtkPVServerManagerCore-pv5.1 -lvtkPVServerImplementationCore-pv5.1 -lvtkPVClientServerCoreCore-pv5.1 -lvtkFiltersParallel-pv5.1 -lvtkFiltersModeling-pv5.1 -lvtkRenderingCore-pv5.1 -lvtkFiltersExtraction-pv5.1 -lvtkFiltersStatistics-pv5.1 -lvtkImagingFourier-pv5.1 -lvtkImagingCore-pv5.1 -lvtkalglib-pv5.1 -lvtkFiltersGeometry-pv5.1 -lvtkFiltersSources-pv5.1 -lvtkFiltersGeneral-pv5.1 -lvtkCommonComputationalGeometry-pv5.1 -lvtkCommonColor-pv5.1 -lvtkFiltersProgrammable-pv5.1 -lvtkPVVTKExtensionsCore-pv5.1 -lvtkPVCommon-pv5.1 -lvtkClientServer-pv5.1 -lvtkIOXMLParser-pv5.1 -lvtkFiltersCore-pv5.1 -lvtkParallelMPI-pv5.1 -lvtkParallelCore-pv5.1 -lvtkIOLegacy-pv5.1 -lvtkCommonExecutionModel-pv5.1 -lvtkCommonDataModel-pv5.1 -lvtkCommonSystem-pv5.1 -lvtkCommonTransforms-pv5.1 -lvtkCommonMisc-pv5.1 -lvtkCommonMath-pv5.1 -lprotobuf -lpthread  -lvtkPythonInterpreter-pv5.1 -lvtkWrappingPython27Core-pv5.1 -lvtkCommonCore-pv5.1 -lpython2.7 -lvtksys-pv5.1 -Wl,-rpath,$(PARAVIEW_LIB_DIR) 

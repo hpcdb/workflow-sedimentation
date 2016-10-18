@@ -18,18 +18,20 @@ make install
 
 # Paraview
 BUILD_SHARED_LIBS: ON
-PARAVIEW_ENABLE_PYTHON: ON
-PARAVIEW_USE_MPI: ON
 CMAKE_BUILD_TYPE: Release
-PARAVIEW_ENABLE_CATALYST: ON
-PARAVIEW_INSTALL_DEVELOPMENT_FILES:0N
 PARAVIEW_BUILD_QT_GUI: OFF
-VTK_OPENGL_HAS_OSMESA: ON.
-VTK_USE_X: OFF.
+PARAVIEW_ENABLE_CATALYST: ON
+PARAVIEW_ENABLE_PYTHON: ON
+PARAVIEW_INSTALL_DEVELOPMENT_FILES:0N
+PARAVIEW_USE_MPI: ON
+
+VTK_OPENGL_HAS_OSMESA: ON
+VTK_USE_X: OFF
+VTK_USE_OFFSCREEN=ON
+
 OSMESA_INCLUDE_DIR and OPENGL_INCLUDE_DIR: Make sure these are not set to the OpenGL directory location of the header files.
 OSMESA_LIBRARY: Set this to the Mesa library.
 OPENGL_gl_LIBRARY and OPENGL_glu_LIBRARY: These should not be set.
-VTK_USE_OFFSCREEN=ON
 
 
 ========================================================================
@@ -111,3 +113,10 @@ apt-get install libphonon-dev libphonon4 qt4-dev-tools libqt4-core libqt4-gui qt
 cmake /programs/ParaView-v5.0.1-source -DBUILD_SHARED_LIBS=1 -DPARAVIEW_ENABLE_PYTHON=1 -DPARAVIEW_USE_MPI=1 -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_ENABLE_CATALYST=1 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=1 -DPARAVIEW_BUILD_QT_GUI=0 -DVTK_OPENGL_HAS_OSMESA=1 -DVTK_USE_X=0 -DOSMESA_INCLUDE_DIR=/programs/mesa-build/include -DOSMESA_LIBRARY=/programs/mesa-build/lib/libOSMesa.so -DVTK_USE_OFFSCREEN=1 -DCMAKE_INSTALL_PREFIX=/programs/paraview-install -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi -DOPENGL_INCLUDE_DIR= -DOPENGL_gl_LIBRARY= -DOPENGL_glu_LIBRARY= -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi
 make
 make install
+
+--------------------------------------------
+
+SETUP PYTHON ENVIRONMENT - LoboC
+export PYTHONPATH=/home/user2/sources/ParaView-v5.1.0/build/lib:/home/user2/sources/ParaView-v5.1.0/build/lib/site-packages
+export LD_LIBRARY_PATH=/home/user2/sources/ParaView-v5.1.0/build/lib:$LD_LIBRARY_PATH
+export PATH=$PATH:/home/user2/sources/ParaView-v5.1.0/build/bin
