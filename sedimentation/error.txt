@@ -1,6 +1,0 @@
-rm: cannot remove ‘output-solver.log’: No such file or directory
-rm: cannot remove ‘output-statistics.log’: No such file or directory
-
-real	0m12.594s
-user	0m12.168s
-sys	0m0.172s
