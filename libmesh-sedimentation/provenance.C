@@ -21,7 +21,7 @@
 #include "rapidjson/stringbuffer.h"
 
 #include "dfanalyzer/task.h"
-#include "dfanalyzer/extractor.h"
+#include "dfanalyzer/indexer.h"
 
 #include "libmesh/libmesh.h"
 #include "libmesh/getpot.h"
@@ -40,10 +40,14 @@ Provenance::Provenance() {
 
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar");
     string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar");
+    string rdiFilePath = infile("rdiFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDI-1.0.jar");
+    bin = infile("bin", "");
+    extraArguments = infile("extraArguments", "");
     rawDataAccess = infile("access", "EXTRACTION");
     cartridge = infile("cartridge", "CSV");
     pgCommandLine = "java -jar " + pgFilePath + " ";
     rdeCommandLine = "java -jar " + rdeFilePath + " ";
+    rdiCommandLine = "java -jar " + rdiFilePath + " ";
 
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     pgDirectory = directory + "/prov/pg/" + dataflow + "/";
@@ -358,7 +362,7 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
 }
 
 void Provenance::outputInitDataExtraction(int simulationID, string transformation, string dataSet,
-        int time_step, string xdmf, string rawDataFile, int dimension, string extractorName) {
+        int time_step, string xdmf, string rawDataFile, int dimension, string indexerName) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Init Data Extraction" << endl;
@@ -394,23 +398,25 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     string extension = "data";
     if (rawDataAccess == "INDEXING") {
         extension = "index";
-        Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
-        ext.addAttribute("u", "numeric", false);
-        ext.addAttribute("v", "numeric", false);
+        Indexer idx(rdiCommandLine, rawDataAccess, cartridge, indexerName);
+        idx.addAttribute("u", "numeric", false);
+        idx.addAttribute("v", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("w", "numeric", false);
+            idx.addAttribute("w", "numeric", false);
         }
-        ext.addAttribute("p", "numeric", false);
-        ext.addAttribute("s", "numeric", false);
-        ext.addAttribute("d", "numeric", false);
+        idx.addAttribute("p", "numeric", false);
+        idx.addAttribute("s", "numeric", false);
+        idx.addAttribute("d", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("vtkvalidpointmask", "numeric", false);
-            ext.addAttribute("arc_length", "numeric", false);
+            idx.addAttribute("vtkvalidpointmask", "numeric", false);
+            idx.addAttribute("arc_length", "numeric", false);
         }
-        ext.addAttribute("points0", "numeric", false);
-        ext.addAttribute("points1", "numeric", false);
-        ext.addAttribute("points2", "numeric", false);
-        ext.extract(directory, rawDataFile);
+        idx.addAttribute("points0", "numeric", false);
+        idx.addAttribute("points1", "numeric", false);
+        idx.addAttribute("points2", "numeric", false);
+        idx.setBin(bin);
+        idx.setExtraArguments(extraArguments);
+        idx.index(directory, rawDataFile);
     }
 
     rdePerf.end();
@@ -420,7 +426,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 
     char extractedFileName[jsonArraySize];
     if (rawDataAccess == "INDEXING") {
-        sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
+        sprintf(extractedFileName, "%s.%s", indexerName.c_str(), extension.c_str());
     } else {
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }
@@ -871,7 +877,7 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
 
 void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskID,
         string transformation, string dataSet, int time_step,
-        string xdmf, string rawDataFile, int dimension, string extractorName) {
+        string xdmf, string rawDataFile, int dimension, string indexerName) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Data Extraction" << endl;
@@ -909,23 +915,25 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     string extension = "data";
     if (rawDataAccess == "INDEXING") {
         extension = "index";
-        Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
-        ext.addAttribute("u", "numeric", false);
-        ext.addAttribute("v", "numeric", false);
+        Indexer idx(rdiCommandLine, rawDataAccess, cartridge, indexerName);
+        idx.addAttribute("u", "numeric", false);
+        idx.addAttribute("v", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("w", "numeric", false);
+            idx.addAttribute("w", "numeric", false);
         }
-        ext.addAttribute("p", "numeric", false);
-        ext.addAttribute("s", "numeric", false);
-        ext.addAttribute("d", "numeric", false);
+        idx.addAttribute("p", "numeric", false);
+        idx.addAttribute("s", "numeric", false);
+        idx.addAttribute("d", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("vtkvalidpointmask", "numeric", false);
-            ext.addAttribute("arc_length", "numeric", false);
+            idx.addAttribute("vtkvalidpointmask", "numeric", false);
+            idx.addAttribute("arc_length", "numeric", false);
         }
-        ext.addAttribute("points0", "numeric", false);
-        ext.addAttribute("points1", "numeric", false);
-        ext.addAttribute("points2", "numeric", false);
-        ext.extract(directory, rawDataFile);
+        idx.addAttribute("points0", "numeric", false);
+        idx.addAttribute("points1", "numeric", false);
+        idx.addAttribute("points2", "numeric", false);
+        idx.setBin(bin);
+        idx.setExtraArguments(extraArguments);
+        idx.index(directory, rawDataFile);
     }
 
     rdePerf.end();
@@ -935,7 +943,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
 
     char extractedFileName[jsonArraySize];
     if (rawDataAccess == "INDEXING") {
-        sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
+        sprintf(extractedFileName, "%s.%s", indexerName.c_str(), extension.c_str());
     } else {
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }

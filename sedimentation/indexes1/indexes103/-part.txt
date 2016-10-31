@@ -1,0 +1,79 @@
+# metadata file written by ibis::part::writeMetaData
+# on Mon Oct 31 14:49:21 2016
+
+BEGIN HEADER
+Name = "indexes1_L0SOw0"
+Description = "/programs/fastbit/bin/ardea -d /experiment/sedimentation/indexes1 -m U:int, V:int, W:int, P:text, S:text, D:text, VTKVALIDPOINTMASK:int, ARC_LENGTH:int, POINTS:0:float, POINTS:1:int, POINTS:2:int -t /experiment/sedimentation/ext_line_3_3.csv -b ,"
+Number_of_columns = 9
+Number_of_rows = 808
+Timestamp = 1477925361
+State = 1
+index = <binning precision=2/><encoding equality/>
+END HEADER
+
+Begin Column
+name = "ARC_LENGTH"
+data_type = "INT"
+minimum = 0
+maximum = 2
+End Column
+
+Begin Column
+name = "D"
+description = D 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column
+
+Begin Column
+name = "P"
+description = P 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column
+
+Begin Column
+name = "POINTS"
+data_type = "FLOAT"
+minimum = 0.02
+maximum = 13.5
+End Column
+
+Begin Column
+name = "S"
+description = S 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column
+
+Begin Column
+name = "U"
+data_type = "INT"
+minimum = 0
+maximum = 0
+sorted = true
+End Column
+
+Begin Column
+name = "V"
+data_type = "INT"
+minimum = 0
+maximum = 0
+sorted = true
+End Column
+
+Begin Column
+name = "VTKVALIDPOINTMASK"
+data_type = "INT"
+minimum = 0
+maximum = 1
+sorted = true
+End Column
+
+Begin Column
+name = "W"
+data_type = "INT"
+minimum = 0
+maximum = 0
+sorted = true
+End Column

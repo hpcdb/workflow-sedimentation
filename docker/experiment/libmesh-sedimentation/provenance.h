@@ -67,6 +67,9 @@ private:
     string directory = "";
     string pgCommandLine = "";
     string rdeCommandLine = "";
+    string rdiCommandLine = "";
+    string bin="";
+    string extraArguments = "";
     string dataflow = "sedimentation";
     string jsonDirectory = "";
     string pgDirectory = "";

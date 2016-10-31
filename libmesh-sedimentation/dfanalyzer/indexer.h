@@ -8,24 +8,26 @@
 
 using namespace std;
 
-class Extractor {
+class Indexer {
     string method = "EXTRACTION";
     string extension = "CSV";
     string name = "";
     string path = "";
     string filename = "";
     string delimeter = ",";
+    string bin = "";
+    string extraArguments = "";
     vector<Attribute> attributes;
     string commandLine = "";
 
 public:
 
-    Extractor(string commandLine, string name) {
+    Indexer(string commandLine, string name) {
         this->name = name;
         this->commandLine = commandLine;
     };
 
-    Extractor(string commandLine, string method, string extension, string name) {
+    Indexer(string commandLine, string method, string extension, string name) {
         this->method = method;
         this->extension = extension;
         this->name = name;
@@ -41,11 +43,19 @@ public:
         this->delimeter = delimeter;
     }
 
-    void extract(string path, string filename) {
+    void setBin(string dir){
+        this->bin = dir;
+    }
+
+    void setExtraArguments(string arguments){
+        this->extraArguments = arguments;
+    }
+
+    void index(string path, string filename) {
         char buffer[512];
-        sprintf(buffer, "%s%s:%s:EXTRACT %s %s %s [", commandLine.c_str(), method.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
+        sprintf(buffer, "%s%s:INDEX %s %s %s [", commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
 #ifdef VERBOSE
-    	sprintf(buffer, "#!/bin/bash;%s%s:%s:EXTRACT %s %s %s [", commandLine.c_str(), method.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
+    	sprintf(buffer, "#!/bin/bash;%s%s:INDEX %s %s %s [", commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
 #endif
         
         bool first = true;
@@ -61,7 +71,9 @@ public:
             }
         }
         sprintf(buffer, "%s] -delimiter=\"%s\"", buffer, this->delimeter.c_str());
-	cout << buffer << endl;
+        sprintf(buffer, "%s -bin=\"%s\"", buffer, this->bin.c_str());
+        sprintf(buffer, "%s -option=%s", buffer, this->extraArguments.c_str());
+	    cout << buffer << endl;
         system(buffer);
     }
 
