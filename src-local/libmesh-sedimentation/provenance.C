@@ -56,6 +56,24 @@ Provenance::Provenance() {
     jsonDirectory = "prov/di/" + dataflow + "/";
     pgDirectory = "prov/pg/" + dataflow + "/";
 #endif
+
+    cout << "###########################" << endl;
+    cout << "Provenance Properties" << endl;
+    cout << "pgFilePath=";
+    cout << pgFilePath.c_str() << endl;
+    cout << "rdeFilePath=";
+    cout << rdeFilePath.c_str() << endl;
+    cout << "rdiFilePath=";
+    cout << rdiFilePath.c_str() << endl;
+    cout << "rawDataAccess=";
+    cout << rawDataAccess.c_str() << endl;
+    cout << "cartridge=";
+    cout << cartridge.c_str() << endl;
+    cout << "bin=";
+    cout << bin.c_str() << endl;
+    cout << "extraArguments=";
+    cout << extraArguments.c_str() << endl;
+    cout << "###########################" << endl;
     
     processor_id = libMesh::global_processor_id();
 }
@@ -396,7 +414,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     rdePerf.start();
 
     string extension = "data";
-    if (rawDataAccess == "INDEXING") {
+    if (rawDataAccess.compare("INDEXING") == 0) {
         extension = "index";
         Indexer idx(rdiCommandLine, rawDataAccess, cartridge, indexerName);
         idx.addAttribute("u", "numeric", false);
@@ -414,7 +432,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         idx.addAttribute("points0", "numeric", false);
         idx.addAttribute("points1", "numeric", false);
         idx.addAttribute("points2", "numeric", false);
-        if(cartridge == "FASTBIT"){
+        if(cartridge.compare("FASTBIT") == 0){
             idx.setBin(bin);
             idx.setExtraArguments(extraArguments);
         }
@@ -427,7 +445,7 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     perf.start();
 
     char extractedFileName[jsonArraySize];
-    if (rawDataAccess == "INDEXING") {
+    if (rawDataAccess.compare("INDEXING") == 0){
         sprintf(extractedFileName, "%s.%s", indexerName.c_str(), extension.c_str());
     } else {
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
@@ -915,7 +933,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     rdePerf.start();
 
     string extension = "data";
-    if (rawDataAccess == "INDEXING") {
+    if (rawDataAccess.compare("INDEXING") == 0) {
         extension = "index";
         Indexer idx(rdiCommandLine, rawDataAccess, cartridge, indexerName);
         idx.addAttribute("u", "numeric", false);
@@ -933,7 +951,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         idx.addAttribute("points0", "numeric", false);
         idx.addAttribute("points1", "numeric", false);
         idx.addAttribute("points2", "numeric", false);
-        if(cartridge == "FASTBIT"){
+        if(cartridge.compare("FASTBIT") == 0){
             idx.setBin(bin);
             idx.setExtraArguments(extraArguments);
         }
@@ -946,7 +964,7 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     perf.start();
 
     char extractedFileName[jsonArraySize];
-    if (rawDataAccess == "INDEXING") {
+    if (rawDataAccess.compare("INDEXING") == 0) {
         sprintf(extractedFileName, "%s.%s", indexerName.c_str(), extension.c_str());
     } else {
         sprintf(extractedFileName, "%s", rawDataFile.c_str());

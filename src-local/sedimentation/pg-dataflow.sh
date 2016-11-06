@@ -4,16 +4,16 @@ rm -rf prov/pg/*
 # MacOS
 # PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation
 # docker
-PGDIR=/shared/experiment/libmesh-sedimentation
+# PGDIR=/shared/experiment/libmesh-sedimentation
 # Virtual Box - mint
-# PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
+PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
 
 # Sedimentation Solver
 dimension="3"
 access="indexing"
-cartridge="csv"
+cartridge="fastbit"
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode
@@ -100,6 +100,9 @@ if [ "$dimension" == "2" ]; then
 	elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
 		# indexing - csv
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -tag irde -algorithm INDEXING:CSV
+	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		# indexing - fastbit
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -tag irde -algorithm INDEXING:FASTBIT
 	fi
 
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name simulationID -type numeric
@@ -153,6 +156,11 @@ elif [ "$dimension" == "3" ]; then
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:CSV
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:CSV
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:CSV
+	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm INDEXING:FASTBIT
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:FASTBIT
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:FASTBIT
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:FASTBIT
 	fi
 
 	# line 0
@@ -295,6 +303,9 @@ if [ "$dimension" == "2" ]; then
 	elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
 		# indexing - csv
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm INDEXING:CSV
+	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		# indexing - fastbit
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm INDEXING:FASTBIT
 	fi
 
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name simulationID -type numeric
@@ -349,6 +360,11 @@ elif [ "$dimension" == "3" ]; then
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:CSV
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:CSV
 		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:CSV
+	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm INDEXING:FASTBIT
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:FASTBIT
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:FASTBIT
+		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:FASTBIT
 	fi
 
 	# line 0

@@ -1,8 +1,8 @@
-directory = /shared/experiment/sedimentation/
-pgFilePath = /shared/experiment/dfa/PG-1.0.jar
-rdeFilePath = /shared/experiment/dfa/RDE-1.0.jar
-rdiFilePath = /shared/experiment/dfa/RDI-1.0.jar
+directory = /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/
+pgFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/PG-1.0.jar
+rdeFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDE-1.0.jar
+rdiFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar
 access=INDEXING
-cartridge=CSV
-#bin=/programs/fastbit/bin
-#extraArguments=[b:precision=2]
+cartridge=FASTBIT
+bin=/programs/fastbit/bin
+extraArguments=[b:precision=2]
