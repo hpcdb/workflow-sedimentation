@@ -80,7 +80,9 @@ void one_wrapper (DenseVector<Number>& output,
                             const std::string&)
 {
         double xlock = parameters.get<Real> ("xlock");
-        if(p(0) <= xlock) return 1.0;
+        double hlock = parameters.get<Real> ("hlock");
+
+        if( (p(0) <= xlock) && (p(2)  <= hlock) )  return 1.0;
         return 0.0;
 }
 
@@ -98,35 +100,51 @@ void one_wrapper (DenseVector<Number>& output,
     system.project_solution(init_value, NULL, es.parameters);
   }
 
+void SedimentationTransport::init()
+  {
+     const MeshBase& mesh = es.get_mesh();
+
+     // The dimension that we are running
+     this->dim = mesh.mesh_dimension();
+
+     TransientLinearImplicitSystem & transport_system = this->es.add_system<TransientLinearImplicitSystem> ("sediment");
+  
+     unsigned int s_var = transport_system.add_variable ("s");
+     
+     transport_system.attach_init_function(init_sedimentation);
+     
+     
+  }
 
 
-
-void SedimentationTransport::setup()
+void SedimentationTransport::setup(GetPot &infile)
 {
-    const MeshBase& mesh = es.get_mesh();
+  const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running
   this->dim = mesh.mesh_dimension();
 
+  TransientLinearImplicitSystem & transport_system = this->es.get_system<TransientLinearImplicitSystem> ("sediment");
 
-  TransientLinearImplicitSystem & transport_system = this->es.add_system<TransientLinearImplicitSystem> ("sediment");
-
-  transport_system.attach_init_function(init_sedimentation);
-
-  unsigned int s_var = transport_system.add_variable ("s");
+  unsigned int s_var = transport_system.variable_number("s");
 
   transport_system.attach_assemble_object(*this);
 
-  std::set<boundary_id_type> cnull;
-  cnull.insert(BOUNDARY_PNULL);
-
+  std::set<boundary_id_type> czero;
+  
   std::vector<unsigned int> sed_vars(1);
   sed_vars[0] = s_var;
   ZeroFunction<Number> zero;
-  DirichletBoundary dirichlet_cnull(cnull,sed_vars, &zero);
-
-  transport_system.get_dof_map().add_dirichlet_boundary(dirichlet_cnull);
-
+  
+  int czero_id = infile("dirichlet/czero", -1);
+  if(czero_id != -1) {
+      czero.insert(czero_id);
+      transport_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(czero,sed_vars, &zero));
+  }
+  
+  this->es.parameters.set<int>("no-flux bc")   = infile("flux/noflux"   , -1);
+  this->es.parameters.set<int>("advective bc") = infile("flux/advective", -1);
+  
 }
 
 

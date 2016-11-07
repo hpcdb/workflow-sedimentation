@@ -184,6 +184,7 @@ int main(int argc, char** argv) {
     Real Sc = infile("Sc", 0.71);
     Real Us = infile("Us", 0.0);
     Real xlock = infile("xlock", 1.0);
+    Real hlock = infile("hlock", 1.0);
     Real alfa = infile("alfa", 1.0);
     Real theta = infile("theta", 0.5);
     Real ex = infile("ex", 0.0);
@@ -208,6 +209,8 @@ int main(int argc, char** argv) {
 
     /////// 
     equation_systems.parameters.set<Real> ("xlock") = xlock;
+    equation_systems.parameters.set<Real> ("hlock") = hlock;
+
     equation_systems.parameters.set<Real> ("theta") = theta;
     equation_systems.parameters.set<Real> ("ex") = ex;
     equation_systems.parameters.set<Real> ("ey") = ey;
@@ -233,38 +236,49 @@ int main(int argc, char** argv) {
 
     const unsigned int write_interval = infile("write_interval", 10);
     std::string rname = infile("output", "out");
+    std::string dname = infile("dir_path", "");
+
 
 #ifdef XDMF_
     XDMFWriter xdmf_writer(mesh);
     xdmf_writer.set_file_name(rname);
+    xdmf_writer.set_dir_path(dname);
 #endif
 
-    if (!is_file_exist("restart.in") || true) {
+    if (!is_file_exist("restart.run")) {
 
         const string mesh_file = infile("mesh_file", "0");
 
-        std::cout << "Opening file: " << mesh_file << endl;
+        if(mesh_file == "0") {        
 
-        if (dim == 2) {
-            MeshTools::Generation::build_square(mesh, ncellx, ncelly,
-                    xmin, xmax,
-                    ymin, ymax, QUAD4);
-        } else {
-            MeshTools::Generation::build_cube(mesh, ncellx, ncelly, ncellz,
-                    xmin, xmax,
-                    ymin, ymax,
-                    zmin, zmax, HEX8);
-        }
+            if (dim == 2) {
+                MeshTools::Generation::build_square(mesh, ncellx, ncelly,
+                        xmin, xmax,
+                        ymin, ymax, QUAD4);
+            } else {
+                MeshTools::Generation::build_cube(mesh, ncellx, ncelly, ncellz,
+                        xmin, xmax,
+                        ymin, ymax,
+                        zmin, zmax, HEX8);
+            } 
+        } else 
+            mesh.read(mesh_file);
 
         refinement.uniformly_refine(hlevels);
 
-        sediment_flow.setup();
-        sediment_transport.setup();
-        sediment_deposition.setup();
-
-#ifdef MESH_MOVIMENT
-        moving_mesh.setup();
-#endif
+        sediment_flow.init();
+        sediment_transport.init();
+        sediment_deposition.init();
+        #ifdef MESH_MOVIMENT
+        moving_mesh.init();
+        #endif
+         
+        sediment_flow.setup(infile);
+        sediment_transport.setup(infile);
+        sediment_deposition.setup(infile);
+        #ifdef MESH_MOVIMENT  
+        moving_mesh.setup(infile);
+        #endif
 
 
 #ifdef PROV
@@ -301,6 +315,14 @@ int main(int argc, char** argv) {
 
         equation_systems.read(solution_restart, READ);
 
+        sediment_flow.setup(infile);
+        sediment_transport.setup(infile);
+        sediment_deposition.setup(infile);
+
+        #ifdef MESH_MOVIMENT
+        moving_mesh.setup(infile);
+        #endif
+
         // Get a reference to the Convection-Diffusion system object.
         TransientLinearImplicitSystem & transport_system =
                 equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
@@ -326,6 +348,7 @@ int main(int argc, char** argv) {
 #endif
 
     }
+    
 
     // Print information about the mesh to the screen.
     mesh.print_info();
@@ -397,6 +420,11 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
         FEAdaptor::Initialize(argc, argv);
         FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+        if (libMesh::global_processor_id() == 0) {
+            char commandLine[jsonArraySize];
+            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+            system(strdup(commandLine));
+        }
 #endif  
 
 #ifdef PERFORMANCE
@@ -438,6 +466,11 @@ int main(int argc, char** argv) {
             if (ik == 0) {
                 FEAdaptor::Initialize(argc, argv);
                 FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+            }
+            if (libMesh::global_processor_id() == 0) {
+                char commandLine[jsonArraySize];
+                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                system(strdup(commandLine));
             }
 #endif  
 
@@ -894,6 +927,11 @@ int main(int argc, char** argv) {
 
 #ifdef USE_CATALYST
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                    if (libMesh::global_processor_id() == 0) {
+                        char commandLine[jsonArraySize];
+                        sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                        system(strdup(commandLine));
+                    }
 #endif
 
 #ifdef PERFORMANCE
@@ -934,6 +972,11 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
                         if (ik == 0) {
                             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                        }
+                        if (libMesh::global_processor_id() == 0) {
+                            char commandLine[jsonArraySize];
+                            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                            system(strdup(commandLine));
                         }
 #endif  
 
@@ -1010,6 +1053,11 @@ int main(int argc, char** argv) {
 
 #ifdef USE_CATALYST
             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+            if (libMesh::global_processor_id() == 0) {
+                char commandLine[jsonArraySize];
+                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                system(strdup(commandLine));
+            }
 #endif
 
 #ifdef PERFORMANCE
@@ -1050,6 +1098,11 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
                 if (ik == 0) {
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                }
+                if (libMesh::global_processor_id() == 0) {
+                    char commandLine[jsonArraySize];
+                    sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                    system(strdup(commandLine));
                 }
 #endif  
 

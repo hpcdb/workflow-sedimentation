@@ -1,0 +1,30 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "getmaximumiterations",
+    "workspace": "/home/vitor/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::getmaximumiterations",
+            "method": "COMPUTATION",
+            "endTime": "07.11.2016-03:45:14"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "ogetmaximumiterations",
+            "elements": [
+                "1;0.0100000;0.0200000;500000;10;0.001000000;200;1;1;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf"
+            ]
+        }
+    ],
+    "dependency": {},
+    "files": [
+        {
+            "name": "/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf",
+            "path": "/home/vitor/dev/workflow-sedimentation/src-local/sedimentation"
+        }
+    ]
+}

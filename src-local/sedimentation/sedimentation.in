@@ -4,6 +4,8 @@
 #------------------------------------------------------
 
 # The coarse grid size from which to start adaptivity
+mesh_file = necker3d.msh
+
 dim    =  3
 ncellx = 90
 ncelly = 10
@@ -16,6 +18,17 @@ ymax =  2.0
 zmin =  0.0
 zmax =  2.0
 
+dirichlet/deposition = 1
+dirichlet/slipx      = 2
+dirichlet/slipy      = 3
+dirichlet/noslip     = 4
+dirichlet/pnull      = 5
+dirichlet/czero      = 5
+dirichlet/fixedwall  = 5
+
+
+xlock = 1.0
+hlock = 1.85 
 
 # refinement parameters
 # uniform refinement - rate: 2*hlevels - test case (1)
@@ -59,4 +72,6 @@ is_gravitational_current = 0
 
 # Write out every nth timestep to file.
 write_interval = 1
-output = /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output_
+dir_path = /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/
+output = output_
+

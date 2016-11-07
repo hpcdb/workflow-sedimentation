@@ -1,0 +1,45 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "iline2extraction",
+    "workspace": "/home/vitor/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::iline2extraction-1",
+            "method": "COMPUTATION",
+            "endTime": "07.11.2016-03:45:16"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "oline2iextraction",
+            "elements": [
+                "1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/iline2.index"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "getmaximumiterations"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": [
+        {
+            "name": "ext_line_2_1.csv",
+            "path": "/home/vitor/dev/workflow-sedimentation/src-local/sedimentation"
+        },
+        {
+            "name": "/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf",
+            "path": "/home/vitor/dev/workflow-sedimentation/src-local/sedimentation"
+        }
+    ]
+}

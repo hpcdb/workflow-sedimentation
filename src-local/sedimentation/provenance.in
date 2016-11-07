@@ -4,5 +4,5 @@ rdeFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDE-1.0.jar
 rdiFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar
 access=INDEXING
 cartridge=FASTBIT
-bin=/programs/fastbit/bin
+bin=/home/vitor/programs/fastbit/bin
 extraArguments=[b:precision=2]

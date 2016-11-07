@@ -108,6 +108,10 @@ if [ "$dimension" == "2" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name filepath -type file -extractor irde
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name rowid -type numeric -extractor irde
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name u -type numeric -extractor irde
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name v -type numeric -extractor irde
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name p -type numeric -extractor irde
@@ -167,6 +171,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name filepath -type file -extractor iline0
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name rowid -type numeric -extractor iline0
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name u -type numeric -extractor iline0
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name v -type numeric -extractor iline0
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name w -type numeric -extractor iline0
@@ -183,6 +191,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name filepath -type file -extractor iline1
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name rowid -type numeric -extractor iline1
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name u -type numeric -extractor iline1
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name v -type numeric -extractor iline1
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name w -type numeric -extractor iline1
@@ -199,6 +211,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name filepath -type file -extractor iline2
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name rowid -type numeric -extractor iline2
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name u -type numeric -extractor iline2
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name v -type numeric -extractor iline2
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name w -type numeric -extractor iline2
@@ -215,6 +231,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name filepath -type file -extractor iline3
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name rowid -type numeric -extractor iline3
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name u -type numeric -extractor iline3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name v -type numeric -extractor iline3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name w -type numeric -extractor iline3
@@ -311,6 +331,10 @@ if [ "$dimension" == "2" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name filepath -type file -extractor rde
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name rowid -type numeric -extractor rde
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name u -type numeric -extractor rde
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name v -type numeric -extractor rde
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name p -type numeric -extractor rde
@@ -371,6 +395,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name filepath -type file -extractor line0
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name rowid -type numeric -extractor line0
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name u -type numeric -extractor line0
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name v -type numeric -extractor line0
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name w -type numeric -extractor line0
@@ -387,6 +415,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name filepath -type file -extractor line1
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name rowid -type numeric -extractor line1
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name u -type numeric -extractor line1
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name v -type numeric -extractor line1
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name w -type numeric -extractor line1
@@ -403,6 +435,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name filepath -type file -extractor line2
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name rowid -type numeric -extractor line2
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name u -type numeric -extractor line2
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name v -type numeric -extractor line2
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name w -type numeric -extractor line2
@@ -419,6 +455,10 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name simulationID -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name time_step -type numeric
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name xdmf -type file
+	if [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name filepath -type file -extractor line3
+		java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name rowid -type numeric -extractor line3
+	fi
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name u -type numeric -extractor line3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name v -type numeric -extractor line3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name w -type numeric -extractor line3

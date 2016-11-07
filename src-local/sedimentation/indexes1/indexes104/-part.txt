@@ -1,0 +1,90 @@
+# metadata file written by ibis::part::writeMetaData
+# on Mon Nov  7 15:45:29 2016
+
+BEGIN HEADER
+Name = "indexes1_L11xi0"
+Description = "/home/vitor/programs/fastbit/bin/ardea -d /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/indexes1 -m U:text, V:int, W:text, P:text, S:text, D:text, VTKVALIDPOINTMASK:int, ARC_LENGTH:int, POINTS0:int, POINTS1:int, POINTS2:int -t /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/ext_line_2_3.csv -b ,"
+Number_of_columns = 11
+Number_of_rows = 1515
+Timestamp = 1478540729
+State = 1
+index = <binning precision=2/><encoding equality/>
+END HEADER
+
+Begin Column
+name = "ARC_LENGTH"
+data_type = "INT"
+minimum = 0
+maximum = 2
+End Column
+
+Begin Column
+name = "D"
+description = D 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column
+
+Begin Column
+name = "P"
+description = P 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column
+
+Begin Column
+name = "POINTS0"
+data_type = "INT"
+minimum = 0
+maximum = 9
+End Column
+
+Begin Column
+name = "POINTS1"
+data_type = "INT"
+minimum = 0
+maximum = 2
+End Column
+
+Begin Column
+name = "POINTS2"
+data_type = "INT"
+minimum = 0
+maximum = 0
+sorted = true
+End Column
+
+Begin Column
+name = "S"
+description = S 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column
+
+Begin Column
+name = "U"
+description = U 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column
+
+Begin Column
+name = "V"
+data_type = "INT"
+minimum = -8
+maximum = 9
+End Column
+
+Begin Column
+name = "VTKVALIDPOINTMASK"
+data_type = "INT"
+minimum = -9
+maximum = 8
+End Column
+
+Begin Column
+name = "W"
+description = W 
+data_type = "TEXT"
+index=<binning precision=2/><encoding equality/>
+End Column

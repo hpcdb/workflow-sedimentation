@@ -144,6 +144,7 @@ mesh_moviment.$(obj-suffix):\
     /home/vitor/src/libmesh-install/include/libmesh/fe.h\
     /home/vitor/src/libmesh-install/include/libmesh/fe_abstract.h\
     /home/vitor/src/libmesh-install/include/libmesh/fe_base.h\
+    /home/vitor/src/libmesh-install/include/libmesh/fe_interface.h\
     /home/vitor/src/libmesh-install/include/libmesh/fe_map.h\
     /home/vitor/src/libmesh-install/include/libmesh/fe_transformation_base.h\
     /home/vitor/src/libmesh-install/include/libmesh/fe_type.h\
@@ -167,6 +168,7 @@ mesh_moviment.$(obj-suffix):\
     /home/vitor/src/libmesh-install/include/libmesh/libmesh_logging.h\
     /home/vitor/src/libmesh-install/include/libmesh/libmesh_nullptr.h\
     /home/vitor/src/libmesh-install/include/libmesh/linear_implicit_system.h\
+    /home/vitor/src/libmesh-install/include/libmesh/location_maps.h\
     /home/vitor/src/libmesh-install/include/libmesh/mapvector.h\
     /home/vitor/src/libmesh-install/include/libmesh/mesh.h\
     /home/vitor/src/libmesh-install/include/libmesh/mesh_base.h\
@@ -183,7 +185,9 @@ mesh_moviment.$(obj-suffix):\
     /home/vitor/src/libmesh-install/include/libmesh/numeric_vector.h\
     /home/vitor/src/libmesh-install/include/libmesh/ostream_proxy.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel.h\
+    /home/vitor/src/libmesh-install/include/libmesh/parallel_algebra.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_communicator_specializations\
+    /home/vitor/src/libmesh-install/include/libmesh/parallel_ghost_sync.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_implementation.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_mesh.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_object.h\
@@ -330,6 +334,7 @@ sedimentation.$(obj-suffix):\
     /home/vitor/src/libmesh-install/include/libmesh/libmesh_logging.h\
     /home/vitor/src/libmesh-install/include/libmesh/libmesh_nullptr.h\
     /home/vitor/src/libmesh-install/include/libmesh/linear_implicit_system.h\
+    /home/vitor/src/libmesh-install/include/libmesh/location_maps.h\
     /home/vitor/src/libmesh-install/include/libmesh/mapvector.h\
     /home/vitor/src/libmesh-install/include/libmesh/mesh.h\
     /home/vitor/src/libmesh-install/include/libmesh/mesh_base.h\
@@ -347,6 +352,7 @@ sedimentation.$(obj-suffix):\
     /home/vitor/src/libmesh-install/include/libmesh/ostream_proxy.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_communicator_specializations\
+    /home/vitor/src/libmesh-install/include/libmesh/parallel_ghost_sync.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_implementation.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_mesh.h\
     /home/vitor/src/libmesh-install/include/libmesh/parallel_object.h\

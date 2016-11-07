@@ -67,8 +67,9 @@ public:
   SedimentationTransport (EquationSystems &es_in) : es (es_in), Reynolds(1.0)
   {};
 
+  void init();
   void assemble ();
-  void setup();
+  void setup(GetPot &infile);
   
   
 private:
