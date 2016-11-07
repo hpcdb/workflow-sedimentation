@@ -2,5 +2,5 @@ PROV:getmaximumiterations:Input
       0.00005
       elapsed-time: 0.00005 seconds.
 PROV:getmaximumiterations:Output
-      0.00010
-      elapsed-time: 0.00010 seconds.
+      0.00016
+      elapsed-time: 0.00016 seconds.

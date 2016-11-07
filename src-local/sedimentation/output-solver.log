@@ -4,7 +4,7 @@ pgFilePath=/home/vitor/dev/workflow-sedimentation/src-local/dfa/PG-1.0.jar
 rdeFilePath=/home/vitor/dev/workflow-sedimentation/src-local/dfa/RDE-1.0.jar
 rdiFilePath=/home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar
 rawDataAccess=INDEXING
-cartridge=FASTBIT
+cartridge=OPTIMIZED_FASTBIT
 bin=/home/vitor/programs/fastbit/bin
 extraArguments=[b:precision=2]
 ###########################
@@ -87,21 +87,21 @@ Parameters:
 
 [WRITE] /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_000_00000.h5 - /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf
 [CATALYST] Time step: 1 ; Time: 0.0
-Data Extraction Cost: 0.63298
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX iline0 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_0_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.37 seconds
+Data Extraction Cost: 0.75617
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX iline0 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_0_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.22 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/iline0.index
-Data Extraction Cost: 0.01603
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX iline1 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_1_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.36 seconds
+Data Extraction Cost: 0.01822
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX iline1 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_1_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.18 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/iline1.index
-Data Extraction Cost: 0.01717
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX iline2 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_2_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.39 seconds
+Data Extraction Cost: 0.02198
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX iline2 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_2_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.18 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/iline2.index
-Data Extraction Cost: 0.02335
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX iline3 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_3_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.36 seconds
+Data Extraction Cost: 0.01624
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX iline3 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_3_1.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.22 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00000.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/iline3.index
 ======================================================
  Time step  1  simulation time = 0.0100...
@@ -132,21 +132,21 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_000_00001.h5 - /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00001.xmf
 [CATALYST] Time step: 2 ; Time: 0.01
-Data Extraction Cost: 0.17558
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line01 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_0_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.40 seconds
+Data Extraction Cost: 0.20727
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line01 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_0_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.18 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00001.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line01.index
-Data Extraction Cost: 0.02110
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line11 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_1_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.33 seconds
+Data Extraction Cost: 0.01492
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line11 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_1_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.22 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00001.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line11.index
-Data Extraction Cost: 0.03653
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line21 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_2_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.40 seconds
+Data Extraction Cost: 0.02701
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line21 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_2_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.23 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00001.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line21.index
-Data Extraction Cost: 0.02162
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line31 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_3_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.27 seconds
+Data Extraction Cost: 0.01919
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line31 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_3_2.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.20 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00001.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line31.index
 ======================================================
  Time step  2  simulation time = 0.0200...
@@ -174,21 +174,21 @@ Warning!  Parallel xda/xdr is not yet implemented.
 Writing a serialized file instead.
 [WRITE] /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_000_00002.h5 - /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00002.xmf
 [CATALYST] Time step: 3 ; Time: 0.02
-Data Extraction Cost: 0.19140
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line02 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_0_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.46 seconds
+Data Extraction Cost: 0.24584
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line02 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_0_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.23 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00002.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line02.index
-Data Extraction Cost: 0.03038
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line12 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_1_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.29 seconds
+Data Extraction Cost: 0.03264
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line12 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_1_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.22 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00002.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line12.index
-Data Extraction Cost: 0.02427
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line22 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_2_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.27 seconds
+Data Extraction Cost: 0.03360
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line22 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_2_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.10 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00002.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line22.index
-Data Extraction Cost: 0.01526
-java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar FASTBIT:INDEX line32 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_3_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter="," -bin="/home/vitor/programs/fastbit/bin" -option=[b:precision=2]
-FASTBIT:INDEX --> 0.35 seconds
+Data Extraction Cost: 0.02027
+java -jar /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar OPTIMIZED_FASTBIT:INDEX line32 /home/vitor/dev/workflow-sedimentation/src-local/sedimentation ext_line_3_3.csv [u:numeric,v:numeric,w:numeric,p:numeric,s:numeric,d:numeric,vtkvalidpointmask:numeric,arc_length:numeric,points0:numeric,points1:numeric,points2:numeric] -delimiter=","
+OPTIMIZED_FASTBIT:INDEX --> 0.18 seconds
 1;0;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/output/output__1_00002.xmf;/home/vitor/dev/workflow-sedimentation/src-local/sedimentation/line32.index
 FLOW SOLVER - TOTAL LINEAR ITERATIONS : 161
 TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : 44
