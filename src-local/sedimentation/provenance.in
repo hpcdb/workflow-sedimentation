@@ -2,7 +2,7 @@ directory = /home/vitor/dev/workflow-sedimentation/src-local/sedimentation/
 pgFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/PG-1.0.jar
 rdeFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDE-1.0.jar
 rdiFilePath = /home/vitor/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar
-access=EXTRACTION
-cartridge=CSV
+access=INDEXING
+cartridge=FASTBIT
 bin=/home/vitor/programs/fastbit/bin
 extraArguments=[b:precision=2]

@@ -147,8 +147,8 @@ int main(int argc, char** argv) {
     Provenance prov;
 
 #ifdef PROV
-    // Mesh Generation
-    prov.inputMeshGeneration(simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
+    // Input Mesh
+    prov.inputInputMesh(simulationID, dim);
 #endif
     // Create a mesh object, with dimension to be overridden later,
     // distributed across the default MPI communicator.
@@ -289,7 +289,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Refinement
-        prov.outputMeshGeneration(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+        prov.outputInputMesh(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
 #endif
 
         // Initialize the data structures for the equation system.
@@ -316,7 +316,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Refinement
-        prov.outputMeshGeneration(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+        prov.outputInputMesh(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
 #endif
 
         equation_systems.read(solution_restart, READ);

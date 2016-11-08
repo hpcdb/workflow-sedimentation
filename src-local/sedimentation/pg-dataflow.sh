@@ -12,45 +12,35 @@ PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 
 # Sedimentation Solver
 dimension="3"
-access="extraction"
-cartridge="csv"
+access="indexing"
+cartridge="fastbit"
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode
 # Dataflow
 java -jar ../dfa/PG-1.0.jar -dataflow -tag sedimentation
 
-echo "Mesh Generation"
-java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshGeneration
-java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation meshGeneration -name libmesh-sedimentation-opt::MeshGeneration -filepath $PGDIR
+echo "Input Mesh"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag inputMesh
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation inputMesh -name libmesh-sedimentation-opt::InputMesh -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshGeneration -tag imeshgeneration -type input
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshGeneration -tag omeshgeneration -type output
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation inputMesh -tag iinputmesh -type input
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation inputMesh -tag oinputmesh -type output
 
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name simulationID -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name dim -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ncellx -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ncelly -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ncellz -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name xmin -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ymin -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name zmin -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name xmax -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ymax -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name zmax -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set imeshgeneration -name ref_interval -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name dim -type numeric
 
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name simulationID -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name r_fraction -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name c_fraction -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name max_h_level -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshGeneration -set omeshgeneration -name hlevels -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name r_fraction -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name c_fraction -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name max_h_level -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name hlevels -type numeric
 
 echo "Create Equation Systems"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag createEquationSystems
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation createEquationSystems -name libmesh-sedimentation-opt::CreateEquationSystems -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag omeshgeneration -type input -dependency meshGeneration
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag oinputmesh -type input -dependency inputMesh
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag ocreateequationsystems -type output
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name simulationID -type numeric

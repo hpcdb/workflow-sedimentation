@@ -78,17 +78,16 @@ Provenance::Provenance() {
     processor_id = libMesh::global_processor_id();
 }
 
-void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int ncelly, int ncellz,
-        double xmin, double ymin, double zmin, double xmax, double ymax, double zmax, int ref_interval) {
+void Provenance::inputInputMesh(int simulationID, int dim) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Input Mesh Generation" << endl;
+    cout << "Input Input Mesh" << endl;
 #endif    
 
     Performance perf;
     perf.start();
 
-    string transformation = "meshgeneration";
+    string transformation = "inputmesh";
     PerformanceMetric p;
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -102,7 +101,7 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     t.setStatus("RUNNING");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d", simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
+    sprintf(memalloc, "%d;%d", simulationID, dim);
     vector<string> e = {memalloc};
     t.addSet("i" + transformation, e);
 
@@ -123,17 +122,17 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     file.close();
 }
 
-void Provenance::outputMeshGeneration(int simulationID, double r_fraction, double c_fraction,
+void Provenance::outputInputMesh(int simulationID, double r_fraction, double c_fraction,
         double max_h_level, unsigned int hlevels) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Output Mesh Generation" << endl;
+    cout << "Output Input Mesh" << endl;
 #endif
 
     Performance perf;
     perf.start();
 
-    string transformation = "meshgeneration";
+    string transformation = "inputmesh";
     Task t(simulationID);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
@@ -181,7 +180,7 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     t2.setTransformation(transformation);
     t2.setWorkspace(directory);
     t2.setStatus("RUNNING");
-    t2.addDtDependency("meshgeneration");
+    t2.addDtDependency("inputmesh");
 
     sprintf(memalloc, "%d", simulationID);
     t2.addIdDependency(memalloc);

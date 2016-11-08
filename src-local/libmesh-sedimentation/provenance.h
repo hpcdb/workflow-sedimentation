@@ -28,8 +28,8 @@ using namespace libMesh;
 class Provenance {
 public:
     Provenance();
-    void inputMeshGeneration(int simulationID, int dim, int ncellx, int ncelly, int ncellz, double xmin, double ymin, double zmin, double xmax, double ymax, double zmax, int ref_interval);
-    void outputMeshGeneration(int simulationID, double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels);
+    void inputInputMesh(int simulationID, int dim);
+    void outputInputMesh(int simulationID, double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels);
 
     void outputCreateEquationSystems(int simulationID, Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc, Real theta, Real ex, Real ey, Real ez, Real c_factor);
 
