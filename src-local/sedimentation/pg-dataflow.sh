@@ -12,8 +12,8 @@ PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 
 # Sedimentation Solver
 dimension="3"
-access="indexing"
-cartridge="optimized_fastbit"
+access="extraction"
+cartridge="csv"
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode

@@ -380,7 +380,7 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
 }
 
 void Provenance::outputInitDataExtraction(int simulationID, string transformation, string dataSet,
-        int time_step, string xdmf, string rawDataFile, int dimension, string indexerName) {
+        int time_step, string xdmf, string rawDataFile, int dimension, string indexerName, int indexerID) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Init Data Extraction" << endl;
@@ -432,11 +432,12 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         idx.addAttribute("points0", "numeric", false);
         idx.addAttribute("points1", "numeric", false);
         idx.addAttribute("points2", "numeric", false);
-        if(cartridge.compare("FASTBIT") == 0){
+
+        if(cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0){
             idx.setBin(bin);
             idx.setExtraArguments(extraArguments);
         }
-        idx.index(directory, rawDataFile);
+        idx.index(directory, rawDataFile, indexerID);
     }
 
     rdePerf.end();
@@ -451,9 +452,15 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }
 
-    sprintf(memalloc, "%d;%d;%s;%s/%s",
-            simulationID, time_step, xdmf.c_str(),
-            directory.c_str(), extractedFileName);
+    if(rawDataAccess.compare("INDEXING") == 0 && (cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0)){
+        sprintf(memalloc, "%d;%d;%s;%s/index/%d/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), indexerID, extractedFileName);
+    }else{
+        sprintf(memalloc, "%d;%d;%s;%s/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), extractedFileName);
+    }
     cout << memalloc << endl;
 
     vector<string> e = {memalloc};
@@ -897,7 +904,7 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
 
 void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskID,
         string transformation, string dataSet, int time_step,
-        string xdmf, string rawDataFile, int dimension, string indexerName) {
+        string xdmf, string rawDataFile, int dimension, string indexerName, int indexerID) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Data Extraction" << endl;
@@ -951,11 +958,11 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         idx.addAttribute("points0", "numeric", false);
         idx.addAttribute("points1", "numeric", false);
         idx.addAttribute("points2", "numeric", false);
-        if(cartridge.compare("FASTBIT") == 0){
+        if(cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0){
             idx.setBin(bin);
             idx.setExtraArguments(extraArguments);
         }
-        idx.index(directory, rawDataFile);
+        idx.index(directory, rawDataFile, indexerID);
     }
 
     rdePerf.end();
@@ -970,9 +977,15 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }
 
-    sprintf(memalloc, "%d;%d;%s;%s/%s",
-            simulationID, time_step, xdmf.c_str(),
-            directory.c_str(), extractedFileName);
+    if(rawDataAccess.compare("INDEXING") == 0 && (cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0)){
+        sprintf(memalloc, "%d;%d;%s;%s/index/%d/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), indexerID, extractedFileName);
+    }else{
+        sprintf(memalloc, "%d;%d;%s;%s/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), extractedFileName);
+    }
     cout << memalloc << endl;
 
     vector<string> e = {memalloc};

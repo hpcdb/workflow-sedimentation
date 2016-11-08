@@ -36,7 +36,7 @@ public:
     void outputGetMaximumIterations(int simulationID, Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, int max_r_steps, unsigned int write_interval, string xdmf);
 
     void inputInitDataExtraction(int simulationID, string transformation);
-    void outputInitDataExtraction(int simulationID, string transformation, string dataSet, int time_step, string xdmf, string rawDataFile, int dimension, string extractorName);
+    void outputInitDataExtraction(int simulationID, string transformation, string dataSet, int time_step, string xdmf, string rawDataFile, int dimension, string extractorName, int indexerID);
 
     void inputSolverSimulationFluid(int taskID, int simulationID, int subTaskID);
     void outputSolverSimulationFluid(int taskID, int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
@@ -50,7 +50,7 @@ public:
     void outputMeshWriter(int taskID, int simulationID, int subTaskID, int time_step, string xdmf);
 
     void inputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation);
-    void outputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string dataSet, int time_step, string xdmf, string rawDataFile, int dimension, string extractorName);
+    void outputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string dataSet, int time_step, string xdmf, string rawDataFile, int dimension, string extractorName, int indexerID);
 
     void meshAggregator(int simulationID, string xdmf, int n_processors, vector<string> meshDependencies);
 

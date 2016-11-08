@@ -51,12 +51,15 @@ public:
         this->extraArguments = arguments;
     }
 
-    void index(string path, string filename) {
-        char buffer[512];
-        sprintf(buffer, "%s%s:INDEX %s %s %s [", commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
-#ifdef VERBOSE
-    	sprintf(buffer, "#!/bin/bash;%s%s:INDEX %s %s %s [", commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
-#endif
+    void index(string path, string filename, int indexerID) {
+        char buffer[2048];
+
+        if(extension.compare("FASTBIT") == 0 || extension.compare("OPTIMIZED_FASTBIT") == 0){
+            sprintf(buffer, "mkdir index/%d; cd index/%d; mv ../../%s .; cp -rf ../../FastBit .;", indexerID, indexerID, filename.c_str());
+            sprintf(buffer, "%s%s%s:INDEX %s %s/index/%d %s [", buffer, commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), indexerID, filename.c_str());
+        }else{
+            sprintf(buffer, "%s%s:INDEX %s %s %s [", commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
+        }
         
         bool first = true;
         for (Attribute att : this->attributes) {
@@ -71,9 +74,10 @@ public:
             }
         }
         sprintf(buffer, "%s] -delimiter=\"%s\"", buffer, this->delimeter.c_str());
-        if(extension.compare("FASTBIT") == 0){
+        if(extension.compare("FASTBIT") == 0 || extension.compare("OPTIMIZED_FASTBIT") == 0){
             sprintf(buffer, "%s -bin=\"%s\"", buffer, this->bin.c_str());
             sprintf(buffer, "%s -option=%s", buffer, this->extraArguments.c_str());
+            sprintf(buffer, "%s;cd ../..", buffer);
         }
 	    cout << buffer << endl;
         system(buffer);

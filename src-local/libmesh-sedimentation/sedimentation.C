@@ -222,6 +222,12 @@ int main(int argc, char** argv) {
 
     // LOOP 
     Real init_time = 0.0;
+    int indexerID = 0;
+
+    // create index directory
+    char cmd[32];
+    sprintf(cmd, "mkdir index");
+    system(cmd);
 
     // INPUT: TIME INTEGRATION
     Real dt = infile("deltat", 0.005);
@@ -423,7 +429,7 @@ int main(int argc, char** argv) {
         if (libMesh::global_processor_id() == 0) {
             char commandLine[jsonArraySize];
             sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-            system(strdup(commandLine));
+            system(commandLine);
         }
 #endif  
 
@@ -440,7 +446,9 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Writer
-        prov.outputInitDataExtraction(simulationID, "initdataextraction", "oinitdataextraction", 0, current_files[1], finalFilename, dim, "irde");
+        indexerID++;
+        prov.outputInitDataExtraction(simulationID, "initdataextraction", "oinitdataextraction", 0, current_files[1], finalFilename, dim, "irde", indexerID);
+
 #endif
     } else if (dim == 3) {
         // 3D analysis
@@ -470,7 +478,7 @@ int main(int argc, char** argv) {
             if (libMesh::global_processor_id() == 0) {
                 char commandLine[jsonArraySize];
                 sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                system(strdup(commandLine));
+                system(commandLine);
             }
 #endif  
 
@@ -487,11 +495,12 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
             // Mesh Writer
+            indexerID++;
             sprintf(argument1, "iline%dextraction", ik);
             char argument2[jsonArraySize];
             sprintf(argument2, "oline%diextraction", ik);
             sprintf(memalloc, "iline%d", ik);
-            prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
+            prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
         }
     }
@@ -930,7 +939,7 @@ int main(int argc, char** argv) {
                     if (libMesh::global_processor_id() == 0) {
                         char commandLine[jsonArraySize];
                         sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                        system(strdup(commandLine));
+                        system(commandLine);
                     }
 #endif
 
@@ -947,7 +956,8 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
                     sprintf(memalloc, "rde%d", numberOfWrites);
-                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc);
+                    indexerID++;
+                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
                 } else if (dim == 3) {
                     // 3D analysis
@@ -976,7 +986,7 @@ int main(int argc, char** argv) {
                         if (libMesh::global_processor_id() == 0) {
                             char commandLine[jsonArraySize];
                             sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                            system(strdup(commandLine));
+                            system(commandLine);
                         }
 #endif  
 
@@ -997,7 +1007,8 @@ int main(int argc, char** argv) {
                         sprintf(memalloc, "line%d%d", ik, numberOfWrites);
                         char argument2[jsonArraySize];
                         sprintf(argument2, "oline%dextraction", ik);
-                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
+                        indexerID++;
+                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
                     }
                 }
@@ -1056,7 +1067,7 @@ int main(int argc, char** argv) {
             if (libMesh::global_processor_id() == 0) {
                 char commandLine[jsonArraySize];
                 sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                system(strdup(commandLine));
+                system(commandLine);
             }
 #endif
 
@@ -1073,7 +1084,8 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
             sprintf(memalloc, "rde%d", numberOfWrites);
-            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc);
+            indexerID++;
+            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
         } else if (dim == 3) {
             // 3D analysis
@@ -1102,7 +1114,7 @@ int main(int argc, char** argv) {
                 if (libMesh::global_processor_id() == 0) {
                     char commandLine[jsonArraySize];
                     sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                    system(strdup(commandLine));
+                    system(commandLine);
                 }
 #endif  
 
@@ -1123,7 +1135,8 @@ int main(int argc, char** argv) {
                 char argument2[jsonArraySize];
                 sprintf(argument2, "oline%diextraction", ik);
                 sprintf(memalloc, "line%d%d", ik, numberOfWrites);
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
+                indexerID++;
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
             }
         }

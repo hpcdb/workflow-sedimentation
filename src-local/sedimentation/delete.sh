@@ -18,6 +18,7 @@ rm -rf *.dump
 rm -rf data
 rm -rf *.data
 rm -rf *.index
+rm -rf index
 
 mkdir prov
 mkdir prov/di
