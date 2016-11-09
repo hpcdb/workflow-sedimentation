@@ -27,6 +27,7 @@ class XDMFWriter
     public:
         XDMFWriter(const Mesh& mesh);
         void set_file_name(std::string filename);
+        void set_dir_path(std::string path);
         void set_file_id(int n_time_file) {n_timestep = n_time_file; } 
         int  get_file_id() { return n_timestep; }
         string* write_time_step(EquationSystems &es, double time);
@@ -41,6 +42,7 @@ class XDMFWriter
         // mapping between global and local ids
         std::map<dof_id_type, dof_id_type> g2l;
         std::string        basename;
+        std::string        dir;
         int                n_timestep;
         ElemType           elemtype;
         int                n_local_nodes;

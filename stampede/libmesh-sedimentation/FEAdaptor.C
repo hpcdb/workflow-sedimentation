@@ -71,10 +71,13 @@ namespace
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
+    ElemType etype = (*el)->type();
     int counter = 0;
     for ( ; el != end_el; ++el)
     {
       const Elem* elem = *el;
+
+
       for(int ino = 0; ino <  elem->n_nodes(); ++ino)
       {
           int g_id = elem->node(ino);
@@ -102,7 +105,19 @@ namespace
   
    
     // create the cells
-    VTKGrid->Allocate(static_cast<vtkIdType>(numberOfCells*9));
+     int np = 0;
+     int vtk_type;
+    if(etype == HEX8) {
+       VTKGrid->Allocate(static_cast<vtkIdType>(numberOfCells*9));
+       np = 8;
+       vtk_type = VTK_HEXAHEDRON;
+
+     }
+     else if (etype == TET4) {
+       VTKGrid->Allocate(static_cast<vtkIdType>(numberOfCells*5));
+        np =4;
+        vtk_type = VTK_TETRA;
+     }
     
     el     = mesh.active_local_elements_begin();
     for ( ; el != end_el; ++el)
@@ -113,7 +128,8 @@ namespace
         {
             tmp[ino] = g2l[elem->node(ino)];
         }
-         VTKGrid->InsertNextCell(VTK_HEXAHEDRON, 8, tmp);
+
+         VTKGrid->InsertNextCell(vtk_type,np,  tmp);
                
     }
     

@@ -20,7 +20,24 @@ void inlet_wrapper (DenseVector<Number>& output,
       this->boussinesq = 1.0;
  }
 
-void SedimentationFlow::setup()
+ void SedimentationFlow::init()
+ {
+     
+     MeshBase& mesh = this->es.get_mesh();
+     this->dim = mesh.mesh_dimension();
+     TransientLinearImplicitSystem & flow_system = this->es.add_system<TransientLinearImplicitSystem> ("flow");
+     
+     unsigned int u_var = flow_system.add_variable("u", FIRST);
+     unsigned int v_var = flow_system.add_variable("v", FIRST);
+     unsigned int w_var;
+     if(dim == 3)
+        w_var = flow_system.add_variable("w", FIRST);
+
+     unsigned int p_var = flow_system.add_variable("p", FIRST);
+     
+ }
+
+void SedimentationFlow::setup(GetPot &infile)
 {
    MeshBase& mesh = this->es.get_mesh();
 
@@ -28,157 +45,97 @@ void SedimentationFlow::setup()
 
     // Add a transient system to the EquationSystems
   // object named "Convection-Diffusion".
-  TransientLinearImplicitSystem & flow_system = this->es.add_system<TransientLinearImplicitSystem> ("flow");
+   
+  TransientLinearImplicitSystem & flow_system = this->es.get_system<TransientLinearImplicitSystem> ("flow");
 
   flow_system.attach_assemble_object(*this);
 
-  unsigned int u_var = flow_system.add_variable("u", FIRST);
-  unsigned int v_var = flow_system.add_variable("v", FIRST);
-  unsigned int w_var;
+  unsigned int u_var = flow_system.variable_number ("u");
+  unsigned int v_var = flow_system.variable_number ("v");
+  unsigned int w_var = 0;
   if(dim == 3)
-      w_var = flow_system.add_variable("w", FIRST);
-
-  unsigned int p_var = flow_system.add_variable("p", FIRST);
-
-  std::set<boundary_id_type> noslip;
-  std::set<boundary_id_type> slipy;
-  std::set<boundary_id_type> slipx;
-  std::set<boundary_id_type> slipz;
-  std::set<boundary_id_type> pnull;
-  this->boundary_id[DEP]   = BOUNDARY_DEPOSITION;
-  this->boundary_id[PNULL] = BOUNDARY_PNULL;
-
-  if(this->dim == 3) {
-
-      this->boundary_id[MIN_X] = 4;
-      this->boundary_id[MIN_Y] = 1;
-      this->boundary_id[MIN_Z] = 0;
-      this->boundary_id[MAX_X] = 2;
-      this->boundary_id[MAX_Y] = 3;
-      this->boundary_id[MAX_Z] = 5;
-
-      noslip.insert(this->boundary_id[MIN_Z]);
-      //noslip.insert(this->boundary_id[MAX_X]);
-      noslip.insert(this->boundary_id[MAX_Z]);
-
-      slipy.insert(this->boundary_id[MIN_Y]);
-      slipy.insert(this->boundary_id[MAX_Y]);
-      slipx.insert(this->boundary_id[MIN_X]);
-      slipx.insert(this->boundary_id[MAX_X]);
-      pnull.insert(this->boundary_id[PNULL]);
-
-  }
-  else if (dim == 2)
-  {
-      this->boundary_id[MIN_X] = 3;
-      this->boundary_id[MIN_Y] = 0;
-      this->boundary_id[MAX_X] = 1;
-      this->boundary_id[MAX_Y] = 2;
-
-      noslip.insert(this->boundary_id[MIN_Y]);
-      noslip.insert(this->boundary_id[MAX_Y]);
-      //noslip.insert(this->boundary_id[MAX_Y]);
-      //slipy.insert(this->boundary_id[MAX_Y]);
-      slipx.insert(this->boundary_id[MIN_X]);
-      slipx.insert(this->boundary_id[MAX_X]);
-
-      pnull.insert(this->boundary_id[PNULL]);
-
-  }
+   w_var = flow_system.variable_number ("w");
+  
+  unsigned int p_var = flow_system.variable_number ("p");
 
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-
-  int boundary_dep =  (this->dim > 2)?this->boundary_id[MIN_Z]:this->boundary_id[MIN_Y];
-  int boundary_top = (this->dim > 2)?this->boundary_id[MAX_Z]:this->boundary_id[MAX_Y];
-
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-   for ( ; el != end_el; ++el)
-   {
-              const Elem* elem = *el;
-
-              unsigned int side_dep     = 0;
-              unsigned int side_max_x   = 0;
-              unsigned int side_top     = 0;
-              bool found_side_dep       = false;
-              bool found_side_max_x     = false;
-              bool found_side_top       = false;
-
-              for(unsigned int side=0; side<elem->n_sides(); side++)
-                {
-                  if( mesh.get_boundary_info().has_boundary_id(elem, side, boundary_dep))
-                    {
-                      side_dep = side;
-                      found_side_dep = true;
-                    }
-
-                    if( mesh.get_boundary_info().has_boundary_id(elem, side, boundary_top))
-                    {
-                      side_top = side;
-                      found_side_top = true;
-                    }
-
-                    if( mesh.get_boundary_info().has_boundary_id(elem, side, this->boundary_id[MAX_X]))
-                    {
-                      side_max_x = side;
-                      found_side_max_x = true;
-                    }
-
-
-                }
-                if(found_side_dep)
-                {
-                  for(unsigned int n=0; n<elem->n_nodes(); n++)
-                    {
-                      if (elem->is_node_on_side(n, side_dep))
-                        {
-                          mesh.get_boundary_info().add_node(elem->get_node(n), this->boundary_id[DEP]);
-                        }
-                    }
-                }
-                if(found_side_max_x && found_side_top)
-                {
-                    for(unsigned int n=0; n<elem->n_nodes(); n++)
-                    {
-                      if (elem->is_node_on_side(n, side_max_x) &&
-                          elem->is_node_on_side(n, side_top  )
-                          )
-                        {
-                          mesh.get_boundary_info().add_node(elem->get_node(n), this->boundary_id[PNULL]);
-                        }
-                    }
-                }
-
-    }
-
+  std::set<boundary_id_type> slipx;      // 1
+  std::set<boundary_id_type> slipy;      // 2
+  std::set<boundary_id_type> slipz;      // 3
+  std::set<boundary_id_type> pnull;      // 4
+  std::set<boundary_id_type> noslip;     // 5
+  std::set<boundary_id_type> inlet;      // 6
+  std::set<boundary_id_type> outflow;    // 7
+  std::set<boundary_id_type> deposition; // 8
+  
+  
   std::vector<unsigned int> velocity_var(2);
   velocity_var[0] = u_var;
   velocity_var[1] = v_var;
   if(this->dim == 3)
      velocity_var.push_back(w_var);
 
-
-  std::vector<unsigned int> velocity_y(1);
-  velocity_y[0]    = v_var;
-
   std::vector<unsigned int> velocity_x(1);
   velocity_x[0]    = u_var;
+  
+  std::vector<unsigned int> velocity_y(1);
+  velocity_y[0]    = v_var;
+  
+  std::vector<unsigned int> velocity_z(1);
+  velocity_z[0]    = w_var;
+
 
   std::vector<unsigned int> pressure(1);
   pressure[0] = p_var;
 
   ZeroFunction<Number> zero;
 
-  DirichletBoundary dirichlet_noslip(noslip,velocity_var, &zero);
-  DirichletBoundary dirichlet_slipy (slipy ,velocity_y  , &zero);
-  DirichletBoundary dirichlet_slipx (slipx ,velocity_x  , &zero);
-  DirichletBoundary dirichlet_pnull (pnull ,pressure    , &zero);
 
-  flow_system.get_dof_map().add_dirichlet_boundary(dirichlet_noslip);
-  flow_system.get_dof_map().add_dirichlet_boundary(dirichlet_slipx);
-  flow_system.get_dof_map().add_dirichlet_boundary(dirichlet_slipy);
-  flow_system.get_dof_map().add_dirichlet_boundary(dirichlet_pnull);
-
+  int slipx_id = infile("dirichlet/slipx", -1);
+  if(slipx_id != -1) {
+      slipx.insert(slipx_id);
+      flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(slipx,velocity_x, &zero));
+  }
+  
+  int slipy_id = infile("dirichlet/slipy", -1);
+  if(slipy_id != -1) {
+      slipy.insert(slipy_id);
+      flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(slipy,velocity_y, &zero));
+  }
+  
+  int slipz_id = infile("dirichlet/slipz", -1);
+  if(slipz_id != -1) {
+      slipz.insert(slipz_id);
+      flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(slipz,velocity_z, &zero));
+  }
+  
+  int pnull_id = infile("dirichlet/pnull", -1);
+  if(pnull_id != -1) {
+      pnull.insert(pnull_id);
+      flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(pnull,pressure, &zero));
+  }
+  
+  int noslip_id = infile("dirichlet/noslip", -1);
+  if(noslip_id != -1) {
+      noslip.insert(noslip_id);
+      flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(noslip,velocity_var, &zero));
+  }
+  
+  int deposition_id = infile("dirichlet/deposition", -1);
+  if(deposition_id != -1) {
+      deposition.insert(deposition_id);
+      flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(deposition,velocity_var, &zero));
+  }
+  
+  int inlet_id = infile("dirichlet/inlet", -1);
+  if(inlet_id != -1) {
+      inlet.insert(inlet_id);
+      flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(inlet,velocity_var, &zero));
+  }
+  
+  int outflow_id = infile("dirichlet/outflow", -1);
+  es.parameters.set<int>("outflow_id") = outflow_id;
+  
 }
 
 

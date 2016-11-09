@@ -71,7 +71,8 @@ class SedimentationFlow : public System::Assembly
   
 
   void assemble ();
-  void setup();
+  void init();
+  void setup(GetPot &infile);
   void solve();
   void set_gravitational_current_on();
 

@@ -1,0 +1,7 @@
+directory = /work/03664/silva/simulation/sedimentation/exp-idx-ofb
+pgFilePath = /work/03664/silva/simulation/sedimentation/dfa/PG-1.0.jar
+rdeFilePath = /work/03664/silva/simulation/sedimentation/dfa/RDE-1.0.jar
+access=INDEXING
+cartridge=OPTIMIZED_FASTBIT
+bin=/work/03664/silva/programs/fastbit/bin
+extraArguments=[b:precision=2]

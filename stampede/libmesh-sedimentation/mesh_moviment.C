@@ -6,6 +6,10 @@
 #include <math.h>
 using namespace std;
 
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel_ghost_sync.h"
+
 // Basic include file needed for the mesh functionality.
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
@@ -39,6 +43,7 @@ using namespace std;
 #include "libmesh/numeric_vector.h"
 
 
+#include "libmesh/fe_interface.h"
 // To impose Dirichlet boundary conditions
 #include "libmesh/dirichlet_boundaries.h"
 #include "libmesh/analytic_function.h"
@@ -46,26 +51,46 @@ using namespace std;
 // The definition of a geometric element
 #include "libmesh/elem.h"
 #include "define.h"
-using namespace libMesh;
+
 
 #include "mesh_moviment.h"
 #include "define.h"
 
 #include "libmesh/zero_function.h"
 
+using namespace libMesh;
 
-void MeshMoviment::setup()
+
+void MeshMoviment::init()
 {
-
-  LinearImplicitSystem & mesh_system = this->es.add_system<LinearImplicitSystem> ("mesh_moviment");
-  mesh_system.add_vector("mesh-velocity");
-  unsigned int dispz = mesh_system.add_variable ("disp-z");
-
-  mesh_system.attach_assemble_object(*this);
-
+    LinearImplicitSystem & mesh_system = this->es.add_system<LinearImplicitSystem> ("MeshMoving");
+    unsigned int dispz = mesh_system.add_variable ("disp-z");
 }
 
 
+void MeshMoviment::setup(GetPot &infile)
+{
+
+  LinearImplicitSystem & mesh_system = this->es.get_system<LinearImplicitSystem> ("MeshMoving");
+  mesh_system.add_vector("mesh-velocity");
+   unsigned int dispz = mesh_system.variable_number ("disp-z");
+  mesh_system.attach_assemble_object(*this);
+
+  this->deposition_id = infile("dirichlet/deposition", 0);
+  this->fixedwall_id  = infile("dirichlet/fixedwall", 0);  
+  
+  std::set<boundary_id_type> fixed;
+  std::vector<unsigned int> vars(1);
+  vars[0] = dispz;
+  ZeroFunction<Number> zero;
+  
+  if(fixedwall_id > 0) {
+      fixed.insert(fixedwall_id);
+      mesh_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(fixed,vars, &zero));
+  }
+  
+
+}
 
 
 void MeshMoviment::assemble()
@@ -81,17 +106,23 @@ void MeshMoviment::assemble()
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the Convection-Diffusion system object.
-  LinearImplicitSystem & system =
-    es.get_system<LinearImplicitSystem> ("mesh_moviment");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("MeshMoving");
 
+  
   ExplicitSystem &      deposition_system = es.get_system<ExplicitSystem>("deposition");
-  NumericVector<Number> &deposition_rate = deposition_system .get_vector("deposition_rate");
+ NumericVector<Number> &  deposition_rate = deposition_system .get_vector("deposition_rate");
 
 
   // Numeric ids corresponding to each variable in the system
   const unsigned int dispz_var     = system.variable_number ("disp-z");
   const unsigned int d_var         = deposition_system.variable_number("d");
-
+  //const unsigned int dVdt_var      = deposition_rate.variable_number("dVdt");
+  
+  
+  const Real c_factor = es.parameters.get<Real>("c_factor");
+  const Real Us       = es.parameters.get<Real>("Us");
+  const Real dt       = es.parameters.get<Real>("dt");
+  
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
   FEType fe_type = system.variable_type(dispz_var);
@@ -123,15 +154,20 @@ void MeshMoviment::assemble()
   const std::vector<std::vector<Real> >& phi      = fe->get_phi();
 
 
+
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi      = fe->get_dphi();
+  
+  
+  const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
+  const std::vector<Real>& JxW_face                = fe_face->get_JxW();
 
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map      = system.get_dof_map();
+  const DofMap& dof_map       = system.get_dof_map();
   const DofMap& dof_map_dep  = deposition_system.get_dof_map();
 
   DenseMatrix<Number> Ke;
@@ -141,7 +177,8 @@ void MeshMoviment::assemble()
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
-  std::vector<dof_id_type> dof_indices_deposition;
+  std::vector<dof_id_type> dof_indices_dep;
+  std::vector<dof_id_type> dof_indices_dep_face;
 
   Number aux1, aux2;
 
@@ -181,6 +218,7 @@ void MeshMoviment::assemble()
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  
 
   for ( ; el != end_el; ++el)
     {
@@ -193,7 +231,6 @@ void MeshMoviment::assemble()
       // matrix and right-hand-side this element will
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
-      dof_map_dep.dof_indices (elem, dof_indices_deposition, d_var);
 
       // Compute the element-specific data for the current
       // element.
@@ -229,53 +266,36 @@ void MeshMoviment::assemble()
 
        // The penalty value.
        const Real penalty = 1.e10;
+       std::vector<Number>   elem_soln;
+       std::vector<Number>   nodal_soln;
 
        for (unsigned int s=0; s<elem->n_sides(); s++)
        if (elem->neighbor(s) == NULL)
        {
               UniquePtr<Elem> side = elem->side(s);
 
-
-              if( mesh.boundary_info->boundary_id(elem,s) == BOUNDARY_DEPOSITION)
+              if( mesh.boundary_info->boundary_id(elem,s) == deposition_id)
               {
-
-                const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-                const std::vector<Real>& JxW_face                = fe_face->get_JxW();
-                fe_face->reinit(elem, s);
-
-                for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                {
-
-                    const Real penalty = 1.e10;
-
-                    const Real value = 0.001;
+                 elem_soln.resize(side->n_nodes());
+                 
+                 dof_map_dep.dof_indices(side.get(),dof_indices_dep_face);
+                 
+                 for(int i =0; i < dof_indices_dep_face.size(); i++)
+                     elem_soln[i] = deposition_rate(dof_indices_dep_face[i]);
+                 
+                 FEInterface::nodal_soln(dim,fe_type,side.get(),elem_soln, nodal_soln);
                   
-                    for (unsigned int i=0; i<phi_face.size(); i++)
-                      for (unsigned int j=0; j<phi_face.size(); j++)
-                        Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
+                 for(int n = 0; n < elem->n_nodes(); n++)
+                     for(int i =0; i < side->n_nodes(); i++)
+                     {
+                         if(side->node(i) == elem->node(n))
+                         {
+                             Ke(n,n) += penalty;
+                             Fe(n)   += nodal_soln[i]*penalty*c_factor;
+                         }
+                    
+                     }
 
-                    for (unsigned int i=0; i<phi_face.size(); i++)
-                      Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                 }
-
-                /*
-                    // Loop over the nodes on the side.
-                    for (unsigned int ns=0; ns<side->n_nodes(); ns++)
-                    {
-                        for (unsigned int n=0; n<elem->n_nodes(); n++)
-                            if (elem->node(n) == side->node(ns))
-                            {
-
-                                int dof = elem->get_node(n)->dof_number(deposition_system.number(),0,0);
-                                //Real value = deposition_rate(dof_indices_deposition[n]);
-                                Real value = deposition_rate.el(dof);                                // Matrix contribution.
-                                Ke(n,n) += penalty;
-                                // Right-hand-side contribution.
-                                Fe(n)   += penalty*value;
-                            }
-
-                    }
-                 * */
 
                }
 
@@ -286,7 +306,7 @@ void MeshMoviment::assemble()
 
         // If this assembly program were to be used on an adaptive mesh,
         // we would have to apply any hanging node constraint equations
-        dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+         dof_map.heterogenously_constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
         // The element matrix and right-hand-side are now built
         // for this element.  Add them to the global matrix and
@@ -309,10 +329,10 @@ void MeshMoviment::updateMesh()
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
-
+  int d = dim -1;
   // Get a reference to the Convection-Diffusion system object.
   LinearImplicitSystem & system =
-    es.get_system<LinearImplicitSystem> ("mesh_moviment");
+    es.get_system<LinearImplicitSystem> ("MeshMoving");
 
   NumericVector<Number> & mesh_velocity = system.get_vector("mesh-velocity");
 
@@ -325,10 +345,13 @@ void MeshMoviment::updateMesh()
       unsigned int dof      = node->dof_number(system.number(),0, 0);
 
       Number value = system.current_local_solution->el(dof);
-      (*node)(2) += value;
+      (*node)(d) += value;
       mesh_velocity.set(dof, value/dt);
 
   }
+
+  SyncNodalPositions sync_object(mesh);
+  Parallel::sync_dofobject_data_by_id(mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
 
 
 }

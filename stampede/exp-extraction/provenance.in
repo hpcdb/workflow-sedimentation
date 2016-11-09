@@ -1,5 +1,0 @@
-directory = /work/03664/silva/simulation/sedimentation/exp-extraction
-pgFilePath = /work/03664/silva/simulation/sedimentation/dfa/PG-1.0.jar
-rdeFilePath = /work/03664/silva/simulation/sedimentation/dfa/RDE-1.0.jar
-access=EXTRACTION
-cartridge=CSV
