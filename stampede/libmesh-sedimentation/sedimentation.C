@@ -253,8 +253,8 @@ int main(int argc, char** argv) {
 
     if (!is_file_exist("restart.run")) {
 
-        const string mesh_file = infile("mesh_file", "0");
-
+        // const string mesh_file = infile("mesh_file", "0");
+        const string mesh_file = "necker3d.msh";
         if(mesh_file == "0") {        
 
             if (dim == 2) {

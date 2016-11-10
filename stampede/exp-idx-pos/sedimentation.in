@@ -4,7 +4,7 @@
 #------------------------------------------------------
 
 # The coarse grid size from which to start adaptivity
-mesh_file = necker3d-lc-0.25.msh
+mesh_file = necker3d.msh
 
 dim    =  3
 ncellx = 90
