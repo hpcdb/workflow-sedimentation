@@ -14,7 +14,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <chrono>
+#include <ctime>
 
 #include "libmesh/libmesh.h"
 
@@ -25,24 +25,24 @@ using namespace libMesh;
 
 class Performance
 {
-  	public:
+    public:
       Performance(){};
 
       void start(){
-        startTime = std::chrono::system_clock::now();
+        clock_gettime(CLOCK_REALTIME, &startTime);
       }
 
       void end(){
-        endTime = std::chrono::system_clock::now();
+        clock_gettime(CLOCK_REALTIME, &endTime);
       }
 
       double elapsedTime(){
-          return double(double(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count())/1000000.00);
+          return (endTime.tv_sec - startTime.tv_sec + (endTime.tv_nsec - startTime.tv_nsec) / 1000000000.);
       }
 
     private:
-      std::chrono::time_point<std::chrono::system_clock> startTime;
-      std::chrono::time_point<std::chrono::system_clock> endTime;
+      timespec startTime;
+      timespec endTime;
 };
 
 

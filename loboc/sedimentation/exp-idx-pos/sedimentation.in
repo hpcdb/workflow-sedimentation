@@ -1,0 +1,77 @@
+# Input file for transport simulation
+#######################################################
+# Mesh Parameters
+#------------------------------------------------------
+
+# The coarse grid size from which to start adaptivity
+mesh_file = necker3d.msh
+
+dim    =  3
+ncellx = 90
+ncelly = 10
+ncellz = 10
+
+xmin =  0.0
+xmax = 18.0
+ymin =  0.0
+ymax =  2.0
+zmin =  0.0
+zmax =  2.0
+
+dirichlet/deposition = 1
+dirichlet/slipx      = 2
+dirichlet/slipy      = 3
+dirichlet/noslip     = 4
+dirichlet/pnull      = 5
+dirichlet/czero      = 5
+dirichlet/fixedwall  = 5
+
+
+xlock = 1.0
+hlock = 1.85 
+
+# refinement parameters
+# uniform refinement - rate: 2*hlevels - test case (1)
+# stampede - supercomputing - hlevels(2)
+# test - hlevels(0)
+hlevels     = 0
+# AMR - test case (0)
+# stampede - supercomputing - max_r_steps(1)
+max_r_steps = 1
+r_fraction  = 0.85
+c_fraction  = 0.05
+max_h_level = 3
+r_interval  = 3
+
+
+#----------------------------------------------------
+# TIME INTEGRATION PARAMETERS
+# The interval between our timesteps - test case (0.005)
+deltat = 0.010
+
+# And the number of timesteps to take
+n_time_steps = 500000
+max_linear_iterations = 200
+
+# maximum time - test case (25.000)
+#stampede - supercomputing - tmax(10.000)
+#test - tmax(0.020)
+tmax    = 0.050
+
+#------------------------------------------------------
+# EQUATION PARAMETERS
+Reynolds    =  0.0
+Grashof     =  5E06
+Sc          =  1.0
+Us          =  0.02
+ex          =  0.0
+ey          =  0.0
+ez          = -1.0
+is_gravitational_current = 0
+
+
+# Write out every nth timestep to file.
+write_interval = 1
+dir_path = /home/user4/simulation/sedimentation/exp-idx-pos/output/output_
+output = output_
+

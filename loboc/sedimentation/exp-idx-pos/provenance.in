@@ -1,0 +1,7 @@
+directory = /home/user4/simulation/sedimentation/exp-idx-pos
+pgFilePath = /home/user4/simulation/sedimentation/dfa/PG-1.0.jar
+rdeFilePath = /home/user4/simulation/sedimentation/dfa/RDE-1.0.jar
+access=INDEXING
+cartridge=CSV
+bin=/work/03664/silva/programs/fastbit/bin
+extraArguments=[b:precision=2]

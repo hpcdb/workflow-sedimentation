@@ -14,14 +14,14 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <chrono>
+#include <ctime>
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
 #include "dfanalyzer/task.h"
-#include "dfanalyzer/extractor.h"
+#include "dfanalyzer/indexer.h"
 
 #include "libmesh/libmesh.h"
 #include "libmesh/getpot.h"
@@ -40,10 +40,14 @@ Provenance::Provenance() {
 
     string pgFilePath = infile("pgFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/PG-1.0.jar");
     string rdeFilePath = infile("rdeFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDE-1.0.jar");
+    string rdiFilePath = infile("rdiFilePath", "/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/dfa/RDI-1.0.jar");
+    bin = infile("bin", "");
+    extraArguments = infile("extraArguments", "");
     rawDataAccess = infile("access", "EXTRACTION");
     cartridge = infile("cartridge", "CSV");
     pgCommandLine = "java -jar " + pgFilePath + " ";
     rdeCommandLine = "java -jar " + rdeFilePath + " ";
+    rdiCommandLine = "java -jar " + rdiFilePath + " ";
 
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     pgDirectory = directory + "/prov/pg/" + dataflow + "/";
@@ -52,21 +56,38 @@ Provenance::Provenance() {
     jsonDirectory = "prov/di/" + dataflow + "/";
     pgDirectory = "prov/pg/" + dataflow + "/";
 #endif
+
+    cout << "###########################" << endl;
+    cout << "Provenance Properties" << endl;
+    cout << "pgFilePath=";
+    cout << pgFilePath.c_str() << endl;
+    cout << "rdeFilePath=";
+    cout << rdeFilePath.c_str() << endl;
+    cout << "rdiFilePath=";
+    cout << rdiFilePath.c_str() << endl;
+    cout << "rawDataAccess=";
+    cout << rawDataAccess.c_str() << endl;
+    cout << "cartridge=";
+    cout << cartridge.c_str() << endl;
+    cout << "bin=";
+    cout << bin.c_str() << endl;
+    cout << "extraArguments=";
+    cout << extraArguments.c_str() << endl;
+    cout << "###########################" << endl;
     
     processor_id = libMesh::global_processor_id();
 }
 
-void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int ncelly, int ncellz,
-        double xmin, double ymin, double zmin, double xmax, double ymax, double zmax, int ref_interval) {
+void Provenance::inputInputMesh(int simulationID, int dim) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Input Mesh Generation" << endl;
+    cout << "Input Input Mesh" << endl;
 #endif    
 
     Performance perf;
     perf.start();
 
-    string transformation = "meshgeneration";
+    string transformation = "inputmesh";
     PerformanceMetric p;
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -80,7 +101,7 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     t.setStatus("RUNNING");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d;%d;%d;%d;%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d", simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
+    sprintf(memalloc, "%d;%d", simulationID, dim);
     vector<string> e = {memalloc};
     t.addSet("i" + transformation, e);
 
@@ -101,17 +122,17 @@ void Provenance::inputMeshGeneration(int simulationID, int dim, int ncellx, int 
     file.close();
 }
 
-void Provenance::outputMeshGeneration(int simulationID, double r_fraction, double c_fraction,
+void Provenance::outputInputMesh(int simulationID, double r_fraction, double c_fraction,
         double max_h_level, unsigned int hlevels) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Output Mesh Generation" << endl;
+    cout << "Output Input Mesh" << endl;
 #endif
 
     Performance perf;
     perf.start();
 
-    string transformation = "meshgeneration";
+    string transformation = "inputmesh";
     Task t(simulationID);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
@@ -159,7 +180,7 @@ void Provenance::outputMeshGeneration(int simulationID, double r_fraction, doubl
     t2.setTransformation(transformation);
     t2.setWorkspace(directory);
     t2.setStatus("RUNNING");
-    t2.addDtDependency("meshgeneration");
+    t2.addDtDependency("inputmesh");
 
     sprintf(memalloc, "%d", simulationID);
     t2.addIdDependency(memalloc);
@@ -358,7 +379,7 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
 }
 
 void Provenance::outputInitDataExtraction(int simulationID, string transformation, string dataSet,
-        int time_step, string xdmf, string rawDataFile, int dimension, string extractorName) {
+        int time_step, string xdmf, string rawDataFile, int dimension, string indexerName, int indexerID) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Init Data Extraction" << endl;
@@ -392,25 +413,30 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     rdePerf.start();
 
     string extension = "data";
-    if (rawDataAccess == "INDEXING") {
+    if (rawDataAccess.compare("INDEXING") == 0) {
         extension = "index";
-        Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
-        ext.addAttribute("u", "numeric", false);
-        ext.addAttribute("v", "numeric", false);
+        Indexer idx(rdiCommandLine, rawDataAccess, cartridge, indexerName);
+        idx.addAttribute("u", "numeric", false);
+        idx.addAttribute("v", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("w", "numeric", false);
+            idx.addAttribute("w", "numeric", false);
         }
-        ext.addAttribute("p", "numeric", false);
-        ext.addAttribute("s", "numeric", false);
-        ext.addAttribute("d", "numeric", false);
+        idx.addAttribute("p", "numeric", false);
+        idx.addAttribute("s", "numeric", false);
+        idx.addAttribute("d", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("vtkvalidpointmask", "numeric", false);
-            ext.addAttribute("arc_length", "numeric", false);
+            idx.addAttribute("vtkvalidpointmask", "numeric", false);
+            idx.addAttribute("arc_length", "numeric", false);
         }
-        ext.addAttribute("points0", "numeric", false);
-        ext.addAttribute("points1", "numeric", false);
-        ext.addAttribute("points2", "numeric", false);
-        ext.extract(directory, rawDataFile);
+        idx.addAttribute("points0", "numeric", false);
+        idx.addAttribute("points1", "numeric", false);
+        idx.addAttribute("points2", "numeric", false);
+
+        if(cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0){
+            idx.setBin(bin);
+            idx.setExtraArguments(extraArguments);
+        }
+        idx.index(directory, rawDataFile, indexerID);
     }
 
     rdePerf.end();
@@ -419,15 +445,21 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     perf.start();
 
     char extractedFileName[jsonArraySize];
-    if (rawDataAccess == "INDEXING") {
-        sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
+    if (rawDataAccess.compare("INDEXING") == 0){
+        sprintf(extractedFileName, "%s.%s", indexerName.c_str(), extension.c_str());
     } else {
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }
 
-    sprintf(memalloc, "%d;%d;%s;%s/%s",
-            simulationID, time_step, xdmf.c_str(),
-            directory.c_str(), extractedFileName);
+    if(rawDataAccess.compare("INDEXING") == 0 && (cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0)){
+        sprintf(memalloc, "%d;%d;%s;%s/index/%d/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), indexerID, extractedFileName);
+    }else{
+        sprintf(memalloc, "%d;%d;%s;%s/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), extractedFileName);
+    }
     cout << memalloc << endl;
 
     vector<string> e = {memalloc};
@@ -871,7 +903,7 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
 
 void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskID,
         string transformation, string dataSet, int time_step,
-        string xdmf, string rawDataFile, int dimension, string extractorName) {
+        string xdmf, string rawDataFile, int dimension, string indexerName, int indexerID) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Data Extraction" << endl;
@@ -907,25 +939,29 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     rdePerf.start();
 
     string extension = "data";
-    if (rawDataAccess == "INDEXING") {
+    if (rawDataAccess.compare("INDEXING") == 0) {
         extension = "index";
-        Extractor ext(rdeCommandLine, rawDataAccess, cartridge, extractorName);
-        ext.addAttribute("u", "numeric", false);
-        ext.addAttribute("v", "numeric", false);
+        Indexer idx(rdiCommandLine, rawDataAccess, cartridge, indexerName);
+        idx.addAttribute("u", "numeric", false);
+        idx.addAttribute("v", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("w", "numeric", false);
+            idx.addAttribute("w", "numeric", false);
         }
-        ext.addAttribute("p", "numeric", false);
-        ext.addAttribute("s", "numeric", false);
-        ext.addAttribute("d", "numeric", false);
+        idx.addAttribute("p", "numeric", false);
+        idx.addAttribute("s", "numeric", false);
+        idx.addAttribute("d", "numeric", false);
         if (dimension == 3) {
-            ext.addAttribute("vtkvalidpointmask", "numeric", false);
-            ext.addAttribute("arc_length", "numeric", false);
+            idx.addAttribute("vtkvalidpointmask", "numeric", false);
+            idx.addAttribute("arc_length", "numeric", false);
         }
-        ext.addAttribute("points0", "numeric", false);
-        ext.addAttribute("points1", "numeric", false);
-        ext.addAttribute("points2", "numeric", false);
-        ext.extract(directory, rawDataFile);
+        idx.addAttribute("points0", "numeric", false);
+        idx.addAttribute("points1", "numeric", false);
+        idx.addAttribute("points2", "numeric", false);
+        if(cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0){
+            idx.setBin(bin);
+            idx.setExtraArguments(extraArguments);
+        }
+        idx.index(directory, rawDataFile, indexerID);
     }
 
     rdePerf.end();
@@ -934,15 +970,21 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     perf.start();
 
     char extractedFileName[jsonArraySize];
-    if (rawDataAccess == "INDEXING") {
-        sprintf(extractedFileName, "%s.%s", extractorName.c_str(), extension.c_str());
+    if (rawDataAccess.compare("INDEXING") == 0) {
+        sprintf(extractedFileName, "%s.%s", indexerName.c_str(), extension.c_str());
     } else {
         sprintf(extractedFileName, "%s", rawDataFile.c_str());
     }
 
-    sprintf(memalloc, "%d;%d;%s;%s/%s",
-            simulationID, time_step, xdmf.c_str(),
-            directory.c_str(), extractedFileName);
+    if(rawDataAccess.compare("INDEXING") == 0 && (cartridge.compare("FASTBIT") == 0 || cartridge.compare("OPTIMIZED_FASTBIT") == 0)){
+        sprintf(memalloc, "%d;%d;%s;%s/index/%d/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), indexerID, extractedFileName);
+    }else{
+        sprintf(memalloc, "%d;%d;%s;%s/%s",
+                simulationID, time_step, xdmf.c_str(),
+                directory.c_str(), extractedFileName);
+    }
     cout << memalloc << endl;
 
     vector<string> e = {memalloc};

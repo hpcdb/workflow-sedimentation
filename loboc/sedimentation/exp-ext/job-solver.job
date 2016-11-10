@@ -1,0 +1,55 @@
+#PBS -l select=50:ncpus=48:mpiprocs=24
+#PBS -l walltime=999:00:00
+#PBS -j oe  
+#PBS -N sed-ext
+#PBS -V 
+echo "Starting job..."
+module list 
+
+echo "Configuring workspace..."
+export CPATH=/home/user4/simulation/sedimentation/exp-ext
+export DIR_MONETDB=/home/user4/programs/monetdb
+export DATAPATH=$MONETDB/data
+export DATAFLOW_TAG=sedimentation
+cd $CPATH
+
+echo "Specifying dataflow generation..."
+./pg-dataflow.sh
+
+echo "Configuring the lists of machines for the solver and database system..."
+cp $PBS_NODEFILE nodes.txt
+java -jar /home/user4/simulation/sedimentation/bin/EnvironmentFileGenerator-LoboC-1.0.jar nodes.txt
+
+echo "Starting database system..."
+#rm -rf data
+#unzip /home/user4/programs/monetdb/monetdb-database.zip
+/home/user4/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
+sleep 15
+
+echo "Setting up environment variables..."
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user2/local/gnu/paraview/5.1/lib/paraview-5.1
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user4/local/all/paraview/lib/paraview-5.1
+
+echo "Executing sedimentation solver..."
+echo -n " -np 24 /home/user4/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt analysis3D.py" >> mpirun.sh 
+chmod 774 mpirun.sh
+./mpirun.sh >> out.txt 2>> err.txt
+#/home/user4/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt analysis3D.py >> out.txt 2>> err.txt
+
+echo "Calculating total elapsed times based on log files..."
+java -jar /home/user4/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt
+
+echo "Executing termination algorithm..."
+/home/user4/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
+/home/user4/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
+
+#echo "Backing up provenance database..."
+#mclient -p 54321 -d dataflow_analyzer --dump > prov-db.dump
+
+echo "Finishing job..."
+
+
+
+
+
+

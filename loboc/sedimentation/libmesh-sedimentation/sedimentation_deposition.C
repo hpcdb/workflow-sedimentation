@@ -3,9 +3,8 @@
 #include "define.h"
 #include "libmesh/fe_interface.h"
 
-void SedimentationDeposition::setup()
+void SedimentationDeposition::init()
 {
-
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & sediment_system =
      es.get_system<TransientLinearImplicitSystem> ("sediment");
@@ -13,7 +12,17 @@ void SedimentationDeposition::setup()
     ExplicitSystem & deposition_system = es.add_system<ExplicitSystem>("deposition"); 
     deposition_system.add_variable("d");
     deposition_system.add_vector("deposition_rate");
-      
+    
+    //ExplicitSystem & deposition_rate  = es.add_system<ExplicitSystem>("deposition_rate"); 
+    //deposition_rate.add_variable("dVdt");
+    
+}
+
+void SedimentationDeposition::setup(GetPot &infile)
+{
+    ExplicitSystem & deposition_system = es.get_system<ExplicitSystem>("deposition"); 
+    deposition_system.add_vector("deposition_rate");
+    this->deposition_id = infile("dirichlet/deposition", -1);
 }
 
 
@@ -90,7 +99,7 @@ void SedimentationDeposition::ComputeDeposition()
       for (unsigned int s=0; s<elem->n_sides(); s++)
           if (elem->neighbor(s) == libmesh_nullptr)
             {
-              if(mesh.get_boundary_info().has_boundary_id(elem, s, 0))
+              if(mesh.get_boundary_info().has_boundary_id(elem, s, deposition_id))
               {
 
                  UniquePtr<const Elem> side (elem->build_side(s));

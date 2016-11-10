@@ -69,12 +69,14 @@ public:
     
   SedimentationDeposition (EquationSystems &es_in) : es (es_in)
   {}
+  void init();
   void ComputeDeposition();
   void print();
-  void setup();
+  void setup(GetPot &infile);
   //void update2();
 private:
   EquationSystems &es;
+  int deposition_id;
   
 };
 

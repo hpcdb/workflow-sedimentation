@@ -3,7 +3,6 @@
 #include "../rapidjson/stringbuffer.h"
 #include "../rapidjson/writer.h"
 #include "../rapidjson/prettywriter.h"
-#include "date.h"
 
 #include <string>
 #include <cstdio>
@@ -11,7 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <chrono>
+#include <ctime>
 #include <string>
 #include <sstream>
 
