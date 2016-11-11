@@ -17,9 +17,6 @@ export DATAPATH=$CPATH/data
 export DATAFLOW_TAG=sedimentation
 cd $CPATH
 
-echo "Cleaning results from a previous execution..."
-./delete.sh >>solver.output 2>>solver.error
-
 echo "Specifying dataflow generation..."
 ./pg-dataflow.sh >>solver.output 2>>solver.error
 
