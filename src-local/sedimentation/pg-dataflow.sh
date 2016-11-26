@@ -9,6 +9,8 @@ rm -rf prov/pg/*
 PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
+# LoboC
+PGDIR=/home/users/vitorss/simulation/sedimentation/libmesh-sedimentation
 
 # Sedimentation Solver
 dimension="3"

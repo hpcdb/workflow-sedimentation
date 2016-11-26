@@ -1,7 +1,8 @@
-directory = /home/user4/simulation/sedimentation/exp-idx-ofb
-pgFilePath = /home/user4/simulation/sedimentation/dfa/PG-1.0.jar
-rdeFilePath = /home/user4/simulation/sedimentation/dfa/RDE-1.0.jar
+directory = /home/users/vitorss/simulation/sedimentation/exp-idx-ofb/
+pgFilePath = /home/users/vitorss/simulation/sedimentation/dfa/PG-1.0.jar
+rdeFilePath = /home/users/vitorss/simulation/sedimentation/dfa/RDE-1.0.jar
+rdiFilePath = /home/users/vitorss/simulation/sedimentation/dfa/RDI-1.0.jar
 access=INDEXING
 cartridge=OPTIMIZED_FASTBIT
-bin=/work/03664/silva/programs/fastbit/bin
+bin=/home/users/vitorss/local/all/fastbit/bin
 extraArguments=[b:precision=2]

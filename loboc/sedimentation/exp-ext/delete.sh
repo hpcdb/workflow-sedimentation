@@ -21,7 +21,10 @@ rm -rf *.index
 rm -rf index
 rm -rf solver.output
 rm -rf solver.error
-rm *solver.o*
+rm -rf db-err.txt
+rm -rf db-out.txt
+rm -rf err.txt
+rm -rf out.txt
 
 mkdir prov
 mkdir prov/di

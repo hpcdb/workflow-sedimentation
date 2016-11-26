@@ -9,6 +9,6 @@ dir=`pwd`
 
 for i in `echo $lines`; do 
   host=`echo $i`
-  echo "cd $cpath;monetdb-stop-all"
-  ssh $host "cd $cpath;monetdb-stop-all"
+  echo "cd $cpath;monetdbd stop $datapath"
+  ssh $host "cd $cpath;monetdbd stop $datapath"
 done
