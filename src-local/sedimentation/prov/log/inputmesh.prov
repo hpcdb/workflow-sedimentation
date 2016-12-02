@@ -1,0 +1,18 @@
+PROV:inputmesh:Input
+      0.00132
+      elapsed-time: 0.00132 seconds.
+PROV:inputmesh:Output
+      0.00038
+      elapsed-time: 0.00038 seconds.
+PROV:inputmesh:Input
+      0.00094
+      elapsed-time: 0.00094 seconds.
+PROV:inputmesh:Output
+      0.00036
+      elapsed-time: 0.00036 seconds.
+PROV:inputmesh:Input
+      0.00091
+      elapsed-time: 0.00091 seconds.
+PROV:inputmesh:Output
+      0.00034
+      elapsed-time: 0.00034 seconds.

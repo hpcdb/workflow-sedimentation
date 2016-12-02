@@ -2,20 +2,20 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 
 # MacOS
-# PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation
+PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation
 # docker
 # PGDIR=/shared/experiment/libmesh-sedimentation
 # Virtual Box - mint
-PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
+# PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
 # LoboC
-PGDIR=/home/users/vitorss/simulation/sedimentation/libmesh-sedimentation
+# PGDIR=/home/users/vitorss/simulation/sedimentation/libmesh-sedimentation
 
 # Sedimentation Solver
 dimension="3"
 access="indexing"
-cartridge="fastbit"
+cartridge="csv"
 
 echo "Dataflow - libMesh Sedimentation"
 # Default mode
