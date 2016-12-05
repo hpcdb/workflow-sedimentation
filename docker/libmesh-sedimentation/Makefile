@@ -3,7 +3,7 @@
 # Template libMesh application Makefile
 
 # MacOS
-# LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh/build
+# LIBMESH_DIR ?=/Users/vitor/Documents/Program_Installations/libmesh
 # docker
 LIBMESH_DIR ?=/programs/libmesh/build
 # Virtual Box
@@ -13,7 +13,7 @@ LIBMESH_DIR ?=/programs/libmesh/build
 # LoboC
 #LIBMESH_DIR ?=/home/user4/local/intel/libmesh
 #LIBMESH_DIR ?=/home/user2/local/gnu/libmesh-git
-# LIBMESH_DIR ?=/home/user4/local/gnu/libmesh
+# LIBMESH_DIR ?=/home/users/vitorss/local/gnu/libmesh
 
 # METHOD = dbg
 # include the library options determined by configure
@@ -36,27 +36,28 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 
 # MacOS
-# PARAVIEW_DIR=/Users/vitor/Documents/Program_Installations/ParaView-v5.1.2/build/CMakeFiles/__macos_install
+# PARAVIEW_DIR=/Users/vitor/Documents/Program_Installations/src/ParaView-v5.1.2/build/CMakeFiles/__macos_install
 # docker
 PARAVIEW_DIR=/programs/paraview-install
 # Stampede
-#PARAVIEW_DIR=/work/03664/silva/programs/paraview
+# PARAVIEW_DIR=/work/03664/silva/programs/paraview
+
 # LoboC
 #PARAVIEW_DIR=/home/user4/local/all/paraview
 #PARAVIEW_DIR=/home/user2/local/gnu/paraview/5.1
-# PARAVIEW_DIR=/home/user4/local/all/paraview
-
-# PARAVIEW_LIB_DIR=$(PARAVIEW_DIR)/lib/paraview-5.0
-# PARAVIEW_LIBS =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv5.0 -lvtkPVCatalyst-pv5.0 -lvtkPVServerManagerApplication-pv5.0 -lvtkPVServerManagerCore-pv5.0 -lvtkPVServerImplementationCore-pv5.0 -lvtkPVClientServerCoreCore-pv5.0 -lvtkFiltersParallel-pv5.0 -lvtkFiltersModeling-pv5.0 -lvtkRenderingCore-pv5.0 -lvtkFiltersExtraction-pv5.0 -lvtkFiltersStatistics-pv5.0 -lvtkImagingFourier-pv5.0 -lvtkImagingCore-pv5.0 -lvtkalglib-pv5.0 -lvtkFiltersGeometry-pv5.0 -lvtkFiltersSources-pv5.0 -lvtkFiltersGeneral-pv5.0 -lvtkCommonComputationalGeometry-pv5.0 -lvtkCommonColor-pv5.0 -lvtkFiltersProgrammable-pv5.0 -lvtkPVVTKExtensionsCore-pv5.0 -lvtkPVCommon-pv5.0 -lvtkClientServer-pv5.0 -lvtkIOXMLParser-pv5.0 -lvtkFiltersCore-pv5.0 -lvtkParallelMPI-pv5.0 -lvtkParallelCore-pv5.0 -lvtkIOLegacy-pv5.0 -lvtkCommonExecutionModel-pv5.0 -lvtkCommonDataModel-pv5.0 -lvtkCommonSystem-pv5.0 -lvtkCommonTransforms-pv5.0 -lvtkCommonMisc-pv5.0 -lvtkCommonMath-pv5.0 -lprotobuf -lpthread  -lvtkPythonInterpreter-pv5.0 -lvtkWrappingPython27Core-pv5.0 -lvtkCommonCore-pv5.0 -lpython2.6 -lvtksys-pv5.0 -Wl,-rpath,$(PARAVIEW_LIB_DIR) 
-# PARAVIEW_INCLUDE=-I$(PARAVIEW_DIR)/include/paraview-5.0
-# libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) -I../../xdmf
-# libmesh_LDFLAGS+=$(PARAVIEW_LIBS)
+# PARAVIEW_DIR=/home/users/vitorss/local/all/paraview
 
 PARAVIEW_LIB_DIR=$(PARAVIEW_DIR)/lib/paraview-5.0
-PARAVIEW_LIBS =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv5.0 -lvtkPVCatalyst-pv5.0 -lvtkPVServerManagerApplication-pv5.0 -lvtkPVServerManagerCore-pv5.0 -lvtkPVServerImplementationCore-pv5.0 -lvtkPVClientServerCoreCore-pv5.0 -lvtkFiltersParallel-pv5.0 -lvtkFiltersModeling-pv5.0 -lvtkRenderingCore-pv5.0 -lvtkFiltersExtraction-pv5.0 -lvtkFiltersStatistics-pv5.0 -lvtkImagingFourier-pv5.0 -lvtkImagingCore-pv5.0 -lvtkalglib-pv5.0 -lvtkFiltersGeometry-pv5.0 -lvtkFiltersSources-pv5.0 -lvtkFiltersGeneral-pv5.0 -lvtkCommonComputationalGeometry-pv5.0 -lvtkCommonColor-pv5.0 -lvtkFiltersProgrammable-pv5.0 -lvtkPVVTKExtensionsCore-pv5.0 -lvtkPVCommon-pv5.0 -lvtkClientServer-pv5.0 -lvtkIOXMLParser-pv5.0 -lvtkFiltersCore-pv5.0 -lvtkParallelMPI-pv5.0 -lvtkParallelCore-pv5.0 -lvtkIOLegacy-pv5.0 -lvtkCommonExecutionModel-pv5.0 -lvtkCommonDataModel-pv5.0 -lvtkCommonSystem-pv5.0 -lvtkCommonTransforms-pv5.0 -lvtkCommonMisc-pv5.0 -lvtkCommonMath-pv5.0 -lprotobuf -lpthread  -lvtkPythonInterpreter-pv5.0 -lvtkWrappingPython27Core-pv5.0 -lvtkCommonCore-pv5.0 -lpython2.7 -lvtksys-pv5.0 -Wl,-rpath,$(PARAVIEW_LIB_DIR) 
+PARAVIEW_LIBS =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv5.0 -lvtkPVCatalyst-pv5.0 -lvtkPVServerManagerApplication-pv5.0 -lvtkPVServerManagerCore-pv5.0 -lvtkPVServerImplementationCore-pv5.0 -lvtkPVClientServerCoreCore-pv5.0 -lvtkFiltersParallel-pv5.0 -lvtkFiltersModeling-pv5.0 -lvtkRenderingCore-pv5.0 -lvtkFiltersExtraction-pv5.0 -lvtkFiltersStatistics-pv5.0 -lvtkImagingFourier-pv5.0 -lvtkImagingCore-pv5.0 -lvtkalglib-pv5.0 -lvtkFiltersGeometry-pv5.0 -lvtkFiltersSources-pv5.0 -lvtkFiltersGeneral-pv5.0 -lvtkCommonComputationalGeometry-pv5.0 -lvtkCommonColor-pv5.0 -lvtkFiltersProgrammable-pv5.0 -lvtkPVVTKExtensionsCore-pv5.0 -lvtkPVCommon-pv5.0 -lvtkClientServer-pv5.0 -lvtkIOXMLParser-pv5.0 -lvtkFiltersCore-pv5.0 -lvtkParallelMPI-pv5.0 -lvtkParallelCore-pv5.0 -lvtkIOLegacy-pv5.0 -lvtkCommonExecutionModel-pv5.0 -lvtkCommonDataModel-pv5.0 -lvtkCommonSystem-pv5.0 -lvtkCommonTransforms-pv5.0 -lvtkCommonMisc-pv5.0 -lvtkCommonMath-pv5.0 -lprotobuf -lpthread  -lvtkPythonInterpreter-pv5.0 -lvtkWrappingPython27Core-pv5.0 -lvtkCommonCore-pv5.0 -lpython2.6 -lvtksys-pv5.0 -Wl,-rpath,$(PARAVIEW_LIB_DIR) 
 PARAVIEW_INCLUDE=-I$(PARAVIEW_DIR)/include/paraview-5.0
 libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) -I../../xdmf
 libmesh_LDFLAGS+=$(PARAVIEW_LIBS)
+
+# PARAVIEW_LIB_DIR=$(PARAVIEW_DIR)/lib/paraview-5.0
+# PARAVIEW_LIBS =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv5.0 -lvtkPVCatalyst-pv5.0 -lvtkPVServerManagerApplication-pv5.0 -lvtkPVServerManagerCore-pv5.0 -lvtkPVServerImplementationCore-pv5.0 -lvtkPVClientServerCoreCore-pv5.0 -lvtkFiltersParallel-pv5.0 -lvtkFiltersModeling-pv5.0 -lvtkRenderingCore-pv5.0 -lvtkFiltersExtraction-pv5.0 -lvtkFiltersStatistics-pv5.0 -lvtkImagingFourier-pv5.0 -lvtkImagingCore-pv5.0 -lvtkalglib-pv5.0 -lvtkFiltersGeometry-pv5.0 -lvtkFiltersSources-pv5.0 -lvtkFiltersGeneral-pv5.0 -lvtkCommonComputationalGeometry-pv5.0 -lvtkCommonColor-pv5.0 -lvtkFiltersProgrammable-pv5.0 -lvtkPVVTKExtensionsCore-pv5.0 -lvtkPVCommon-pv5.0 -lvtkClientServer-pv5.0 -lvtkIOXMLParser-pv5.0 -lvtkFiltersCore-pv5.0 -lvtkParallelMPI-pv5.0 -lvtkParallelCore-pv5.0 -lvtkIOLegacy-pv5.0 -lvtkCommonExecutionModel-pv5.0 -lvtkCommonDataModel-pv5.0 -lvtkCommonSystem-pv5.0 -lvtkCommonTransforms-pv5.0 -lvtkCommonMisc-pv5.0 -lvtkCommonMath-pv5.0 -lprotobuf -lpthread  -lvtkPythonInterpreter-pv5.0 -lvtkWrappingPython27Core-pv5.0 -lvtkCommonCore-pv5.0 -lpython2.7 -lvtksys-pv5.0 -Wl,-rpath,$(PARAVIEW_LIB_DIR) 
+# PARAVIEW_INCLUDE=-I$(PARAVIEW_DIR)/include/paraview-5.0
+# libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) -I../../xdmf
+# libmesh_LDFLAGS+=$(PARAVIEW_LIBS)
 
 # Virtual Box
 # PARAVIEW_DIR=/home/vitor/src/paraview

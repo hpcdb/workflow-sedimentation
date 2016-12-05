@@ -6,7 +6,9 @@
  * Created on February 26, 2015, 11:07 AM
  */
 
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <cstdlib>
 #include <cstring>
@@ -120,12 +122,16 @@ namespace libMesh
 //
 // XDMF Constructor. 
 XDMFWriter::XDMFWriter(const Mesh & mesh) : mesh(mesh), 
-                        n_timestep(0),
-                                                basename("output")
+   						n_timestep(0),
+                                                basename("output"),
+                                                dir("")
 {
     this->processor_id = libMesh::global_processor_id();
     this->n_processors = libMesh::global_n_processors();
+    
+   
 }
+
 
 XDMFWriter::~XDMFWriter()
 {
@@ -137,6 +143,14 @@ void XDMFWriter::set_file_name(std::string filename)
     this->basename = filename;
 }
 
+void XDMFWriter::set_dir_path(std::string path)
+{
+    this->dir = path;
+    struct stat st = {0};
+    if (stat(dir.c_str(), &st) == -1) {
+        mkdir(dir.c_str(), 0700);
+    }
+}
 
 string* XDMFWriter::write_time_step(EquationSystems& es, double time)
 {
@@ -180,13 +194,14 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     
 #endif
     
+    
     solution.resize(this->n_local_nodes);
     
 #ifdef LIBMESH_HAVE_HDF5
     hid_t   file_id;
     herr_t  status;
     
-    sprintf(filename,"%s_%d_%03d_%05d.h5",this->basename.c_str(),n_processors,processor_id, this->n_timestep);
+    sprintf(filename,"%s%s_%d_%03d_%05d.h5",this->dir.c_str(),this->basename.c_str(),n_processors,processor_id, this->n_timestep);
     file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     H5_WriteInteger(file_id,"/conn",&conn[0],conn.size(),false);
     H5_WriteDouble(file_id,"/coords",&coords[0],coords.size(),false);
@@ -206,9 +221,9 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     status = H5Fclose(file_id);
 #else
 
-    sprintf(filename,"%s.xyz.%d.%03d.%05d.bin",this->basename.c_str(),n_processors,processor_id, this->n_timestep);
+    sprintf(filename,"%s%s.xyz.%d.%03d.%05d.bin",this->dir.c_str(),this->basename.c_str(),n_processors,processor_id, this->n_timestep);
     BIN_WriteDouble(filename,&coords[0],coords.size());
-    sprintf(filename,"%s.con.%d.%03d.%05d.bin",this->basename.c_str(),n_processors,processor_id, this->n_timestep);
+    sprintf(filename,"%s%s.con.%d.%03d.%05d.bin",this->dir.c_str(),this->basename.c_str(),n_processors,processor_id, this->n_timestep);
     BIN_WriteInt(filename,&conn[0],conn.size());
     
     //LOOP over all system
@@ -220,7 +235,7 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
             this->get_variable_solution(es,ns,nv,solution);
             std::string v = es.get_system(ns).variable_name(nv);
 
-            sprintf(filename,"%s.%s.%d.%03d.%05d.bin",this->basename.c_str(),v.c_str(),
+            sprintf(filename,"%s%s.%s.%d.%03d.%05d.bin",this->dir.c_str(),this->basename.c_str(),v.c_str(),
                                                       n_processors,processor_id, this->n_timestep);
             BIN_WriteDouble(filename,&solution[0],solution.size());
         }
@@ -232,7 +247,7 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     write_spatial_collection(es, time);
     write_temporal_collection();
 
-    sprintf(xdmf_filename,"%s_%d_%05d.xmf", this->basename.c_str(), n_processors,this->n_timestep);
+    sprintf(xdmf_filename,"%s%s_%d_%05d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors,this->n_timestep);
     // char the_path[2048];
     // getcwd(the_path, 2048);
     files[0] = filename;
@@ -273,7 +288,7 @@ void XDMFWriter::write_spatial_collection(EquationSystems& es, double time)
             nnoel = 4;
         } 
        
-        sprintf(filename,"%s_%d_%05d.xmf", this->basename.c_str(), n_processors,this->n_timestep);
+        sprintf(filename,"%s%s_%d_%05d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors,this->n_timestep);
         FILE * fxml = fopen(filename, "w");
         fprintf(fxml,"<?xml version=\"1.0\" ?>\n");
         fprintf(fxml,"<!-- DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" [] --> \n");
@@ -336,7 +351,7 @@ void XDMFWriter::write_temporal_collection()
     if(processor_id == 0)
     {
         char filename[255];   
-        sprintf(filename,"%s_%d.xmf", this->basename.c_str(), n_processors);
+        sprintf(filename,"%s%s_%d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors);
         FILE * fxml = fopen(filename, "w");
         fprintf(fxml,"<?xml version=\"1.0\" ?>\n");
         fprintf(fxml,"<!-- DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" [] --> \n");

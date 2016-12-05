@@ -147,8 +147,8 @@ int main(int argc, char** argv) {
     Provenance prov;
 
 #ifdef PROV
-    // Mesh Generation
-    prov.inputMeshGeneration(simulationID, dim, ncellx, ncelly, ncellz, xmin, ymin, zmin, xmax, ymax, zmax, ref_interval);
+    // Input Mesh
+    prov.inputInputMesh(simulationID, dim);
 #endif
     // Create a mesh object, with dimension to be overridden later,
     // distributed across the default MPI communicator.
@@ -184,6 +184,7 @@ int main(int argc, char** argv) {
     Real Sc = infile("Sc", 0.71);
     Real Us = infile("Us", 0.0);
     Real xlock = infile("xlock", 1.0);
+    Real hlock = infile("hlock", 1.0);
     Real alfa = infile("alfa", 1.0);
     Real theta = infile("theta", 0.5);
     Real ex = infile("ex", 0.0);
@@ -208,6 +209,8 @@ int main(int argc, char** argv) {
 
     /////// 
     equation_systems.parameters.set<Real> ("xlock") = xlock;
+    equation_systems.parameters.set<Real> ("hlock") = hlock;
+
     equation_systems.parameters.set<Real> ("theta") = theta;
     equation_systems.parameters.set<Real> ("ex") = ex;
     equation_systems.parameters.set<Real> ("ey") = ey;
@@ -219,6 +222,12 @@ int main(int argc, char** argv) {
 
     // LOOP 
     Real init_time = 0.0;
+    int indexerID = 0;
+
+    // create index directory
+    char cmd[32];
+    sprintf(cmd, "mkdir index");
+    system(cmd);
 
     // INPUT: TIME INTEGRATION
     Real dt = infile("deltat", 0.005);
@@ -233,43 +242,54 @@ int main(int argc, char** argv) {
 
     const unsigned int write_interval = infile("write_interval", 10);
     std::string rname = infile("output", "out");
+    std::string dname = infile("dir_path", "");
+
 
 #ifdef XDMF_
     XDMFWriter xdmf_writer(mesh);
     xdmf_writer.set_file_name(rname);
+    xdmf_writer.set_dir_path(dname);
 #endif
 
-    if (!is_file_exist("restart.in") || true) {
+    if (!is_file_exist("restart.run")) {
 
-        const string mesh_file = infile("mesh_file", "0");
+        // const string mesh_file = infile("mesh_file", "0");
+        const string mesh_file = "necker3d.msh";
+        if(mesh_file == "0") {        
 
-        std::cout << "Opening file: " << mesh_file << endl;
-
-        if (dim == 2) {
-            MeshTools::Generation::build_square(mesh, ncellx, ncelly,
-                    xmin, xmax,
-                    ymin, ymax, QUAD4);
-        } else {
-            MeshTools::Generation::build_cube(mesh, ncellx, ncelly, ncellz,
-                    xmin, xmax,
-                    ymin, ymax,
-                    zmin, zmax, HEX8);
-        }
+            if (dim == 2) {
+                MeshTools::Generation::build_square(mesh, ncellx, ncelly,
+                        xmin, xmax,
+                        ymin, ymax, QUAD4);
+            } else {
+                MeshTools::Generation::build_cube(mesh, ncellx, ncelly, ncellz,
+                        xmin, xmax,
+                        ymin, ymax,
+                        zmin, zmax, HEX8);
+            } 
+        } else 
+            mesh.read(mesh_file);
 
         refinement.uniformly_refine(hlevels);
 
-        sediment_flow.setup();
-        sediment_transport.setup();
-        sediment_deposition.setup();
-
-#ifdef MESH_MOVIMENT
-        moving_mesh.setup();
-#endif
+        sediment_flow.init();
+        sediment_transport.init();
+        sediment_deposition.init();
+        #ifdef MESH_MOVIMENT
+        moving_mesh.init();
+        #endif
+         
+        sediment_flow.setup(infile);
+        sediment_transport.setup(infile);
+        sediment_deposition.setup(infile);
+        #ifdef MESH_MOVIMENT  
+        moving_mesh.setup(infile);
+        #endif
 
 
 #ifdef PROV
         // Mesh Refinement
-        prov.outputMeshGeneration(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+        prov.outputInputMesh(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
 #endif
 
         // Initialize the data structures for the equation system.
@@ -296,10 +316,18 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Refinement
-        prov.outputMeshGeneration(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+        prov.outputInputMesh(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
 #endif
 
         equation_systems.read(solution_restart, READ);
+
+        sediment_flow.setup(infile);
+        sediment_transport.setup(infile);
+        sediment_deposition.setup(infile);
+
+        #ifdef MESH_MOVIMENT
+        moving_mesh.setup(infile);
+        #endif
 
         // Get a reference to the Convection-Diffusion system object.
         TransientLinearImplicitSystem & transport_system =
@@ -326,6 +354,7 @@ int main(int argc, char** argv) {
 #endif
 
     }
+    
 
     // Print information about the mesh to the screen.
     mesh.print_info();
@@ -397,6 +426,11 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
         FEAdaptor::Initialize(argc, argv);
         FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+        if (libMesh::global_processor_id() == 0) {
+            char commandLine[jsonArraySize];
+            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+            system(commandLine);
+        }
 #endif  
 
 #ifdef PERFORMANCE
@@ -412,7 +446,9 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
         // Mesh Writer
-        prov.outputInitDataExtraction(simulationID, "initdataextraction", "oinitdataextraction", 0, current_files[1], finalFilename, dim, "irde");
+        indexerID++;
+        prov.outputInitDataExtraction(simulationID, "initdataextraction", "oinitdataextraction", 0, current_files[1], finalFilename, dim, "irde", indexerID);
+
 #endif
     } else if (dim == 3) {
         // 3D analysis
@@ -439,6 +475,11 @@ int main(int argc, char** argv) {
                 FEAdaptor::Initialize(argc, argv);
                 FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
             }
+            if (libMesh::global_processor_id() == 0) {
+                char commandLine[jsonArraySize];
+                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                system(commandLine);
+            }
 #endif  
 
 #ifdef PERFORMANCE
@@ -454,11 +495,12 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
             // Mesh Writer
+            indexerID++;
             sprintf(argument1, "iline%dextraction", ik);
             char argument2[jsonArraySize];
             sprintf(argument2, "oline%diextraction", ik);
             sprintf(memalloc, "iline%d", ik);
-            prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
+            prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
         }
     }
@@ -470,7 +512,7 @@ int main(int argc, char** argv) {
     int numberIterationsFluid = 0;
     int numberIterationsSediments = 0;
     int numberIterationsMeshRefinements = 0;
-    int numberOfWrites = 0;
+    int numberOfWrites = 1;
     vector<string> meshDependencies;
 
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
@@ -894,6 +936,11 @@ int main(int argc, char** argv) {
 
 #ifdef USE_CATALYST
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                    if (libMesh::global_processor_id() == 0) {
+                        char commandLine[jsonArraySize];
+                        sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                        system(commandLine);
+                    }
 #endif
 
 #ifdef PERFORMANCE
@@ -909,7 +956,8 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
                     sprintf(memalloc, "rde%d", numberOfWrites);
-                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc);
+                    indexerID++;
+                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
                 } else if (dim == 3) {
                     // 3D analysis
@@ -935,6 +983,11 @@ int main(int argc, char** argv) {
                         if (ik == 0) {
                             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
                         }
+                        if (libMesh::global_processor_id() == 0) {
+                            char commandLine[jsonArraySize];
+                            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                            system(commandLine);
+                        }
 #endif  
 
 #ifdef PERFORMANCE
@@ -954,7 +1007,8 @@ int main(int argc, char** argv) {
                         sprintf(memalloc, "line%d%d", ik, numberOfWrites);
                         char argument2[jsonArraySize];
                         sprintf(argument2, "oline%dextraction", ik);
-                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
+                        indexerID++;
+                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
                     }
                 }
@@ -1010,6 +1064,11 @@ int main(int argc, char** argv) {
 
 #ifdef USE_CATALYST
             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+            if (libMesh::global_processor_id() == 0) {
+                char commandLine[jsonArraySize];
+                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                system(commandLine);
+            }
 #endif
 
 #ifdef PERFORMANCE
@@ -1025,7 +1084,8 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
             sprintf(memalloc, "rde%d", numberOfWrites);
-            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc);
+            indexerID++;
+            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
         } else if (dim == 3) {
             // 3D analysis
@@ -1051,6 +1111,11 @@ int main(int argc, char** argv) {
                 if (ik == 0) {
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
                 }
+                if (libMesh::global_processor_id() == 0) {
+                    char commandLine[jsonArraySize];
+                    sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                    system(commandLine);
+                }
 #endif  
 
 #ifdef PERFORMANCE
@@ -1070,7 +1135,8 @@ int main(int argc, char** argv) {
                 char argument2[jsonArraySize];
                 sprintf(argument2, "oline%diextraction", ik);
                 sprintf(memalloc, "line%d%d", ik, numberOfWrites);
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc);
+                indexerID++;
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
             }
         }

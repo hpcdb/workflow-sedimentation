@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   mesh_moviment.h
  * Author: camata
  *
@@ -57,7 +57,7 @@
 
 #include "libmesh/string_to_enum.h"
 #include "libmesh/getpot.h"
-
+#include "libmesh/parallel_ghost_sync.h"
 #include "define.h"
 
 // Bring in everything from the libMesh namespace
@@ -66,22 +66,23 @@ using namespace libMesh;
 
 class MeshMoviment : public System::Assembly
 {
-    
+
   public:
-    
-  MeshMoviment (EquationSystems &es_in) : es (es_in)
+
+  MeshMoviment (EquationSystems &es_in) : es (es_in), deposition_id(0), fixedwall_id(0)
   {};
+  void init();
   void assemble ();
-  void setup();
+  void setup(GetPot &infile);
   void updateMesh();
 
    private:
 
+     int deposition_id;
+     int fixedwall_id;
      EquationSystems &es;
+     
 };
 
 
 #endif	/* SEDIMENTATION_TRANSPORT_H */
-
-
-

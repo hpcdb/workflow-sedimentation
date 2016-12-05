@@ -4,7 +4,7 @@ rm -rf prov/pg/*
 # MacOS
 # PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/sedimentation
 # docker
-PGDIR=/shared/experiment/libmesh-sedimentation
+PGDIR=/experiment/libmesh-sedimentation
 # Virtual Box - mint
 # PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
@@ -12,7 +12,7 @@ PGDIR=/shared/experiment/libmesh-sedimentation
 
 # Sedimentation Solver
 dimension="3"
-access="indexing"
+access="extraction"
 cartridge="csv"
 
 echo "Dataflow - libMesh Sedimentation"

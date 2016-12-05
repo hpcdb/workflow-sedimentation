@@ -59,4 +59,5 @@ is_gravitational_current = 0
 
 # Write out every nth timestep to file.
 write_interval = 1
-output = /shared/experiment/sedimentation/output/output_
+dir_path = /experiment/sedimentation/output/
+output = output
