@@ -1,0 +1,1 @@
+rm video.mp4;cat image_*.png | ~/sources/ffmpeg-git-20161204-64bit-static/ffmpeg -i - -c:v libx264 -r 30 video.mp4
