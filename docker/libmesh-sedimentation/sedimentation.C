@@ -512,7 +512,7 @@ int main(int argc, char** argv) {
     int numberIterationsFluid = 0;
     int numberIterationsSediments = 0;
     int numberIterationsMeshRefinements = 0;
-    int numberOfWrites = 1;
+    int numberOfWrites = 0;
     vector<string> meshDependencies;
 
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {

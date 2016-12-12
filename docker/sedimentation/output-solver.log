@@ -1,0 +1,87 @@
+###########################
+Provenance Properties
+pgFilePath=/shared/experiment/dfa/PG-1.0.jar
+rdeFilePath=/shared/experiment/dfa/RDE-1.0.jar
+rdiFilePath=/shared/experiment/dfa/RDI-1.0.jar
+rawDataAccess=EXTRACTION
+cartridge=CSV
+bin=
+extraArguments=
+###########################
+Parameters: 
+  Reynolds: 2236.07
+  Grashof : 5e+06
+  Sc      : 1
+ Mesh Information:
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=79821
+    n_local_nodes()=79821
+  n_elem()=72000
+    n_local_elem()=72000
+    n_active_elem()=72000
+  n_subdomains()=2
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=3
+   System #2, "deposition"
+    Type "Explicit"
+    Variables="d" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=79821
+    n_local_dofs()=79821
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=2
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+   System #0, "flow"
+    Type "TransientLinearImplicit"
+    Variables={ "u" "v" "w" "p" } 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=319284
+    n_local_dofs()=319284
+    n_constrained_dofs()=27864
+    n_local_constrained_dofs()=27864
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 100.879
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 108
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 27864
+      Average DoF Constraint Length= 0
+   System #1, "sediment"
+    Type "TransientLinearImplicit"
+    Variables="s" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=79821
+    n_local_dofs()=79821
+    n_constrained_dofs()=3801
+    n_local_constrained_dofs()=3801
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 25.2197
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 3801
+      Average DoF Constraint Length= 0
+

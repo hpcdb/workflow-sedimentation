@@ -4,6 +4,7 @@
 #------------------------------------------------------
 
 # The coarse grid size from which to start adaptivity
+mesh_file = necker3d.msh
 dim    =  3
 ncellx = 90
 ncelly = 10
@@ -16,6 +17,18 @@ ymax =  2.0
 zmin =  0.0
 zmax =  2.0
 
+dirichlet/deposition = 1
+dirichlet/slipx      = 2
+dirichlet/slipy      = 5
+dirichlet/slipz      = 3
+dirichlet/noslip     = 4
+dirichlet/pnull      = 6
+dirichlet/czero      = 6
+dirichlet/fixedwall  = 6
+
+
+xlock = 1.0
+hlock = 1.8 
 
 # refinement parameters
 # uniform refinement - rate: 2*hlevels - test case (1)
@@ -28,13 +41,13 @@ max_r_steps = 1
 r_fraction  = 0.85
 c_fraction  = 0.05
 max_h_level = 3
-r_interval  = 3
+r_interval  = 2
 
 
 #----------------------------------------------------
 # TIME INTEGRATION PARAMETERS
 # The interval between our timesteps - test case (0.005)
-deltat = 0.010
+deltat = 0.005
 
 # And the number of timesteps to take
 n_time_steps = 500000
@@ -43,7 +56,7 @@ max_linear_iterations = 200
 # maximum time - test case (25.000)
 #stampede - supercomputing - tmax(10.000)
 #test - tmax(0.020)
-tmax    = 0.020
+tmax    = 0.050
 
 #------------------------------------------------------
 # EQUATION PARAMETERS

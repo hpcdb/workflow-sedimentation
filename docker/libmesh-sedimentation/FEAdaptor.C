@@ -272,7 +272,7 @@ namespace FEAdaptor
          pipeline->Initialize(scripts[i]);
          Processor->AddPipeline(pipeline.GetPointer());
       }
-     //std::cout << "COPROCESSING INIT END" << std::endl;
+     // std::cout << "COPROCESSING INIT END" << std::endl;
   }
 
   void Finalize()
@@ -292,7 +292,7 @@ namespace FEAdaptor
   void CoProcess(int numScripts, char* scripts[],EquationSystems &eq, double time, unsigned int timeStep, 
     bool lastTimeStep = false, bool using_amr = false)
   {
-    //std::cout << "COPROCESSING BEGIN" << std::endl;
+    // std::cout << "COPROCESSING BEGIN" << std::endl;
     Processor->RemoveAllPipelines();
     for(int i=1;i<numScripts;i++)
     {

@@ -35,7 +35,7 @@ def CreateCoProcessor():
       # plotOverLine1.Source.Point1 = [0.0, 1.0, 0.0]
       # plotOverLine1.Source.Point2 = [18.0, 1.0, 0.0]
 
-      SaveData('ext_plane_' + str(timeStep) + ".csv", proxy=output_2_00000xmf, Precision=5,
+      SaveData('init_ext_plane_' + str(timeStep) + ".csv", proxy=output_2_00000xmf, Precision=5,
         UseScientificNotation=0,
         WriteAllTimeSteps=0,
         FieldAssociation='Points')

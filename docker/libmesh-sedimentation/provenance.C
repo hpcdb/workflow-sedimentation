@@ -45,9 +45,9 @@ Provenance::Provenance() {
     extraArguments = infile("extraArguments", "");
     rawDataAccess = infile("access", "EXTRACTION");
     cartridge = infile("cartridge", "CSV");
-    pgCommandLine = "$JAVA_HOME/bin/java -jar " + pgFilePath + " ";
-    rdeCommandLine = "$JAVA_HOME/bin/java -jar " + rdeFilePath + " ";
-    rdiCommandLine = "$JAVA_HOME/bin/java -jar " + rdiFilePath + " ";
+    pgCommandLine = "java -jar " + pgFilePath + " ";
+    rdeCommandLine = "java -jar " + rdeFilePath + " ";
+    rdiCommandLine = "java -jar " + rdiFilePath + " ";
 
     jsonDirectory = directory + "/prov/di/" + dataflow + "/";
     pgDirectory = directory + "/prov/pg/" + dataflow + "/";
