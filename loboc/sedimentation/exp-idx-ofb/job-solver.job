@@ -1,4 +1,4 @@
-#PBS -l select=11:ncpus=48:mpiprocs=24
+#PBS -l select=41:ncpus=48:mpiprocs=24
 #PBS -l walltime=999:00:00
 #PBS -j oe  
 #PBS -N sed-idx-ofb
@@ -41,7 +41,7 @@ echo "Calculating total elapsed times based on log files..."
 java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt
 
 #echo "Executing termination algorithm..."
-#home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
+#/home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
 #/home/users/vitorss/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
 
 #echo "Backing up provenance database..."

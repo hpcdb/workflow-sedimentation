@@ -25,7 +25,10 @@ rm -rf db-err.txt
 rm -rf db-out.txt
 rm -rf err.txt
 rm -rf out.txt
-
+rm -rf sed-ext*
+rm -rf image_*.png
+rm -rf video.mp4
+rm -rf mpirun.sh
 mkdir prov
 mkdir prov/di
 mkdir prov/pg
