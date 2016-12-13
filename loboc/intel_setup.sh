@@ -38,9 +38,9 @@ cd ..
 echo "***************************************************"
 echo " Installing HDF5..."
 echo "***************************************************"
-#wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.17.tar.bz2
-tar xjvf hdf5-1.8.17.tar.bz2
-cd hdf5-1.8.17/
+#wget https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-1.8.18.tar
+tar xjvf hdf5-1.8.18.tar.bz2
+cd hdf5-1.8.18/
 ./configure --prefix=${HOME}/local/intel/hdf5 --with-zlib=${HOME}/local/intel/zlib --with-szlib=${HOME}/local/intel/szip CC=icc CXX=icpc FC=ifort --enable-fortran
 make -j 4
 make install
