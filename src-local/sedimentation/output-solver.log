@@ -1,0 +1,101 @@
+###########################
+Provenance Properties
+pgFilePath=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/PG-1.0.jar
+rdeFilePath=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDE-1.0.jar
+rdiFilePath=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDI-1.0.jar
+rawDataAccess=EXTRACTION
+cartridge=csv
+bin=/home/vitor/Documents/program/fastbit/bin
+extraArguments=[b:precision=2]
+###########################
+Parameters: 
+  Reynolds: 2236.07
+  Grashof : 5e+06
+  Sc      : 1
+ Mesh Information:
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=5713
+    n_local_nodes()=5713
+  n_elem()=25842
+    n_local_elem()=25842
+    n_active_elem()=25842
+  n_subdomains()=2
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=3
+   System #2, "deposition"
+    Type "Explicit"
+    Variables="d" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=5713
+    n_local_dofs()=5713
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    n_vectors()=2
+    n_matrices()=0
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 0
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+   System #0, "flow"
+    Type "TransientLinearImplicit"
+    Variables={ "u" "v" "w" "p" } 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=22852
+    n_local_dofs()=22852
+    n_constrained_dofs()=5241
+    n_local_constrained_dofs()=5241
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 52.6932
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 132
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 5241
+      Average DoF Constraint Length= 0
+   System #1, "sediment"
+    Type "TransientLinearImplicit"
+    Variables="s" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=5713
+    n_local_dofs()=5713
+    n_constrained_dofs()=821
+    n_local_constrained_dofs()=821
+    n_vectors()=3
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 13.1733
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 33
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 821
+      Average DoF Constraint Length= 0
+
+[WRITE] /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/output/output_1_000_00000.h5 - /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/output/output_1_00000.xmf
+[CATALYST] Time step: 1 ; Time: 0.0
+1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/output/output_1_00000.xmf;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/ext_line_0_1.csv
+1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/output/output_1_00000.xmf;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/ext_line_1_1.csv
+1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/output/output_1_00000.xmf;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/ext_line_2_1.csv
+1;0;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/output/output_1_00000.xmf;/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/ext_line_3_1.csv
+======================================================
+ Time step  1  simulation time = 0.0100...
+======================================================
+ Solving Navier-Stokes equation...
+------------------------------------------------------
+STEP NLI  |b-AX|         |du|           |du|/|u|       
+------------------------------------------------------
+*** Warning, This code is deprecated, and likely to be removed in future library versions! /Users/vitor/Documents/Program_Installations/libmesh/include/libmesh/type_vector.h, line 879, compiled Dec 20 2016 at 06:58:42 ***
