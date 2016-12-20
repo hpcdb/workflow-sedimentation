@@ -2,9 +2,9 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 
 # MacOS
-PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation
+# PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation
 # docker
-# PGDIR=/shared/experiment/libmesh-sedimentation
+PGDIR=/shared/experiment/libmesh-sedimentation
 # Virtual Box - mint
 # PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
@@ -228,6 +228,17 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points0 -type numeric -extractor iline3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points1 -type numeric -extractor iline3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points2 -type numeric -extractor iline3
+
+	echo "Initial Visualization"
+	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iVisualization
+	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iVisualization -name libmesh-sedimentation-opt::iVisualization -filepath $PGDIR
+
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iVisualization -tag ogetmaximumiterations -type input -dependency getMaximumIterations
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iVisualization -tag oivisualization -type output
+
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name simulationID -type numeric
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name time_step -type numeric
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name png -type file
 fi
 
 echo "Solver Simulation to the Fluid"
@@ -440,6 +451,17 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points0 -type numeric -extractor line3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points1 -type numeric -extractor line3
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points2 -type numeric -extractor line3
+
+	echo "Visualization"
+	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag visualization
+	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation visualization -name libmesh-sedimentation-opt::Visualization -filepath $PGDIR
+
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag omeshwriter -type input -dependency meshWriter
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag ovisualization -type output
+
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name simulationID -type numeric
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name time_step -type numeric
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name png -type file
 fi
 
 # echo "Compute Statistics"
@@ -470,6 +492,5 @@ echo "Dataflow ingestion"
 java -jar ../dfa/PG-1.0.jar -ingest -dataflow sedimentation
 
 cp prov/pg/sedimentation/dataflow.json .
-
 
 

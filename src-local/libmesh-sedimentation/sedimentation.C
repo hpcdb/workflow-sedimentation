@@ -458,8 +458,12 @@ int main(int argc, char** argv) {
             sprintf(finalFilename, "ext_line_%d_%d.csv", ik, t_step);
 
 #ifdef PROV
-            // Mesh Writer
+            // Init Data Extraction
             char argument1[jsonArraySize];
+            if(ik == 0){
+                sprintf(argument1, "ivisualization");
+                prov.inputInitVisualization(simulationID, argument1);
+            }
             sprintf(argument1, "iline%dextraction", ik);
             prov.inputInitDataExtraction(simulationID, argument1);
 #endif
@@ -473,7 +477,13 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
             if (ik == 0) {
                 FEAdaptor::Initialize(argc, argv);
-                FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+                FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);                
+
+                sprintf(argument1, "ivisualization");
+                char argument2[jsonArraySize];
+                sprintf(argument2, "oivisualization");
+                sprintf(memalloc, "image_%d.png", t_step);
+                prov.outputInitVisualization(simulationID, argument1, argument2, 0, memalloc);
             }
             if (libMesh::global_processor_id() == 0) {
                 char commandLine[jsonArraySize];
@@ -969,6 +979,10 @@ int main(int argc, char** argv) {
 #ifdef PROV
                         // Mesh Writer
                         char argument1[jsonArraySize];
+                        if(ik == 0){
+                            sprintf(argument1, "visualization");
+                            prov.inputVisualization(simulationID, argument1);
+                        }
                         sprintf(argument1, "line%dextraction", ik);
                         prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
@@ -982,6 +996,12 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
                         if (ik == 0) {
                             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+
+                            sprintf(argument1, "visualization");
+                            char argument2[jsonArraySize];
+                            sprintf(argument2, "ovisualization");
+                            sprintf(memalloc, "image_%d.png", step);
+                            prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
                         }
                         if (libMesh::global_processor_id() == 0) {
                             char commandLine[jsonArraySize];
@@ -1097,6 +1117,10 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 // Mesh Writer
                 char argument1[jsonArraySize];
+                if(ik == 0){
+                    sprintf(argument1, "visualization");
+                    prov.inputVisualization(simulationID, argument1);
+                }
                 sprintf(argument1, "line%dextraction", ik);
                 prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
@@ -1110,6 +1134,12 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
                 if (ik == 0) {
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+
+                    sprintf(argument1, "visualization");
+                    char argument2[jsonArraySize];
+                    sprintf(argument2, "ovisualization");
+                    sprintf(memalloc, "image_%d.png", step);
+                    prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
                 }
                 if (libMesh::global_processor_id() == 0) {
                     char commandLine[jsonArraySize];

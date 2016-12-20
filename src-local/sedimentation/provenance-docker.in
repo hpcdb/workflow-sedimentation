@@ -1,5 +1,8 @@
-directory = /experiment/sedimentation
+directory = /experiment/sedimentation/
 pgFilePath = /experiment/dfa/PG-1.0.jar
 rdeFilePath = /experiment/dfa/RDE-1.0.jar
-access=INDEXING
-cartridge=CSV
+rdiFilePath = /experiment/dfa/RDI-1.0.jar
+access=EXTRACTION
+cartridge=csv
+bin=/programs/fastbit/bin
+extraArguments=[b:precision=2]

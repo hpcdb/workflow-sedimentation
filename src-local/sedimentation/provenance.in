@@ -1,12 +1,22 @@
-# MacOS
-directory = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/
-pgFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/PG-1.0.jar
-rdeFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDE-1.0.jar
-rdiFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDI-1.0.jar
+# Docker
+directory = /experiment/sedimentation/
+pgFilePath = /experiment/dfa/PG-1.0.jar
+rdeFilePath = /experiment/dfa/RDE-1.0.jar
+rdiFilePath = /experiment/dfa/RDI-1.0.jar
 access=EXTRACTION
 cartridge=csv
-bin=/home/vitor/Documents/program/fastbit/bin
+bin=/programs/fastbit/bin
 extraArguments=[b:precision=2]
+
+# MacOS
+#directory = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/
+#pgFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/PG-1.0.jar
+#rdeFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDE-1.0.jar
+#rdiFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDI-1.0.jar
+#access=EXTRACTION
+#cartridge=csv
+#bin=/home/vitor/Documents/program/fastbit/bin
+#extraArguments=[b:precision=2]
 
 # Mint
 #directory = /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/
