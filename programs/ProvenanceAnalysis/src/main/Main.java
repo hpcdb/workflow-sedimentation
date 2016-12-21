@@ -15,10 +15,10 @@ public class Main {
             System.out.println("######################################################");
             System.out.println("#################### Log Analysis ####################");
             System.out.println("######################################################");
-            double provenanceTime = Analysis.provenance(logDirectory);
-            double rdeTime = Analysis.rawDataExtraction(logDirectory);
-            double indexing = Analysis.indexing(logDirectory);
-            Analysis.solver(logDirectory, provenanceTime, rdeTime, indexing);
+            Analysis analysis = new Analysis();
+            analysis.setLogDirectory(logDirectory);
+            analysis.run();
+            analysis.print();
             System.out.println("######################################################");
         }
     }

@@ -84,9 +84,11 @@ def CreateCoProcessor():
 
       end=dt.datetime.now()
       elapsedTime = (end.microsecond-start.microsecond)/1e6
+      if(elapsedTime < 0.00000):
+        elapsedTime = 0.00
 
-      text_file = open("prov/rde/data-extraction.prov", "w")
-      text_file.write("RDE:DataExtraction:Process\n      elapsed-time: %.5f seconds." % (elapsedTime))
+      text_file = open("prov/rde/data-extraction.prov", "a+")
+      text_file.write("RDE:DataExtraction:Process\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
       text_file.close()
 
       start=dt.datetime.now()
@@ -217,9 +219,11 @@ def CreateCoProcessor():
       
       end=dt.datetime.now()
       elapsedTime = (end.microsecond-start.microsecond)/1e6
+      if(elapsedTime < 0.00000):
+        elapsedTime = 0.00
 
-      text_file = open("prov/visualization/paraview.prov", "w")
-      text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds." % (elapsedTime))
+      text_file = open("prov/visualization/paraview.prov", "a+")
+      text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
       text_file.close()
 
     return Pipeline()

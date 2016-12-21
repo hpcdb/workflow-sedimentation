@@ -74,6 +74,7 @@ public:
             }
         }
         sprintf(buffer, "%s] -delimiter=\"%s\"", buffer, this->delimeter.c_str());
+        sprintf(buffer, "%s -performance=%s", buffer, "prov/indexing/rdi-component.prov");
         if(extension.compare("FASTBIT") == 0 || extension.compare("OPTIMIZED_FASTBIT") == 0){
             sprintf(buffer, "%s -bin=\"%s\"", buffer, this->bin.c_str());
             sprintf(buffer, "%s -option=%s", buffer, this->extraArguments.c_str());

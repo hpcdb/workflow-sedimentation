@@ -62,8 +62,8 @@ public:
 
     void finishDataIngestor();
 
-    void storeDataExtractionCost(double elapsedTime);
-    void storeRDEComponentCost(double elapsedTime);
+    void storeCatalystCost(double elapsedTime);
+    void storeRDIComponentCost(double elapsedTime);
     void storeSolverCost(double elapsedTime);
 private:
     int processor_id;
