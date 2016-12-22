@@ -22,6 +22,8 @@ rm -rf data
 rm -rf *.data
 rm -rf *.index
 rm -rf index
+rm -rf image*
+rm -rf video*
 
 mkdir prov
 mkdir prov/di
