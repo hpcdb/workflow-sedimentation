@@ -253,8 +253,8 @@ int main(int argc, char** argv) {
 
     if (!is_file_exist("restart.run")) {
 
-        // const string mesh_file = infile("mesh_file", "0");
-        const string mesh_file = "necker3d.msh";
+        const string mesh_file = infile("mesh_file", "0");
+
         if(mesh_file == "0") {        
 
             if (dim == 2) {
@@ -417,30 +417,28 @@ int main(int argc, char** argv) {
         prov.inputInitDataExtraction(simulationID, "initdataextraction");
 #endif
 
-#ifdef PERFORMANCE
-        if (libMesh::global_processor_id() == 0) {
-            perf.start();
-        }
-#endif
-
 #ifdef USE_CATALYST
+        #ifdef PERFORMANCE
+            if (libMesh::global_processor_id() == 0) {
+                perf.start();
+            }
+        #endif
         FEAdaptor::Initialize(argc, argv);
         FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
-        if (libMesh::global_processor_id() == 0) {
-            char commandLine[jsonArraySize];
-            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-            system(commandLine);
-        }
-#endif  
-
-#ifdef PERFORMANCE
+        #ifdef PERFORMANCE
         if (libMesh::global_processor_id() == 0) {
             perf.end();
             double elapsedTime = perf.elapsedTime();
             char buffer[jsonArraySize];
-            sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
+            sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
             cout << buffer << endl;
-            prov.storeDataExtractionCost(elapsedTime);
+            prov.storeCatalystCost(elapsedTime);
+        }
+        #endif  
+        if (libMesh::global_processor_id() == 0) {
+            char commandLine[jsonArraySize];
+            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+            system(commandLine);
         }
 #endif  
 
@@ -458,40 +456,48 @@ int main(int argc, char** argv) {
             sprintf(finalFilename, "ext_line_%d_%d.csv", ik, t_step);
 
 #ifdef PROV
-            // Mesh Writer
+            // Init Data Extraction
             char argument1[jsonArraySize];
+            if(ik == 0){
+                sprintf(argument1, "ivisualization");
+                prov.inputInitVisualization(simulationID, argument1);
+            }
             sprintf(argument1, "iline%dextraction", ik);
             prov.inputInitDataExtraction(simulationID, argument1);
 #endif
 
-#ifdef PERFORMANCE
-            if (libMesh::global_processor_id() == 0) {
-                perf.start();
-            }
-#endif
-
 #ifdef USE_CATALYST
             if (ik == 0) {
+                #ifdef PERFORMANCE
+                    if (libMesh::global_processor_id() == 0) {
+                        perf.start();
+                    }
+                #endif
                 FEAdaptor::Initialize(argc, argv);
-                FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+                FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);         
+                #ifdef PERFORMANCE
+                    if (libMesh::global_processor_id() == 0) {
+                        perf.end();
+                        double elapsedTime = perf.elapsedTime();
+                        char buffer[jsonArraySize];
+                        sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
+                        cout << buffer << endl;
+                        prov.storeCatalystCost(elapsedTime);
+                    }
+                #endif        
+
+                sprintf(argument1, "ivisualization");
+                char argument2[jsonArraySize];
+                sprintf(argument2, "oivisualization");
+                sprintf(memalloc, "image_%d.png", t_step);
+                prov.outputInitVisualization(simulationID, argument1, argument2, 0, memalloc);
             }
             if (libMesh::global_processor_id() == 0) {
                 char commandLine[jsonArraySize];
                 sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
                 system(commandLine);
             }
-#endif  
-
-#ifdef PERFORMANCE
-            if (libMesh::global_processor_id() == 0) {
-                perf.end();
-                double elapsedTime = perf.elapsedTime();
-                char buffer[jsonArraySize];
-                sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
-                cout << buffer << endl;
-                prov.storeDataExtractionCost(elapsedTime);
-            }
-#endif  
+#endif   
 
 #ifdef PROV
             // Mesh Writer
@@ -924,33 +930,31 @@ int main(int argc, char** argv) {
                     prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction");
 #endif
 
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.start();
-                    }
-#endif
-
                     char firstFilename[jsonArraySize];
                     sprintf(firstFilename, "init_ext_plane_%d.csv", step);
                     sprintf(finalFilename, "ext_plane_%d.csv", step);
 
 #ifdef USE_CATALYST
+                    #ifdef PERFORMANCE
+                    if (libMesh::global_processor_id() == 0) {
+                        perf.start();
+                    }
+                    #endif
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                    #ifdef PERFORMANCE
+                        if (libMesh::global_processor_id() == 0) {
+                            perf.end();
+                            double elapsedTime = perf.elapsedTime();
+                            char buffer[jsonArraySize];
+                            sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
+                            cout << buffer << endl;
+                            prov.storeCatalystCost(elapsedTime);
+                        }
+                    #endif                        
                     if (libMesh::global_processor_id() == 0) {
                         char commandLine[jsonArraySize];
                         sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
                         system(commandLine);
-                    }
-#endif
-
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.end();
-                        double elapsedTime = perf.elapsedTime();
-                        char buffer[jsonArraySize];
-                        sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
-                        cout << buffer << endl;
-                        prov.storeDataExtractionCost(elapsedTime);
                     }
 #endif
 
@@ -969,35 +973,43 @@ int main(int argc, char** argv) {
 #ifdef PROV
                         // Mesh Writer
                         char argument1[jsonArraySize];
+                        if(ik == 0){
+                            sprintf(argument1, "visualization");
+                            prov.inputVisualization(simulationID, argument1);
+                        }
                         sprintf(argument1, "line%dextraction", ik);
                         prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
 
-#ifdef PERFORMANCE
-                        if (libMesh::global_processor_id() == 0) {
-                            perf.start();
-                        }
-#endif
-
 #ifdef USE_CATALYST
                         if (ik == 0) {
+                            #ifdef PERFORMANCE
+                                if (libMesh::global_processor_id() == 0) {
+                                    perf.start();
+                                }
+                            #endif
                             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                            #ifdef PERFORMANCE
+                                if (libMesh::global_processor_id() == 0) {
+                                    perf.end();
+                                    double elapsedTime = perf.elapsedTime();
+                                    char buffer[jsonArraySize];
+                                    sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
+                                    cout << buffer << endl;
+                                    prov.storeCatalystCost(elapsedTime);
+                                }
+                            #endif  
+
+                            sprintf(argument1, "visualization");
+                            char argument2[jsonArraySize];
+                            sprintf(argument2, "ovisualization");
+                            sprintf(memalloc, "image_%d.png", step);
+                            prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
                         }
                         if (libMesh::global_processor_id() == 0) {
                             char commandLine[jsonArraySize];
                             sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
                             system(commandLine);
-                        }
-#endif  
-
-#ifdef PERFORMANCE
-                        if (libMesh::global_processor_id() == 0) {
-                            perf.end();
-                            double elapsedTime = perf.elapsedTime();
-                            char buffer[jsonArraySize];
-                            sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
-                            cout << buffer << endl;
-                            prov.storeDataExtractionCost(elapsedTime);
                         }
 #endif  
 
@@ -1052,33 +1064,31 @@ int main(int argc, char** argv) {
             prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction");
 #endif
 
-#ifdef PERFORMANCE
-            if (libMesh::global_processor_id() == 0) {
-                perf.start();
-            }
-#endif
-
             char firstFilename[jsonArraySize];
             sprintf(firstFilename, "init_ext_plane_%d.csv", step);
             sprintf(finalFilename, "ext_plane_%d.csv", step);
 
 #ifdef USE_CATALYST
+            #ifdef PERFORMANCE
+                if (libMesh::global_processor_id() == 0) {
+                    perf.start();
+                }
+            #endif
             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+            #ifdef PERFORMANCE
+                if (libMesh::global_processor_id() == 0) {
+                    perf.end();
+                    double elapsedTime = perf.elapsedTime();
+                    char buffer[jsonArraySize];
+                    sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
+                    cout << buffer << endl;
+                    prov.storeCatalystCost(elapsedTime);
+                }
+            #endif
             if (libMesh::global_processor_id() == 0) {
                 char commandLine[jsonArraySize];
                 sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
                 system(commandLine);
-            }
-#endif
-
-#ifdef PERFORMANCE
-            if (libMesh::global_processor_id() == 0) {
-                perf.end();
-                double elapsedTime = perf.elapsedTime();
-                char buffer[jsonArraySize];
-                sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
-                cout << buffer << endl;
-                prov.storeDataExtractionCost(elapsedTime);
             }
 #endif
 
@@ -1097,19 +1107,38 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 // Mesh Writer
                 char argument1[jsonArraySize];
+                if(ik == 0){
+                    sprintf(argument1, "visualization");
+                    prov.inputVisualization(simulationID, argument1);
+                }
                 sprintf(argument1, "line%dextraction", ik);
                 prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
 #endif
 
-#ifdef PERFORMANCE
-                if (libMesh::global_processor_id() == 0) {
-                    perf.start();
-                }
-#endif
-
 #ifdef USE_CATALYST
                 if (ik == 0) {
+                    #ifdef PERFORMANCE
+                        if (libMesh::global_processor_id() == 0) {
+                            perf.start();
+                        }
+                    #endif
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                    #ifdef PERFORMANCE
+                        if (libMesh::global_processor_id() == 0) {
+                            perf.end();
+                            double elapsedTime = perf.elapsedTime();
+                            char buffer[jsonArraySize];
+                            sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
+                            cout << buffer << endl;
+                            prov.storeCatalystCost(elapsedTime);
+                        }
+                    #endif  
+
+                    sprintf(argument1, "visualization");
+                    char argument2[jsonArraySize];
+                    sprintf(argument2, "ovisualization");
+                    sprintf(memalloc, "image_%d.png", step);
+                    prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
                 }
                 if (libMesh::global_processor_id() == 0) {
                     char commandLine[jsonArraySize];
@@ -1118,16 +1147,7 @@ int main(int argc, char** argv) {
                 }
 #endif  
 
-#ifdef PERFORMANCE
-                if (libMesh::global_processor_id() == 0) {
-                    perf.end();
-                    double elapsedTime = perf.elapsedTime();
-                    char buffer[jsonArraySize];
-                    sprintf(buffer, "Data Extraction Cost: %.5f", elapsedTime);
-                    cout << buffer << endl;
-                    prov.storeDataExtractionCost(elapsedTime);
-                }
-#endif  
+
 
 #ifdef PROV
                 // Mesh Writer
@@ -1150,6 +1170,12 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
     // Mesh Aggregator
+    #ifdef USE_CATALYST
+        sprintf(memalloc, "rm video.mp4;cat image_*.png | ffmpeg -i - -r 30 video.mp4");
+        cout << memalloc << endl;
+        system(memalloc);
+    #endif
+
     char out_filename[jsonArraySize];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
     prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(), meshDependencies);

@@ -394,110 +394,100 @@ void SedimentationFlow::assemble3D()
 
              const Number Udphi_i = Uvms*dphi[i][qp];
 
-              Fu(i) += JxW[qp]*((phi[i][qp] + tau*Udphi_i)*u_old +      // mass-matrix term
-                      dt* (phi[i][qp] + tau*Udphi_i)*f(0));       // SUPG term
+              Fu(i) += JxW[qp]*(u_old*(phi[i][qp] + tau*Udphi_i) +                  // mass-matrix term
+			        dt*f(0)*(phi[i][qp]+ tau*Udphi_i));                 // SUPG term
 
-              Fv(i) += JxW[qp]*((phi[i][qp] + tau*Udphi_i)*v_old +      // mass-matrix term
-                      dt* (phi[i][qp] + tau*Udphi_i)*f(1));       // SUPG term
+              Fv(i) += JxW[qp]*(v_old*(phi[i][qp] + tau*Udphi_i) +                  // mass-matrix term
+			        dt*f(1)*(phi[i][qp]+ tau*Udphi_i));                 // SUPG term
 
-              Fw(i) += JxW[qp]*((phi[i][qp] + tau*Udphi_i)*w_old +      // mass-matrix term
-                      dt* (phi[i][qp] + tau*Udphi_i)*f(2));                 // SUPG term
+              Fw(i) += JxW[qp]*(w_old*(phi[i][qp] + tau*Udphi_i) +                  // mass-matrix term
+			        dt*f(2)*(phi[i][qp]+ tau*Udphi_i));                 // SUPG term
 
-              Fp(i) += JxW[qp]*tau*(U_old*dphi[i][qp]                   // PSPG term
-                                    + dt*(dphi[i][qp]*norm)*fg          //PSPG buoyancy vector
-                               );
+              Fp(i) += JxW[qp] * tau*(U_old*dphi[i][qp]                             // PSPG term
+                                      + dt*(dphi[i][qp]*norm)*fg                    //PSPG buoyancy vector
+	                             );
 
               // Matrix contributions for the uu and vv couplings.
               for (unsigned int j=0; j<n_u_dofs; j++)
               {
-                const Number Udphi_j = Uvms*dphi[j][qp];
+		              const Number Udphi_j = Uvms*dphi[j][qp];
 
-                  // Galerkin contribution
-                    // G.1: u row
-                    Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                     // mass matrix term
-                                       dt*uRe*(2.0*dphi[i][qp](0)*dphi[j][qp](0)  + 
-                                                   dphi[i][qp](1)*dphi[j][qp](1)  +
-                                                   dphi[i][qp](2)*dphi[j][qp](2)) +  // xx diffusion term
-                                       dt*Udphi_j*phi[i][qp]) ;                      // convection term
+	                // Galerkin contribution
+                  Kuu(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                     // mass matrix term
+                                       dt*uRe*2.0*(dphi[i][qp]*dphi[j][qp]) +      // xx diffusion term
+                                       dt*Udphi_j*phi[i][qp]) ;                    // convection term
 
-                    Kuv(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](1)*dphi[j][qp](0));   // xy diffusion term
-                    Kuw(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](2)*dphi[j][qp](0));   // xz diffusion term
-                    Kup(i,j) += JxW[qp]*(-dt*dphi[i][qp](0)*phi[j][qp]);
+		              Kuv(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](1)*dphi[j][qp](0));      // xy diffusion term
+                  Kuw(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](2)*dphi[j][qp](0));      // xz diffusion term
+		              Kup(i,j) += JxW[qp]*(-dt*phi[j][qp]*dphi[i][qp](0));
 
-                    // G.2: v row
-                    Kvu(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](0)*dphi[j][qp](1));      // xy diffusion term
-                    Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                     // mass matrix term
-                                       dt*uRe*(2.0*dphi[i][qp](1)*dphi[j][qp](1) +
-                                                   dphi[i][qp](0)*dphi[j][qp](0) +       
-                                                   dphi[i][qp](2)*dphi[j][qp](2)) +      // diffusion term
-                                       dt*(Udphi_j)*phi[i][qp] )   ;               // convection term
-                    Kvw(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](2)*dphi[j][qp](1));      // xy diffusion term
-                    Kvp(i,j) += JxW[qp]*(-dt*dphi[i][qp](1)*phi[j][qp]);
 
-                    // G.3: w row
-                    Kwu(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](0)*dphi[j][qp](2));      // xy diffusion term
-                    Kwv(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](1)*dphi[j][qp](2));      // xy diffusion term
-                    Kww(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                     // mass matrix term
-                                       dt*uRe*(2.0*dphi[i][qp](2)*dphi[j][qp](2)  + 
-                                                   dphi[i][qp](1)*dphi[j][qp](1)  +
-                                                   dphi[i][qp](0)*dphi[j][qp](0)) +  // diffusion term
-                                       dt*(Udphi_j)*phi[i][qp] );                    // convection term
+                  Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                    // mass matrix term
+                                       dt*uRe*2.0*(dphi[i][qp]*dphi[j][qp]) +     // diffusion term
+                                       dt*(Udphi_j)*phi[i][qp] )   ;              // convection term
 
-                    Kwp(i,j) += JxW[qp]*(-dt*dphi[i][qp](2)*phi[j][qp]);
+                  Kvu(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](0)*dphi[j][qp](1));     // xy diffusion term
+                  Kvw(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](2)*dphi[j][qp](1));     // xy diffusion term
+                  Kvp(i,j) += JxW[qp]*(-dt*phi[j][qp]*dphi[i][qp](1));
 
-                    // G.4: p row
-                    Kpu(i,j) += JxW[qp] * (dt*phi[i][qp]*dphi[j][qp](0));           // X divergent operator
-                    Kpv(i,j) += JxW[qp] * (dt*phi[i][qp]*dphi[j][qp](1));           // Y divergent operator
-                    Kpw(i,j) += JxW[qp] * (dt*phi[i][qp]*dphi[j][qp](2));           // Z divergent operator
+                  Kww(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                    // mass matrix term
+                                       dt*uRe*2.0*(dphi[i][qp]*dphi[j][qp]) +     // diffusion term
+                                       dt*(Udphi_j)*phi[i][qp] );                 // convection term
 
-                    
-                    // SUPG Contribution
-                    // S1. u row
-                    Kuu(i,j)+= JxW[qp]*tau*(Udphi_i*phi[j][qp]  +                 // mass-matrix term
-                                             dt*Udphi_i*Udphi_j);                    // advection term
-                    Kup(i,j)+= JxW[qp] * (dt*tau*Udphi_i*dphi[j][qp](0));           // X pressure gradient term
 
-                    //S2. v row
-                    Kvv(i,j)+= JxW[qp]*tau*(Udphi_i*phi[j][qp]  +                 // mass-matrix term
-                                             dt*Udphi_i*Udphi_j);                    // advection term
-                    Kvp(i,j)+= JxW[qp] * (dt*tau*Udphi_i*dphi[j][qp](1));           // X pressure gradient term
+                  Kwu(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](0)*dphi[j][qp](2));     // xy diffusion term
+                  Kwv(i,j) += JxW[qp]*dt*uRe*(dphi[i][qp](1)*dphi[j][qp](2));     // xy diffusion term
+		              Kwp(i,j) += JxW[qp]*(-dt*phi[j][qp]*dphi[i][qp](2));
 
-                    //S3. w row
-                    Kww(i,j)+= JxW[qp]*tau*((Udphi_i)*phi[j][qp]  +                 // mass-matrix term
+
+		              Kpu(i,j) += JxW[qp] * (dt*phi[i][qp]*dphi[j][qp](0));           // X divergent operator
+                  Kpv(i,j) += JxW[qp] * (dt*phi[i][qp]*dphi[j][qp](1));           // Y divergent operator
+                  Kpw(i,j) += JxW[qp] * (dt*phi[i][qp]*dphi[j][qp](2));           // Z divergent operator
+
+		              // SUPG Contribution
+		              Kuu(i,j)+= JxW[qp]*tau*((Udphi_i)*phi[j][qp]  +                 // mass-matrix term
                                           dt*Udphi_i*Udphi_j);                    // advection term
-                    Kwp(i,j)+= JxW[qp] * (dt*tau*Udphi_i*dphi[j][qp](2));           // Z pressure gradient term
+                  Kup(i,j)+= JxW[qp] * (dt*tau*Udphi_i*dphi[j][qp](0));           // X pressure gradient term
 
-                    // PSPG
-                    // ----
-                    //P.1) P row
-                    Kpu(i,j)+= JxW[qp] * (tau * (dphi[i][qp](0)*phi[j][qp] +        // mass-matrix term
+
+		              Kvv(i,j)+= JxW[qp]*tau*((Udphi_i)*phi[j][qp]  +                 // mass-matrix term
+                                          dt*Udphi_i*Udphi_j);                    // advection term
+                  Kvp(i,j)+= JxW[qp] * (dt*tau*Udphi_i*dphi[j][qp](1));           // X pressure gradient term
+
+                  Kww(i,j)+= JxW[qp]*tau*((Udphi_i)*phi[j][qp]  +                 // mass-matrix term
+                                          dt*Udphi_i*Udphi_j);                    // advection term
+                  Kwp(i,j)+= JxW[qp] * (dt*tau*Udphi_i*dphi[j][qp](2));           // Z pressure gradient term
+
+		              // PSPG
+                  // ----
+                  //P.1) P row
+                  Kpu(i,j)+= JxW[qp] * (tau * (dphi[i][qp](0)*phi[j][qp] +          // mass-matrix term
                                         dt*dphi[i][qp](0) * Udphi_j ));             // advection term
-                    Kpv(i,j)+= JxW[qp] * (tau * (dphi[i][qp](1)*phi[j][qp] +        // mass-matrix term
+                  Kpv(i,j)+= JxW[qp] * (tau * (dphi[i][qp](1)*phi[j][qp] +          // mass-matrix term
                                          dt*dphi[i][qp](1) * Udphi_j ));            // advection term
-                    Kpw(i,j)+= JxW[qp] * (tau * (dphi[i][qp](2)*phi[j][qp] +        // mass-matrix term
+                  Kpw(i,j)+= JxW[qp] * (tau * (dphi[i][qp](2)*phi[j][qp] +          // mass-matrix term
                                          dt*dphi[i][qp](2) * Udphi_j ));            // advection term
-                    Kpp(i,j)+= JxW[qp] *  dt*tau*(dphi[i][qp]*dphi[j][qp]);         // gradient operator
+                  Kpp(i,j)+= JxW[qp] *  dt*tau*(dphi[i][qp]*dphi[j][qp]);           // gradient operator
 
-                    // LSIC
-                  
-                    //L.1) U row
-                    Kuu(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](0); // XX divergent operator
-                    Kuv(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](1); // XY divergent operator
-                    Kuw(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](2); // XZ divergent operator
-                  
-                    //L.2) V row
-                    Kvu(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](0); // YX divergent operator
-                    Kvv(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](1); // YY divergent operator
-                    Kvw(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](2); // YZ divergent operator
-                  
-                    //L.3) W row
-                    Kwu(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](0); // ZX divergent operator
-                    Kwv(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](1); // ZY divergent operator
-                    Kww(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](2); // ZZ divergent operator
-      
+                  // LSIC
+                  /*
+                  //L.1) U row
+                  Kuu(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](0); // XX divergent operator
+                  Kuv(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](1); // XY divergent operator
+                  Kuw(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](2); // XZ divergent operator
+                  //L.2) V row
+                  Kvu(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](0); // YX divergent operator
+                  Kvv(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](1); // YY divergent operator
+                  Kvw(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](2); // YZ divergent operator
+                  //L.3) W row
+                  Kwu(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](0); // ZX divergent operator
+                  Kwv(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](1); // ZY divergent operator
+                  Kww(i,j)+= JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](2); // ZZ divergent operator
+		  */
                 }
 
             }
+
         } // end of the quadrature point qp-loop
 
       dof_map.heterogenously_constrain_element_matrix_and_vector (Ke, Fe, dof_indices);

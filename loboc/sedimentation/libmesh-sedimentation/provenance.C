@@ -53,8 +53,8 @@ Provenance::Provenance() {
     pgDirectory = directory + "/prov/pg/" + dataflow + "/";
 #ifdef LINUX
     directory = directory.substr(0, directory.size()-1);
-    jsonDirectory = "prov/di/" + dataflow + "/";
-    pgDirectory = "prov/pg/" + dataflow + "/";
+    jsonDirectory = directory + "/prov/di/" + dataflow + "/";
+    pgDirectory = directory + "/prov/pg/" + dataflow + "/";
 #endif
 
     cout << "###########################" << endl;
@@ -73,6 +73,10 @@ Provenance::Provenance() {
     cout << bin.c_str() << endl;
     cout << "extraArguments=";
     cout << extraArguments.c_str() << endl;
+    cout << "jsonDirectory=";
+    cout << jsonDirectory.c_str() << endl;
+    cout << "pgDirectory=";
+    cout << pgDirectory.c_str() << endl;
     cout << "###########################" << endl;
     
     processor_id = libMesh::global_processor_id();
@@ -409,8 +413,8 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
-    Performance rdePerf;
-    rdePerf.start();
+    Performance rdiPerf;
+    rdiPerf.start();
 
     string extension = "data";
     if (rawDataAccess.compare("INDEXING") == 0) {
@@ -439,8 +443,8 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
         idx.index(directory, rawDataFile, indexerID);
     }
 
-    rdePerf.end();
-    storeRDEComponentCost(rdePerf.elapsedTime());
+    rdiPerf.end();
+    storeRDIComponentCost(rdiPerf.elapsedTime());
 
     perf.start();
 
@@ -483,6 +487,184 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
     perf.end();
     elapsedTime = perf.elapsedTime();
 
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Output" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+}
+
+void Provenance::inputInitVisualization(int simulationID, string transformation) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Input Init Visualization" << endl;
+#endif
+
+    Performance perf;
+    perf.start();
+
+    PerformanceMetric p;
+    char memalloc[jsonArraySize];
+    sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
+    p.SetDescription(memalloc);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyStartTime();
+
+    Task t(simulationID);
+    t.addPerformanceMetric(p);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("RUNNING");
+    t.addDtDependency("getmaximumiterations");
+
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
+
+    sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
+
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Input" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+}
+
+void Provenance::outputInitVisualization(int simulationID, string transformation, string dataSet, int time_step, string png) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Output Init Visualization" << endl;
+#endif
+    Performance perf;
+    perf.start();
+
+    Task t(simulationID);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("FINISHED");
+    t.addDtDependency("getmaximumiterations");
+
+    char memalloc[4096];
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
+
+    File f1(directory, png);
+    t.addFile(f1);
+
+    sprintf(memalloc, "%d;%d;%s%s",
+            simulationID, time_step, pgDirectory.c_str(), png.c_str());
+
+    vector<string> e = {memalloc};
+    t.addSet("o" + transformation, e);
+
+    sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
+
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Output" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+}
+
+void Provenance::inputVisualization(int simulationID, string transformation) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Input Visualization" << endl;
+#endif
+
+    Performance perf;
+    perf.start();
+
+    PerformanceMetric p;
+    char memalloc[jsonArraySize];
+    sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
+    p.SetDescription(memalloc);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyStartTime();
+
+    Task t(simulationID);
+    t.addPerformanceMetric(p);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("RUNNING");
+    t.addDtDependency("meshwriter");
+
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
+
+    sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
+
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Input" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+}
+
+void Provenance::outputVisualization(int simulationID, string transformation, string dataSet, int time_step, string png) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Output Visualization" << endl;
+#endif
+    Performance perf;
+    perf.start();
+
+    Task t(simulationID);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("FINISHED");
+    t.addDtDependency("meshwriter");
+
+    char memalloc[4096];
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
+
+    File f1(directory, png);
+    t.addFile(f1);
+
+    sprintf(memalloc, "%d;%d;%s%s",
+            simulationID, time_step, pgDirectory.c_str(), png.c_str());
+
+    vector<string> e = {memalloc};
+    t.addSet("o" + transformation, e);
+
+    sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
+
+    ofstream file;
     file.open("prov/log/" + transformation + ".prov", ios_base::app);
     file << "PROV:" + transformation + ":Output" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
@@ -935,8 +1117,8 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
-    Performance rdePerf;
-    rdePerf.start();
+    Performance rdiPerf;
+    rdiPerf.start();
 
     string extension = "data";
     if (rawDataAccess.compare("INDEXING") == 0) {
@@ -964,8 +1146,8 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
         idx.index(directory, rawDataFile, indexerID);
     }
 
-    rdePerf.end();
-    storeRDEComponentCost(rdePerf.elapsedTime());
+    rdiPerf.end();
+    storeRDIComponentCost(rdiPerf.elapsedTime());
 
     perf.start();
 
@@ -1045,8 +1227,8 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
 
     char memalloc[4096];
 
-    sprintf(memalloc, "%d;%s;%d",
-            simulationID, xdmf.c_str(), n_processors);
+    sprintf(memalloc, "%d;%s%s;%d;%svideo.mp4",
+            simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str());
 
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
@@ -1077,22 +1259,22 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     file.close();
 }
 
-void Provenance::storeDataExtractionCost(double elapsedTime) {
+void Provenance::storeCatalystCost(double elapsedTime) {
     if (processor_id != 0) return;
     ofstream file;
-    file.open("prov/rde/data-extraction.prov", ios_base::app);
-    file << "RDE:DataExtraction:Process" << endl;
+    file.open("prov/paraview/catalyst.prov", ios_base::app);
+    file << "Paraview:Catalyst:Pipeline" << endl;
     char buffer[jsonArraySize];
     sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
 }
 
-void Provenance::storeRDEComponentCost(double elapsedTime) {
+void Provenance::storeRDIComponentCost(double elapsedTime) {
     if (processor_id != 0) return;
     ofstream file;
-    file.open("prov/indexing/rde-component.prov", ios_base::app);
-    file << "RDEComponent:DataExtraction:Process" << endl;
+    file.open("prov/rdi/indexing.prov", ios_base::app);
+    file << "RDIComponent:DataExtraction:Process" << endl;
     char buffer[jsonArraySize];
     sprintf(buffer, "%.5f", elapsedTime);
     file << space << "elapsed-time: " << buffer << " seconds." << endl;

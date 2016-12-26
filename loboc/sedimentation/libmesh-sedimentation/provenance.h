@@ -38,6 +38,9 @@ public:
     void inputInitDataExtraction(int simulationID, string transformation);
     void outputInitDataExtraction(int simulationID, string transformation, string dataSet, int time_step, string xdmf, string rawDataFile, int dimension, string extractorName, int indexerID);
 
+    void inputInitVisualization(int simulationID, string transformation);
+    void outputInitVisualization(int simulationID, string transformation, string dataSet, int time_step, string png);
+
     void inputSolverSimulationFluid(int taskID, int simulationID, int subTaskID);
     void outputSolverSimulationFluid(int taskID, int simulationID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
 
@@ -52,17 +55,19 @@ public:
     void inputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation);
     void outputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string dataSet, int time_step, string xdmf, string rawDataFile, int dimension, string extractorName, int indexerID);
 
+    void inputVisualization(int simulationID, string transformation);
+    void outputVisualization(int simulationID, string transformation, string dataSet, int time_step, string png);
+
     void meshAggregator(int simulationID, string xdmf, int n_processors, vector<string> meshDependencies);
 
     void finishDataIngestor();
 
-    void storeDataExtractionCost(double elapsedTime);
-    void storeRDEComponentCost(double elapsedTime);
+    void storeCatalystCost(double elapsedTime);
+    void storeRDIComponentCost(double elapsedTime);
     void storeSolverCost(double elapsedTime);
 private:
     int processor_id;
-    const int textArraySize = 64;
-    const int jsonArraySize = 128;
+    const int jsonArraySize = 4096;
     string space = "      ";
     string directory = "";
     string pgCommandLine = "";

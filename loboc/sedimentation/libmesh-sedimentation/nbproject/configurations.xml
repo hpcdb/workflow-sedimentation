@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
+      <df name="dfanalyzer">
+        <in>performance_metric.C</in>
+        <in>provenance_object.C</in>
+        <in>task.C</in>
+      </df>
       <in>FEAdaptor.C</in>
       <in>mesh_moviment.C</in>
       <in>provenance.C</in>
@@ -43,11 +48,13 @@
           <executablePath>libmesh-sedimentation-opt</executablePath>
           <ccTool>
             <incDir>
-              <pElem>../../../programs/paraview/include/paraview-5.1</pElem>
+              <pElem>../../../../program/paraview/include/paraview-5.1</pElem>
               <pElem>../../xdmf</pElem>
-              <pElem>../../../programs/libmesh-install/include</pElem>
-              <pElem>../../../programs/hdf5/include</pElem>
-              <pElem>../../../programs/petsc/include</pElem>
+              <pElem>../../../../program/libmesh/include</pElem>
+              <pElem>../../../../program/hdf5/include</pElem>
+              <pElem>../../../../program/petsc/3.7.2/include</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include</pElem>
               <pElem>/usr/lib/openmpi/include</pElem>
               <pElem>/usr/lib/openmpi/include/openmpi</pElem>
             </incDir>
@@ -56,11 +63,34 @@
             </preprocessorList>
           </ccTool>
         </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
       </makefileType>
       <item path="FEAdaptor.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
+      <item path="dfanalyzer/performance_metric.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="dfanalyzer/provenance_object.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="dfanalyzer/task.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <folder path="0/dfanalyzer">
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
       <item path="mesh_moviment.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
