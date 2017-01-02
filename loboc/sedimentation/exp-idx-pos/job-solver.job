@@ -13,8 +13,8 @@ export DATAFLOW_TAG=sedimentation
 export DFA=/home/users/vitorss/simulation/sedimentation/dfa
 cd $CPATH
 
-#echo "Specifying dataflow generation..."
-#./pg-dataflow.sh
+echo "Specifying dataflow generation..."
+./pg-dataflow.sh
 
 echo "Configuring the lists of machines for the solver and database system..."
 cp $PBS_NODEFILE nodes.txt
