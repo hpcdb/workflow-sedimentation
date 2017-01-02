@@ -1,5 +1,5 @@
-#PBS -l select=41:ncpus=48:mpiprocs=24
-#PBS -l walltime=999:00:00
+#PBS -l select=81:ncpus=48:mpiprocs=24
+#PBS -l walltime=18:00:00
 #PBS -j oe  
 #PBS -N sed-idx-fb
 #PBS -V 
@@ -13,8 +13,8 @@ export DATAFLOW_TAG=sedimentation
 export DFA=/home/users/vitorss/simulation/sedimentation/dfa
 cd $CPATH
 
-#echo "Specifying dataflow generation..."
-#./pg-dataflow.sh
+echo "Specifying dataflow generation..."
+./pg-dataflow.sh
 
 echo "Configuring the lists of machines for the solver and database system..."
 cp $PBS_NODEFILE nodes.txt
@@ -22,10 +22,10 @@ java -jar /home/users/vitorss/simulation/sedimentation/bin/EnvironmentFileGenera
 
 echo "Starting database system..."
 #$DFA/create-data.sh $DFA $DATAPATH
-#rm -rf data
-#unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
-#/home/users/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
-#sleep 15
+rm -rf data
+unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
+/home/users/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
+sleep 15
 
 echo "Setting up environment variables..."
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user2/local/gnu/paraview/5.1/lib/paraview-5.1
@@ -40,9 +40,9 @@ chmod 774 mpirun.sh
 echo "Calculating total elapsed times based on log files..."
 java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt
 
-#echo "Executing termination algorithm..."
-#/home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
-#/home/users/vitorss/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
+echo "Executing termination algorithm..."
+/home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
+/home/users/vitorss/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
 
 #echo "Backing up provenance database..."
 #mclient -p 54321 -d dataflow_analyzer --dump > prov-db.dump
