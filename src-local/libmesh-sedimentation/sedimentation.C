@@ -225,9 +225,9 @@ int main(int argc, char** argv) {
     int indexerID = 0;
 
     // create index directory
-    char cmd[32];
-    sprintf(cmd, "mkdir index");
-    system(cmd);
+    // char cmd[32];
+    // sprintf(cmd, "mkdir index");
+    // system(cmd);
 
     // INPUT: TIME INTEGRATION
     Real dt = infile("deltat", 0.005);
@@ -1170,11 +1170,11 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
     // Mesh Aggregator
-    #ifdef USE_CATALYST
-        sprintf(memalloc, "rm video.mp4;cat image_*.png | ffmpeg -i - -r 30 video.mp4");
-        cout << memalloc << endl;
-        system(memalloc);
-    #endif
+    // #ifdef USE_CATALYST
+    //     sprintf(memalloc, "rm video.mp4;cat image_*.png | ffmpeg -i - -r 30 video.mp4");
+    //     cout << memalloc << endl;
+    //     system(memalloc);
+    // #endif
 
     char out_filename[jsonArraySize];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());

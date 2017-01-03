@@ -55,10 +55,40 @@ public class Analysis {
         }
         return totalElapsedTime;
     }
+    
+    private static double getMaxElapsedTime(String logDir, String subDir) {
+        File folder = new File(logDir + "/" + subDir);
+        File[] files = folder.listFiles();
+
+        String header = "elapsed-time:";
+        double maxElapsedTime = 0.0;
+
+        for (File f : files) {
+            if (f.isFile() && f.getName().endsWith(".prov")) {
+                try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        if (line.contains(header)) {
+                            double elapsedTime = Double.valueOf(line.trim()
+                                    .replaceAll(header, "").replaceAll("seconds.", "").trim());
+                            if(elapsedTime > maxElapsedTime){
+                                maxElapsedTime = elapsedTime;
+                            }
+                        }
+                    }
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Analysis.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Analysis.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return maxElapsedTime;
+    }
 
     private void calculateOverheads() {
-        double paraviewOverhead = paraviewTime - rdeTime - visualizationTime;
-        double rdiOverhead = rdiTime - indexingTime;
+        paraviewOverhead = paraviewTime - rdeTime - visualizationTime;
+        rdiOverhead = rdiTime - indexingTime;
     }
 
     private void setProvenanceTime() {
@@ -70,7 +100,7 @@ public class Analysis {
     }
 
     private void setRDETime() {
-        this.rdeTime = Analysis.getElapsedTime(logDirectory, "rde");;
+        this.rdeTime = Analysis.getMaxElapsedTime(logDirectory, "rde");;
     }
 
     private void setRDITime() {
@@ -82,7 +112,7 @@ public class Analysis {
     }
 
     private void setVisualization() {
-        this.visualizationTime = Analysis.getElapsedTime(logDirectory, "visualization");;
+        this.visualizationTime = Analysis.getMaxElapsedTime(logDirectory, "visualization");;
     }
 
     void setLogDirectory(String logDirectory) {

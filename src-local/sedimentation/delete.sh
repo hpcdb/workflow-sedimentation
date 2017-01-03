@@ -40,3 +40,4 @@ mkdir prov/di/sedimentation
 cp dataflow.json prov/pg/sedimentation/
 cp dataflow.json prov/di/sedimentation/
 mkdir output
+mkdir index

@@ -225,9 +225,9 @@ int main(int argc, char** argv) {
     int indexerID = 0;
 
     // create index directory
-    char cmd[32];
-    sprintf(cmd, "mkdir index");
-    system(cmd);
+    // char cmd[32];
+    // sprintf(cmd, "mkdir index");
+    // system(cmd);
 
     // INPUT: TIME INTEGRATION
     Real dt = infile("deltat", 0.005);

@@ -87,7 +87,7 @@ def CreateCoProcessor():
       if(elapsedTime < 0.00000):
         elapsedTime = 0.00
 
-      text_file = open("prov/rde/data-extraction.prov", "a+")
+      text_file = open("prov/rde/data-extraction-" + str(timeStep) + ".prov", "a+")
       text_file.write("RDE:DataExtraction:Process\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
       text_file.close()
 
@@ -222,7 +222,7 @@ def CreateCoProcessor():
 #      if(elapsedTime < 0.00000):
 #        elapsedTime = 0.00
 #
-#      text_file = open("prov/visualization/paraview.prov", "a+")
+#      text_file = open("prov/visualization/paraview-" + str(timeStep) + ".prov", "a+")
 #      text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
 #      text_file.close()
 
