@@ -35,7 +35,6 @@ echo "Executing sedimentation solver..."
 echo -n " -np 24 /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt analysis3D.py" >> mpirun.sh 
 chmod 774 mpirun.sh
 ./mpirun.sh >> out.txt 2>> err.txt
-#/home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt analysis3D.py >> out.txt 2>> err.txt
 
 echo "Calculating total elapsed times based on log files..."
 java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt

@@ -1228,11 +1228,11 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
     char memalloc[4096];
 
 // with visualization
-    // sprintf(memalloc, "%d;%s%s;%d;%svideo.mp4",
-    //         simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str());
+    sprintf(memalloc, "%d;%s%s;%d;%svideo.mp4",
+            simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str());
 // without visualization
-    sprintf(memalloc, "%d;%s%s;%d;%s%s",
-            simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str(), xdmf.c_str());
+    // sprintf(memalloc, "%d;%s%s;%d;%s%s",
+    //         simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str(), xdmf.c_str());
 
 
     vector<string> e = {memalloc};
