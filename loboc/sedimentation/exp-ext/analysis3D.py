@@ -226,7 +226,7 @@ def CreateCoProcessor():
       # text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
       # text_file.close()
 
-      return Pipeline()
+    return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):
     def CreatePipeline(self, datadescription):
