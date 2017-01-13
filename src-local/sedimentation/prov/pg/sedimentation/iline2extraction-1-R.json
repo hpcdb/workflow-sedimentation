@@ -1,0 +1,29 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "iline2extraction",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::iline2extraction-1",
+            "method": "COMPUTATION",
+            "startTime": "13.01.2017-07:18:31"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "getmaximumiterations"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

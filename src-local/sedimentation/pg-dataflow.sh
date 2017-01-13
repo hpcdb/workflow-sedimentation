@@ -16,7 +16,7 @@ PGDIR=/shared/experiment/libmesh-sedimentation
 
 # Sedimentation Solver
 dimension="3"
-access="indexing"
+access="extraction"
 cartridge="csv"
 
 echo "Dataflow - libMesh Sedimentation"

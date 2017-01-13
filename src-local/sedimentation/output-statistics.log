@@ -1,0 +1,23 @@
+######################################################
+#################### Log Analysis ####################
+######################################################
+Solver elapsed time (seconds): 7.95
+Provenance elapsed time (seconds): 0.01
+Raw data extraction elapsed time (seconds): 0.11
+Visualization elapsed time (seconds): 0.0
+Raw data indexing elapsed time (seconds): 0.0
+ParaView overhead elapsed time (seconds): 1.16
+RDI overhead  elapsed time (seconds): 0.0
+Total elapsed time (seconds): 9.22
+------------------------------------------------------
+----------------- Percentual Analysis ----------------
+------------------------------------------------------
+Solver elapsed time (%): 86.17
+Provenance elapsed time (%): 0.06
+Raw data extraction elapsed time (%): 1.15
+Visualization elapsed time (%): 0.0
+Raw data indexing elapsed time (%): 0.0
+Paraview OVERHEAD elapsed time (%): 12.62
+Raw data indexing OVERHEAD elapsed time (%): 0.0
+Total elapsed time (%): 100.0
+######################################################

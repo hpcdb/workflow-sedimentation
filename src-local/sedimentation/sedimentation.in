@@ -73,10 +73,10 @@ is_gravitational_current = 0
 # Write out every nth timestep to file.
 write_interval = 1
 # Mint
-#dir_path = /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/
+dir_path = /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/
 # MacOS
 #dir_path = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/output/
 # Docker
-dir_path = /experiment/sedimentation/output/
+#dir_path = /experiment/sedimentation/output/
 output = output
 
