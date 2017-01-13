@@ -59,11 +59,11 @@
 
 #include "sedimentation_transport.h"
 
-// Bring in everything from the libMesh namespace
-using namespace libMesh;
-
 #define MAX(a,b) a>b?a:b
 #define MIN(a,b) a<b?a:b
+
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
 
 
 // Define a wrapper for exact_solution that will be needed below
@@ -81,8 +81,8 @@ void one_wrapper (DenseVector<Number>& output,
 {
         double xlock = parameters.get<Real> ("xlock");
         double hlock = parameters.get<Real> ("hlock");
-
-        if( (p(0) <= xlock) && (p(2)  <= hlock) )  return 1.0;
+        int d        = parameters.get<int>  ("dim");
+        if((p(0) <= xlock) && (p(d-1) <= hlock) ) return 1.0;
         return 0.0;
 }
 
@@ -96,11 +96,12 @@ void one_wrapper (DenseVector<Number>& output,
       es.get_system<TransientLinearImplicitSystem>("sediment");
 
     es.parameters.set<Real> ("time") = system.time = 0;
-
+    
     system.project_solution(init_value, NULL, es.parameters);
   }
 
-void SedimentationTransport::init()
+
+  void SedimentationTransport::init()
   {
      const MeshBase& mesh = es.get_mesh();
 
@@ -115,7 +116,6 @@ void SedimentationTransport::init()
      
      
   }
-
 
 void SedimentationTransport::setup(GetPot &infile)
 {
@@ -136,12 +136,18 @@ void SedimentationTransport::setup(GetPot &infile)
   sed_vars[0] = s_var;
   ZeroFunction<Number> zero;
   
-  int czero_id = infile("dirichlet/czero", -1);
-  if(czero_id != -1) {
-      czero.insert(czero_id);
-      transport_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(czero,sed_vars, &zero));
+  int size   = infile.vector_variable_size("dirichlet/czero");  
+  for(int i = 0; i < size; i++) {
+    int czero_id = infile("dirichlet/czero", -1, i);
+    if(czero_id != -1) {
+        czero.insert(czero_id);
+        
+    }
   }
+  if(czero.size() != 0 )
+    transport_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(czero,sed_vars, &zero));
   
+
   this->es.parameters.set<int>("no-flux bc")   = infile("flux/noflux"   , -1);
   this->es.parameters.set<int>("advective bc") = infile("flux/advective", -1);
   
@@ -154,6 +160,9 @@ void SedimentationTransport::assemble2D()
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "sediment");
+  
+  PerfLog* perf_log = es.parameters.get<PerfLog*>("PerfLog");
+  perf_log->pause_event("Transport:Solver");
 
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
@@ -243,16 +252,19 @@ void SedimentationTransport::assemble2D()
   //const RealVectorValue velocity = es.parameters.get<RealVectorValue> ("velocity");
   const Real dt      = es.parameters.get<Real>  ("dt");
 
-  const Real fopc    = es.parameters.get<Real>   ("fopc");
+  const Real fopc    = es.parameters.get<Real>  ("fopc");
   const Real theta   = es.parameters.get<Real>  ("theta");
   const Real k       = es.parameters.get<Real>  ("Diffusivity");
   const Real Us      = es.parameters.get<Real>  ("Us");
   const Real ex      = es.parameters.get<Real>  ("ex");
   const Real ey      = es.parameters.get<Real>  ("ey");
   const Real ez      = es.parameters.get<Real>  ("ez");
+  const int  noflux_bc   = es.parameters.get<int>  ("no-flux bc");
+  const int  adv_bc      = es.parameters.get<int>  ("advective bc");
 
   RealVectorValue norm(ex,ez);
-  
+
+
   const Real one3  = 1.0/3.0;
   const Real invPi = 1.0/libMesh::pi;
 
@@ -302,17 +314,17 @@ void SedimentationTransport::assemble2D()
       Fe.resize (dof_indices.size());
 
 
-      // Compute SUPG stabilization parameters:
-      // The carateristic height of the element
-      const Real volume      = elem->volume();
-      const Real h_caract    = 2.0*pow(volume*invPi, 0.5);
-      const Real aux1        = 9.0*pow(4.0*k/(h_caract*h_caract),2.0)+ 4.0/(dt*dt);
-      const Real invPHI      = 1.0;
+	  // Compute SUPG stabilization parameters:
+	  // The carateristic height of the element
+        const Real volume      = elem->volume();
+        const Real h_caract    = 2.0*pow(volume*invPi, 0.5);
+        const Real aux1        = 9.0*pow(4.0*k/(h_caract*h_caract),2.0)+ 4.0/(dt*dt);
+        const Real invPHI      = 1.0;
 
 
-      // loop over quadrature points
-      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
-      {
+        // loop over quadrature points
+        for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+        {
             // Values to hold the old solution & its gradient.
             Number   s_old = 0.0, s = 0.0;
             Gradient grad_s_old , grad_s, grad_u, grad_v, grad_p;
@@ -331,6 +343,7 @@ void SedimentationTransport::assemble2D()
 
               u += phi[l][qp]*(flow_system.current_solution(dof_indices_u[l]));
               v += phi[l][qp]*(flow_system.current_solution(dof_indices_v[l])-Us);
+
               grad_u.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_u[l]));
               grad_v.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_v[l]));
 
@@ -340,28 +353,39 @@ void SedimentationTransport::assemble2D()
               grad_p.add_scaled(dphi[l][qp],flow_system.current_solution(dof_indices_p[l]));
 
             }
+            
+            
 
             Point f;
             f(0) = norm(0)*s;
             f(1) = norm(1)*s;
 
+
             RealVectorValue U(u,v);
+            
+            
+            
 
             Real unorm       = U.norm();
 
+            // Now compute the element matrix and RHS contributions.
+            //const Real res         = (s-s_old)/dt + velocity*grad_s;
 
             Real aux2        = pow(2.0*unorm/h_caract,2.0) + aux1;
             Real tau         = pow(aux2,-0.5);
-
+            //const Real aux3        = invPHI*invPHI*(grad_s(0)*grad_s(0) + grad_s(1)*grad_s(1));
+            //const Real aux4        = 0.5*(pow(h_caract,alfa));
+            //Real delta = 0.0;
+            //if(aux3 > 0.0)
+            //    delta =  fabs(invPHI*res) * pow(aux3,beta) * aux4;
             Real rint_x = (u - u_old)/dt + (U*grad_u) + grad_p(0) - f(0);
             Real rint_y = (v - v_old)/dt + (U*grad_v) + grad_p(1) - f(1);
-            tau = 0.0;
+
             RealVectorValue velocity(u-tau*rint_x,v-tau*rint_y);
             unorm       = velocity.norm();
             aux2        = pow(2.0*unorm/h_caract,2.0) + aux1;
             tau         = pow(aux2,-0.5);
-            
-            
+
             // CAU stabilization parameter
             Real res_mass = (s - s_old)/dt;
             Real res_adv  = (velocity*grad_s);
@@ -370,11 +394,11 @@ void SedimentationTransport::assemble2D()
             gcnorm  = MAX(1.0E-10, gcnorm);
             Real ogcnorm = 1.0/gcnorm;
             Real aux3 = res_adv/(ogcnorm*ogcnorm);
-            RealVectorValue b(grad_s(0) * aux3, grad_s(1)*aux3);
+            RealVectorValue b(grad_s(0) * aux3, grad_s(1));
             Real bnorm = b.norm();
             bnorm = MAX( bnorm, 1.0E-10 );
             Real bdb = k*bnorm*bnorm;
-            bdb = MAX( bdb, 1.0E-10 );
+            bdb = MAX( bdb, 1.d-10 );
             Real Pe_p = h_caract*(bnorm*bnorm*bnorm)/bdb;
             Real alpha_c = MIN(0.25*Pe_p, 0.70);
             Real delta_sco = 0.5*h_caract * alpha_c * residuo * ogcnorm * fopc;
@@ -384,7 +408,7 @@ void SedimentationTransport::assemble2D()
             {
               // The RHS contribution
               // Galerkin term
-                Fe(i) += JxW[qp]*(s_old*phi[i][qp]  //mass term
+                Fe(i) += JxW[qp]*(s_old*phi[i][qp]       //mass term
                                     -(1.0-theta)*dt*(
                                         // Convection term
                                         (grad_s_old*velocity)*phi[i][qp] +
@@ -424,7 +448,6 @@ void SedimentationTransport::assemble2D()
       // The following loops over the sides of the element.
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
-      /*
       {
 
 
@@ -434,12 +457,11 @@ void SedimentationTransport::assemble2D()
 
               fe_face->reinit(elem,s);
 
-              // Applying no-flux boundary condition
-              if(mesh.boundary_info->boundary_id(elem,s) == BOUNDARY_ID_MIN_Z)
+              // Applying flux advective boundary condition
+              if(mesh.boundary_info->boundary_id(elem,s) == adv_bc)
               {
 
-                std::vector<Point> normals = fe_face->get_normals();
-
+                
                 for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
                     Number   s     = 0.0;
@@ -447,30 +469,56 @@ void SedimentationTransport::assemble2D()
 
                     for (unsigned int i=0; i<phi_face.size(); i++)
                     {
-                        s += phi_face[i][qp]*system.current_solution(dof_indices[i]);
-                        grad_s.add_scaled(dphi_face[i][qp],system.current_solution(dof_indices[i]));
+                        s += phi_face[i][qp]*system.old_solution(dof_indices[i]);
+                       
                     }
 
-                    Number no_flux = s*Us + grad_s*normals[qp];
+                    Number  tmp =  -k/Us;
 
                     // RHS contribution
                     for (unsigned int i=0; i<phi_face.size(); i++)
-                        Fe(i) += JxW_face[qp]*no_flux*phi_face[i][qp];
+                        Fe(i) += JxW_face[qp]*tmp*s*phi_face[i][qp];
 
                     //Matrix contribution
 
-                    //for (unsigned int i=0; i<phi_face.size(); i++)
-                    //    for (unsigned int j=0; j<phi_face.size(); j++)
-                    //        Ke(i,j) += JxW_face[qp]*phi_face[i][qp]*phi_face[j][qp];
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                        for (unsigned int j=0; j<phi_face.size(); j++)
+                            Ke(i,j) += JxW_face[qp]*tmp*phi_face[i][qp]*phi_face[j][qp];
 
                 }
-
               }
+              
+              if(mesh.boundary_info->boundary_id(elem,s) == noflux_bc)
+              {
+                for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                {
+                    Number   s     = 0.0;
+                  
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                    {
+                        s += phi_face[i][qp]*system.old_solution(dof_indices[i]);
+                        
+                    }
+                    
+                    Number  tmp =  (1.0-theta)*Us*dt*JxW_face[qp];
+                    // RHS contribution
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                        Fe(i) += tmp*s*phi_face[i][qp];
 
+                    //Matrix contribution
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                        for (unsigned int j=0; j<phi_face.size(); j++)
+                            Ke(i,j) += tmp*phi_face[i][qp]*phi_face[j][qp];
+
+                }
+                  
+              }
             }
 
-      }
-       * */
+        }
+
+      
+      
 
       // If this assembly program were to be used on an adaptive mesh,
       // we would have to apply any hanging node constraint equations
@@ -484,6 +532,8 @@ void SedimentationTransport::assemble2D()
       system.rhs->add_vector    (Fe, dof_indices);
     }
     // That concludes the system matrix assembly routine.
+  
+    perf_log->restart_event("Transport:Solver");
 
 }
 
@@ -602,8 +652,11 @@ void SedimentationTransport::assemble3D()
   const Real ex      = es.parameters.get<Real>  ("ex");
   const Real ey      = es.parameters.get<Real>  ("ey");
   const Real ez      = es.parameters.get<Real>  ("ez");
+  const int  noflux_bc   = es.parameters.get<int>  ("no-flux bc");
+  const int  adv_bc      = es.parameters.get<int>  ("advective bc");
 
   RealVectorValue e(ex,ey,ez);
+
 
   const Real one3  = 1.0/3.0;
   const Real invPi = 1.0/libMesh::pi;
@@ -688,11 +741,13 @@ void SedimentationTransport::assemble3D()
 
             RealVectorValue velocity(u+e(0)*Us,v+e(1)*Us,w+e(2)*Us);
 
-	    const Real unorm       = velocity.size();
+            const Real res         = (s-s_old)/dt + velocity*grad_s;
+	          const Real unorm       = velocity.norm();
             const Real aux2        = pow(2.0*unorm/h_caract,2.0) + aux1;
             const Real tau         = pow(aux2,-0.5);
 
-              // CAU stabilization parameter
+
+            // CAU stabilization parameter
             Real res_mass = (s - s_old)/dt;
             Real res_adv  = (velocity*grad_s);
             Real residuo    = res_mass + res_adv;
@@ -704,10 +759,11 @@ void SedimentationTransport::assemble3D()
             Real bnorm = b.norm();
             bnorm = MAX( bnorm, 1.0E-10 );
             Real bdb = k*bnorm*bnorm;
-            bdb = MAX( bdb, 1.0E-10 );
+            bdb = MAX( bdb, 1.d-10 );
             Real Pe_p = 0.5*h_caract*(bnorm*bnorm*bnorm)/bdb;
             Real alpha_c = MIN(0.25*Pe_p, 0.70);
             Real delta_sco = 0.5*h_caract * alpha_c * residuo * ogcnorm * fopc;
+
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i=0; i<phi.size(); i++)
@@ -740,7 +796,7 @@ void SedimentationTransport::assemble3D()
                                                 phi[j][qp]*(velocity*dphi[i][qp]) +
                                                 theta*dt*(velocity*dphi[j][qp])*(velocity*dphi[i][qp])
                                            );
-                    // YZBetha
+                    // CAU
                     Ke(i,j) += JxW[qp]*delta_sco*dt*(dphi[i][qp]*dphi[j][qp]);
                 }
             }
@@ -751,6 +807,74 @@ void SedimentationTransport::assemble3D()
       // boundary conditions.  For this example we will only
       // consider simple Dirichlet boundary conditions imposed
       // via the penalty method.
+       {
+
+
+        for (unsigned int s=0; s<elem->n_sides(); s++)
+          if (elem->neighbor(s) == NULL)
+            {
+
+              fe_face->reinit(elem,s);
+
+              // Applying flux advective boundary condition
+              if(mesh.boundary_info->boundary_id(elem,s) == adv_bc)
+              {
+
+                
+                for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                {
+                    Number   s     = 0.0;
+                    Gradient grad_s;
+
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                    {
+                        s += phi_face[i][qp]*system.old_solution(dof_indices[i]);
+                       
+                    }
+
+                    Number  tmp =  -k/Us;
+
+                    // RHS contribution
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                        Fe(i) += JxW_face[qp]*tmp*s*phi_face[i][qp];
+
+                    //Matrix contribution
+
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                        for (unsigned int j=0; j<phi_face.size(); j++)
+                            Ke(i,j) += JxW_face[qp]*tmp*phi_face[i][qp]*phi_face[j][qp];
+
+                }
+              }
+              
+              if(mesh.boundary_info->boundary_id(elem,s) == noflux_bc)
+              {
+                for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                {
+                    Number   s     = 0.0;
+                  
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                    {
+                        s += phi_face[i][qp]*system.old_solution(dof_indices[i]);
+                        
+                    }
+                    
+                    Number  tmp =  (1.0-theta)*Us*dt*JxW_face[qp];
+                    // RHS contribution
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                        Fe(i) += tmp*s*phi_face[i][qp];
+
+                    //Matrix contribution
+                    for (unsigned int i=0; i<phi_face.size(); i++)
+                        for (unsigned int j=0; j<phi_face.size(); j++)
+                            Ke(i,j) += tmp*phi_face[i][qp]*phi_face[j][qp];
+
+                }
+                  
+              }
+            }
+
+        }
 
 
       // If this assembly program were to be used on an adaptive mesh,
