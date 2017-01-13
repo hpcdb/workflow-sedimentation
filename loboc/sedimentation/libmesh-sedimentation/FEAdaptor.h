@@ -8,21 +8,23 @@
 #ifndef FEADAPTOR_H
 #define	FEADAPTOR_H
 
-#define USE_CATALYST
-
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
 
+#include <iostream>
+#include <string>
+
 using namespace libMesh;
+using namespace std;
 
 namespace FEAdaptor
 {
-  void Initialize(int numScripts, char* scripts[]);
+  void Initialize(int numScripts, string extractionScript, string visualizationScript);
 
   void Finalize();
 
-  void CoProcess(int numScripts, char* scripts[],EquationSystems &eq, double time, unsigned int timeStep, bool lastTimeStep, bool using_amr);
+  void CoProcess(int numScripts, string extractionScript, string visualizationScript, EquationSystems &eq, double time, unsigned int timeStep, bool lastTimeStep, bool using_amr);
   
 }
 

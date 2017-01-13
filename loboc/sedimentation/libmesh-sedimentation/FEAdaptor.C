@@ -42,6 +42,8 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/fe_interface.h"
 
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -252,8 +254,12 @@ namespace FEAdaptor
 {
 
   std::map<int, int>                   g2l;
+  int numScripts;
+  vtkNew<vtkCPPythonScriptPipeline> extraction;
+  vtkNew<vtkCPPythonScriptPipeline> visualization;
+
   
-  void Initialize(int numScripts, char* scripts[])
+  void Initialize(int numScripts, string extractionScript, string visualizationScript)
   {
       
     //std::cout << "COPROCESSING INIT BEGIN" << std::endl;
@@ -266,11 +272,15 @@ namespace FEAdaptor
       {
         Processor->RemoveAllPipelines();
       }
-    for(int i=1;i<numScripts;i++)
-      {
-         vtkNew<vtkCPPythonScriptPipeline> pipeline;
-         pipeline->Initialize(scripts[i]);
-         Processor->AddPipeline(pipeline.GetPointer());
+
+      if(numScripts > 1){
+        extraction->Initialize(extractionScript.c_str());
+        Processor->AddPipeline(extraction.GetPointer());
+      }
+
+      if(numScripts > 2){
+        visualization->Initialize(visualizationScript.c_str());
+        Processor->AddPipeline(visualization.GetPointer());
       }
      //std::cout << "COPROCESSING INIT END" << std::endl;
   }
@@ -289,16 +299,14 @@ namespace FEAdaptor
       }
   }
 
-  void CoProcess(int numScripts, char* scripts[],EquationSystems &eq, double time, unsigned int timeStep, 
+  void CoProcess(int numScripts, string extractionScript, string visualizationScript, EquationSystems &eq, double time, unsigned int timeStep, 
     bool lastTimeStep = false, bool using_amr = false)
   {
     //std::cout << "COPROCESSING BEGIN" << std::endl;
-    Processor->RemoveAllPipelines();
-    for(int i=1;i<numScripts;i++)
-    {
-       vtkNew<vtkCPPythonScriptPipeline> pipeline;
-       pipeline->Initialize(scripts[i]);
-       Processor->AddPipeline(pipeline.GetPointer());
+    if(numScripts > 1){
+      Processor->RemovePipeline(extraction.GetPointer());
+      extraction->Initialize(extractionScript.c_str());
+      Processor->AddPipeline(extraction.GetPointer());
     }
 
     vtkNew<vtkCPDataDescription> dataDescription;

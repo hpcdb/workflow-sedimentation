@@ -109,6 +109,24 @@ bool is_file_exist(const char *fileName) {
 // since it was designed to be run only with real numbers.
 
 int main(int argc, char** argv) {
+    string extractionScript;
+    string visualizationScript;
+    if(argc > 1){
+        extractionScript = argv[1];
+        if(argc > 2){
+            visualizationScript = argv[2];
+        }
+    }
+
+    if (libMesh::global_processor_id() == 0) {
+	    cout << "######################" << endl;
+	    cout << "Catalyst Configuration" << endl;
+	    cout << "######################" << endl;
+	    cout << "Extraction script: " << extractionScript << endl;
+	    cout << "Visualization script: " << visualizationScript << endl;
+	}
+
+
     Performance solverPerf;
     char memalloc[jsonArraySize];
     char finalFilename[jsonArraySize];
@@ -428,10 +446,10 @@ int main(int argc, char** argv) {
             }
         #endif
         perf_log.start_event("CATALYST:Init");
-        FEAdaptor::Initialize(argc, argv);
+        FEAdaptor::Initialize(argc, extractionScript, visualizationScript);
         perf_log.stop_event("CATALYST:Init");
         perf_log.start_event("CATALYST:CoProcess");
-        FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+        FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);
         perf_log.stop_event("CATALYST:CoProcess");
         #ifdef PERFORMANCE
         if (libMesh::global_processor_id() == 0) {
@@ -482,10 +500,10 @@ int main(int argc, char** argv) {
                     }
                 #endif
                 perf_log.start_event("CATALYST:Init");
-                FEAdaptor::Initialize(argc, argv);
+                FEAdaptor::Initialize(argc, extractionScript, visualizationScript);
                 perf_log.stop_event("CATALYST:Init");
                 perf_log.start_event("CATALYST:CoProcess");
-                FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);         
+                FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);         
                 perf_log.stop_event("CATALYST:CoProcess");
                 #ifdef PERFORMANCE
                     if (libMesh::global_processor_id() == 0) {
@@ -961,7 +979,7 @@ int main(int argc, char** argv) {
                     }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                    FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
@@ -1011,7 +1029,7 @@ int main(int argc, char** argv) {
                                 }
                             #endif
                             perf_log.start_event("CATALYST:CoProcess");
-                            FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                            FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
                             perf_log.stop_event("CATALYST:CoProcess");
                             #ifdef PERFORMANCE
                                 if (libMesh::global_processor_id() == 0) {
@@ -1101,7 +1119,7 @@ int main(int argc, char** argv) {
                 }
             #endif
             perf_log.start_event("CATALYST:CoProcess");
-            FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+            FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
             perf_log.stop_event("CATALYST:CoProcess");
             #ifdef PERFORMANCE
                 if (libMesh::global_processor_id() == 0) {
@@ -1151,7 +1169,7 @@ int main(int argc, char** argv) {
                         }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                    FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
