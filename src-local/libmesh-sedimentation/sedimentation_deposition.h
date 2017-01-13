@@ -76,7 +76,7 @@ public:
   //void update2();
 private:
   EquationSystems &es;
-  int deposition_id;
+  int   deposition_id;
   
 };
 

@@ -54,6 +54,8 @@
 
 #define XDMF_
 
+#include "FEAdaptor.h"
+
 #include "xdmf.h"
 
 // Bring in everything from the libMesh namespace
@@ -66,7 +68,6 @@ using namespace std;
 #include "mesh_moviment.h"
 #include "provenance.h"
 #include "performance.h"
-#include "FEAdaptor.h"
 
 const int jsonArraySize = 256;
 
@@ -160,7 +161,6 @@ int main(int argc, char** argv) {
     const unsigned int hlevels = infile("hlevels", 0);
 
     MeshRefinement refinement(mesh);
-
     refinement.refine_fraction() = r_fraction;
     refinement.coarsen_fraction() = c_fraction;
     refinement.max_h_level() = max_h_level;
@@ -169,7 +169,7 @@ int main(int argc, char** argv) {
 
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
-
+    
     SedimentationFlow sediment_flow(equation_systems);
     SedimentationTransport sediment_transport(equation_systems);
     SedimentationDeposition sediment_deposition(equation_systems);
@@ -203,7 +203,8 @@ int main(int argc, char** argv) {
     cout << "  Grashof : " << Gr << endl;
     cout << "  Sc      : " << Sc << endl;
 
-    equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
+    equation_systems.parameters.set<int> ("dim")          = infile( "dim", 2);
+	equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
     equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
     equation_systems.parameters.set<Real> ("Us") = Us;
 
@@ -217,6 +218,7 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("ez") = ez;
     equation_systems.parameters.set<Real> ("c_factor") = c_factor;
     equation_systems.parameters.set<Real> ("fopc") = fopc;
+    equation_systems.parameters.set<Real> ("dt_stab")     = infile( "dt_stab", 0.1);
 
     ////
 
@@ -387,7 +389,9 @@ int main(int argc, char** argv) {
     string* current_files;
 
 #ifdef LIBMESH_HAVE_HDF5
+    perf_log.start_event("XDMF:Write");
     current_files = xdmf_writer.write_time_step(equation_systems, time);
+    perf_log.stop_event("XDMF:Write");
     cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 #else
     int exodus_step = 0;
@@ -423,8 +427,12 @@ int main(int argc, char** argv) {
                 perf.start();
             }
         #endif
+        perf_log.start_event("CATALYST:Init");
         FEAdaptor::Initialize(argc, argv);
+        perf_log.stop_event("CATALYST:Init");
+        perf_log.start_event("CATALYST:CoProcess");
         FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);
+        perf_log.stop_event("CATALYST:CoProcess");
         #ifdef PERFORMANCE
         if (libMesh::global_processor_id() == 0) {
             perf.end();
@@ -473,8 +481,12 @@ int main(int argc, char** argv) {
                         perf.start();
                     }
                 #endif
+                perf_log.start_event("CATALYST:Init");
                 FEAdaptor::Initialize(argc, argv);
+                perf_log.stop_event("CATALYST:Init");
+                perf_log.start_event("CATALYST:CoProcess");
                 FEAdaptor::CoProcess(argc, argv, equation_systems, 0.0, t_step, false, false);         
+                perf_log.stop_event("CATALYST:CoProcess");
                 #ifdef PERFORMANCE
                     if (libMesh::global_processor_id() == 0) {
                         perf.end();
@@ -520,6 +532,8 @@ int main(int argc, char** argv) {
     int numberIterationsMeshRefinements = 0;
     int numberOfWrites = 0;
     vector<string> meshDependencies;
+
+    equation_systems.parameters.set<PerfLog*> ("PerfLog")    = &perf_log;
 
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
         taskID++;
@@ -623,7 +637,9 @@ int main(int argc, char** argv) {
                 flow_last_nonlinear_soln->add(*flow_system.solution);
 
                 // Assemble & solve the linear system.
+                perf_log.start_event("Flow:Solver");
                 flow_system.solve();
+                perf_log.stop_event("Flow:Solver");
 
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
@@ -750,7 +766,9 @@ int main(int argc, char** argv) {
                 sed_last_nonlinear_soln->add(*transport_system.solution);
 
                 // Assemble & solve the linear system.
+                perf_log.start_event("Transport:Solver");
                 transport_system.solve();
+                perf_log.stop_event("Transport:Solver");
 
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
@@ -905,7 +923,9 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef LIBMESH_HAVE_HDF5
+                perf_log.start_event("XDMF:Write");
                 current_files = xdmf_writer.write_time_step(equation_systems, time);
+                perf_log.stop_event("XDMF:Write");
                 cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 #else
                 //ExodusII_IO exo(mesh);
@@ -940,7 +960,9 @@ int main(int argc, char** argv) {
                         perf.start();
                     }
                     #endif
+                    perf_log.start_event("CATALYST:CoProcess");
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                    perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
                             perf.end();
@@ -988,7 +1010,9 @@ int main(int argc, char** argv) {
                                     perf.start();
                                 }
                             #endif
+                            perf_log.start_event("CATALYST:CoProcess");
                             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, false, false);
+                            perf_log.stop_event("CATALYST:CoProcess");
                             #ifdef PERFORMANCE
                                 if (libMesh::global_processor_id() == 0) {
                                     perf.end();
@@ -1039,7 +1063,9 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef LIBMESH_HAVE_HDF5
+        perf_log.start_event("XDMF:Write");
         current_files = xdmf_writer.write_time_step(equation_systems, time);
+        perf_log.stop_event("XDMF:Write");
         cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 #else
         //        ExodusII_IO exo(mesh);
@@ -1074,7 +1100,9 @@ int main(int argc, char** argv) {
                     perf.start();
                 }
             #endif
+            perf_log.start_event("CATALYST:CoProcess");
             FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+            perf_log.stop_event("CATALYST:CoProcess");
             #ifdef PERFORMANCE
                 if (libMesh::global_processor_id() == 0) {
                     perf.end();
@@ -1122,7 +1150,9 @@ int main(int argc, char** argv) {
                             perf.start();
                         }
                     #endif
+                    perf_log.start_event("CATALYST:CoProcess");
                     FEAdaptor::CoProcess(argc, argv, equation_systems, transport_system.time, step, true, false);
+                    perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
                             perf.end();
@@ -1170,11 +1200,11 @@ int main(int argc, char** argv) {
 
 #ifdef PROV
     // Mesh Aggregator
-    // #ifdef USE_CATALYST
-    //     sprintf(memalloc, "rm video.mp4;cat image_*.png | ffmpeg -i - -r 30 video.mp4");
-    //     cout << memalloc << endl;
-    //     system(memalloc);
-    // #endif
+//    #ifdef USE_CATALYST
+//        sprintf(memalloc, "rm video.mp4;cat image_*.png | ffmpeg -i - -r 30 video.mp4");
+//        cout << memalloc << endl;
+//        system(memalloc);
+//    #endif
 
     char out_filename[jsonArraySize];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());

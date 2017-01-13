@@ -72,7 +72,6 @@ void MeshMoviment::setup(GetPot &infile)
 {
 
   LinearImplicitSystem & mesh_system = this->es.get_system<LinearImplicitSystem> ("MeshMoving");
-  mesh_system.add_vector("mesh-velocity");
    unsigned int dispz = mesh_system.variable_number ("disp-z");
   mesh_system.attach_assemble_object(*this);
 
@@ -96,9 +95,6 @@ void MeshMoviment::setup(GetPot &infile)
 void MeshMoviment::assemble()
 {
 
-
-  //std::vector<Real> tau_fsi;
-
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
@@ -109,14 +105,14 @@ void MeshMoviment::assemble()
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("MeshMoving");
 
   
-  ExplicitSystem &      deposition_system = es.get_system<ExplicitSystem>("deposition");
- NumericVector<Number> &  deposition_rate = deposition_system .get_vector("deposition_rate");
+  ExplicitSystem        &  deposition_system = es.get_system<ExplicitSystem>("deposition");
+  NumericVector<Number> &  deposition_rate   = deposition_system .get_vector("deposition_rate");
 
 
   // Numeric ids corresponding to each variable in the system
   const unsigned int dispz_var     = system.variable_number ("disp-z");
   const unsigned int d_var         = deposition_system.variable_number("d");
-  //const unsigned int dVdt_var      = deposition_rate.variable_number("dVdt");
+
   
   
   const Real c_factor = es.parameters.get<Real>("c_factor");
@@ -167,7 +163,7 @@ void MeshMoviment::assemble()
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
-  const DofMap& dof_map       = system.get_dof_map();
+  const DofMap& dof_map      = system.get_dof_map();
   const DofMap& dof_map_dep  = deposition_system.get_dof_map();
 
   DenseMatrix<Number> Ke;
@@ -207,9 +203,9 @@ void MeshMoviment::assemble()
     MPI_Allreduce(&vmaxt, &vmax, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
     MPI_Allreduce(&vmint, &vmin, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
 
-    cout << "||dV/dt|| = " << deposition_rate.l2_norm() << endl;
-    cout << "Vol_{min}: " << vmin << endl;
-    cout << "Vol_{max}: " << vmax << endl;
+    //cout << "||dV/dt|| = " << deposition_rate.l2_norm() << endl;
+    //cout << "Vol_{min}: " << vmin << endl;
+    //cout << "Vol_{max}: " << vmax << endl;
 
     aux1 = vmin/vmax;
     aux2 = 1.0/vmax;
@@ -331,10 +327,7 @@ void MeshMoviment::updateMesh()
   const unsigned int dim = mesh.mesh_dimension();
   int d = dim -1;
   // Get a reference to the Convection-Diffusion system object.
-  LinearImplicitSystem & system =
-    es.get_system<LinearImplicitSystem> ("MeshMoving");
-
-  NumericVector<Number> & mesh_velocity = system.get_vector("mesh-velocity");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("MeshMoving");
 
   // Loop over all nodes and copy the location from the current system to
   // the auxiliary system.
@@ -346,12 +339,11 @@ void MeshMoviment::updateMesh()
 
       Number value = system.current_local_solution->el(dof);
       (*node)(d) += value;
-      mesh_velocity.set(dof, value/dt);
 
   }
 
   SyncNodalPositions sync_object(mesh);
   Parallel::sync_dofobject_data_by_id(mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
 
-
+  
 }
