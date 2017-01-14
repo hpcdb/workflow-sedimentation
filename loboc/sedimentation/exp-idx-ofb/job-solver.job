@@ -3,7 +3,9 @@
 #PBS -j oe  
 #PBS -N sed-idx-ofb
 #PBS -V 
+
 echo "Starting job..."
+module load intel
 module list 
 
 echo "Configuring workspace..."
@@ -21,18 +23,18 @@ cp $PBS_NODEFILE nodes.txt
 java -jar /home/users/vitorss/simulation/sedimentation/bin/EnvironmentFileGenerator-LoboC-1.0.jar nodes.txt
 
 echo "Starting database system..."
-#$DFA/create-data.sh $DFA $DATAPATH
 rm -rf data
 unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
 /home/users/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
 sleep 15
 
 echo "Setting up environment variables..."
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user2/local/gnu/paraview/5.1/lib/paraview-5.1
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/users/vitorss/local/all/paraview/lib/paraview-5.1
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/users/vitorss/local/all/paraview/lib/paraview-5.1
+export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/site-packages:/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2
+export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
 
 echo "Executing sedimentation solver..."
-echo -n " -np 24 /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt analysis3D.py" >> mpirun.sh 
+echo -n " -np 24 /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt extraction.py visualization.py" >> mpirun.sh 
 chmod 774 mpirun.sh
 ./mpirun.sh >> out.txt 2>> err.txt
 
@@ -42,9 +44,6 @@ java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.ja
 echo "Executing termination algorithm..."
 /home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
 /home/users/vitorss/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
-
-#echo "Backing up provenance database..."
-#mclient -p 54321 -d dataflow_analyzer --dump > prov-db.dump
 
 echo "Finishing job..."
 
