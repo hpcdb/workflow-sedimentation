@@ -104,7 +104,7 @@ public class Analysis {
     }
 
     private void setRDITime() {
-        this.rdiTime = Analysis.getElapsedTime(logDirectory, "rdi");;
+        this.rdiTime = Analysis.getMaxElapsedTime(logDirectory, "rdi");;
     }
 
     private void setIndexing() {

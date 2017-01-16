@@ -2,6 +2,7 @@
 from paraview.simple import *
 from paraview import coprocessing
 
+import datetime as dt
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
@@ -13,6 +14,11 @@ from paraview import coprocessing
 def CreateCoProcessor():
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
+
+      start=dt.datetime.now()
+
+      print "[CATALYST] Visualization"
+
       # state file generated using paraview version 5.2.0
 
       # ----------------------------------------------------------------
@@ -128,6 +134,15 @@ def CreateCoProcessor():
       # finally, restore active source
       SetActiveSource(slice1)
       # ----------------------------------------------------------------
+
+      end=dt.datetime.now()
+      elapsedTime = (end.microsecond-start.microsecond)/1e6
+      if(elapsedTime < 0.00000):
+        elapsedTime = 0.00
+
+      text_file = open("prov/visualization/paraview-" + str(timeStep) + ".prov", "a+")
+      text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
+      text_file.close()
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):
