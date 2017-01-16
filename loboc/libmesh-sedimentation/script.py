@@ -12,33 +12,19 @@ from paraview import coprocessing
 # ----------------------- CoProcessor definition -----------------------
 
 def CreateCoProcessor():
-  
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
-      timeStep = datadescription.GetTimeStep()
-      time = datadescription.GetTime()
-      print "[CATALYST] Time step: " + str(timeStep) + " ; Time: " + str(time)
-      # 3D analysis
-      #### disable automatic camera reset on 'Show'
-      paraview.simple._DisableFirstRenderCameraReset()
+      filename_3_pvtu = coprocessor.CreateProducer( datadescription, "input" )
 
-      # create a new 'Xdmf3ReaderS'
-      # create a producer from a simulation input
-      output_2_00000xmf = coprocessor.CreateProducer(datadescription, 'input')
+      Slice1 = Slice( guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
+      Slice1.SliceType.Offset = 0.0
+      Slice1.SliceType.Origin = [0.5, 0.5, 0.5]
+      Slice1.SliceType.Normal = [0.0, 1.0, 0.0]
 
-      # create a new 'Plot Over Line'
-      # plotOverLine1 = PlotOverLine(Input=output_2_00000xmf,
-      #     Source='High Resolution Line Source')
-      # plotOverLine1.Tolerance = 2.22044604925031e-16
+      ParallelPolyDataWriter1 = coprocessor.CreateWriter( XMLPPolyDataWriter, "slice_%t.pvtp", 10 )
 
-      # # init the 'High Resolution Line Source' selected for 'Source'
-      # plotOverLine1.Source.Point1 = [0.0, 1.0, 0.0]
-      # plotOverLine1.Source.Point2 = [18.0, 1.0, 0.0]
-
-      SaveData('init_ext_plane_' + str(timeStep) + ".csv", proxy=output_2_00000xmf, Precision=5,
-        UseScientificNotation=0,
-        WriteAllTimeSteps=0,
-        FieldAssociation='Points')
+      SetActiveSource(filename_3_pvtu)
+      ParallelUnstructuredGridWriter1 = coprocessor.CreateWriter( XMLPUnstructuredGridWriter, "fullgrid_%t.pvtu", 100 )
 
     return Pipeline()
 
@@ -47,7 +33,7 @@ def CreateCoProcessor():
       self.Pipeline = _CreatePipeline(self, datadescription)
 
   coprocessor = CoProcessor()
-  freqs = {'input': [1]}
+  freqs = {'input': [10, 100]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#SBATCH -J sed-idx-ofb      # Job name
+#SBATCH -o log.%j.out         # Name of stdout output file (%j expands to jobId)
+#SBATCH -e log.%j.err         # Name of stderr output file (%j expands to jobId)
+#SBATCH -p normal        # Queue name
+#SBATCH -N 33                  # Total number of nodes requested (16 cores/node)
+#SBATCH -n 528                 # Total number of mpi tasks requested
+#SBATCH -t 48:00:00           # Run time (hh:mm:ss)
+
+# Launch application
+echo "Starting job..."
+
+echo "Configuring workspace..."
+export CPATH=/work/03664/silva/simulation/sedimentation/exp-idx-ofb
+export DATAPATH=$CPATH/data
+export DATAFLOW_TAG=sedimentation
+cd $CPATH
+
+echo "Specifying dataflow generation..."
+./pg-dataflow.sh >>solver.output 2>>solver.error
+
+echo "Configuring the lists of machines for the solver and database system..."
+echo $SLURM_NODELIST > nodes.txt
+java -jar /work/03664/silva/simulation/sedimentation/stampede/EnvironmentFileGenerator-Stampede.jar nodes.txt
+
+echo "Starting database system..."
+cd $CPATH
+rm -rf data
+unzip /work/03664/silva/scripts/monetdb/monetdb-database.zip
+/work/03664/silva/simulation/sedimentation/stampede/database_starter.sh database.conf $CPATH $DATAPATH
+sleep 15
+
+echo "Executing sedimentation solver..."
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/work/03664/silva/programs/paraview/lib/paraview-5.0
+/usr/bin/time ibrun -n 512 -o 16 /work/03664/silva/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt extraction.py visualization.py >>solver.output 2>>solver.error
+
+echo "Calculating total elapsed times based on log files..."
+java -jar /work/03664/silva/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >>solver.output 2>>solver.error
+
+echo "Executing termination algorithm..."
+/work/03664/silva/simulation/sedimentation/stampede/termination.sh $CPATH $DATAFLOW_TAG >>solver.output 2>>solver.error
+
+echo "Finishing job..."

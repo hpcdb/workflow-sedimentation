@@ -1,24 +1,24 @@
 
-try: paraview.simple
-except: from paraview.simple import *
-
+from paraview.simple import *
 from paraview import coprocessing
 
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
+# ParaView 5.0.0-RC3 64 bits
 
 
 # ----------------------- CoProcessor definition -----------------------
 
 def CreateCoProcessor():
-  
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
-      timeStep = datadescription.GetTimeStep()
-      time = datadescription.GetTime()
-      print "[CATALYST] Time step: " + str(timeStep) + " ; Time: " + str(time)
-      # 3D analysis
+      # state file generated using paraview version 5.0.0-RC3
+
+      # ----------------------------------------------------------------
+      # setup the data processing pipelines
+      # ----------------------------------------------------------------
+
       #### disable automatic camera reset on 'Show'
       paraview.simple._DisableFirstRenderCameraReset()
 
@@ -27,19 +27,13 @@ def CreateCoProcessor():
       output_2_00000xmf = coprocessor.CreateProducer(datadescription, 'input')
 
       # create a new 'Plot Over Line'
-      # plotOverLine1 = PlotOverLine(Input=output_2_00000xmf,
-      #     Source='High Resolution Line Source')
-      # plotOverLine1.Tolerance = 2.22044604925031e-16
+      plotOverLine1 = PlotOverLine(Input=output_2_00000xmf,
+          Source='High Resolution Line Source')
+      plotOverLine1.Tolerance = 2.22044604925031e-16
 
-      # # init the 'High Resolution Line Source' selected for 'Source'
-      # plotOverLine1.Source.Point1 = [0.0, 1.0, 0.0]
-      # plotOverLine1.Source.Point2 = [18.0, 1.0, 0.0]
-
-      SaveData('init_ext_plane_' + str(timeStep) + ".csv", proxy=output_2_00000xmf, Precision=5,
-        UseScientificNotation=0,
-        WriteAllTimeSteps=0,
-        FieldAssociation='Points')
-
+      # init the 'High Resolution Line Source' selected for 'Source'
+      plotOverLine1.Source.Point1 = [0.0, 1.0, 0.0]
+      plotOverLine1.Source.Point2 = [18.0, 1.0, 0.0]
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):
@@ -47,7 +41,8 @@ def CreateCoProcessor():
       self.Pipeline = _CreatePipeline(self, datadescription)
 
   coprocessor = CoProcessor()
-  freqs = {'input': [1]}
+  # these are the frequencies at which the coprocessor updates.
+  freqs = {'input': []}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 
@@ -60,7 +55,7 @@ coprocessor = CreateCoProcessor()
 
 #--------------------------------------------------------------
 # Enable Live-Visualizaton with ParaView
-coprocessor.EnableLiveVisualization(False)
+coprocessor.EnableLiveVisualization(False, 1)
 
 
 # ---------------------- Data Selection method ----------------------
