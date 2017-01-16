@@ -118,13 +118,13 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (libMesh::global_processor_id() == 0) {
-	    cout << "######################" << endl;
-	    cout << "Catalyst Configuration" << endl;
-	    cout << "######################" << endl;
-	    cout << "Extraction script: " << extractionScript << endl;
-	    cout << "Visualization script: " << visualizationScript << endl;
-	}
+ //    if (libMesh::global_processor_id() == 0) {
+	//     cout << "######################" << endl;
+	//     cout << "Catalyst Configuration" << endl;
+	//     cout << "######################" << endl;
+	//     cout << "Extraction script: " << extractionScript << endl;
+	//     cout << "Visualization script: " << visualizationScript << endl;
+	// }
 
 
     Performance solverPerf;
