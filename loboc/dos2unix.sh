@@ -1,13 +1,13 @@
 #!/bin/bash
 cd dfa
-dos2unix *.sh
-dos2unix *.job
-cd ../exp-extraction
-dos2unix *.sh
-dos2unix *.job
-cd ../stampede
-dos2unix *.sh
-dos2unix *.job
-cd ../libmesh-sedimentation
-dos2unix *.sh
-dos2unix *.job
+dos2unix *
+cd ../bin
+dos2unix *
+cd ../exp-ext
+dos2unix *
+cd ../exp-idx-pos
+dos2unix *
+cd ../exp-idx-fb
+dos2unix *
+cd ../exp-idx-ofb
+dos2unix *

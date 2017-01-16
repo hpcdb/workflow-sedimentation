@@ -1,5 +1,5 @@
-#PBS -l select=81:ncpus=48:mpiprocs=24
-#PBS -l walltime=18:00:00
+#PBS -l select=80:ncpus=48:mpiprocs=24
+#PBS -l walltime=168:00:00
 #PBS -j oe  
 #PBS -N sed-idx-pos
 #PBS -V 
@@ -15,35 +15,34 @@ export DATAFLOW_TAG=sedimentation
 export DFA=/home/users/vitorss/simulation/sedimentation/dfa
 cd $CPATH
 
-echo "Specifying dataflow generation..."
-./pg-dataflow.sh
+#echo "Specifying dataflow generation..."
+#./pg-dataflow.sh
 
 echo "Configuring the lists of machines for the solver and database system..."
 cp $PBS_NODEFILE nodes.txt
 java -jar /home/users/vitorss/simulation/sedimentation/bin/EnvironmentFileGenerator-LoboC-1.0.jar nodes.txt
 
-echo "Starting database system..."
-rm -rf data
-unzip /home/users/vitorss/local/all/monetdb/monetdb-database3.zip
-/home/users/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
-sleep 15
+#echo "Starting database system..."
+#rm -rf data
+#unzip /home/users/vitorss/local/all/monetdb/monetdb-database3.zip
+#/home/users/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
+#sleep 15
 
 echo "Setting up environment variables..."
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user2/local/gnu/paraview/5.1/lib/paraview-5.1
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/users/vitorss/local/all/paraview/lib/paraview-5.1
 export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/site-packages:/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2
 export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
 
 echo "Executing sedimentation solver..."
-echo -n " -np 24 /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt extraction.py visualization.py" >> mpirun.sh 
-chmod 774 mpirun.sh
-./mpirun.sh >> out.txt 2>> err.txt
+/usr/bin/time mpirun /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt extraction.py visualization.py >> out.txt 2>> err.txt
 
 echo "Calculating total elapsed times based on log files..."
 java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt
 
-echo "Executing termination algorithm..."
-/home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
-/home/users/vitorss/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
+#echo "Executing termination algorithm..."
+#/home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
+#/home/users/vitorss/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
 
 echo "Finishing job..."
 
