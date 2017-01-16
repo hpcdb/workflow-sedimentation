@@ -17,7 +17,7 @@ def CreateCoProcessor():
     class Pipeline:
       timeStep = datadescription.GetTimeStep()
       time = datadescription.GetTime()
-      print "[CATALYST] Time step: " + str(timeStep) + " ; Time: " + str(time)
+      print "[CATALYST] Extraction - Time step: " + str(timeStep) + " ; Time: " + str(time)
       start=dt.datetime.now()
 
       # 3D analysis

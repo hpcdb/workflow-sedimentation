@@ -17,7 +17,9 @@ def CreateCoProcessor():
 
       start=dt.datetime.now()
 
-      print "[CATALYST] Visualization"
+      timeStep = datadescription.GetTimeStep()
+      time = datadescription.GetTime()
+      print "[CATALYST] Visualization  - Time step: " + str(timeStep) + " ; Time: " + str(time)
 
       # state file generated using paraview version 5.2.0
 
