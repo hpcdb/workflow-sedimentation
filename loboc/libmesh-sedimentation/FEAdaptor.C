@@ -273,12 +273,12 @@ namespace FEAdaptor
         Processor->RemoveAllPipelines();
       }
 
-      if(numScripts > 1){
+      if(numScripts > 0){
         extraction->Initialize(extractionScript.c_str());
         Processor->AddPipeline(extraction.GetPointer());
       }
 
-      if(numScripts > 2){
+      if(numScripts > 1){
         visualization->Initialize(visualizationScript.c_str());
         Processor->AddPipeline(visualization.GetPointer());
       }
@@ -303,7 +303,7 @@ namespace FEAdaptor
     bool lastTimeStep = false, bool using_amr = false)
   {
     //std::cout << "COPROCESSING BEGIN" << std::endl;
-    if(numScripts > 1){
+    if(numScripts > 0){
       Processor->RemovePipeline(extraction.GetPointer());
       extraction->Initialize(extractionScript.c_str());
       Processor->AddPipeline(extraction.GetPointer());

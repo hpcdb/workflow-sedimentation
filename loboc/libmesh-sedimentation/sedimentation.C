@@ -129,14 +129,6 @@ int main(int argc, char** argv) {
   
   GetPot infile(input);
 
- //    if (libMesh::global_processor_id() == 0) {
-	//     cout << "######################" << endl;
-	//     cout << "Catalyst Configuration" << endl;
-	//     cout << "######################" << endl;
-	//     cout << "Extraction script: " << extractionScript << endl;
-	//     cout << "Visualization script: " << visualizationScript << endl;
-	// }
-
 
     Performance solverPerf;
     char memalloc[jsonArraySize];
@@ -287,8 +279,9 @@ int main(int argc, char** argv) {
   
     std::cout  << "File name: " << rname << endl;
     std::cout  << "  path: "   << dpath  << endl;
-    std::cout  << "Extraction script: "   << extractionScript  << endl;
-    std::cout  << "Visualization script: "   << visualizationScript  << endl;
+    std::cout  << "Number of scripts: "   << numberOfScripts  << endl;
+    std::cout  << "  Extraction script: "   << extractionScript  << endl;
+    std::cout  << "  Visualization script: "   << visualizationScript  << endl;
 
 
 #ifdef XDMF_
