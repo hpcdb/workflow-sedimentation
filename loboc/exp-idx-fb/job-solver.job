@@ -1,5 +1,5 @@
-#PBS -l select=80:ncpus=48:mpiprocs=24
-#PBS -l walltime=168:00:00
+#PBS -l select=40:ncpus=48:mpiprocs=12
+#PBS -l walltime=999:00:00
 #PBS -j oe  
 #PBS -N sed-idx-fb
 #PBS -V 
@@ -35,7 +35,7 @@ export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/
 export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
 
 echo "Executing sedimentation solver..."
-/usr/bin/time mpirun /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt extraction.py visualization.py >> out.txt 2>> err.txt
+/usr/bin/time mpirun /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d $CPATH/output/ >> out.txt 2>> err.txt
 
 echo "Calculating total elapsed times based on log files..."
 java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt

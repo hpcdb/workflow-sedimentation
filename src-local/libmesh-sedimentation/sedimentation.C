@@ -41,6 +41,8 @@
 
 #include "libmesh/error_vector.h"
 #include "libmesh/kelly_error_estimator.h"
+#include "libmesh/fe_interface.h"
+
 
 // For systems of equations the \p DenseSubMatrix
 // and \p DenseSubVector provide convenient ways for
@@ -109,14 +111,23 @@ bool is_file_exist(const char *fileName) {
 // since it was designed to be run only with real numbers.
 
 int main(int argc, char** argv) {
-    string extractionScript;
-    string visualizationScript;
-    if(argc > 1){
-        extractionScript = argv[1];
-        if(argc > 2){
-            visualizationScript = argv[2];
-        }
-    }
+    PerfLog perf_log("Sedimentation Solver");
+
+// This example requires Adaptive Mesh Refinement support - although
+  // it only refines uniformly, the refinement code used is the same
+  // underneath
+  GetPot command_line(argc, argv);
+  std::string input; 
+  
+  if (command_line.search(1, "-i"))
+    input = command_line.next(input);
+  else
+  {
+      std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh -o [output file prefix] -d [output file path] -e [extraction script].py -v [visualization script].py" << std::endl;
+      libmesh_error_msg( "You need specify a input file!");
+  }
+  
+  GetPot infile(input);
 
  //    if (libMesh::global_processor_id() == 0) {
 	//     cout << "######################" << endl;
@@ -141,13 +152,6 @@ int main(int argc, char** argv) {
 
     // Initialize libMesh.
     LibMeshInit init(argc, argv);
-
-    PerfLog perf_log("Sedimentation Solver");
-
-    // This example requires Adaptive Mesh Refinement support - although
-    // it only refines uniformly, the refinement code used is the same
-    // underneath
-    GetPot infile("sedimentation.in");
 
     int init_tstep = 1;
 
@@ -183,7 +187,7 @@ int main(int argc, char** argv) {
     refinement.coarsen_fraction() = c_fraction;
     refinement.max_h_level() = max_h_level;
 
-    bool first_step_refinement = false;
+    bool first_step_refinement    = infile("first_step_refinement" , false);
 
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
@@ -229,7 +233,7 @@ int main(int argc, char** argv) {
     /////// 
     equation_systems.parameters.set<Real> ("xlock") = xlock;
     equation_systems.parameters.set<Real> ("hlock") = hlock;
-
+    equation_systems.parameters.set<Real> ("alfa")        = alfa;
     equation_systems.parameters.set<Real> ("theta") = theta;
     equation_systems.parameters.set<Real> ("ex") = ex;
     equation_systems.parameters.set<Real> ("ey") = ey;
@@ -261,34 +265,52 @@ int main(int argc, char** argv) {
     int max_r_steps = infile("max_r_steps", 1);
 
     const unsigned int write_interval = infile("write_interval", 10);
-    std::string rname = infile("output", "out");
-    std::string dname = infile("dir_path", "");
+    std::string rname = "out"; 
+    std::string dpath = "output/"; 
+    int numberOfScripts = 0;
+    std::string  extractionScript = "";
+    std::string  visualizationScript = "";
+  
+    if (command_line.search(1, "-o"))
+        rname = command_line.next(rname);
+  
+    if (command_line.search(1, "-d"))
+        dpath = command_line.next(dpath);
+
+    if (command_line.search(1, "-e"))
+        extractionScript = command_line.next(extractionScript);
+        numberOfScripts++;
+  
+    if (command_line.search(1, "-v"))
+        visualizationScript = command_line.next(visualizationScript);
+        numberOfScripts++;
+  
+    std::cout  << "File name: " << rname << endl;
+    std::cout  << "  path: "   << dpath  << endl;
+    std::cout  << "Extraction script: "   << extractionScript  << endl;
+    std::cout  << "Visualization script: "   << visualizationScript  << endl;
 
 
 #ifdef XDMF_
     XDMFWriter xdmf_writer(mesh);
     xdmf_writer.set_file_name(rname);
-    xdmf_writer.set_dir_path(dname);
+    xdmf_writer.set_dir_path(dpath);
 #endif
 
     if (!is_file_exist("restart.run")) {
 
-        const string mesh_file = infile("mesh_file", "0");
-
-        if(mesh_file == "0") {        
-
-            if (dim == 2) {
-                MeshTools::Generation::build_square(mesh, ncellx, ncelly,
-                        xmin, xmax,
-                        ymin, ymax, QUAD4);
-            } else {
-                MeshTools::Generation::build_cube(mesh, ncellx, ncelly, ncellz,
-                        xmin, xmax,
-                        ymin, ymax,
-                        zmin, zmax, HEX8);
-            } 
-        } else 
-            mesh.read(mesh_file);
+        string mesh_file; 
+        if (command_line.search(1, "-m"))
+          mesh_file = command_line.next(mesh_file);
+        else
+        {
+          std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh" << std::endl;
+          libmesh_error_msg( "You need specify a mesh file!");
+        }
+        
+        std::cout << "Opening file: " << mesh_file << std::endl;
+        
+        mesh.read(mesh_file);
 
         refinement.uniformly_refine(hlevels);
 
@@ -340,6 +362,7 @@ int main(int argc, char** argv) {
 #endif
 
         equation_systems.read(solution_restart, READ);
+        equation_systems.parameters.set<int> ("dim")          = mesh.mesh_dimension();
 
         sediment_flow.setup(infile);
         sediment_transport.setup(infile);
@@ -355,18 +378,19 @@ int main(int argc, char** argv) {
 
         //transport_system.add_vector("volume");
 
-        transport_system.update();
+        
 
         // Get a reference to the Convection-Diffusion system object.
         TransientLinearImplicitSystem & flow_system =
                 equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
 
-        flow_system.update();
-
         ExplicitSystem & deposition_system = equation_systems.get_system<ExplicitSystem>("deposition");
         deposition_system.add_vector("deposition_rate");
 
+        flow_system.update();
+        transport_system.update();
         deposition_system.update();
+        equation_systems.update();
 
 #ifdef PROV
         // Generate solver parameters
@@ -446,10 +470,10 @@ int main(int argc, char** argv) {
             }
         #endif
         perf_log.start_event("CATALYST:Init");
-        FEAdaptor::Initialize(argc, extractionScript, visualizationScript);
+        FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
         perf_log.stop_event("CATALYST:Init");
         perf_log.start_event("CATALYST:CoProcess");
-        FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);
+        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);
         perf_log.stop_event("CATALYST:CoProcess");
         #ifdef PERFORMANCE
         if (libMesh::global_processor_id() == 0) {
@@ -464,6 +488,7 @@ int main(int argc, char** argv) {
         if (libMesh::global_processor_id() == 0) {
             char commandLine[jsonArraySize];
             sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+            cout << commandLine << endl;
             system(commandLine);
         }
 #endif  
@@ -500,10 +525,10 @@ int main(int argc, char** argv) {
                     }
                 #endif
                 perf_log.start_event("CATALYST:Init");
-                FEAdaptor::Initialize(argc, extractionScript, visualizationScript);
+                FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
                 perf_log.stop_event("CATALYST:Init");
                 perf_log.start_event("CATALYST:CoProcess");
-                FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);         
+                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);         
                 perf_log.stop_event("CATALYST:CoProcess");
                 #ifdef PERFORMANCE
                     if (libMesh::global_processor_id() == 0) {
@@ -525,6 +550,7 @@ int main(int argc, char** argv) {
             if (libMesh::global_processor_id() == 0) {
                 char commandLine[jsonArraySize];
                 sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                cout << commandLine << endl;
                 system(commandLine);
             }
 #endif   
@@ -979,7 +1005,7 @@ int main(int argc, char** argv) {
                     }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
+                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
@@ -1029,7 +1055,7 @@ int main(int argc, char** argv) {
                                 }
                             #endif
                             perf_log.start_event("CATALYST:CoProcess");
-                            FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
+                            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
                             perf_log.stop_event("CATALYST:CoProcess");
                             #ifdef PERFORMANCE
                                 if (libMesh::global_processor_id() == 0) {
@@ -1119,7 +1145,7 @@ int main(int argc, char** argv) {
                 }
             #endif
             perf_log.start_event("CATALYST:CoProcess");
-            FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
+            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
             perf_log.stop_event("CATALYST:CoProcess");
             #ifdef PERFORMANCE
                 if (libMesh::global_processor_id() == 0) {
@@ -1169,7 +1195,7 @@ int main(int argc, char** argv) {
                         }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(argc, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
+                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
