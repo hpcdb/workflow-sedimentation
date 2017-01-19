@@ -28,11 +28,11 @@ echo "Configuring the lists of machines for the solver and database system..."
 cp $PBS_NODEFILE nodes.txt
 java -jar /home/users/vitorss/simulation/sedimentation/bin/EnvironmentFileGenerator-LoboC-1.0.jar nodes.txt
 
-#echo "Starting database system..."
-#rm -rf data
-#unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
-#/home/users/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
-#sleep 15
+echo "Starting database system..."
+rm -rf data
+unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
+/home/users/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
+sleep 15
 
 echo "Setting up environment variables..."
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user2/local/gnu/paraview/5.1/lib/paraview-5.1
