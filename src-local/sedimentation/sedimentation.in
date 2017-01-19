@@ -51,7 +51,7 @@ n_time_steps          = 1000000
 max_linear_iterations = 100
 
 # maximun time
-tmax    = 25.0
+tmax    = 0.050
 
 #------------------------------------------------------
 # EQUATION PARAMETERS
@@ -64,4 +64,4 @@ ey          =  0.0
 ez          = -1.0
 
 # Write out every nth timestep to file.
-write_interval = 50
+write_interval = 2

@@ -32,4 +32,8 @@ time ../libmesh-sedimentation/libmesh-sedimentation-opt -i sedimentation.in -m n
 cd prov
 directory=`pwd`
 cd ..
+TMAX=0.050
+DELTAT=0.005
+WRITE_INTERVAL=2
+IMAGES=`echo $TMAX $DELTAT $WRITE_INTERVAL | awk '{print int(($1/$2)/$3)}'`
 java -jar ../dfa/ProvenanceAnalysis.jar $directory  | tee -a "output-statistics.log"
