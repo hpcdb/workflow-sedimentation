@@ -15,6 +15,12 @@ export DATAFLOW_TAG=sedimentation
 export DFA=/home/users/vitorss/simulation/sedimentation/dfa
 cd $CPATH
 
+echo "Configuration properties to the sedimentation solver..."
+TMAX=25.000
+DELTAT=0.005
+WRITE_INTERVAL=50
+IMAGES=`echo $TMAX $DELTAT $WRITE_INTERVAL | awk '{print int(($1/$2)/$3)}'`
+
 #echo "Specifying dataflow generation..."
 #./pg-dataflow.sh
 
@@ -42,7 +48,7 @@ echo "Executing sedimentation solver..."
 #./mpirun.sh >> out.txt 2>> err.txt
 
 echo "Calculating total elapsed times based on log files..."
-java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt
+java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov $IMAGES >> out.txt 2>> err.txt
 
 #echo "Executing termination algorithm..."
 #/home/users/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG

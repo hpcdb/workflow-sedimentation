@@ -37,8 +37,8 @@ hlevels     = 1
 max_r_steps = 2
 r_fraction  = 0.9
 c_fraction  = 0.01
-max_h_level = 3
-r_interval  = 10
+max_h_level = 2
+r_interval  = 20
 nelem_target = 0
 
 #----------------------------------------------------

@@ -102,26 +102,26 @@ public class Analysis {
     }
 
     private void setRDETime() {
-        this.rdeTime = Analysis.getTotalElapsedTime(logDirectory, "rde");;
+        this.rdeTime = Analysis.getTotalElapsedTime(logDirectory, "rde");
     }
 
     private void setRDITime() {
-        this.rdiTime = Analysis.getTotalElapsedTime(logDirectory, "rdi");;
+        this.rdiTime = Analysis.getTotalElapsedTime(logDirectory, "rdi");
     }
 
     private void setIndexing() {
-        this.indexingTime = Analysis.getElapsedTime(logDirectory, "indexing");;
+        this.indexingTime = Analysis.getElapsedTime(logDirectory, "indexing");
     }
 
-    private void setVisualization() {
-        this.visualizationTime = Analysis.getTotalElapsedTime(logDirectory, "visualization");;
+    private void setVisualization(Integer visualizationProcesses) {
+        this.visualizationTime = visualizationProcesses * Analysis.getTotalElapsedTime(logDirectory, "visualization");
     }
 
     void setLogDirectory(String logDirectory) {
         this.logDirectory = logDirectory;
     }
 
-    void run() {
+    void run(Integer visualizationProcesses) {
         if (logDirectory != null) {
             this.setLogDirectory(logDirectory);
             this.setProvenanceTime();
@@ -129,7 +129,7 @@ public class Analysis {
             this.setRDETime();
             this.setRDITime();
             this.setIndexing();
-            this.setVisualization();
+            this.setVisualization(visualizationProcesses);
             this.calculateOverheads();
             this.calculateSolverTime();
         }
