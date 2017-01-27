@@ -1,4 +1,4 @@
-#PBS -l select=40:ncpus=48:mpiprocs=12
+#PBS -l select=41:ncpus=48:mpiprocs=12
 #PBS -l walltime=999:00:00
 #PBS -j oe  
 #PBS -N sed-idx-fb
@@ -16,7 +16,7 @@ export DFA=/home/users/vitorss/simulation/sedimentation/dfa
 cd $CPATH
 
 echo "Configuration properties to the sedimentation solver..."
-TMAX=25.000
+TMAX=15.000
 DELTAT=0.005
 WRITE_INTERVAL=50
 IMAGES=`echo $TMAX $DELTAT $WRITE_INTERVAL | awk '{print int(($1/$2)/$3)}'`
@@ -41,7 +41,11 @@ export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/
 export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
 
 echo "Executing sedimentation solver..."
-/usr/bin/time mpirun /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d $CPATH/output/ >> out.txt 2>> err.txt
+#/usr/bin/time mpirun /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d $CPATH/output/ >> out.txt 2>> err.txt
+
+echo -n "/usr/bin/time mpirun -machinefile machines.conf -n 480 /home/users/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d $CPATH/output/ >> out.txt 2>> err.txt" > mpirun.sh 
+chmod 774 mpirun.sh
+./mpirun.sh
 
 echo "Calculating total elapsed times based on log files..."
 java -jar /home/users/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov $IMAGES >> out.txt 2>> err.txt

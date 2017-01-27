@@ -51,7 +51,7 @@ n_time_steps          = 1000000
 max_linear_iterations = 100
 
 # maximun time
-tmax    = 25.0
+tmax    = 15.0
 
 #------------------------------------------------------
 # EQUATION PARAMETERS
