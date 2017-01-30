@@ -32,13 +32,13 @@ def CreateCoProcessor():
 
       # Create a new 'Render View'
       renderView1 = CreateView('RenderView')
-      renderView1.ViewSize = [843, 548]
+      renderView1.ViewSize = [1576, 813]
       renderView1.AxesGrid = 'GridAxes3DActor'
       renderView1.CenterOfRotation = [9.0, 1.0, 1.0]
       renderView1.StereoType = 0
-      renderView1.CameraPosition = [-6.952177934155311, -13.115707925050087, 7.750935516468179]
-      renderView1.CameraFocalPoint = [15.657178373648106, 10.328436290391561, -5.599344535473394]
-      renderView1.CameraViewUp = [0.30271277448995376, 0.23416332177220445, 0.9238682345969048]
+      renderView1.CameraPosition = [9.203341686849779, 18.584335141254197, 19.31227776012338]
+      renderView1.CameraFocalPoint = [8.921420604241932, -5.795293437434016, -6.076599705831125]
+      renderView1.CameraViewUp = [-0.012293826919437537, 0.7213114964450353, -0.6925016873018425]
       renderView1.CameraParallelScale = 9.1104335791443
       renderView1.Background = [0.32, 0.34, 0.43]
 
@@ -46,7 +46,7 @@ def CreateCoProcessor():
       # and provide it with information such as the filename to use,
       # how frequently to write the images, etc.
       coprocessor.RegisterView(renderView1,
-          filename='image_%t.png', freq=1, fittoscreen=1, magnification=1, width=843, height=548, cinema={})
+          filename='image_%t.png', freq=1, fittoscreen=0, magnification=1, width=1576, height=813, cinema={})
       renderView1.ViewTime = datadescription.GetTime()
 
       # ----------------------------------------------------------------
@@ -55,13 +55,10 @@ def CreateCoProcessor():
 
       # create a new 'XDMF Reader'
       # create a producer from a simulation input
-      necker_24xmf = coprocessor.CreateProducer(datadescription, 'input')
-
-      # create a new 'Merge Blocks'
-      mergeBlocks1 = MergeBlocks(Input=necker_24xmf)
+      output_480_00091xmf = coprocessor.CreateProducer(datadescription, 'input')
 
       # create a new 'Slice'
-      slice1 = Slice(Input=mergeBlocks1)
+      slice1 = Slice(Input=output_480_00091xmf)
       slice1.SliceType = 'Plane'
       slice1.SliceOffsetValues = [0.0]
 
@@ -74,46 +71,27 @@ def CreateCoProcessor():
       # note: the Get..() functions create a new object, if needed
       # ----------------------------------------------------------------
 
-      # get color transfer function/color map for 'u'
-      uLUT = GetColorTransferFunction('u')
-      uLUT.RGBPoints = [0.0, 0.231373, 0.298039, 0.752941, 0.0, 0.865003, 0.865003, 0.865003, 0.0, 0.705882, 0.0156863, 0.14902]
-      uLUT.ScalarRangeInitialized = 1.0
-
-      # get opacity transfer function/opacity map for 'u'
-      uPWF = GetOpacityTransferFunction('u')
-      uPWF.Points = [0.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.0]
-      uPWF.ScalarRangeInitialized = 1
-
       # get color transfer function/color map for 's'
       sLUT = GetColorTransferFunction('s')
+      sLUT.RGBPoints = [-0.0025015015241097176, 0.231373, 0.298039, 0.752941, 0.4809214858543685, 0.865003, 0.865003, 0.865003, 0.9643444732328467, 0.705882, 0.0156863, 0.14902]
       sLUT.ScalarRangeInitialized = 1.0
 
       # get opacity transfer function/opacity map for 's'
       sPWF = GetOpacityTransferFunction('s')
+      sPWF.Points = [-0.0025015015241097176, 0.0, 0.5, 0.0, 0.9643444732328467, 1.0, 0.5, 0.0]
       sPWF.ScalarRangeInitialized = 1
 
       # ----------------------------------------------------------------
       # setup the visualization in view 'renderView1'
       # ----------------------------------------------------------------
 
-      # show data from mergeBlocks1
-      mergeBlocks1Display = Show(mergeBlocks1, renderView1)
-      # trace defaults for the display properties.
-      mergeBlocks1Display.Representation = 'Outline'
-      mergeBlocks1Display.ColorArrayName = ['POINTS', 'u']
-      mergeBlocks1Display.LookupTable = uLUT
-      mergeBlocks1Display.SelectOrientationVectors = 'None'
-      mergeBlocks1Display.ScaleFactor = 1.8
-      mergeBlocks1Display.SelectScaleArray = 'u'
-      mergeBlocks1Display.GlyphType = 'Arrow'
-      mergeBlocks1Display.ScalarOpacityUnitDistance = 0.21899198191391755
-      
-
       # show data from slice1
       slice1Display = Show(slice1, renderView1)
       # trace defaults for the display properties.
       slice1Display.ColorArrayName = ['POINTS', 's']
       slice1Display.LookupTable = sLUT
+      slice1Display.OSPRayScaleArray = 'u'
+      slice1Display.OSPRayScaleFunction = 'PiecewiseFunction'
       slice1Display.SelectOrientationVectors = 'None'
       slice1Display.ScaleFactor = 1.8
       slice1Display.SelectScaleArray = 'u'
@@ -126,9 +104,6 @@ def CreateCoProcessor():
 
       # get color legend/bar for sLUT in view renderView1
       sLUTColorBar = GetScalarBar(sLUT, renderView1)
-      sLUTColorBar.Position = [0.2805106888361045, 0.05445155393053011]
-      sLUTColorBar.Position2 = [0.43000000000000005, 0.11999999999999994]
-      sLUTColorBar.Orientation = 'Horizontal'
       sLUTColorBar.Title = 's'
       sLUTColorBar.ComponentTitle = ''
 
@@ -153,7 +128,7 @@ def CreateCoProcessor():
 
   coprocessor = CoProcessor()
   # these are the frequencies at which the coprocessor updates.
-  freqs = {'input': [1, 1, 1]}
+  freqs = {'input': [1, 1]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 
