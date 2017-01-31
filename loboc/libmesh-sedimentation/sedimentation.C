@@ -218,7 +218,7 @@ int main(int argc, char** argv) {
     cout << "  Sc      : " << Sc << endl;
 
     equation_systems.parameters.set<int> ("dim")          = infile( "dim", 2);
-	equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
+    equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
     equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
     equation_systems.parameters.set<Real> ("Us") = Us;
 
@@ -466,7 +466,7 @@ int main(int argc, char** argv) {
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
         perf_log.stop_event("CATALYST:Init");
         perf_log.start_event("CATALYST:CoProcess");
-        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);
+        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
         perf_log.stop_event("CATALYST:CoProcess");
         #ifdef PERFORMANCE
         if (libMesh::global_processor_id() == 0) {
@@ -521,7 +521,7 @@ int main(int argc, char** argv) {
                 FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
                 perf_log.stop_event("CATALYST:Init");
                 perf_log.start_event("CATALYST:CoProcess");
-                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);         
+                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);         
                 perf_log.stop_event("CATALYST:CoProcess");
                 #ifdef PERFORMANCE
                     if (libMesh::global_processor_id() == 0) {
@@ -887,54 +887,54 @@ int main(int argc, char** argv) {
             redo_nl = false;
 
             if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) ) {
-	            std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
-	            std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
+                std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
+                std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
 
-	            numberIterationsMeshRefinements++;
-	        	int beforeNActiveElem = mesh.n_active_elem();
+                numberIterationsMeshRefinements++;
+                int beforeNActiveElem = mesh.n_active_elem();
 
-	            ErrorVector error, errorFlow, errorTransp;
-	            
-	            
-	            KellyErrorEstimator error_estimator_flow;   
-	            KellyErrorEstimator error_estimator_transp;
-	             
-	            std::vector<Real> weights(flow_system.n_vars(),1.0);
-	            weights[flow_system.n_vars()-1] = 0.0;
-	            
-	            error_estimator_flow.error_norm = SystemNorm(std::vector<FEMNormType>(flow_system.n_vars(), error_estimator_flow.error_norm.type(0)),weights);
-	            error_estimator_flow.estimate_error (flow_system, errorFlow);
-	        
-	            error_estimator_transp.estimate_error (transport_system, errorTransp);
-	            
-	            
-	            libmesh_assert(errorFlow.size() == errorTransp.size());
-	            error.resize(errorFlow.size());
-	            
-	            for(int i = 0; i < error.size(); ++i){
-	                error[i] = errorFlow[i] + errorTransp[i];
-	            }
-	             
-	            
-	            refinement.flag_elements_by_error_fraction (error);
-	            
-	            //refinement.flag_elements_by_nelem_target(error);
-	            
-	            refinement.refine_and_coarsen_elements();
-	            std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
-	            
-	            //equation_systems.update();
-	            equation_systems.reinit ();
-	            redo_nl = true;
+                ErrorVector error, errorFlow, errorTransp;
+                
+                
+                KellyErrorEstimator error_estimator_flow;   
+                KellyErrorEstimator error_estimator_transp;
+                 
+                std::vector<Real> weights(flow_system.n_vars(),1.0);
+                weights[flow_system.n_vars()-1] = 0.0;
+                
+                error_estimator_flow.error_norm = SystemNorm(std::vector<FEMNormType>(flow_system.n_vars(), error_estimator_flow.error_norm.type(0)),weights);
+                error_estimator_flow.estimate_error (flow_system, errorFlow);
+            
+                error_estimator_transp.estimate_error (transport_system, errorTransp);
+                
+                
+                libmesh_assert(errorFlow.size() == errorTransp.size());
+                error.resize(errorFlow.size());
+                
+                for(int i = 0; i < error.size(); ++i){
+                    error[i] = errorFlow[i] + errorTransp[i];
+                }
+                 
+                
+                refinement.flag_elements_by_error_fraction (error);
+                
+                //refinement.flag_elements_by_nelem_target(error);
+                
+                refinement.refine_and_coarsen_elements();
+                std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
+                
+                //equation_systems.update();
+                equation_systems.reinit ();
+                redo_nl = true;
 
-	            first_step_refinement = false;
+                first_step_refinement = false;
 
-	            #ifdef PROV
-	                // Mesh Refinement
-	                prov.outputMeshRefinement(taskID, simulationID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
-				#endif
+                #ifdef PROV
+                    // Mesh Refinement
+                    prov.outputMeshRefinement(taskID, simulationID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
+                #endif
 
-	         }
+             }
 
             sediment_deposition.ComputeDeposition();
             sediment_deposition.print();
@@ -1007,6 +1007,7 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
 #endif
+                }
 
                 int step = t_step + 1;
                 if (dim == 2) {
@@ -1025,7 +1026,7 @@ int main(int argc, char** argv) {
                     }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
+                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
@@ -1075,7 +1076,7 @@ int main(int argc, char** argv) {
                                 }
                             #endif
                             perf_log.start_event("CATALYST:CoProcess");
-                            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
+                            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
                             perf_log.stop_event("CATALYST:CoProcess");
                             #ifdef PERFORMANCE
                                 if (libMesh::global_processor_id() == 0) {
@@ -1111,7 +1112,7 @@ int main(int argc, char** argv) {
                         prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
                     }
-                }
+                
 
                 sprintf(memalloc, "%d", taskID);
                 meshDependencies.push_back(memalloc);
@@ -1165,7 +1166,7 @@ int main(int argc, char** argv) {
                 }
             #endif
             perf_log.start_event("CATALYST:CoProcess");
-            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
+            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
             perf_log.stop_event("CATALYST:CoProcess");
             #ifdef PERFORMANCE
                 if (libMesh::global_processor_id() == 0) {
@@ -1215,7 +1216,7 @@ int main(int argc, char** argv) {
                         }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
+                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
