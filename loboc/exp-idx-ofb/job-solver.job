@@ -19,7 +19,7 @@ cd $CPATH
 echo "Configuration properties to the sedimentation solver..."
 TMAX=15.000
 DELTAT=0.005
-WRITE_INTERVAL=1
+WRITE_INTERVAL=50
 IMAGES=`echo $TMAX $DELTAT $WRITE_INTERVAL | awk '{print int(($1/$2)/$3)}'`
 
 #echo "Specifying dataflow generation..."
