@@ -1018,7 +1018,6 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
 #endif
-                }
 
                 int step = t_step + 1;
                 if (dim == 2) {
@@ -1127,6 +1126,8 @@ int main(int argc, char** argv) {
 
                 sprintf(memalloc, "%d", taskID);
                 meshDependencies.push_back(memalloc);
+            }
+            
             }
         }
     }
