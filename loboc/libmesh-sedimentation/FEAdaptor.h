@@ -20,6 +20,8 @@ using namespace std;
 
 namespace FEAdaptor
 {
+  void mark_to_rebuild_grid();
+
   void Initialize(int numScripts, string extractionScript, string visualizationScript);
 
   void Finalize();

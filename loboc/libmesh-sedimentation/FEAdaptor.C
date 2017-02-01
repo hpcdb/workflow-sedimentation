@@ -52,6 +52,7 @@ namespace
 
   vtkCPProcessor* Processor    = NULL;
   vtkUnstructuredGrid* VTKGrid = NULL;
+  bool rebuild_grid            = false;
   
   void BuildVTKGrid(EquationSystems &eq, std::map<int, int> &g2l)
   {
@@ -235,12 +236,13 @@ namespace
         BuildVTKGrid(eq, g2l);
     }
     
-    if(VTKGrid != NULL && using_amr)
+    if(VTKGrid != NULL && rebuild_grid)
     {
         g2l.clear();
         VTKGrid->Delete();
         VTKGrid = vtkUnstructuredGrid::New();
         BuildVTKGrid(eq, g2l);
+        rebuild_grid = false;
         
     }
     
@@ -252,6 +254,10 @@ namespace
 
 namespace FEAdaptor
 {
+
+  void mark_to_rebuild_grid() {
+      rebuild_grid = true;
+  }
 
   std::map<int, int>                   g2l;
   int numScripts;

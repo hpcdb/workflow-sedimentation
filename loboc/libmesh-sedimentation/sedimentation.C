@@ -173,6 +173,7 @@ int main(int argc, char** argv) {
     double c_fraction = infile("c_fraction", 0.10);
     double max_h_level = infile("max_h_level", 1);
     const unsigned int hlevels = infile("hlevels", 0);
+    bool amrc_flow_transp         = infile("amrc_flow_transp",false);
 
     MeshRefinement refinement(mesh);
     refinement.refine_fraction() = r_fraction;
@@ -887,47 +888,57 @@ int main(int argc, char** argv) {
             redo_nl = false;
 
             if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) ) {
-                std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
+                            std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
+                std::cout<<" Considering Transport"<<((amrc_flow_transp && !first_step_refinement)?" & Flow Variables\n": " Variable\n");
                 std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
-
-                numberIterationsMeshRefinements++;
+                
                 int beforeNActiveElem = mesh.n_active_elem();
-
-                ErrorVector error, errorFlow, errorTransp;
-                
-                
+                ErrorVector error_flow, error;
                 KellyErrorEstimator error_estimator_flow;   
                 KellyErrorEstimator error_estimator_transp;
-                 
-                std::vector<Real> weights(flow_system.n_vars(),1.0);
-                weights[flow_system.n_vars()-1] = 0.0;
                 
-                error_estimator_flow.error_norm = SystemNorm(std::vector<FEMNormType>(flow_system.n_vars(), error_estimator_flow.error_norm.type(0)),weights);
-                error_estimator_flow.estimate_error (flow_system, errorFlow);
-            
-                error_estimator_transp.estimate_error (transport_system, errorTransp);
-                
-                
-                libmesh_assert(errorFlow.size() == errorTransp.size());
-                error.resize(errorFlow.size());
-                
-                for(int i = 0; i < error.size(); ++i){
-                    error[i] = errorFlow[i] + errorTransp[i];
-                }
-                 
-                
-                refinement.flag_elements_by_error_fraction (error);
-                
-                //refinement.flag_elements_by_nelem_target(error);
-                
-                refinement.refine_and_coarsen_elements();
-                std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
-                
-                //equation_systems.update();
-                equation_systems.reinit ();
-                redo_nl = true;
+                perf_log.start_event("estimate_error","AMR");
+                // First compute error for transport only
+                error_estimator_transp.estimate_error (transport_system, error);
 
+                // Now compute the error also for weighted flow variables but only if not "first_step_refinement"
+                if(amrc_flow_transp && !first_step_refinement) {
+                    // Weights to compute error for the Flow variables (to exclude pressure)
+                    std::vector<Real> weights(flow_system.n_vars(),1.0);
+                    weights[flow_system.n_vars()-1] = 0.0; // excluding pressure for while
+                    error_estimator_flow.error_norm = SystemNorm(std::vector<FEMNormType>(flow_system.n_vars(), error_estimator_flow.error_norm.type(0)),weights);
+                    error_estimator_flow.estimate_error (flow_system, error_flow);
+
+                    libmesh_assert(error_flow==error);
+                    for (unsigned int i=0; i<error.size(); i++ )
+                        error[i]+=error_flow[i];
+                }
+                
+                perf_log.stop_event("estimate_error","AMR");
+
+                perf_log.start_event("flag_elements","AMR");
+                refinement.flag_elements_by_error_fraction (error);
+                perf_log.stop_event("flag_elements","AMR");
+                
+                perf_log.start_event("refine_and_coarse","AMR");
+                refinement.refine_and_coarsen_elements();
+                perf_log.stop_event("refine_and_coarse","AMR");
+                
+               
+                //equation_systems.update();
+                perf_log.start_event("reinit systems","AMR");
+                equation_systems.reinit ();
+                perf_log.stop_event("reinit systems","AMR");
+                
+                redo_nl = true;
                 first_step_refinement = false;
+                
+    #ifdef USE_CATALYST
+                FEAdaptor::mark_to_rebuild_grid();
+    #endif 
+      
+                
+                std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
 
                 #ifdef PROV
                     // Mesh Refinement
