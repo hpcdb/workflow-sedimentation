@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -l select=30:ncpus=48:mpiprocs=12
+#PBS -l walltime=900:00:00
+#PBS -j oe
+#PBS -V
+#PBS -N TankLibMesh
+
+# load modules
+module load intel
+
+export PYTHONPATH=/sw/apps/suse/shared/paraview/5.2/intel/lib/paraview-5.2/site-packages:/sw/apps/suse/shared/paraview/5.2/intel/lib/paraview-5.2:$PYTHONPATH
+
+export LD_LIBRARY_PATH=/sw/apps/suse/shared/paraview/5.2/intel/lib/paraview-5.2:$LD_LIBRARY_PATH
+
+# change directory
+cd ${PBS_O_WORKDIR}
+#lyst run
+mpirun ./sediment-opt -i sed3d.in -m tank.msh -d out -o tank tank3dvd.py  > tela.out 
+
+
+
