@@ -1,0 +1,8 @@
+directory = /scratch/10061a/vitorss/simulation/sedimentation/tank-idx-ofb/
+pgFilePath = /scratch/10061a/vitorss/simulation/sedimentation/dfa/PG-1.0.jar
+rdeFilePath = /scratch/10061a/vitorss/simulation/sedimentation/dfa/RDE-1.0.jar
+rdiFilePath = /scratch/10061a/vitorss/simulation/sedimentation/dfa/RDI-1.0.jar
+access=INDEXING
+cartridge=OPTIMIZED_FASTBIT
+bin=/home/users/vitorss/local/all/fastbit/bin
+extraArguments=[b:precision=2]
