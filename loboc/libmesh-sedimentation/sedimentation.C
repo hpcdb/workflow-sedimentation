@@ -1119,7 +1119,7 @@ int main(int argc, char** argv) {
                         char argument2[jsonArraySize];
                         sprintf(argument2, "oline%dextraction", ik);
                         indexerID++;
-                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
+                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
                     }
                 
@@ -1263,7 +1263,7 @@ int main(int argc, char** argv) {
                 sprintf(argument2, "oline%diextraction", ik);
                 sprintf(memalloc, "line%d%d", ik, numberOfWrites);
                 indexerID++;
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
             }
         }
