@@ -415,7 +415,7 @@ int main(int argc, char** argv) {
     transport_system.time = time;
     flow_system.time = time;
 
-    unsigned int t_step = 1;
+    unsigned int t_step = 0;
     unsigned int n_linear_iterations_flow = 0;
     unsigned int n_nonlinear_iterations_flow = 0;
     unsigned int n_nonlinear_iterations_transport = 0;
@@ -450,8 +450,8 @@ int main(int argc, char** argv) {
     if (dim == 2) {
         // 2D analysis
         char firstFilename[jsonArraySize];
-        sprintf(firstFilename, "init_ext_plane_%d.csv", t_step);
-        sprintf(finalFilename, "ext_plane_%d.csv", t_step);
+        sprintf(firstFilename, "init_ext_line_%d.csv", t_step);
+        sprintf(finalFilename, "ext_line_%d.csv", t_step);
 #ifdef PROV
         // Mesh Writer
         prov.inputInitDataExtraction(simulationID, "initdataextraction");
@@ -888,6 +888,7 @@ int main(int argc, char** argv) {
             redo_nl = false;
 
             if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) ) {
+                numberIterationsMeshRefinements++;
                             std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
                 std::cout<<" Considering Transport"<<((amrc_flow_transp && !first_step_refinement)?" & Flow Variables\n": " Variable\n");
                 std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
@@ -1026,8 +1027,8 @@ int main(int argc, char** argv) {
 #endif
 
                     char firstFilename[jsonArraySize];
-                    sprintf(firstFilename, "init_ext_plane_%d.csv", step);
-                    sprintf(finalFilename, "ext_plane_%d.csv", step);
+                    sprintf(firstFilename, "init_ext_line_%d.csv", step);
+                    sprintf(finalFilename, "ext_line_%d.csv", step);
 
 #ifdef USE_CATALYST
                     #ifdef PERFORMANCE
@@ -1168,8 +1169,8 @@ int main(int argc, char** argv) {
 #endif
 
             char firstFilename[jsonArraySize];
-            sprintf(firstFilename, "init_ext_plane_%d.csv", step);
-            sprintf(finalFilename, "ext_plane_%d.csv", step);
+            sprintf(firstFilename, "init_ext_line_%d.csv", step);
+            sprintf(finalFilename, "ext_line_%d.csv", step);
 
 #ifdef USE_CATALYST
             #ifdef PERFORMANCE

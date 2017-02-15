@@ -608,7 +608,7 @@ void Provenance::inputVisualization(int simulationID, string transformation) {
     t.setStatus("RUNNING");
     t.addDtDependency("meshwriter");
 
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
@@ -644,7 +644,7 @@ void Provenance::outputVisualization(int simulationID, string transformation, st
     t.addDtDependency("meshwriter");
 
     char memalloc[4096];
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     File f1(directory, png);
@@ -802,7 +802,7 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
     t.setStatus("RUNNING");
     t.addDtDependency("solversimulationfluid");
 
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
@@ -843,7 +843,7 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
     t.addDtDependency("solversimulationfluid");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
@@ -904,7 +904,7 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
     t.setStatus("FINISHED");
     t.addDtDependency("solversimulationsediments");
 
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%d;%s;%d;%d;%d",
@@ -1231,8 +1231,8 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
 //    sprintf(memalloc, "%d;%s%s;%d;%svideo.mp4",
 //            simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str());
 // without visualization
-     sprintf(memalloc, "%d;%s%s;%d;%s%s",
-             simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str(), xdmf.c_str());
+     sprintf(memalloc, "%d;%s%s;%d",
+             simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors);
 
 
     vector<string> e = {memalloc};
