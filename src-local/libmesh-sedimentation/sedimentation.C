@@ -173,6 +173,7 @@ int main(int argc, char** argv) {
     double c_fraction = infile("c_fraction", 0.10);
     double max_h_level = infile("max_h_level", 1);
     const unsigned int hlevels = infile("hlevels", 0);
+    bool amrc_flow_transp         = infile("amrc_flow_transp",false);
 
     MeshRefinement refinement(mesh);
     refinement.refine_fraction() = r_fraction;
@@ -218,7 +219,7 @@ int main(int argc, char** argv) {
     cout << "  Sc      : " << Sc << endl;
 
     equation_systems.parameters.set<int> ("dim")          = infile( "dim", 2);
-	equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
+    equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
     equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
     equation_systems.parameters.set<Real> ("Us") = Us;
 
@@ -414,7 +415,7 @@ int main(int argc, char** argv) {
     transport_system.time = time;
     flow_system.time = time;
 
-    unsigned int t_step = 1;
+    unsigned int t_step = 0;
     unsigned int n_linear_iterations_flow = 0;
     unsigned int n_nonlinear_iterations_flow = 0;
     unsigned int n_nonlinear_iterations_transport = 0;
@@ -449,8 +450,8 @@ int main(int argc, char** argv) {
     if (dim == 2) {
         // 2D analysis
         char firstFilename[jsonArraySize];
-        sprintf(firstFilename, "init_ext_plane_%d.csv", t_step);
-        sprintf(finalFilename, "ext_plane_%d.csv", t_step);
+        sprintf(firstFilename, "init_ext_line_%d.csv", t_step);
+        sprintf(finalFilename, "ext_line_%d.csv", t_step);
 #ifdef PROV
         // Mesh Writer
         prov.inputInitDataExtraction(simulationID, "initdataextraction");
@@ -466,7 +467,7 @@ int main(int argc, char** argv) {
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
         perf_log.stop_event("CATALYST:Init");
         perf_log.start_event("CATALYST:CoProcess");
-        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);
+        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
         perf_log.stop_event("CATALYST:CoProcess");
         #ifdef PERFORMANCE
         if (libMesh::global_processor_id() == 0) {
@@ -521,7 +522,7 @@ int main(int argc, char** argv) {
                 FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
                 perf_log.stop_event("CATALYST:Init");
                 perf_log.start_event("CATALYST:CoProcess");
-                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, false, false);         
+                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);         
                 perf_log.stop_event("CATALYST:CoProcess");
                 #ifdef PERFORMANCE
                     if (libMesh::global_processor_id() == 0) {
@@ -886,28 +887,66 @@ int main(int argc, char** argv) {
 
             redo_nl = false;
 
-            if (first_step_refinement || (((r + 1) != max_r_steps) && (t_step + 1) % ref_interval == 0)) {
-                std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
+            if( first_step_refinement || (((r + 1) != max_r_steps) && (t_step+1)%ref_interval == 0 ) ) {
                 numberIterationsMeshRefinements++;
+                            std::cout<<"\n****************** Mesh Refinement ********************  "     << std::endl;
+                std::cout<<" Considering Transport"<<((amrc_flow_transp && !first_step_refinement)?" & Flow Variables\n": " Variable\n");
+                std::cout<<  "Number of elements before AMR step: " <<  mesh.n_active_elem() << std::endl;
+                
                 int beforeNActiveElem = mesh.n_active_elem();
-                std::cout << "Number of elements before AMR step: " << mesh.n_active_elem() << std::endl;
-                Real H1norm = transport_system.calculate_norm(*transport_system.solution, SystemNorm(H1));
-                ErrorVector error;
-                KellyErrorEstimator error_estimator;
-                error_estimator.estimate_error(transport_system, error);
-                refinement.flag_elements_by_error_fraction(error);
+                ErrorVector error_flow, error;
+                KellyErrorEstimator error_estimator_flow;   
+                KellyErrorEstimator error_estimator_transp;
+                
+                perf_log.start_event("estimate_error","AMR");
+                // First compute error for transport only
+                error_estimator_transp.estimate_error (transport_system, error);
+
+                // Now compute the error also for weighted flow variables but only if not "first_step_refinement"
+                if(amrc_flow_transp && !first_step_refinement) {
+                    // Weights to compute error for the Flow variables (to exclude pressure)
+                    std::vector<Real> weights(flow_system.n_vars(),1.0);
+                    weights[flow_system.n_vars()-1] = 0.0; // excluding pressure for while
+                    error_estimator_flow.error_norm = SystemNorm(std::vector<FEMNormType>(flow_system.n_vars(), error_estimator_flow.error_norm.type(0)),weights);
+                    error_estimator_flow.estimate_error (flow_system, error_flow);
+
+                    libmesh_assert(error_flow==error);
+                    for (unsigned int i=0; i<error.size(); i++ )
+                        error[i]+=error_flow[i];
+                }
+                
+                perf_log.stop_event("estimate_error","AMR");
+
+                perf_log.start_event("flag_elements","AMR");
+                refinement.flag_elements_by_error_fraction (error);
+                perf_log.stop_event("flag_elements","AMR");
+                
+                perf_log.start_event("refine_and_coarse","AMR");
                 refinement.refine_and_coarsen_elements();
-                equation_systems.reinit();
+                perf_log.stop_event("refine_and_coarse","AMR");
+                
+               
+                //equation_systems.update();
+                perf_log.start_event("reinit systems","AMR");
+                equation_systems.reinit ();
+                perf_log.stop_event("reinit systems","AMR");
+                
                 redo_nl = true;
-                std::cout << "Number of elements after AMR step: " << mesh.n_active_elem() << std::endl;
-
-#ifdef PROV
-                // Mesh Refinement
-                prov.outputMeshRefinement(taskID, simulationID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
-#endif
-
                 first_step_refinement = false;
-            }
+                
+    #ifdef USE_CATALYST
+                FEAdaptor::mark_to_rebuild_grid();
+    #endif 
+      
+                
+                std::cout<<  "Number of elements after AMR step: " <<  mesh.n_active_elem() << std::endl;
+
+                #ifdef PROV
+                    // Mesh Refinement
+                    prov.outputMeshRefinement(taskID, simulationID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
+                #endif
+
+             }
 
             sediment_deposition.ComputeDeposition();
             sediment_deposition.print();
@@ -988,8 +1027,8 @@ int main(int argc, char** argv) {
 #endif
 
                     char firstFilename[jsonArraySize];
-                    sprintf(firstFilename, "init_ext_plane_%d.csv", step);
-                    sprintf(finalFilename, "ext_plane_%d.csv", step);
+                    sprintf(firstFilename, "init_ext_line_%d.csv", step);
+                    sprintf(finalFilename, "ext_line_%d.csv", step);
 
 #ifdef USE_CATALYST
                     #ifdef PERFORMANCE
@@ -998,7 +1037,7 @@ int main(int argc, char** argv) {
                     }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
+                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
@@ -1034,7 +1073,7 @@ int main(int argc, char** argv) {
                         char argument1[jsonArraySize];
                         if(ik == 0){
                             sprintf(argument1, "visualization");
-                            prov.inputVisualization(simulationID, argument1);
+                            prov.inputVisualization(taskID, simulationID, argument1);
                         }
                         sprintf(argument1, "line%dextraction", ik);
                         prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
@@ -1048,7 +1087,7 @@ int main(int argc, char** argv) {
                                 }
                             #endif
                             perf_log.start_event("CATALYST:CoProcess");
-                            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, false, false);
+                            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
                             perf_log.stop_event("CATALYST:CoProcess");
                             #ifdef PERFORMANCE
                                 if (libMesh::global_processor_id() == 0) {
@@ -1065,7 +1104,7 @@ int main(int argc, char** argv) {
                             char argument2[jsonArraySize];
                             sprintf(argument2, "ovisualization");
                             sprintf(memalloc, "image_%d.png", step);
-                            prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
+                            prov.outputVisualization(taskID, simulationID, argument1, argument2, 0, memalloc);
                         }
                         if (libMesh::global_processor_id() == 0) {
                             char commandLine[jsonArraySize];
@@ -1081,13 +1120,15 @@ int main(int argc, char** argv) {
                         char argument2[jsonArraySize];
                         sprintf(argument2, "oline%dextraction", ik);
                         indexerID++;
-                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
+                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
                     }
-                }
+                
 
                 sprintf(memalloc, "%d", taskID);
                 meshDependencies.push_back(memalloc);
+            }
+            
             }
         }
     }
@@ -1128,8 +1169,8 @@ int main(int argc, char** argv) {
 #endif
 
             char firstFilename[jsonArraySize];
-            sprintf(firstFilename, "init_ext_plane_%d.csv", step);
-            sprintf(finalFilename, "ext_plane_%d.csv", step);
+            sprintf(firstFilename, "init_ext_line_%d.csv", step);
+            sprintf(finalFilename, "ext_line_%d.csv", step);
 
 #ifdef USE_CATALYST
             #ifdef PERFORMANCE
@@ -1138,7 +1179,7 @@ int main(int argc, char** argv) {
                 }
             #endif
             perf_log.start_event("CATALYST:CoProcess");
-            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
+            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
             perf_log.stop_event("CATALYST:CoProcess");
             #ifdef PERFORMANCE
                 if (libMesh::global_processor_id() == 0) {
@@ -1174,7 +1215,7 @@ int main(int argc, char** argv) {
                 char argument1[jsonArraySize];
                 if(ik == 0){
                     sprintf(argument1, "visualization");
-                    prov.inputVisualization(simulationID, argument1);
+                    prov.inputVisualization(taskID, simulationID, argument1);
                 }
                 sprintf(argument1, "line%dextraction", ik);
                 prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
@@ -1188,7 +1229,7 @@ int main(int argc, char** argv) {
                         }
                     #endif
                     perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, true, false);
+                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
                     perf_log.stop_event("CATALYST:CoProcess");
                     #ifdef PERFORMANCE
                         if (libMesh::global_processor_id() == 0) {
@@ -1205,7 +1246,7 @@ int main(int argc, char** argv) {
                     char argument2[jsonArraySize];
                     sprintf(argument2, "ovisualization");
                     sprintf(memalloc, "image_%d.png", step);
-                    prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
+                    prov.outputVisualization(taskID, simulationID, argument1, argument2, 0, memalloc);
                 }
                 if (libMesh::global_processor_id() == 0) {
                     char commandLine[jsonArraySize];
@@ -1223,7 +1264,7 @@ int main(int argc, char** argv) {
                 sprintf(argument2, "oline%diextraction", ik);
                 sprintf(memalloc, "line%d%d", ik, numberOfWrites);
                 indexerID++;
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
+                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, step, current_files[1], finalFilename, dim, memalloc, indexerID);
 #endif
             }
         }

@@ -20,11 +20,13 @@ using namespace std;
 
 namespace FEAdaptor
 {
+  void mark_to_rebuild_grid();
+
   void Initialize(int numScripts, string extractionScript, string visualizationScript);
 
   void Finalize();
 
-  void CoProcess(int numScripts, string extractionScript, string visualizationScript, EquationSystems &eq, double time, unsigned int timeStep, bool lastTimeStep, bool using_amr);
+  void CoProcess(int numScripts, string extractionScript, string visualizationScript, EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep, bool using_amr);
   
 }
 

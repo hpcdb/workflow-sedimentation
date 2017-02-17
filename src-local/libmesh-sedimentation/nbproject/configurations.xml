@@ -43,13 +43,12 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <buildCommand>${MAKE} -f Makefile CATALYST=1</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath>libmesh-sedimentation-opt</executablePath>
           <ccTool>
             <incDir>
               <pElem>../../../../program/paraview/include/paraview-5.1</pElem>
-              <pElem>../../xdmf</pElem>
               <pElem>../../../../program/libmesh/include</pElem>
               <pElem>../../../../program/hdf5/include</pElem>
               <pElem>../../../../program/petsc/3.7.2/include</pElem>
@@ -60,6 +59,7 @@
             </incDir>
             <preprocessorList>
               <Elem>NDEBUG</Elem>
+              <Elem>USE_CATALYST</Elem>
             </preprocessorList>
           </ccTool>
         </makeTool>

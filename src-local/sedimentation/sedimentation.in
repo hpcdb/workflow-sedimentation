@@ -21,7 +21,7 @@ hlock = 1.999
 # front wall : 5
 # back wall  : 6    
 
-dim = 3
+dim = 3 
 dirichlet/deposition = '3'
 dirichlet/slipx      = '1'
 dirichlet/slipy      = '5 6'
@@ -31,15 +31,17 @@ dirichlet/pnull      = '4'
 dirichlet/fixedwall  = '4'
 dirichlet/czero      = '4'
 
+
 #------------------------------------------------------
 # refinement parameters
-hlevels     = 1
+hlevels     = 0
 max_r_steps = 2
-r_fraction  = 0.9
-c_fraction  = 0.01
+r_fraction  = 0.85
+c_fraction  = 0.05
 max_h_level = 3
 r_interval  = 10
-nelem_target = 0
+first_step_refinement = true
+
 
 #----------------------------------------------------
 # TIME INTEGRATION PARAMETERS

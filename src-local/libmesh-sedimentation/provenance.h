@@ -55,8 +55,8 @@ public:
     void inputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation);
     void outputDataExtraction(int taskID, int simulationID, int subTaskID, string transformation, string dataSet, int time_step, string xdmf, string rawDataFile, int dimension, string extractorName, int indexerID);
 
-    void inputVisualization(int simulationID, string transformation);
-    void outputVisualization(int simulationID, string transformation, string dataSet, int time_step, string png);
+    void inputVisualization(int taskID, int simulationID, string transformation);
+    void outputVisualization(int taskID, int simulationID, string transformation, string dataSet, int time_step, string png);
 
     void meshAggregator(int simulationID, string xdmf, int n_processors, vector<string> meshDependencies);
 

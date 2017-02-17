@@ -131,7 +131,7 @@ def CreateCoProcessor():
 
   coprocessor = CoProcessor()
   # these are the frequencies at which the coprocessor updates.
-  freqs = {'input': [1, 1]}
+  freqs = {'input': [2]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 

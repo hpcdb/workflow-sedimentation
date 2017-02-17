@@ -496,181 +496,181 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 }
 
 void Provenance::inputInitVisualization(int simulationID, string transformation) {
-//     if (processor_id != 0) return;
-// #ifdef VERBOSE
-//     cout << "Input Init Visualization" << endl;
-// #endif
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Input Init Visualization" << endl;
+#endif
 
-//     Performance perf;
-//     perf.start();
+    Performance perf;
+    perf.start();
 
-//     PerformanceMetric p;
-//     char memalloc[jsonArraySize];
-//     sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
-//     p.SetDescription(memalloc);
-//     p.SetMethod("COMPUTATION");
-//     p.IdentifyStartTime();
+    PerformanceMetric p;
+    char memalloc[jsonArraySize];
+    sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
+    p.SetDescription(memalloc);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyStartTime();
 
-//     Task t(simulationID);
-//     t.addPerformanceMetric(p);
-//     t.setDataflow(dataflow);
-//     t.setTransformation(transformation);
-//     t.setWorkspace(directory);
-//     t.setStatus("RUNNING");
-//     t.addDtDependency("getmaximumiterations");
+    Task t(simulationID);
+    t.addPerformanceMetric(p);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("RUNNING");
+    t.addDtDependency("getmaximumiterations");
 
-//     sprintf(memalloc, "%d", simulationID);
-//     t.addIdDependency(memalloc);
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
 
-//     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
-//     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
 
-//     perf.end();
-//     double elapsedTime = perf.elapsedTime();
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
 
-//     ofstream file;
-//     file.open("prov/log/" + transformation + ".prov", ios_base::app);
-//     file << "PROV:" + transformation + ":Input" << endl;
-//     sprintf(memalloc, "%.5f", elapsedTime);
-//     file << space << memalloc << endl;
-//     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-//     file.close();
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Input" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
 }
 
 void Provenance::outputInitVisualization(int simulationID, string transformation, string dataSet, int time_step, string png) {
-//     if (processor_id != 0) return;
-// #ifdef VERBOSE
-//     cout << "Output Init Visualization" << endl;
-// #endif
-//     Performance perf;
-//     perf.start();
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Output Init Visualization" << endl;
+#endif
+    Performance perf;
+    perf.start();
 
-//     Task t(simulationID);
-//     t.setDataflow(dataflow);
-//     t.setTransformation(transformation);
-//     t.setWorkspace(directory);
-//     t.setStatus("FINISHED");
-//     t.addDtDependency("getmaximumiterations");
+    Task t(simulationID);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("FINISHED");
+    t.addDtDependency("getmaximumiterations");
 
-//     char memalloc[4096];
-//     sprintf(memalloc, "%d", simulationID);
-//     t.addIdDependency(memalloc);
+    char memalloc[4096];
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
 
-//     File f1(directory, png);
-//     t.addFile(f1);
+    File f1(directory, png);
+    t.addFile(f1);
 
-//     sprintf(memalloc, "%d;%d;%s%s",
-//             simulationID, time_step, pgDirectory.c_str(), png.c_str());
+    sprintf(memalloc, "%d;%d;%s%s",
+            simulationID, time_step, pgDirectory.c_str(), png.c_str());
 
-//     vector<string> e = {memalloc};
-//     t.addSet("o" + transformation, e);
+    vector<string> e = {memalloc};
+    t.addSet("o" + transformation, e);
 
-//     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
-//     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
 
-//     perf.end();
-//     double elapsedTime = perf.elapsedTime();
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
 
-//     ofstream file;
-//     file.open("prov/log/" + transformation + ".prov", ios_base::app);
-//     file << "PROV:" + transformation + ":Output" << endl;
-//     sprintf(memalloc, "%.5f", elapsedTime);
-//     file << space << memalloc << endl;
-//     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-//     file.close();
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Output" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
 }
 
-void Provenance::inputVisualization(int simulationID, string transformation) {
-//     if (processor_id != 0) return;
-// #ifdef VERBOSE
-//     cout << "Input Visualization" << endl;
-// #endif
+void Provenance::inputVisualization(int taskID, int simulationID, string transformation) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Input Visualization" << endl;
+#endif
 
-//     Performance perf;
-//     perf.start();
+    Performance perf;
+    perf.start();
 
-//     PerformanceMetric p;
-//     char memalloc[jsonArraySize];
-//     sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
-//     p.SetDescription(memalloc);
-//     p.SetMethod("COMPUTATION");
-//     p.IdentifyStartTime();
+    PerformanceMetric p;
+    char memalloc[jsonArraySize];
+    sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation.c_str(), simulationID);
+    p.SetDescription(memalloc);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyStartTime();
 
-//     Task t(simulationID);
-//     t.addPerformanceMetric(p);
-//     t.setDataflow(dataflow);
-//     t.setTransformation(transformation);
-//     t.setWorkspace(directory);
-//     t.setStatus("RUNNING");
-//     t.addDtDependency("meshwriter");
+    Task t(simulationID);
+    t.addPerformanceMetric(p);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("RUNNING");
+    t.addDtDependency("meshwriter");
 
-//     sprintf(memalloc, "%d", simulationID);
-//     t.addIdDependency(memalloc);
+    sprintf(memalloc, "%d", taskID);
+    t.addIdDependency(memalloc);
 
-//     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
-//     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
 
-//     perf.end();
-//     double elapsedTime = perf.elapsedTime();
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
 
-//     ofstream file;
-//     file.open("prov/log/" + transformation + ".prov", ios_base::app);
-//     file << "PROV:" + transformation + ":Input" << endl;
-//     sprintf(memalloc, "%.5f", elapsedTime);
-//     file << space << memalloc << endl;
-//     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-//     file.close();
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Input" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
 }
 
-void Provenance::outputVisualization(int simulationID, string transformation, string dataSet, int time_step, string png) {
-//     if (processor_id != 0) return;
-// #ifdef VERBOSE
-//     cout << "Output Visualization" << endl;
-// #endif
-//     Performance perf;
-//     perf.start();
+void Provenance::outputVisualization(int taskID, int simulationID, string transformation, string dataSet, int time_step, string png) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Output Visualization" << endl;
+#endif
+    Performance perf;
+    perf.start();
 
-//     Task t(simulationID);
-//     t.setDataflow(dataflow);
-//     t.setTransformation(transformation);
-//     t.setWorkspace(directory);
-//     t.setStatus("FINISHED");
-//     t.addDtDependency("meshwriter");
+    Task t(simulationID);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("FINISHED");
+    t.addDtDependency("meshwriter");
 
-//     char memalloc[4096];
-//     sprintf(memalloc, "%d", simulationID);
-//     t.addIdDependency(memalloc);
+    char memalloc[4096];
+    sprintf(memalloc, "%d", taskID);
+    t.addIdDependency(memalloc);
 
-//     File f1(directory, png);
-//     t.addFile(f1);
+    File f1(directory, png);
+    t.addFile(f1);
 
-//     sprintf(memalloc, "%d;%d;%s%s",
-//             simulationID, time_step, pgDirectory.c_str(), png.c_str());
+    sprintf(memalloc, "%d;%d;%s%s",
+            simulationID, time_step, pgDirectory.c_str(), png.c_str());
 
-//     vector<string> e = {memalloc};
-//     t.addSet("o" + transformation, e);
+    vector<string> e = {memalloc};
+    t.addSet("o" + transformation, e);
 
-//     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
-//     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-//     t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
 
-//     perf.end();
-//     double elapsedTime = perf.elapsedTime();
+    perf.end();
+    double elapsedTime = perf.elapsedTime();
 
-//     ofstream file;
-//     file.open("prov/log/" + transformation + ".prov", ios_base::app);
-//     file << "PROV:" + transformation + ":Output" << endl;
-//     sprintf(memalloc, "%.5f", elapsedTime);
-//     file << space << memalloc << endl;
-//     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-//     file.close();
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Output" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
 }
 
 void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int subTaskID) {
@@ -802,7 +802,7 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
     t.setStatus("RUNNING");
     t.addDtDependency("solversimulationfluid");
 
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
@@ -843,7 +843,7 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
     t.addDtDependency("solversimulationfluid");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
@@ -904,7 +904,7 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
     t.setStatus("FINISHED");
     t.addDtDependency("solversimulationsediments");
 
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%d;%s;%d;%d;%d",
@@ -1231,8 +1231,8 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
 //    sprintf(memalloc, "%d;%s%s;%d;%svideo.mp4",
 //            simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str());
 // without visualization
-     sprintf(memalloc, "%d;%s%s;%d;%s%s",
-             simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors, pgDirectory.c_str(), xdmf.c_str());
+     sprintf(memalloc, "%d;%s%s;%d",
+             simulationID, pgDirectory.c_str(), xdmf.c_str(), n_processors);
 
 
     vector<string> e = {memalloc};
