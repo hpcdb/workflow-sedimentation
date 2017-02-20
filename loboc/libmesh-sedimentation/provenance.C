@@ -30,6 +30,7 @@
 #include "performance.h"
 
 #define LINUX
+//#define BACKUP
 
 using namespace std;
 using namespace libMesh;
@@ -111,8 +112,10 @@ void Provenance::inputInputMesh(int simulationID, int dim) {
 
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -156,8 +159,10 @@ void Provenance::outputInputMesh(int simulationID, double r_fraction, double c_f
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -191,8 +196,10 @@ void Provenance::outputInputMesh(int simulationID, double r_fraction, double c_f
 
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t2.writeJSON(memalloc);
+    #endif
 
     perf.end();
     elapsedTime = perf.elapsedTime();
@@ -238,8 +245,10 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -272,8 +281,10 @@ void Provenance::outputCreateEquationSystems(int simulationID, Real Reynolds, Re
 
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t2.writeJSON(memalloc);
+    #endif
 
     perf.end();
     elapsedTime = perf.elapsedTime();
@@ -323,8 +334,10 @@ void Provenance::outputGetMaximumIterations(int simulationID, Real dt, Real tmax
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -367,8 +380,10 @@ void Provenance::inputInitDataExtraction(int simulationID, string transformation
 
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -481,8 +496,10 @@ void Provenance::outputInitDataExtraction(int simulationID, string transformatio
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     elapsedTime = perf.elapsedTime();
@@ -524,8 +541,10 @@ void Provenance::inputInitVisualization(int simulationID, string transformation)
 
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -569,8 +588,10 @@ void Provenance::outputInitVisualization(int simulationID, string transformation
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -584,7 +605,7 @@ void Provenance::outputInitVisualization(int simulationID, string transformation
     file.close();
 }
 
-void Provenance::inputVisualization(int simulationID, string transformation) {
+void Provenance::inputVisualization(int taskID, int simulationID, string transformation) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Input Visualization" << endl;
@@ -613,8 +634,10 @@ void Provenance::inputVisualization(int simulationID, string transformation) {
 
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -628,7 +651,7 @@ void Provenance::inputVisualization(int simulationID, string transformation) {
     file.close();
 }
 
-void Provenance::outputVisualization(int simulationID, string transformation, string dataSet, int time_step, string png) {
+void Provenance::outputVisualization(int taskID, int simulationID, string transformation, string dataSet, int time_step, string png) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Visualization" << endl;
@@ -658,8 +681,10 @@ void Provenance::outputVisualization(int simulationID, string transformation, st
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif        
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -705,8 +730,10 @@ void Provenance::inputSolverSimulationFluid(int taskID, int simulationID, int su
 
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -761,8 +788,10 @@ void Provenance::outputSolverSimulationFluid(int taskID, int simulationID, int s
 
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -807,8 +836,10 @@ void Provenance::inputSolverSimulationSediments(int taskID, int simulationID, in
 
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -863,8 +894,10 @@ void Provenance::outputSolverSimulationSediments(int taskID, int simulationID, i
 
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -918,8 +951,10 @@ void Provenance::outputMeshRefinement(int taskID, int simulationID, int subTaskI
 
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -965,8 +1000,10 @@ void Provenance::inputMeshWriter(int taskID, int simulationID, int subTaskID) {
 
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -1021,8 +1058,10 @@ void Provenance::outputMeshWriter(int taskID, int simulationID, int subTaskID, i
 
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -1068,8 +1107,10 @@ void Provenance::inputDataExtraction(int taskID, int simulationID, int subTaskID
 
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();
@@ -1185,8 +1226,10 @@ void Provenance::outputDataExtraction(int taskID, int simulationID, int subTaskI
 
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     elapsedTime = perf.elapsedTime();
@@ -1249,8 +1292,10 @@ void Provenance::meshAggregator(int simulationID, string xdmf, int n_processors,
 
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
-    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    #ifdef BACKUP
+        sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+        t.writeJSON(memalloc);
+    #endif
 
     perf.end();
     double elapsedTime = perf.elapsedTime();

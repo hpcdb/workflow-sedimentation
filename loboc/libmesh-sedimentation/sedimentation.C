@@ -1073,7 +1073,7 @@ int main(int argc, char** argv) {
                         char argument1[jsonArraySize];
                         if(ik == 0){
                             sprintf(argument1, "visualization");
-                            prov.inputVisualization(simulationID, argument1);
+                            prov.inputVisualization(taskID, simulationID, argument1);
                         }
                         sprintf(argument1, "line%dextraction", ik);
                         prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
@@ -1104,7 +1104,7 @@ int main(int argc, char** argv) {
                             char argument2[jsonArraySize];
                             sprintf(argument2, "ovisualization");
                             sprintf(memalloc, "image_%d.png", step);
-                            prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
+                            prov.outputVisualization(taskID, simulationID, argument1, argument2, 0, memalloc);
                         }
                         if (libMesh::global_processor_id() == 0) {
                             char commandLine[jsonArraySize];
@@ -1215,7 +1215,7 @@ int main(int argc, char** argv) {
                 char argument1[jsonArraySize];
                 if(ik == 0){
                     sprintf(argument1, "visualization");
-                    prov.inputVisualization(simulationID, argument1);
+                    prov.inputVisualization(taskID, simulationID, argument1);
                 }
                 sprintf(argument1, "line%dextraction", ik);
                 prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
@@ -1246,7 +1246,7 @@ int main(int argc, char** argv) {
                     char argument2[jsonArraySize];
                     sprintf(argument2, "ovisualization");
                     sprintf(memalloc, "image_%d.png", step);
-                    prov.outputVisualization(simulationID, argument1, argument2, 0, memalloc);
+                    prov.outputVisualization(taskID, simulationID, argument1, argument2, 0, memalloc);
                 }
                 if (libMesh::global_processor_id() == 0) {
                     char commandLine[jsonArraySize];
