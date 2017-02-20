@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name=".libs">
+      </df>
+      <df name="contrib">
+        <df name="dfanalyzer">
+          <in>attribute.h</in>
+          <in>file.h</in>
+          <in>indexer.h</in>
+          <in>performance_metric.C</in>
+          <in>performance_metric.h</in>
+          <in>provenance_object.C</in>
+          <in>provenance_object.h</in>
+          <in>task.C</in>
+          <in>task.h</in>
+        </df>
+        <df name="rapidjson">
+          <df name="error">
+            <in>en.h</in>
+            <in>error.h</in>
+          </df>
+          <df name="internal">
+            <in>biginteger.h</in>
+            <in>diyfp.h</in>
+            <in>dtoa.h</in>
+            <in>ieee754.h</in>
+            <in>itoa.h</in>
+            <in>meta.h</in>
+            <in>pow10.h</in>
+            <in>regex.h</in>
+            <in>stack.h</in>
+            <in>strfunc.h</in>
+            <in>strtod.h</in>
+            <in>swap.h</in>
+          </df>
+          <df name="msinttypes">
+            <in>inttypes.h</in>
+            <in>stdint.h</in>
+          </df>
+          <in>allocators.h</in>
+          <in>document.h</in>
+          <in>encodedstream.h</in>
+          <in>encodings.h</in>
+          <in>filereadstream.h</in>
+          <in>filewritestream.h</in>
+          <in>fwd.h</in>
+          <in>istreamwrapper.h</in>
+          <in>memorybuffer.h</in>
+          <in>memorystream.h</in>
+          <in>ostreamwrapper.h</in>
+          <in>pointer.h</in>
+          <in>prettywriter.h</in>
+          <in>rapidjson.h</in>
+          <in>reader.h</in>
+          <in>schema.h</in>
+          <in>stream.h</in>
+          <in>stringbuffer.h</in>
+          <in>writer.h</in>
+        </df>
+      </df>
+      <df name="include">
+        <df name="common">
+          <in>define.h</in>
+          <in>stab_helper.h</in>
+        </df>
+        <df name="flow">
+          <in>sedimentation_flow.h</in>
+        </df>
+        <df name="insitu">
+          <in>FEAdaptor.h</in>
+        </df>
+        <df name="io">
+          <in>xdmf.h</in>
+        </df>
+        <df name="mesh_mov">
+          <in>mesh_moviment.h</in>
+        </df>
+        <df name="prov">
+          <in>performance.h</in>
+          <in>provenance.h</in>
+        </df>
+        <df name="sediment">
+          <in>sedimentation_deposition.h</in>
+          <in>sedimentation_transport.h</in>
+        </df>
+      </df>
+      <df name="input">
+        <df name="2D">
+        </df>
+        <df name="3D">
+        </df>
+      </df>
+      <df name="runs">
+        <df name="out">
+          <df name="step1">
+          </df>
+        </df>
+      </df>
+      <df name="src">
+        <df name="common">
+          <in>performance.h</in>
+          <in>stab_helper.C</in>
+        </df>
+        <df name="flow">
+          <in>sedimentation_flow.C</in>
+        </df>
+        <df name="insitu">
+          <in>FEAdaptor.C</in>
+        </df>
+        <df name="io">
+          <in>xdmf.C</in>
+        </df>
+        <df name="mesh_mov">
+          <in>mesh_moviment.C</in>
+        </df>
+        <df name="prov">
+          <in>provenance.C</in>
+        </df>
+        <df name="sediment">
+          <in>sediment_mass_energy.C</in>
+          <in>sedimentation_deposition.C</in>
+          <in>sedimentation_transport.C</in>
+        </df>
+      </df>
+      <in>sedimentation.C</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>
