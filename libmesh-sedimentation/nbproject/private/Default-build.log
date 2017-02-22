@@ -1,2 +1,4 @@
-Makefile:12: /opt/libs/libmesh//Make.common: No such file or directory
-make: *** No rule to make target `/opt/libs/libmesh//Make.common'.  Stop.
+Compiling C++ (in optimized mode) FEAdaptor.C...
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -Qunused-arguments -I/Users/vitor/Documents/Program_Installations/ParaView-v5.0.1-source/build/CMakeFiles/__macos_install/include/paraview-5.0 -I../../xdmf -I/Users/vitor/Documents/Program_Installations/libmesh-git/build/include -I/Users/vitor/Documents/Program_Installations/hdf5-1.8.9/hdf5/include -I/usr/local/include -D_THREAD_SAFE -pthread -I/Users/vitor/Documents/Program_Installations/petsc-3.6.4/include -I/Users/vitor/Documents/Program_Installations/petsc-3.6.4/arch-darwin-c-debug/include -I/opt/X11/include -c FEAdaptor.C -o FEAdaptor.x86_64-apple-darwin15.4.0.opt.o
+make: mpicxx: No such file or directory
+make: *** [FEAdaptor.x86_64-apple-darwin15.4.0.opt.o] Error 1

@@ -2,46 +2,25 @@
 <configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
-      <df name="contrib">
-        <df name="dfanalyzer">
-          <in>performance_metric.C</in>
-          <in>provenance_object.C</in>
-          <in>task.C</in>
-        </df>
+      <df name="dfanalyzer">
+        <in>performance_metric.C</in>
+        <in>provenance_object.C</in>
+        <in>task.C</in>
       </df>
-      <df name="src">
-        <df name="common">
-          <in>stab_helper.C</in>
-        </df>
-        <df name="flow">
-          <in>sedimentation_flow.C</in>
-        </df>
-        <df name="insitu">
-          <in>FEAdaptor.C</in>
-        </df>
-        <df name="io">
-          <in>xdmf.C</in>
-        </df>
-        <df name="mesh_mov">
-          <in>mesh_moviment.C</in>
-        </df>
-        <df name="prov">
-          <in>provenance.C</in>
-        </df>
-        <df name="sediment">
-          <in>sediment_mass_energy.C</in>
-          <in>sedimentation_deposition.C</in>
-          <in>sedimentation_transport.C</in>
-        </df>
-      </df>
+      <in>FEAdaptor.C</in>
+      <in>mesh_moviment.C</in>
+      <in>provenance.C</in>
       <in>sedimentation.C</in>
+      <in>sedimentation_deposition.C</in>
+      <in>sedimentation_flow.C</in>
+      <in>sedimentation_transport.C</in>
+      <in>xdmf.C</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
-      <itemPath>nbproject/private/launcher.properties</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
@@ -64,13 +43,21 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} -f Makefile PROV=1 CATALYST=1</buildCommand>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>libmesh-sedimentation-opt</executablePath>
           <ccTool>
+            <incDir>
+              <pElem>../../../program/libmesh/include</pElem>
+              <pElem>../../../program/hdf5/include</pElem>
+              <pElem>../../../program/petsc/3.7.2/include</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include</pElem>
+              <pElem>/usr/lib/openmpi/include</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi</pElem>
+            </incDir>
             <preprocessorList>
               <Elem>NDEBUG</Elem>
-              <Elem>USE_CATALYST</Elem>
             </preprocessorList>
           </ccTool>
         </makeTool>
@@ -79,265 +66,54 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
-      <item path="contrib/dfanalyzer/performance_metric.C"
-            ex="false"
-            tool="1"
-            flavor2="8">
+      <item path="FEAdaptor.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
-      <item path="contrib/dfanalyzer/provenance_object.C"
-            ex="false"
-            tool="1"
-            flavor2="8">
+      <item path="dfanalyzer/performance_metric.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
-      <item path="contrib/dfanalyzer/task.C" ex="false" tool="1" flavor2="8">
+      <item path="dfanalyzer/provenance_object.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
-      <folder path="0/contrib">
-        <ccTool>
-          <incDir>
-            <pElem>contrib</pElem>
-            <pElem>contrib/dfanalyzer</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-            <pElem>.</pElem>
-          </incDir>
+      <item path="dfanalyzer/task.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
         </ccTool>
-      </folder>
-      <folder path="0/src">
+      </item>
+      <folder path="0/dfanalyzer">
         <ccTool>
           <incDir>
             <pElem>.</pElem>
           </incDir>
         </ccTool>
       </folder>
-      <folder path="0/src/common">
-        <ccTool>
-          <incDir>
-            <pElem>contrib/dfanalyser</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
+      <item path="mesh_moviment.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
         </ccTool>
-      </folder>
-      <folder path="0/src/flow">
-        <ccTool>
-          <incDir>
-            <pElem>contrib/dfanalyser</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
+      </item>
+      <item path="provenance.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
         </ccTool>
-      </folder>
-      <folder path="0/src/insitu">
-        <ccTool>
-          <incDir>
-            <pElem>contrib/dfanalyser</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/io">
-        <ccTool>
-          <incDir>
-            <pElem>contrib/dfanalyser</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/mesh_mov">
-        <ccTool>
-          <incDir>
-            <pElem>contrib/dfanalyser</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/prov">
-        <ccTool>
-          <incDir>
-            <pElem>contrib</pElem>
-            <pElem>contrib/dfanalyzer</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/src/sediment">
-        <ccTool>
-          <incDir>
-            <pElem>contrib/dfanalyser</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
+      </item>
       <item path="sedimentation.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>contrib/dfanalyser</pElem>
-            <pElem>contrib/rapidjson</pElem>
-            <pElem>include/prov</pElem>
-            <pElem>include/common</pElem>
-            <pElem>include/flow</pElem>
-            <pElem>include/insitu</pElem>
-            <pElem>include/io</pElem>
-            <pElem>include/mesh_mov</pElem>
-            <pElem>include/sediment</pElem>
-            <pElem>../../../program/paraview/include/paraview-5.2</pElem>
-            <pElem>../../../program/libmesh/include</pElem>
-            <pElem>../../../program/hdf5/include</pElem>
-            <pElem>../../../program/petsc/include</pElem>
-            <pElem>/usr/lib/openmpi/include</pElem>
-            <pElem>/usr/lib/openmpi/include/openmpi</pElem>
-          </incDir>
         </ccTool>
       </item>
-      <item path="src/common/stab_helper.C" ex="false" tool="1" flavor2="8">
+      <item path="sedimentation_deposition.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
-      <item path="src/flow/sedimentation_flow.C" ex="false" tool="1" flavor2="8">
+      <item path="sedimentation_flow.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
-      <item path="src/insitu/FEAdaptor.C" ex="false" tool="1" flavor2="8">
+      <item path="sedimentation_transport.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
-      <item path="src/io/xdmf.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="0">
-        </ccTool>
-      </item>
-      <item path="src/mesh_mov/mesh_moviment.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="0">
-        </ccTool>
-      </item>
-      <item path="src/prov/provenance.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="0">
-        </ccTool>
-      </item>
-      <item path="src/sediment/sediment_mass_energy.C"
-            ex="false"
-            tool="1"
-            flavor2="8">
-        <ccTool flags="0">
-        </ccTool>
-      </item>
-      <item path="src/sediment/sedimentation_deposition.C"
-            ex="false"
-            tool="1"
-            flavor2="8">
-        <ccTool flags="0">
-        </ccTool>
-      </item>
-      <item path="src/sediment/sedimentation_transport.C"
-            ex="false"
-            tool="1"
-            flavor2="8">
+      <item path="xdmf.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
