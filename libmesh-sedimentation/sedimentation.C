@@ -1,6 +1,6 @@
 /*
  * File:   sedimentation.cpp
- * Author: camata
+ * Author: camata, vitor
  *
  * Created on December 9, 2014, 3:05 PM
  */
@@ -21,7 +21,6 @@
 #include "libmesh/mesh_modification.h"
 #include "libmesh/vtk_io.h"
 #include "libmesh/gmsh_io.h"
-#include "libmesh/exodusII_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
@@ -42,7 +41,6 @@
 #include "libmesh/error_vector.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/fe_interface.h"
-
 
 // For systems of equations the \p DenseSubMatrix
 // and \p DenseSubVector provide convenient ways for
@@ -70,8 +68,7 @@ using namespace std;
 #include "mesh_moviment.h"
 #include "provenance.h"
 #include "performance.h"
-
-const int jsonArraySize = 256;
+#include "extractor.h"
 
 double ramp(double t) {
     double x[3];
@@ -111,6 +108,9 @@ bool is_file_exist(const char *fileName) {
 // since it was designed to be run only with real numbers.
 
 int main(int argc, char** argv) {
+
+    int processorID = libMesh::global_processor_id();
+    cout << to_string(processorID) << endl;
     PerfLog perf_log("Sedimentation Solver");
 
     // This example requires Adaptive Mesh Refinement support - although
@@ -128,17 +128,12 @@ int main(int argc, char** argv) {
 
     GetPot infile(input);
 
+    char meshDependenciesList[256];
 
-    Performance solverPerf;
-    char memalloc[jsonArraySize];
-    char finalFilename[jsonArraySize];
-
-    int simulationID = 1;
-
-#ifdef PERFORMANCE
-    if (libMesh::global_processor_id() == 0) {
-        solverPerf.start();
-    }
+#ifdef PROV
+    Performance solverPerformance;
+    solverPerformance.begin();
+    Provenance prov;
 #endif
 
     // Initialize libMesh.
@@ -158,10 +153,8 @@ int main(int argc, char** argv) {
     double zmax = infile("zmax", 1.0);
     int ref_interval = infile("r_interval", 1);
 
-    Provenance prov;
-
 #ifdef PROV
-    prov.inputInputMesh(simulationID, dim);
+    prov.inputInputMesh(dim);
 #endif
     // Create a mesh object, with dimension to be overridden later,
     // distributed across the default MPI communicator.
@@ -220,8 +213,6 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
     equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
     equation_systems.parameters.set<Real> ("Us") = Us;
-
-    /////// 
     equation_systems.parameters.set<Real> ("xlock") = xlock;
     equation_systems.parameters.set<Real> ("hlock") = hlock;
     equation_systems.parameters.set<Real> ("alfa") = alfa;
@@ -233,16 +224,13 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("fopc") = fopc;
     equation_systems.parameters.set<Real> ("dt_stab") = infile("dt_stab", 0.1);
 
-    ////
-
     // LOOP 
     Real init_time = 0.0;
     int indexerID = 0;
 
-    // create index directory
-    // char cmd[32];
-    // sprintf(cmd, "mkdir index");
-    // system(cmd);
+    //#ifdef PROV
+    //    prov.createIndexDirectory();
+    //#endif
 
     // INPUT: TIME INTEGRATION
     Real dt = infile("deltat", 0.005);
@@ -290,7 +278,6 @@ int main(int argc, char** argv) {
 #endif
 
     if (!is_file_exist("restart.run")) {
-
         string mesh_file;
         if (command_line.search(1, "-m"))
             mesh_file = command_line.next(mesh_file);
@@ -311,7 +298,6 @@ int main(int argc, char** argv) {
 #ifdef MESH_MOVIMENT
         moving_mesh.init();
 #endif
-
         sediment_flow.setup(infile);
         sediment_transport.setup(infile);
         sediment_deposition.setup(infile);
@@ -319,16 +305,13 @@ int main(int argc, char** argv) {
         moving_mesh.setup(infile);
 #endif
 
-
 #ifdef PROV
-        prov.outputInputMesh(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+        prov.outputInputMesh(r_fraction, c_fraction, max_h_level, hlevels);
 #endif
-
         // Initialize the data structures for the equation system.
         equation_systems.init();
-
 #ifdef PROV
-        prov.outputCreateEquationSystems(simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
+        prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
 #endif
 
     } else {
@@ -346,7 +329,7 @@ int main(int argc, char** argv) {
         mesh.read(mesh_restart);
 
 #ifdef PROV
-        prov.outputInputMesh(simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+        prov.outputInputMesh(r_fraction, c_fraction, max_h_level, hlevels);
 #endif
 
         equation_systems.read(solution_restart, READ);
@@ -363,10 +346,7 @@ int main(int argc, char** argv) {
         // Get a reference to the Convection-Diffusion system object.
         TransientLinearImplicitSystem & transport_system =
                 equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
-
         //transport_system.add_vector("volume");
-
-
 
         // Get a reference to the Convection-Diffusion system object.
         TransientLinearImplicitSystem & flow_system =
@@ -379,13 +359,10 @@ int main(int argc, char** argv) {
         transport_system.update();
         deposition_system.update();
         equation_systems.update();
-
 #ifdef PROV
-        prov.outputCreateEquationSystems(simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
+        prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
 #endif
-
     }
-
 
     // Print information about the mesh to the screen.
     mesh.print_info();
@@ -415,44 +392,25 @@ int main(int argc, char** argv) {
     unsigned int n_linear_iterations_transport = 0;
     bool redo_nl;
 
+#ifdef LIBMESH_HAVE_HDF5    
     string* current_files;
-
-#ifdef LIBMESH_HAVE_HDF5
     perf_log.start_event("XDMF:Write");
     current_files = xdmf_writer.write_time_step(equation_systems, time);
     perf_log.stop_event("XDMF:Write");
     cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#else
-    int exodus_step = 0;
-    {
-        std::ostringstream out;
-        out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
-        ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
-        exodus_step++;
-    }
-    //std::string exodus_filename = "output.e";
 #endif
 
 #ifdef PROV
-    prov.outputGetMaximumIterations(simulationID, dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
+    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
+    Performance performance;
 #endif
 
-    Performance perf;
-
+#ifdef USE_CATALYST    
     if (dim == 2) {
-        // 2D analysis
-        char firstFilename[jsonArraySize];
-        sprintf(firstFilename, "init_ext_line_%d.csv", t_step);
-        sprintf(finalFilename, "ext_line_%d.csv", t_step);
+        // 2D analysis        
 #ifdef PROV
-        prov.inputInitDataExtraction(simulationID, "initdataextraction");
-#endif
-
-#ifdef USE_CATALYST
-#ifdef PERFORMANCE
-        if (libMesh::global_processor_id() == 0) {
-            perf.start();
-        }
+        prov.inputInitDataExtraction(-1);
+        performance.begin();
 #endif
         perf_log.start_event("CATALYST:Init");
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
@@ -460,95 +418,40 @@ int main(int argc, char** argv) {
         perf_log.start_event("CATALYST:CoProcess");
         FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
         perf_log.stop_event("CATALYST:CoProcess");
-#ifdef PERFORMANCE
-        if (libMesh::global_processor_id() == 0) {
-            perf.end();
-            double elapsedTime = perf.elapsedTime();
-            char buffer[jsonArraySize];
-            sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
-            cout << buffer << endl;
-            prov.storeCatalystCost(elapsedTime);
-        }
-#endif  
-        if (libMesh::global_processor_id() == 0) {
-            char commandLine[jsonArraySize];
-            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-            cout << commandLine << endl;
-            system(commandLine);
-        }
-#endif  
-
 #ifdef PROV
+        performance.end();
+        prov.storeCatalystCost(0, 1, performance.getElapsedTime());
+        extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
         indexerID++;
-        prov.outputInitDataExtraction(simulationID, "initdataextraction", "oinitdataextraction", 0, current_files[1], finalFilename, dim, "irde", indexerID);
-#endif
+        prov.outputInitDataExtraction(-1, current_files[1], dim, indexerID);
+#endif        
     } else if (dim == 3) {
         // 3D analysis
-        for (int ik = 0; ik <= 3; ik++) {
-            char firstFilename[jsonArraySize];
-            sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, t_step);
-            sprintf(finalFilename, "ext_line_%d_%d.csv", ik, t_step);
-
+        for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROV
-            char argument1[jsonArraySize];
-            if (ik == 0) {
-                sprintf(argument1, "ivisualization");
-                prov.inputInitVisualization(simulationID, argument1);
-            }
-            sprintf(argument1, "iline%dextraction", ik);
-            prov.inputInitDataExtraction(simulationID, argument1);
+            prov.inputInitVisualization(lineID);
+            prov.inputInitDataExtraction(lineID);
+            performance.begin();
 #endif
-
-#ifdef USE_CATALYST
-            if (ik == 0) {
-#ifdef PERFORMANCE
-                if (libMesh::global_processor_id() == 0) {
-                    perf.start();
-                }
-#endif
+            if (lineID == 0) {
                 perf_log.start_event("CATALYST:Init");
                 FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
                 perf_log.stop_event("CATALYST:Init");
                 perf_log.start_event("CATALYST:CoProcess");
                 FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
                 perf_log.stop_event("CATALYST:CoProcess");
-#ifdef PERFORMANCE
-                if (libMesh::global_processor_id() == 0) {
-                    perf.end();
-                    double elapsedTime = perf.elapsedTime();
-                    char buffer[jsonArraySize];
-                    sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
-                    cout << buffer << endl;
-                    prov.storeCatalystCost(elapsedTime);
-                }
-#endif        
-#ifdef PROV
-                sprintf(argument1, "ivisualization");
-                char argument2[jsonArraySize];
-                sprintf(argument2, "oivisualization");
-                sprintf(memalloc, "image_%d.png", t_step);
-                prov.outputInitVisualization(simulationID, argument1, argument2, 0, memalloc);
-#endif
             }
-            if (libMesh::global_processor_id() == 0) {
-                char commandLine[jsonArraySize];
-                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                cout << commandLine << endl;
-                system(commandLine);
-            }
-#endif   
-
 #ifdef PROV
+            performance.end();
+            prov.storeCatalystCost(0, 1, performance.getElapsedTime());
+            prov.outputInitVisualization(lineID, t_step);
+            extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
             indexerID++;
-            sprintf(argument1, "iline%dextraction", ik);
-            char argument2[jsonArraySize];
-            sprintf(argument2, "oline%diextraction", ik);
-            sprintf(memalloc, "iline%d", ik);
-            prov.outputInitDataExtraction(simulationID, argument1, argument2, 0, current_files[1], finalFilename, dim, memalloc, indexerID);
+            prov.outputInitDataExtraction(lineID, current_files[1], dim, indexerID);
 #endif
         }
     }
-
+#endif
 
     // STEP LOOP
     // Loop in time steps
@@ -556,7 +459,7 @@ int main(int argc, char** argv) {
     int numberIterationsFluid = 0;
     int numberIterationsSediments = 0;
     int numberIterationsMeshRefinements = 0;
-    int numberOfWrites = 0;
+    int subTaskID = 0;
     vector<string> meshDependencies;
 
     equation_systems.parameters.set<PerfLog*> ("PerfLog") = &perf_log;
@@ -654,9 +557,8 @@ int main(int argc, char** argv) {
             for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
                 numberIterationsFluid++;
 #ifdef PROV
-                prov.inputSolverSimulationFluid(taskID, simulationID, numberIterationsFluid);
+                prov.inputSolverSimulationFluid(taskID, numberIterationsFluid);
 #endif
-
                 // Update the nonlinear solution.
                 flow_last_nonlinear_soln->zero();
                 flow_last_nonlinear_soln->add(*flow_system.solution);
@@ -711,7 +613,7 @@ int main(int argc, char** argv) {
                 n_nonlinear_iterations_flow++;
 
 #ifdef PROV
-                prov.outputSolverSimulationFluid(taskID, simulationID, numberIterationsFluid, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
+                prov.outputSolverSimulationFluid(taskID, numberIterationsFluid, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
 #endif  
 
                 // Terminate the solution iteration if the difference between
@@ -739,13 +641,11 @@ int main(int argc, char** argv) {
                 //Real flr2 = final_linear_residual*final_linear_residual;
                 equation_systems.parameters.set<Real> ("linear solver tolerance") =
                         std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-
             } // end nonlinear loop
 
             std::cout << " Solving sedimentation equation..." << std::endl;
             {
                 std::ostringstream out;
-
                 // We write the file in the ExodusII format.
                 out << std::setw(55)
                         << std::setfill('-')
@@ -779,11 +679,9 @@ int main(int argc, char** argv) {
             // FLOW NON-LINEAR LOOP
             for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
                 numberIterationsSediments++;
-
 #ifdef PROV
-                prov.inputSolverSimulationSediments(taskID, simulationID, numberIterationsSediments);
+                prov.inputSolverSimulationSediments(taskID, numberIterationsSediments);
 #endif
-
                 // Update the nonlinear solution.
                 sed_last_nonlinear_soln->zero();
                 sed_last_nonlinear_soln->add(*transport_system.solution);
@@ -814,7 +712,6 @@ int main(int argc, char** argv) {
 
                 {
                     std::ostringstream out;
-
                     // We write the file in the ExodusII format.
                     out << std::setw(5)
                             << std::left
@@ -828,7 +725,6 @@ int main(int argc, char** argv) {
                             << std::setw(15)
                             << norm_delta / u_norm
                             << "\n";
-
                     std::cout << out.str() << std::flush;
                 }
 
@@ -839,7 +735,7 @@ int main(int argc, char** argv) {
                 n_nonlinear_iterations_transport++;
 
 #ifdef PROV
-                prov.outputSolverSimulationSediments(taskID, simulationID, numberIterationsSediments, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
+                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
 #endif
 
                 // Terminate the solution iteration if the difference between
@@ -909,7 +805,6 @@ int main(int argc, char** argv) {
                 refinement.refine_and_coarsen_elements();
                 perf_log.stop_event("refine_and_coarse", "AMR");
 
-
                 //equation_systems.update();
                 perf_log.start_event("reinit systems", "AMR");
                 equation_systems.reinit();
@@ -917,18 +812,13 @@ int main(int argc, char** argv) {
 
                 redo_nl = true;
                 first_step_refinement = false;
-
 #ifdef USE_CATALYST
                 FEAdaptor::mark_to_rebuild_grid();
 #endif 
-
-
                 std::cout << "Number of elements after AMR step: " << mesh.n_active_elem() << std::endl;
-
 #ifdef PROV
-                prov.outputMeshRefinement(taskID, simulationID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
+                prov.outputMeshRefinement(taskID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
 #endif
-
             }
 
             sediment_deposition.ComputeDeposition();
@@ -954,7 +844,7 @@ int main(int argc, char** argv) {
 
             // Output every 10 timesteps to file.
             if ((t_step + 1) % write_interval == 0) {
-                numberOfWrites++;
+                subTaskID++;
                 const std::string mesh_restart = rname + "_mesh_restart.xda";
                 const std::string solution_restart = rname + "_solution_restart.xda";
 
@@ -969,287 +859,129 @@ int main(int argc, char** argv) {
                 fout << "init_tstep = " << t_step << std::endl;
                 fout << "mesh_restart = " << mesh_restart << std::endl;
                 fout << "solution_restart = " << solution_restart << std::endl;
-
 #ifdef LIBMESH_HAVE_HDF5
                 fout << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
 #endif
-
                 fout.close();
-
 #ifdef PROV
-                prov.inputMeshWriter(taskID, simulationID, numberOfWrites);
+                prov.inputMeshWriter(taskID, subTaskID);
 #endif
-
 #ifdef LIBMESH_HAVE_HDF5
                 perf_log.start_event("XDMF:Write");
                 current_files = xdmf_writer.write_time_step(equation_systems, time);
                 perf_log.stop_event("XDMF:Write");
                 cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#else
-                //ExodusII_IO exo(mesh);
-                //exo.append(true);
-                //exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
-
-                {
-                    std::ostringstream out;
-                    out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
-                    ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
-                    exodus_step++;
-                }
 #endif
-
 #ifdef PROV
-                prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
+                prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
 #endif
 
                 int step = t_step + 1;
+#ifdef USE_CATALYST
                 if (dim == 2) {
 #ifdef PROV
-                    prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction");
-#endif
-
-                    char firstFilename[jsonArraySize];
-                    sprintf(firstFilename, "init_ext_line_%d.csv", step);
-                    sprintf(finalFilename, "ext_line_%d.csv", step);
-
-#ifdef USE_CATALYST
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.start();
-                    }
+                    prov.inputDataExtraction(taskID, subTaskID, -1);
+                    performance.begin();
 #endif
                     perf_log.start_event("CATALYST:CoProcess");
                     FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
                     perf_log.stop_event("CATALYST:CoProcess");
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.end();
-                        double elapsedTime = perf.elapsedTime();
-                        char buffer[jsonArraySize];
-                        sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
-                        cout << buffer << endl;
-                        prov.storeCatalystCost(elapsedTime);
-                    }
-#endif                        
-                    if (libMesh::global_processor_id() == 0) {
-                        char commandLine[jsonArraySize];
-                        sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                        system(commandLine);
-                    }
-#endif
-
 #ifdef PROV
-                    sprintf(memalloc, "rde%d", numberOfWrites);
+                    performance.end();
+                    prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                    extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
                     indexerID++;
-                    prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc, indexerID);
+                    prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
 #endif
                 } else if (dim == 3) {
                     // 3D analysis
-                    for (int ik = 0; ik <= 3; ik++) {
-                        char firstFilename[jsonArraySize];
-                        sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
-                        sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
-
+                    for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROV
-                        char argument1[jsonArraySize];
-                        if (ik == 0) {
-                            sprintf(argument1, "visualization");
-                            prov.inputVisualization(taskID, simulationID, argument1);
-                        }
-                        sprintf(argument1, "line%dextraction", ik);
-                        prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
+                        prov.inputVisualization(lineID, taskID);
+                        prov.inputDataExtraction(taskID, subTaskID, lineID);
+                        performance.begin();
 #endif
-
-#ifdef USE_CATALYST
-                        if (ik == 0) {
-#ifdef PERFORMANCE
-                            if (libMesh::global_processor_id() == 0) {
-                                perf.start();
-                            }
-#endif
+                        if (lineID == 0) {
                             perf_log.start_event("CATALYST:CoProcess");
                             FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
                             perf_log.stop_event("CATALYST:CoProcess");
-#ifdef PERFORMANCE
-                            if (libMesh::global_processor_id() == 0) {
-                                perf.end();
-                                double elapsedTime = perf.elapsedTime();
-                                char buffer[jsonArraySize];
-                                sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
-                                cout << buffer << endl;
-                                prov.storeCatalystCost(elapsedTime);
-                            }
-#endif  
-
-#ifdef PROV
-                            sprintf(argument1, "visualization");
-                            char argument2[jsonArraySize];
-                            sprintf(argument2, "ovisualization");
-                            sprintf(memalloc, "image_%d.png", step);
-                            prov.outputVisualization(taskID, simulationID, argument1, argument2, 0, memalloc);
-#endif
                         }
-                        if (libMesh::global_processor_id() == 0) {
-                            char commandLine[jsonArraySize];
-                            sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                            system(commandLine);
-                        }
-#endif  
-
 #ifdef PROV
-                        sprintf(argument1, "line%dextraction", ik);
-                        sprintf(memalloc, "line%d%d", ik, numberOfWrites);
-                        char argument2[jsonArraySize];
-                        sprintf(argument2, "oline%dextraction", ik);
+                        performance.end();
+                        prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                        prov.outputVisualization(lineID, taskID, step);
+                        extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
                         indexerID++;
-                        prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, step, current_files[1], finalFilename, dim, memalloc, indexerID);
+                        prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
 #endif
                     }
-
-
-                    sprintf(memalloc, "%d", taskID);
-                    meshDependencies.push_back(memalloc);
+                    sprintf(meshDependenciesList, "%d", taskID);
+                    meshDependencies.push_back(meshDependenciesList);
                 }
-
+#endif
             }
         }
     }
 
     if ((t_step + 1) % write_interval != 0) {
-        numberOfWrites++;
+        subTaskID++;
 #ifdef PROV
-        prov.inputMeshWriter(taskID, simulationID, numberOfWrites);
+        prov.inputMeshWriter(taskID, subTaskID);
 #endif
-
 #ifdef LIBMESH_HAVE_HDF5
         perf_log.start_event("XDMF:Write");
         current_files = xdmf_writer.write_time_step(equation_systems, time);
         perf_log.stop_event("XDMF:Write");
         cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#else
-        //        ExodusII_IO exo(mesh);
-        //        exo.append(true);
-        //        exo.write_time_step (exodus_filename, equation_systems, t_step+1, flow_system.time);
-        {
-            std::ostringstream out;
-            out << rname << "_" << std::setw(5) << std::setfill('0') << exodus_step << ".e";
-            ExodusII_IO(mesh).write_equation_systems(out.str(), equation_systems);
-            exodus_step++;
-        }
 #endif
-
 #ifdef PROV
-        prov.outputMeshWriter(taskID, simulationID, numberOfWrites, t_step, current_files[1]);
+        prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
 #endif
 
         int step = t_step + 1;
+#ifdef USE_CATALYST
         if (dim == 2) {
 #ifdef PROV
-            prov.inputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction");
-#endif
-
-            char firstFilename[jsonArraySize];
-            sprintf(firstFilename, "init_ext_line_%d.csv", step);
-            sprintf(finalFilename, "ext_line_%d.csv", step);
-
-#ifdef USE_CATALYST
-#ifdef PERFORMANCE
-            if (libMesh::global_processor_id() == 0) {
-                perf.start();
-            }
+            prov.inputDataExtraction(taskID, subTaskID, -1);
+            performance.begin();
 #endif
             perf_log.start_event("CATALYST:CoProcess");
             FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
             perf_log.stop_event("CATALYST:CoProcess");
-#ifdef PERFORMANCE
-            if (libMesh::global_processor_id() == 0) {
-                perf.end();
-                double elapsedTime = perf.elapsedTime();
-                char buffer[jsonArraySize];
-                sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
-                cout << buffer << endl;
-                prov.storeCatalystCost(elapsedTime);
-            }
-#endif
-            if (libMesh::global_processor_id() == 0) {
-                char commandLine[jsonArraySize];
-                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                system(commandLine);
-            }
-#endif
-
 #ifdef PROV
-            sprintf(memalloc, "rde%d", numberOfWrites);
+            performance.end();
+            prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+
+            extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
             indexerID++;
-            prov.outputDataExtraction(taskID, simulationID, numberOfWrites, "dataextraction", "odataextraction", step, current_files[1], finalFilename, dim, memalloc, indexerID);
+            prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
 #endif
         } else if (dim == 3) {
             // 3D analysis
-            for (int ik = 0; ik <= 3; ik++) {
-                char firstFilename[jsonArraySize];
-                sprintf(firstFilename, "init_ext_line_%d_%d.csv", ik, step);
-                sprintf(finalFilename, "ext_line_%d_%d.csv", ik, step);
-
+            for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROV
-                char argument1[jsonArraySize];
-                if (ik == 0) {
-                    sprintf(argument1, "visualization");
-                    prov.inputVisualization(taskID, simulationID, argument1);
-                }
-                sprintf(argument1, "line%dextraction", ik);
-                prov.inputDataExtraction(taskID, simulationID, numberOfWrites, argument1);
+                prov.inputVisualization(lineID, taskID);
+                prov.inputDataExtraction(taskID, subTaskID, lineID);
+                performance.begin();
 #endif
-
-#ifdef USE_CATALYST
-                if (ik == 0) {
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.start();
-                    }
-#endif
+                if (lineID == 0) {
                     perf_log.start_event("CATALYST:CoProcess");
                     FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
                     perf_log.stop_event("CATALYST:CoProcess");
-#ifdef PERFORMANCE
-                    if (libMesh::global_processor_id() == 0) {
-                        perf.end();
-                        double elapsedTime = perf.elapsedTime();
-                        char buffer[jsonArraySize];
-                        sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
-                        cout << buffer << endl;
-                        prov.storeCatalystCost(elapsedTime);
-                    }
-#endif  
-#ifdef PROV
-                    sprintf(argument1, "visualization");
-                    char argument2[jsonArraySize];
-                    sprintf(argument2, "ovisualization");
-                    sprintf(memalloc, "image_%d.png", step);
-                    prov.outputVisualization(taskID, simulationID, argument1, argument2, 0, memalloc);
-#endif
                 }
-                if (libMesh::global_processor_id() == 0) {
-                    char commandLine[jsonArraySize];
-                    sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
-                    system(commandLine);
-                }
-#endif  
-
-
-
 #ifdef PROV
-                sprintf(argument1, "line%dextraction", ik);
-                char argument2[jsonArraySize];
-                sprintf(argument2, "oline%diextraction", ik);
-                sprintf(memalloc, "line%d%d", ik, numberOfWrites);
+                performance.end();
+                prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                prov.outputVisualization(lineID, taskID, step);
+                extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
                 indexerID++;
-                prov.outputDataExtraction(taskID, simulationID, numberOfWrites, argument1, argument2, step, current_files[1], finalFilename, dim, memalloc, indexerID);
+                prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
 #endif
             }
         }
-
-        sprintf(memalloc, "%d", taskID);
-        meshDependencies.push_back(memalloc);
+#endif
+        sprintf(meshDependenciesList, "%d", taskID);
+        meshDependencies.push_back(meshDependenciesList);
     }
 
     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
@@ -1262,18 +994,17 @@ int main(int argc, char** argv) {
     //        system(memalloc);
     //    #endif
 
-    char out_filename[jsonArraySize];
+    char out_filename[256];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
-    prov.meshAggregator(simulationID, out_filename, libMesh::global_n_processors(), meshDependencies);
+    sort(meshDependencies.begin(), meshDependencies.end());
+    meshDependencies.erase(unique(meshDependencies.begin(), meshDependencies.end()), meshDependencies.end());
+    prov.meshAggregator(out_filename, libMesh::global_n_processors(), meshDependencies);
     prov.finishDataIngestor();
 #endif
 
-#ifdef PERFORMANCE
-    if (libMesh::global_processor_id() == 0) {
-        solverPerf.end();
-        double elapsedTime = solverPerf.elapsedTime();
-        prov.storeSolverCost(elapsedTime);
-    }
+#ifdef PROV
+    solverPerformance.end();
+    prov.storeSolverCost(solverPerformance.getElapsedTime());
 #endif
 
     // All done.

@@ -1,4 +1,6 @@
-Compiling C++ (in optimized mode) FEAdaptor.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -Qunused-arguments -I/Users/vitor/Documents/Program_Installations/ParaView-v5.0.1-source/build/CMakeFiles/__macos_install/include/paraview-5.0 -I../../xdmf -I/Users/vitor/Documents/Program_Installations/libmesh-git/build/include -I/Users/vitor/Documents/Program_Installations/hdf5-1.8.9/hdf5/include -I/usr/local/include -D_THREAD_SAFE -pthread -I/Users/vitor/Documents/Program_Installations/petsc-3.6.4/include -I/Users/vitor/Documents/Program_Installations/petsc-3.6.4/arch-darwin-c-debug/include -I/opt/X11/include -c FEAdaptor.C -o FEAdaptor.x86_64-apple-darwin15.4.0.opt.o
-make: mpicxx: No such file or directory
-make: *** [FEAdaptor.x86_64-apple-darwin15.4.0.opt.o] Error 1
+Compiling C++ (in optimized mode) sedimentation.C...
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I/home/vitor/Documents/program/libmesh/include -I/home/vitor/Documents/program/hdf5/include -I/home/vitor/Documents/program/petsc/3.7.2/include -I/home/vitor/Documents/program/petsc/3.7.2//include -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent -I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi -c sedimentation.C -o sedimentation.x86_64-unknown-linux-gnu.opt.o
+sedimentation.C:59:23: fatal error: FEAdaptor.h: No such file or directory
+compilation terminated.
+/home/vitor/Documents/program/libmesh/Make.common:145: recipe for target 'sedimentation.x86_64-unknown-linux-gnu.opt.o' failed
+make: *** [sedimentation.x86_64-unknown-linux-gnu.opt.o] Error 1

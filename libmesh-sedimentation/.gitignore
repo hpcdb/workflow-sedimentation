@@ -1,0 +1,12 @@
+*.h5
+*.xmf
+*.xda.*
+*.png
+*.o
+*.e
+*.bin
+
+
+./sediment-opt
+./runs
+/runs/

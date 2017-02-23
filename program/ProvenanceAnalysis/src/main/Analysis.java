@@ -56,7 +56,7 @@ public class Analysis {
         return totalElapsedTime;
     }
     
-    private static double getTotalElapsedTime(String logDir, String subDir) {
+    private static double getMaxElapsedTime(String logDir, String subDir) {
         File folder = new File(logDir + "/" + subDir);
         File[] files = folder.listFiles();
 
@@ -98,23 +98,23 @@ public class Analysis {
     }
 
     private void setParaviewTime() {
-        this.paraviewTime = Analysis.getElapsedTime(logDirectory, "paraview");
+        this.paraviewTime = Analysis.getMaxElapsedTime(logDirectory, "paraview");
     }
 
     private void setRDETime() {
-        this.rdeTime = Analysis.getTotalElapsedTime(logDirectory, "rde");
+        this.rdeTime = Analysis.getMaxElapsedTime(logDirectory, "rde");
     }
 
     private void setRDITime() {
-        this.rdiTime = Analysis.getTotalElapsedTime(logDirectory, "rdi");
+        this.rdiTime = Analysis.getMaxElapsedTime(logDirectory, "rdi");
     }
 
     private void setIndexing() {
-        this.indexingTime = Analysis.getElapsedTime(logDirectory, "indexing");
+        this.indexingTime = Analysis.getMaxElapsedTime(logDirectory, "indexing");
     }
 
     private void setVisualization(Integer visualizationProcesses) {
-        this.visualizationTime = visualizationProcesses * Analysis.getTotalElapsedTime(logDirectory, "visualization");
+        this.visualizationTime = visualizationProcesses * Analysis.getMaxElapsedTime(logDirectory, "visualization");
     }
 
     void setLogDirectory(String logDirectory) {

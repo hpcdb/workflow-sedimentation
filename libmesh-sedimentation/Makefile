@@ -1,15 +1,19 @@
 ######################################################################
 #
 # Template libMesh application Makefile
-#LIBMESH_DIR=/sw/apps/suse/shared/libmesh/release-no-pmesh-opt/intel
-LIBMESH_DIR=/home/vitor/Documents/program/libmesh
+#LIBMESH_DIR=/home/camata/Libraries/libmesh-trunk
+#PARAVIEW_DIR=/opt/app/paraview/5.0.1
+#PARAVIEW_VERSION?=5.0
+CATALYST?=1
+#LIBMESH_DIR?=/opt/libs/libmesh/
+LIBMESH_DIR?=/home/vitor/Documents/program/libmesh
+PROV?=1
 
-# METHOD = dbg
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
 
-target     := ./libmesh-sedimentation-$(METHOD)
 
+TARGET_SUFFIX := $(METHOD)
 
 ###############################################################################
 # File management.  This is where the source, header, and object files are
@@ -17,19 +21,26 @@ target     := ./libmesh-sedimentation-$(METHOD)
 
 #
 # source files
-srcfiles 	:= $(wildcard *.C dfanalyzer/*.C)
+srcfiles 	:= $(wildcard *.C) $(wildcard src/common/*.C) $(wildcard src/flow/*.C) $(wildcard src/insitu/*.C) $(wildcard src/io/*.C) $(wildcard src/mesh_mov/*.C) $(wildcard src/sediment/*.C) 
+
+# PROV
+srcfiles +=  $(wildcard src/prov/*.C) $(wildcard contrib/dfanalyzer/*.C) $(wildcard contrib/rapidjson/*.C)
+LIBMESH_SED_INCLUDE = -I./contrib -I./contrib/dfanalyzer -I./contrib/rapidjson -I./include/prov 
 
 #
 # object files
 objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 
+LIBMESH_SED_INCLUDE += -I./include/common -I./include/flow -I./include/insitu -I./include/io -I./include/mesh_mov -I./include/sediment 
+	
+
+libmesh_CXXFLAGS += $(LIBMESH_SED_INCLUDE)
 
 ifeq (${CATALYST}, 1) 
-#PARAVIEW_VERSION = 5.2
-#PARAVIEW_DIR=/home/users/vitorss/local/all/paraview-5.2.0
-PARAVIEW_VERSION = 5.1
-PARAVIEW_DIR=/home/vitor/Documents/program/paraview
+PARAVIEW_VERSION?=5.1
+#PARAVIEW_DIR?=/opt/paraview/5.2
+PARAVIEW_DIR?=/home/vitor/Documents/program/paraview
 PARAVIEW_LIB_DIR=$(PARAVIEW_DIR)/lib/paraview-$(PARAVIEW_VERSION)
 PARAVIEW_LIBS =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerApplication-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerCore-pv$(PARAVIEW_VERSION) -lvtkPVServerImplementationCore-pv$(PARAVIEW_VERSION) -lvtkPVClientServerCoreCore-pv$(PARAVIEW_VERSION) -lvtkFiltersParallel-pv$(PARAVIEW_VERSION) -lvtkFiltersModeling-pv$(PARAVIEW_VERSION) -lvtkRenderingCore-pv$(PARAVIEW_VERSION) -lvtkFiltersExtraction-pv$(PARAVIEW_VERSION) -lvtkFiltersStatistics-pv$(PARAVIEW_VERSION) -lvtkImagingFourier-pv$(PARAVIEW_VERSION) -lvtkImagingCore-pv$(PARAVIEW_VERSION) -lvtkalglib-pv$(PARAVIEW_VERSION) -lvtkFiltersGeometry-pv$(PARAVIEW_VERSION) -lvtkFiltersSources-pv$(PARAVIEW_VERSION) -lvtkFiltersGeneral-pv$(PARAVIEW_VERSION) -lvtkCommonComputationalGeometry-pv$(PARAVIEW_VERSION) -lvtkCommonColor-pv$(PARAVIEW_VERSION) -lvtkFiltersProgrammable-pv$(PARAVIEW_VERSION) -lvtkPVVTKExtensionsCore-pv$(PARAVIEW_VERSION) -lvtkPVCommon-pv$(PARAVIEW_VERSION) -lvtkClientServer-pv$(PARAVIEW_VERSION) -lvtkIOXMLParser-pv$(PARAVIEW_VERSION) -lvtkFiltersCore-pv$(PARAVIEW_VERSION) -lvtkParallelMPI-pv$(PARAVIEW_VERSION) -lvtkParallelCore-pv$(PARAVIEW_VERSION) -lvtkIOLegacy-pv$(PARAVIEW_VERSION) -lvtkCommonExecutionModel-pv$(PARAVIEW_VERSION) -lvtkCommonDataModel-pv$(PARAVIEW_VERSION) -lvtkCommonSystem-pv$(PARAVIEW_VERSION) -lvtkCommonTransforms-pv$(PARAVIEW_VERSION) -lvtkCommonMisc-pv$(PARAVIEW_VERSION) -lvtkCommonMath-pv$(PARAVIEW_VERSION) -lprotobuf -lpthread  -lvtkPythonInterpreter-pv$(PARAVIEW_VERSION) -lvtkWrappingPython27Core-pv$(PARAVIEW_VERSION) -lvtkCommonCore-pv$(PARAVIEW_VERSION) -lpython2.7 -lvtksys-pv$(PARAVIEW_VERSION) -Wl,-rpath,$(PARAVIEW_LIB_DIR) -Wl,-rpath-link,$(PARAVIEW_LIB_DIR)
 PARAVIEW_INCLUDE=-I$(PARAVIEW_DIR)/include/paraview-$(PARAVIEW_VERSION)
@@ -37,8 +48,12 @@ libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) -DUSE_CATALYST
 libmesh_LDFLAGS+=$(PARAVIEW_LIBS)
 endif
 
+ifeq (${BEDMOV}, 1) 
+libmesh_CXXFLAGS += -DMESH_MOVIMENT
+endif
 
 
+target     := ./sediment-$(TARGET_SUFFIX)
 .PHONY: dust clean distclean
 
 ###############################################################################
@@ -103,4 +118,3 @@ gmv:
 	@$(perl) $(LIBMESH_DIR)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(LIBMESH_DIR)/include $(wildcard $(LIBMESH_DIR)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 
 ###############################################################################
-

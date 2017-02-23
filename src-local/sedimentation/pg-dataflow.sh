@@ -487,7 +487,7 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation meshAgg
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name xdmf -type file
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name n_processors -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name video -type file
+# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name video -type file
 
 echo "Dataflow ingestion"
 java -jar ../dfa/PG-1.0.jar -ingest -dataflow sedimentation
