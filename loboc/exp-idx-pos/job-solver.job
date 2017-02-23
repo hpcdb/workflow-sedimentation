@@ -44,7 +44,7 @@ export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview
 echo "Executing sedimentation solver..."
 #/usr/bin/time mpirun /scratch/10061a/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d $CPATH/output/ >> out.txt 2>> err.txt
 
-echo -n "/usr/bin/time mpirun -machinefile machines.conf -n $JCORES /scratch/10061a/vitorss/simulation/sedimentation/libmesh-sedimentation/libmesh-sedimentation-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d $CPATH/output/ >> out.txt 2>> err.txt" > mpirun.sh 
+echo -n "/usr/bin/time mpirun -machinefile machines.conf -n $JCORES /scratch/10061a/vitorss/simulation/sedimentation/libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d $CPATH/output/ >> out.txt 2>> err.txt" > mpirun.sh 
 chmod 774 mpirun.sh
 ./mpirun.sh
 
