@@ -308,11 +308,11 @@ namespace FEAdaptor
   void CoProcess(int numScripts, string extractionScript, string visualizationScript, EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep = false, bool using_amr = false)
   {
     //std::cout << "COPROCESSING BEGIN" << std::endl;
-    if(numScripts > 0){ 
-      Processor->RemovePipeline(extraction.GetPointer());
-      extraction->Initialize(extractionScript.c_str());
-      Processor->AddPipeline(extraction.GetPointer());
-    }
+    // if(numScripts > 0){ 
+    //   Processor->RemovePipeline(extraction.GetPointer());
+    //   extraction->Initialize(extractionScript.c_str());
+    //   Processor->AddPipeline(extraction.GetPointer());
+    // }
 
     vtkNew<vtkCPDataDescription> dataDescription;
     dataDescription->AddInput("input");

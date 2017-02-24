@@ -36,7 +36,7 @@ extern "C" {
 
             if (libMesh::global_processor_id() == 0) {
                 char commandLine[256];
-                sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
+                sprintf(commandLine, "python clean-csv.py %s %s;rm %s;chmod -R 774 %s", firstFilename, finalFilename, firstFilename, finalFilename);
                 cout << commandLine << endl;
                 int exitStatus = system(commandLine);
             }

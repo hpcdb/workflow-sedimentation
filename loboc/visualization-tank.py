@@ -117,7 +117,7 @@ def CreateCoProcessor():
 
   coprocessor = CoProcessor()
   # these are the frequencies at which the coprocessor updates.
-  freqs = {'input': [1,1]}
+  freqs = {'input': [50]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 
@@ -156,6 +156,12 @@ def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
     global coprocessor
 
+    start=dt.datetime.now()
+
+    timeStep = datadescription.GetTimeStep()
+    time = datadescription.GetTime()
+    print "[CATALYST] Visualization  - Time step: " + str(timeStep) + " ; Time: " + str(time)
+
     # Update the coprocessor by providing it the newly generated simulation data.
     # If the pipeline hasn't been setup yet, this will setup the pipeline.
     coprocessor.UpdateProducers(datadescription)
@@ -166,5 +172,15 @@ def DoCoProcessing(datadescription):
     # Write image capture (Last arg: rescale lookup table), if appropriate.
     coprocessor.WriteImages(datadescription, rescale_lookuptable=False)
 
+    end=dt.datetime.now()
+    elapsedTime = (end.microsecond-start.microsecond)/1e6
+    if(elapsedTime < 0.00000):
+      elapsedTime = 0.00
+
+    text_file = open("prov/visualization/paraview-" + str(timeStep) + ".prov", "a+")
+    text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
+    text_file.close()
+
     # Live Visualization, if enabled.
     coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)
+

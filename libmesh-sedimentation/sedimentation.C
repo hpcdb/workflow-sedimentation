@@ -108,9 +108,6 @@ bool is_file_exist(const char *fileName) {
 // since it was designed to be run only with real numbers.
 
 int main(int argc, char** argv) {
-
-    int processorID = libMesh::global_processor_id();
-    cout << to_string(processorID) << endl;
     PerfLog perf_log("Sedimentation Solver");
 
     // This example requires Adaptive Mesh Refinement support - although
@@ -443,10 +440,10 @@ int main(int argc, char** argv) {
             }
 #ifdef PROV
             performance.end();
-            prov.storeCatalystCost(0, 1, performance.getElapsedTime());
-            prov.outputInitVisualization(lineID, t_step);
             extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
+            prov.storeCatalystCost(0, 1, performance.getElapsedTime());
             indexerID++;
+            prov.outputInitVisualization(lineID, t_step);
             prov.outputInitDataExtraction(lineID, current_files[1], dim, indexerID);
 #endif
         }
@@ -908,10 +905,10 @@ int main(int argc, char** argv) {
                         }
 #ifdef PROV
                         performance.end();
-                        prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
-                        prov.outputVisualization(lineID, taskID, step);
                         extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
+                        prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
                         indexerID++;
+                        prov.outputVisualization(lineID, taskID, step);
                         prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
 #endif
                     }
@@ -971,10 +968,10 @@ int main(int argc, char** argv) {
                 }
 #ifdef PROV
                 performance.end();
-                prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
-                prov.outputVisualization(lineID, taskID, step);
                 extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
+                prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
                 indexerID++;
+                prov.outputVisualization(lineID, taskID, step);
                 prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
 #endif
             }

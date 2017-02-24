@@ -103,7 +103,7 @@ def CreateCoProcessor():
 
   coprocessor = CoProcessor()
   # these are the frequencies at which the coprocessor updates.
-  freqs = {'input': [1]}
+  freqs = {'input': [50]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 
@@ -142,6 +142,11 @@ def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
     global coprocessor
 
+    timeStep = datadescription.GetTimeStep()
+    time = datadescription.GetTime()
+    print "[CATALYST] Extraction - Time step: " + str(timeStep) + " ; Time: " + str(time)
+    start=dt.datetime.now()
+
     # Update the coprocessor by providing it the newly generated simulation data.
     # If the pipeline hasn't been setup yet, this will setup the pipeline.
     coprocessor.UpdateProducers(datadescription)
@@ -154,3 +159,70 @@ def DoCoProcessing(datadescription):
 
     # Live Visualization, if enabled.
     coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)
+
+    # create a new 'XDMF Reader'
+    # create a producer from a simulation input
+    tank_360_00201xmf = coprocessor.CreateProducer(datadescription, 'input')
+
+    # create a new 'Plot Over Line'
+    plotOverLine3 = PlotOverLine(Input=tank_360_00201xmf,
+        Source='High Resolution Line Source')
+    plotOverLine3.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine3.Source.Point1 = [10.0, -9.13, 0.39]
+    plotOverLine3.Source.Point2 = [10.0, 9.56, 0.39]
+
+    # create a new 'Plot Over Line'
+    plotOverLine2 = PlotOverLine(Input=tank_360_00201xmf,
+        Source='High Resolution Line Source')
+    plotOverLine2.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine2.Source.Point1 = [-1.86, 0.0, 0.39]
+    plotOverLine2.Source.Point2 = [19.56, 0.0, 0.39]
+
+    # create a new 'Plot Over Line'
+    plotOverLine1 = PlotOverLine(Input=tank_360_00201xmf,
+        Source='High Resolution Line Source')
+    plotOverLine1.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine1.Source.Point1 = [-1.86, -9.13, 0.39]
+    plotOverLine1.Source.Point2 = [19.1, 9.56, 0.39]
+
+    # create a new 'Plot Over Line'
+    plotOverLine4 = PlotOverLine(Input=tank_360_00201xmf,
+        Source='High Resolution Line Source')
+    plotOverLine4.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine4.Source.Point1 = [10.0, -9.13, 1.0]
+    plotOverLine4.Source.Point2 = [10.0, 9.56, 1.0]
+
+    # save data
+    SaveData('init_ext_line_0_' + str(timeStep) + ".csv", proxy=plotOverLine1, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+    SaveData('init_ext_line_1_' + str(timeStep) + ".csv", proxy=plotOverLine3, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+    SaveData('init_ext_line_2_' + str(timeStep) + ".csv", proxy=plotOverLine2, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+    SaveData('init_ext_line_3_' + str(timeStep) + ".csv", proxy=plotOverLine4, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+
+    end=dt.datetime.now()
+    elapsedTime = (end.microsecond-start.microsecond)/1e6
+    if(elapsedTime < 0.00000):
+      elapsedTime = 0.00
+
+    text_file = open("prov/rde/data-extraction-" + str(timeStep) + ".prov", "a+")
+    text_file.write("RDE:DataExtraction:Process\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
+    text_file.close()
