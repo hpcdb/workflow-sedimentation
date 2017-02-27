@@ -546,7 +546,8 @@ void Provenance::inputInitVisualization(int lineID) {
     cout << "Input Init Visualization" << endl;
 #endif
 
-    string transformation = "ivisualization";
+    char transformation[arraySize];
+    sprintf(transformation, "ivisualization");
 
     Performance perf;
     perf.begin();
@@ -582,8 +583,8 @@ void Provenance::inputInitVisualization(int lineID) {
     double elapsedTime = perf.getElapsedTime();
 
     ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
+    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
+    file << "PROV:" + string(transformation) + ":Input" << endl;
     sprintf(memalloc, "%.5f", elapsedTime);
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;

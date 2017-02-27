@@ -24,7 +24,7 @@ extern "C" {
                 char commandLine[256];
                 sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
                 cout << commandLine << endl;
-                int exitStatus = system(commandLine);
+                system(commandLine);
             }
         }
 
@@ -38,7 +38,7 @@ extern "C" {
                 char commandLine[256];
                 sprintf(commandLine, "python clean-csv.py %s %s;rm %s;chmod -R 774 %s", firstFilename, finalFilename, firstFilename, finalFilename);
                 cout << commandLine << endl;
-                int exitStatus = system(commandLine);
+                system(commandLine);
             }
         }
     }

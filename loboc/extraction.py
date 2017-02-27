@@ -139,7 +139,7 @@ def DoCoProcessing(datadescription):
 
     timeStep = datadescription.GetTimeStep()
     time = datadescription.GetTime()
-    print "[CATALYST] Extraction - Time step: " + str(timeStep) + " ; Time: " + str(time)
+    print "[CATALYST - CoProcessing] Extraction - Time step: " + str(timeStep) + " ; Time: " + str(time)
     start=dt.datetime.now()
 
     # Update the coprocessor by providing it the newly generated simulation data.
