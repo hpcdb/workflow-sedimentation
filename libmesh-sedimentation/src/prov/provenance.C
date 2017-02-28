@@ -31,13 +31,13 @@
 
 #define LINUX
 #define DATABASE
-// #define BACKUP
+#define BACKUP
 
 using namespace std;
 using namespace libMesh;
 
-Provenance::Provenance() {
-    processor_id = libMesh::global_processor_id();
+Provenance::Provenance(int processorID) {
+    processor_id = processorID;
     simulationID = 1;
 
     GetPot infile("provenance.in");
@@ -575,7 +575,7 @@ void Provenance::inputInitVisualization(int lineID) {
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation, simulationID);
     t.writeJSON(memalloc);
 #endif
 

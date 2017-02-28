@@ -123,6 +123,9 @@ int main(int argc, char** argv) {
         libmesh_error_msg("You need specify a input file!");
     }
 
+    // Initialize libMesh.
+    LibMeshInit init(argc, argv);
+
     GetPot infile(input);
 
     char meshDependenciesList[256];
@@ -130,11 +133,12 @@ int main(int argc, char** argv) {
 #ifdef PROV
     Performance solverPerformance;
     solverPerformance.begin();
-    Provenance prov;
+    Provenance prov(libMesh::global_processor_id());
 #endif
-
-    // Initialize libMesh.
-    LibMeshInit init(argc, argv);
+    
+    cout << "PROCESSOR ID:" << endl;
+    cout << libMesh::global_n_processors() << endl;
+    cout << libMesh::global_processor_id() << endl;
 
     int init_tstep = 1;
 

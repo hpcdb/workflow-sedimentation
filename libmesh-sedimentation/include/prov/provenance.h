@@ -27,7 +27,7 @@ using namespace libMesh;
 
 class Provenance {
 public:
-    Provenance();
+    Provenance(int processorID);
     void inputInputMesh(int dim);
     void outputInputMesh(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels);
 
