@@ -16,12 +16,6 @@ export DATAFLOW_TAG=sedimentation
 export DFA=/scratch/10061a/vitorss/simulation/sedimentation/dfa
 cd $CPATH
 
-echo "Configuration properties to the sedimentation solver..."
-TMAX=15.000
-DELTAT=0.005
-WRITE_INTERVAL=50
-IMAGES=`echo $TMAX $DELTAT $WRITE_INTERVAL | awk '{print int(($1/$2)/$3)}'`
-
 #echo "Specifying dataflow generation..."
 #./pg-dataflow.sh
 
@@ -33,7 +27,6 @@ echo "Starting database system..."
 rm -rf data
 unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
 /scratch/10061a/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
-sleep 15
 
 echo "Setting up environment variables..."
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user2/local/gnu/paraview/5.1/lib/paraview-5.1
@@ -47,7 +40,7 @@ chmod 774 mpirun.sh
 ./mpirun.sh
 
 echo "Calculating total elapsed times based on log files..."
-java -jar /scratch/10061a/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov $IMAGES >> out.txt 2>> err.txt
+java -jar /scratch/10061a/vitorss/simulation/sedimentation/dfa/ProvenanceAnalysis.jar $CPATH/prov >> out.txt 2>> err.txt
 
 echo "Executing termination algorithm..."
 /scratch/10061a/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG

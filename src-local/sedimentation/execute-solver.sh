@@ -32,8 +32,4 @@ time mpirun -np 4 ../../libmesh-sedimentation/sediment-opt -i sedimentation.in -
 cd prov
 directory=`pwd`
 cd ..
-TMAX=0.015
-DELTAT=0.005
-WRITE_INTERVAL=2
-IMAGES=`echo $TMAX $DELTAT $WRITE_INTERVAL | awk '{print int(($1/$2)/$3)}'`
-java -jar ../dfa/ProvenanceAnalysis.jar $directory $IMAGES | tee -a "output-statistics.log"
+java -jar ../dfa/ProvenanceAnalysis.jar $directory | tee -a "output-statistics.log"

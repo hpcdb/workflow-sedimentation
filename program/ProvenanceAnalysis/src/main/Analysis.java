@@ -56,7 +56,7 @@ public class Analysis {
         return totalElapsedTime;
     }
     
-    private static double getMaxElapsedTime(String logDir, String subDir) {
+    private static double getSumOfMaxElapsedTimes(String logDir, String subDir) {
         File folder = new File(logDir + "/" + subDir);
         File[] files = folder.listFiles();
 
@@ -98,30 +98,30 @@ public class Analysis {
     }
 
     private void setParaviewTime() {
-        this.paraviewTime = Analysis.getMaxElapsedTime(logDirectory, "paraview");
+        this.paraviewTime = Analysis.getSumOfMaxElapsedTimes(logDirectory, "paraview");
     }
 
     private void setRDETime() {
-        this.rdeTime = Analysis.getMaxElapsedTime(logDirectory, "rde");
+        this.rdeTime = Analysis.getSumOfMaxElapsedTimes(logDirectory, "rde");
     }
 
     private void setRDITime() {
-        this.rdiTime = Analysis.getMaxElapsedTime(logDirectory, "rdi");
+        this.rdiTime = Analysis.getSumOfMaxElapsedTimes(logDirectory, "rdi");
     }
 
     private void setIndexing() {
-        this.indexingTime = Analysis.getMaxElapsedTime(logDirectory, "indexing");
+        this.indexingTime = Analysis.getSumOfMaxElapsedTimes(logDirectory, "indexing");
     }
 
-    private void setVisualization(Integer visualizationProcesses) {
-        this.visualizationTime = visualizationProcesses * Analysis.getMaxElapsedTime(logDirectory, "visualization");
+    private void setVisualization() {
+        this.visualizationTime = Analysis.getSumOfMaxElapsedTimes(logDirectory, "visualization");
     }
 
     void setLogDirectory(String logDirectory) {
         this.logDirectory = logDirectory;
     }
 
-    void run(Integer visualizationProcesses) {
+    void run() {
         if (logDirectory != null) {
             this.setLogDirectory(logDirectory);
             this.setProvenanceTime();
@@ -129,7 +129,7 @@ public class Analysis {
             this.setRDETime();
             this.setRDITime();
             this.setIndexing();
-            this.setVisualization(visualizationProcesses);
+            this.setVisualization();
             this.calculateOverheads();
             this.calculateSolverTime();
         }
