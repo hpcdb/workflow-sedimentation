@@ -36,7 +36,7 @@ extern "C" {
                 size_t len2 = wordToReplace2.length();
                 while (getline(in, line))
                 {
-                    if(line.find("NaN") == std::string::npos){
+                    if(line.find("nan") == std::string::npos){
                         size_t pos = line.find(wordToReplace);
                         if (pos != string::npos)
                             line.replace(pos, len, "");
@@ -73,7 +73,7 @@ extern "C" {
                 size_t len2 = wordToReplace2.length();
                 while (getline(in, line))
                 {
-                    if(line.find("NaN") == std::string::npos){
+                    if(line.find("nan") == std::string::npos){
                         size_t pos = line.find(wordToReplace);
                         if (pos != string::npos)
                             line.replace(pos, len, "");
