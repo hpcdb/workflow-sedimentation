@@ -103,7 +103,7 @@ def CreateCoProcessor():
 
   coprocessor = CoProcessor()
   # these are the frequencies at which the coprocessor updates.
-  freqs = {'input': [50]}
+  freqs = {'input': [100]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 
@@ -144,7 +144,7 @@ def DoCoProcessing(datadescription):
 
     timeStep = datadescription.GetTimeStep()
     time = datadescription.GetTime()
-    print "[CATALYST] Extraction - Time step: " + str(timeStep) + " ; Time: " + str(time)
+    print "[CATALYST - CoProcessing] Extraction - Time step: " + str(timeStep) + " ; Time: " + str(time)
     start=dt.datetime.now()
 
     # Update the coprocessor by providing it the newly generated simulation data.
