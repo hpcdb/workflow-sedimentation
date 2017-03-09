@@ -31,6 +31,7 @@ class XDMFWriter
         void set_file_id(int n_time_file) {n_timestep = n_time_file; } 
         int  get_file_id() { return n_timestep; }
         string* write_time_step(EquationSystems &es, double time);
+		void mesh_changed_on();
         virtual ~XDMFWriter();
 
     private:
@@ -38,6 +39,7 @@ class XDMFWriter
         void get_variable_solution(EquationSystems& es, int sys, int ivar, std::vector<double> &solution);
         void write_spatial_collection(EquationSystems& es, double time);
         void write_temporal_collection();
+		bool is_mesh_changed;
 
         // mapping between global and local ids
         std::map<dof_id_type, dof_id_type> g2l;

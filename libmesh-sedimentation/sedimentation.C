@@ -52,8 +52,6 @@
 // The definition of a geometric element
 #include "libmesh/elem.h"
 
-#define XDMF_
-
 #include "FEAdaptor.h"
 
 #include "xdmf.h"
@@ -69,6 +67,10 @@ using namespace std;
 #include "provenance.h"
 #include "performance.h"
 #include "extractor.h"
+
+void PrintStats(EquationSystems& es);
+
+void ComputeMassAndEnergy(EquationSystems& es, std::ostream &out, double &mass, double &mass_dep);
 
 double ramp(double t) {
     double x[3];
@@ -86,6 +88,7 @@ double ramp(double t) {
     double L2 = ((t - x[0])*(t - x[1])) / ((x[2] - x[0])*(x[2] - x[1]));
 
     return (y[0] * L0 + y[1] * L1 + y[2] * L2);
+
 }
 
 void WriteRestartFile(EquationSystems &es, std::string rname) {
@@ -108,6 +111,9 @@ bool is_file_exist(const char *fileName) {
 // since it was designed to be run only with real numbers.
 
 int main(int argc, char** argv) {
+    // Initialize libMesh.
+    LibMeshInit init(argc, argv);
+
     PerfLog perf_log("Sedimentation Solver");
 
     // This example requires Adaptive Mesh Refinement support - although
@@ -123,19 +129,17 @@ int main(int argc, char** argv) {
         libmesh_error_msg("You need specify a input file!");
     }
 
-    // Initialize libMesh.
-    LibMeshInit init(argc, argv);
-
     GetPot infile(input);
 
     char meshDependenciesList[256];
+    int indexerID = 0;
 
 #ifdef PROV
     Performance solverPerformance;
     solverPerformance.begin();
     Provenance prov(libMesh::global_processor_id());
 #endif
-    
+
     cout << "PROCESSOR ID:" << endl;
     cout << libMesh::global_n_processors() << endl;
     cout << libMesh::global_processor_id() << endl;
@@ -152,7 +156,6 @@ int main(int argc, char** argv) {
     double xmax = infile("xmax", 1.0);
     double ymax = infile("ymax", 1.0);
     double zmax = infile("zmax", 1.0);
-    int ref_interval = infile("r_interval", 1);
 
 #ifdef PROV
     prov.inputInputMesh(dim);
@@ -165,14 +168,16 @@ int main(int argc, char** argv) {
     double c_fraction = infile("c_fraction", 0.10);
     double max_h_level = infile("max_h_level", 1);
     const unsigned int hlevels = infile("hlevels", 0);
+    bool first_step_refinement = infile("first_step_refinement", false);
     bool amrc_flow_transp = infile("amrc_flow_transp", false);
+
+    int ref_interval = infile("r_interval", 1);
+    int max_r_steps = infile("max_r_steps", 1);
 
     MeshRefinement refinement(mesh);
     refinement.refine_fraction() = r_fraction;
     refinement.coarsen_fraction() = c_fraction;
     refinement.max_h_level() = max_h_level;
-
-    bool first_step_refinement = infile("first_step_refinement", false);
 
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
@@ -210,7 +215,6 @@ int main(int argc, char** argv) {
     cout << "  Grashof : " << Gr << endl;
     cout << "  Sc      : " << Sc << endl;
 
-    equation_systems.parameters.set<int> ("dim") = infile("dim", 2);
     equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
     equation_systems.parameters.set<Real> ("Diffusivity") = Diffusivity;
     equation_systems.parameters.set<Real> ("Us") = Us;
@@ -224,10 +228,10 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("c_factor") = c_factor;
     equation_systems.parameters.set<Real> ("fopc") = fopc;
     equation_systems.parameters.set<Real> ("dt_stab") = infile("dt_stab", 0.1);
+    equation_systems.parameters.set<Real> ("erosion/Rp") = infile("erosion/Rp", 0.0);
 
     // LOOP 
     Real init_time = 0.0;
-    int indexerID = 0;
 
     //#ifdef PROV
     //    prov.createIndexDirectory();
@@ -236,17 +240,16 @@ int main(int argc, char** argv) {
     // INPUT: TIME INTEGRATION
     Real dt = infile("deltat", 0.005);
     Real tmax = infile("tmax", 0.1);
-    const unsigned int n_time_steps = infile("n_time_steps", 10);
+    unsigned int n_time_steps = infile("n_time_steps", 10);
 
     //INPUT: NONLINEAR SOLVER
-    const unsigned int n_nonlinear_steps = infile("n_nonlinear_steps", 10);
+    unsigned int n_nonlinear_steps = infile("n_nonlinear_steps", 10);
     double nonlinear_tolerance = infile("nonlinear_tolerance", 1.0E-03);
     int max_linear_iters = infile("max_linear_iterations", 2000);
-    int max_r_steps = infile("max_r_steps", 1);
 
-    const unsigned int write_interval = infile("write_interval", 10);
+    unsigned int write_interval = infile("write_interval", 10);
     std::string rname = "out";
-    std::string dpath = "output/";
+    std::string dpath = "output";
     int numberOfScripts = 0;
     std::string extractionScript = "";
     std::string visualizationScript = "";
@@ -272,13 +275,12 @@ int main(int argc, char** argv) {
     std::cout << "  Visualization script: " << visualizationScript << endl;
 
 
-#ifdef XDMF_
     XDMFWriter xdmf_writer(mesh);
     xdmf_writer.set_file_name(rname);
     xdmf_writer.set_dir_path(dpath);
-#endif
 
     if (!is_file_exist("restart.run")) {
+
         string mesh_file;
         if (command_line.search(1, "-m"))
             mesh_file = command_line.next(mesh_file);
@@ -293,16 +295,18 @@ int main(int argc, char** argv) {
 
         refinement.uniformly_refine(hlevels);
 
+        equation_systems.parameters.set<int> ("dim") = mesh.mesh_dimension();
+
         sediment_flow.init();
         sediment_transport.init();
         sediment_deposition.init();
-#ifdef MESH_MOVIMENT
-        moving_mesh.init();
-#endif
+
         sediment_flow.setup(infile);
         sediment_transport.setup(infile);
         sediment_deposition.setup(infile);
+
 #ifdef MESH_MOVIMENT  
+        moving_mesh.init();
         moving_mesh.setup(infile);
 #endif
 
@@ -311,27 +315,34 @@ int main(int argc, char** argv) {
 #endif
         // Initialize the data structures for the equation system.
         equation_systems.init();
+
 #ifdef PROV
         prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
 #endif
 
     } else {
+
         GetPot restart("restart.in");
         const string mesh_restart = restart("mesh_restart", "0");
         const string solution_restart = restart("solution_restart", "0");
-        init_time = restart("init_time", 0.0);
-        dt = restart("deltat", 0.0);
+        init_time = restart("time", 0.0);
+        dt = restart("dt", 0.0);
+        init_tstep = restart("init_tstep", 0);
 
-#ifdef LIBMESH_HAVE_HDF5
+#ifdef PROV
+        indexerID = restart("indexerID", 0);
+#endif
+
+        sediment_transport.init_mass = restart("initial_mass", 0.0);
+        sediment_transport.mass_dep = restart("mass_dep", 0.0);
+
+
         int xdmf_file_id = restart("xdmf_file_id", 0);
         xdmf_writer.set_file_id(xdmf_file_id);
-#endif
+
 
         mesh.read(mesh_restart);
 
-#ifdef PROV
-        prov.outputInputMesh(r_fraction, c_fraction, max_h_level, hlevels);
-#endif
 
         equation_systems.read(solution_restart, READ);
         equation_systems.parameters.set<int> ("dim") = mesh.mesh_dimension();
@@ -345,24 +356,24 @@ int main(int argc, char** argv) {
 #endif
 
         // Get a reference to the Convection-Diffusion system object.
+        TransientLinearImplicitSystem & flow_system =
+                equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
+
+        // Get a reference to the Convection-Diffusion system object.
         TransientLinearImplicitSystem & transport_system =
                 equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
         //transport_system.add_vector("volume");
 
-        // Get a reference to the Convection-Diffusion system object.
-        TransientLinearImplicitSystem & flow_system =
-                equation_systems.get_system<TransientLinearImplicitSystem> ("flow");
 
         ExplicitSystem & deposition_system = equation_systems.get_system<ExplicitSystem>("deposition");
-        deposition_system.add_vector("deposition_rate");
+
 
         flow_system.update();
         transport_system.update();
         deposition_system.update();
         equation_systems.update();
-#ifdef PROV
-        prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
-#endif
+
+
     }
 
     // Print information about the mesh to the screen.
@@ -393,13 +404,12 @@ int main(int argc, char** argv) {
     unsigned int n_linear_iterations_transport = 0;
     bool redo_nl;
 
-#ifdef LIBMESH_HAVE_HDF5    
+
     string* current_files;
     perf_log.start_event("XDMF:Write");
     current_files = xdmf_writer.write_time_step(equation_systems, time);
     perf_log.stop_event("XDMF:Write");
     cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#endif
 
 #ifdef PROV
     prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
@@ -413,12 +423,12 @@ int main(int argc, char** argv) {
         prov.inputInitDataExtraction(-1);
         performance.begin();
 #endif
-        perf_log.start_event("CATALYST:Init");
+        perf_log.start_event("CATALYST", "Init");
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
-        perf_log.stop_event("CATALYST:Init");
-        perf_log.start_event("CATALYST:CoProcess");
+        perf_log.stop_event("CATALYST", "Init");
+        perf_log.start_event("CATALYST", "CoProcess");
         FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
-        perf_log.stop_event("CATALYST:CoProcess");
+        perf_log.stop_event("CATALYST", "CoProcess");
 #ifdef PROV
         performance.end();
         prov.storeCatalystCost(0, 1, performance.getElapsedTime());
@@ -435,12 +445,12 @@ int main(int argc, char** argv) {
             performance.begin();
 #endif
             if (lineID == 0) {
-                perf_log.start_event("CATALYST:Init");
+                perf_log.start_event("CATALYST", "Init");
                 FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
-                perf_log.stop_event("CATALYST:Init");
-                perf_log.start_event("CATALYST:CoProcess");
+                perf_log.stop_event("CATALYST", "Init");
+                perf_log.start_event("CATALYST", "CoProcess");
                 FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
-                perf_log.stop_event("CATALYST:CoProcess");
+                perf_log.stop_event("CATALYST", "CoProcess");
             }
 #ifdef PROV
             performance.end();
@@ -456,6 +466,7 @@ int main(int argc, char** argv) {
 
     // STEP LOOP
     // Loop in time steps
+    // TODO: PROV 
     int taskID = 0;
     int numberIterationsFluid = 0;
     int numberIterationsSediments = 0;
@@ -468,6 +479,19 @@ int main(int argc, char** argv) {
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
         taskID++;
         if (is_file_exist("abort.run")) break;
+
+        if (is_file_exist("reset.run")) {
+
+            GetPot reset(input);
+            dt = reset("deltat", 0.005);
+            tmax = reset("tmax", 0.1);
+            n_time_steps = reset("n_time_steps", 10);
+            n_nonlinear_steps = reset("n_nonlinear_steps", 10);
+            write_interval = reset("write_interval", 10);
+            nonlinear_tolerance = reset("nonlinear_tolerance", 1.0E-03);
+            max_linear_iters = reset("max_linear_iterations", 2000);
+
+        }
 
         // Increment the time counter, set the time and the
         // time step size as parameters in the EquationSystem.
@@ -556,6 +580,7 @@ int main(int argc, char** argv) {
             // Fluid
             // FLOW NONLINEAR LOOP
             for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
+                // TODO: PROV
                 numberIterationsFluid++;
 #ifdef PROV
                 prov.inputSolverSimulationFluid(taskID, numberIterationsFluid);
@@ -565,9 +590,9 @@ int main(int argc, char** argv) {
                 flow_last_nonlinear_soln->add(*flow_system.solution);
 
                 // Assemble & solve the linear system.
-                perf_log.start_event("Flow:Solver");
+                perf_log.start_event("Solver", "Flow");
                 flow_system.solve();
-                perf_log.stop_event("Flow:Solver");
+                perf_log.stop_event("Solver", "Flow");
 
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
@@ -644,6 +669,7 @@ int main(int argc, char** argv) {
                         std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
             } // end nonlinear loop
 
+            
             std::cout << " Solving sedimentation equation..." << std::endl;
             {
                 std::ostringstream out;
@@ -679,6 +705,7 @@ int main(int argc, char** argv) {
             // Sediments
             // FLOW NON-LINEAR LOOP
             for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
+                //TODO: PROV
                 numberIterationsSediments++;
 #ifdef PROV
                 prov.inputSolverSimulationSediments(taskID, numberIterationsSediments);
@@ -688,10 +715,9 @@ int main(int argc, char** argv) {
                 sed_last_nonlinear_soln->add(*transport_system.solution);
 
                 // Assemble & solve the linear system.
-                perf_log.start_event("Transport:Solver");
+                perf_log.start_event("Solver", "Transport");
                 transport_system.solve();
-                perf_log.stop_event("Transport:Solver");
-
+                perf_log.stop_event("Solver", "Transport");
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
                 sed_last_nonlinear_soln->add(-1., *transport_system.solution);
@@ -819,11 +845,14 @@ int main(int argc, char** argv) {
                 std::cout << "Number of elements after AMR step: " << mesh.n_active_elem() << std::endl;
 #ifdef PROV
                 prov.outputMeshRefinement(taskID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
+                
 #endif
+                
+                xdmf_writer.mesh_changed_on();
             }
 
             sediment_deposition.ComputeDeposition();
-            sediment_deposition.print();
+            //sediment_deposition.print();
 
 #ifdef MESH_MOVIMENT
             std::cout << "Solving Mesh moviment..." << std::endl;
@@ -843,11 +872,13 @@ int main(int argc, char** argv) {
             moving_mesh.updateMesh();
 #endif
 
-            // Output every 10 timesteps to file.
+            // Output every write_interval timesteps to file.
             if ((t_step + 1) % write_interval == 0) {
+                //TODO: PROV
                 subTaskID++;
-                const std::string mesh_restart = rname + "_mesh_restart.xda";
-                const std::string solution_restart = rname + "_solution_restart.xda";
+                
+                const std::string mesh_restart     = rname + "_mesh_restart.xdr";
+                const std::string solution_restart = rname + "_solution_restart.xdr";
 
                 mesh.write(mesh_restart);
                 equation_systems.write(solution_restart, WRITE);
@@ -860,24 +891,28 @@ int main(int argc, char** argv) {
                 fout << "init_tstep = " << t_step << std::endl;
                 fout << "mesh_restart = " << mesh_restart << std::endl;
                 fout << "solution_restart = " << solution_restart << std::endl;
-#ifdef LIBMESH_HAVE_HDF5
                 fout << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
-#endif
+#ifdef PROV
+                fout << "indexerID = " << indexerID << std::endl;
+
+#endif         
+                
                 fout.close();
 #ifdef PROV
                 prov.inputMeshWriter(taskID, subTaskID);
 #endif
-#ifdef LIBMESH_HAVE_HDF5
-                perf_log.start_event("XDMF:Write");
+
+                perf_log.start_event("Write", "XDMF_IO");
                 current_files = xdmf_writer.write_time_step(equation_systems, time);
-                perf_log.stop_event("XDMF:Write");
+                perf_log.stop_event("Write", "XDMF_IO");
                 cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#endif
+
 #ifdef PROV
                 prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
 #endif
 
                 int step = t_step + 1;
+                
 #ifdef USE_CATALYST
                 if (dim == 2) {
 #ifdef PROV
@@ -922,19 +957,25 @@ int main(int argc, char** argv) {
 #endif
             }
         }
+        
+        PrintStats(equation_systems);
+        
     }
 
     if ((t_step + 1) % write_interval != 0) {
+        //TODO: Prov
         subTaskID++;
 #ifdef PROV
         prov.inputMeshWriter(taskID, subTaskID);
 #endif
-#ifdef LIBMESH_HAVE_HDF5
-        perf_log.start_event("XDMF:Write");
+
+        
+        perf_log.start_event("Write", "XDMF_IO");
         current_files = xdmf_writer.write_time_step(equation_systems, time);
-        perf_log.stop_event("XDMF:Write");
+       perf_log.stop_event("Write", "XDMF_IO");
         cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-#endif
+        
+        
 #ifdef PROV
         prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
 #endif
@@ -1011,4 +1052,142 @@ int main(int argc, char** argv) {
     // All done.
     cout << "All done!" << endl;
     return 0;
+}
+
+
+void PrintStats(EquationSystems& es)
+{
+    std::vector<string> vname;
+    std::vector<Real> local_min;
+    std::vector<Real> local_max;
+    std::vector<Real> local_l2norm;
+    std::vector<unsigned int> vars;
+    std::vector<unsigned int> sys;
+    
+    
+    const MeshBase & mesh  = es.get_mesh();
+    const unsigned int dim = mesh.mesh_dimension();
+    
+    
+    const System & flow_system        = es.get_system("flow");
+    const System & sediment_system    = es.get_system("sediment");
+    
+    vars.push_back(flow_system.variable_number("u"));
+    sys.push_back(flow_system.number());
+    vname.push_back("u");
+    
+    vars.push_back(flow_system.variable_number("v"));
+    sys.push_back(flow_system.number());
+    vname.push_back("v");
+   
+    if(dim > 2) {
+        vars.push_back(flow_system.variable_number("w"));
+        sys.push_back(flow_system.number());
+        vname.push_back("w");
+    }
+    
+    vars.push_back(flow_system.variable_number("p"));
+    sys.push_back(flow_system.number());
+    vname.push_back("p");
+    
+    vars.push_back(sediment_system.variable_number("s"));
+    sys.push_back(sediment_system.number());
+    vname.push_back("s");
+    
+    const int nvars = vname.size();
+    
+    local_min.resize(nvars);
+    local_max.resize(nvars);
+    local_l2norm.resize(nvars);
+    
+    for(int v = 0; v < nvars; v++)
+    {
+        local_min[v]    =  1.0E10;
+        local_max[v]    = -1.0E10;
+        local_l2norm[v] = 0.0;
+    }
+    
+    
+    const DofMap & dof_map_flow     = flow_system.get_dof_map();
+    const DofMap & dof_map_sediment = sediment_system.get_dof_map();
+    
+    /*
+    for(int v = 0; v < nvars-1; v++) {
+        std::vector<unsigned int> dof_indices;
+        dof_map_flow.local_variable_indices(dof_indices, mesh, vars[v]);
+        for(int idof; idof  < dof_indices.size(); idof++)
+        {
+            Real value = flow_system.solution->el(idof);
+            local_min[v]     = std::min(local_min[v], value);
+            local_max[v]     = std::max(local_min[v], value);
+            local_l2norm[v]  += value*value;
+        }
+        
+    }
+    
+    {
+         std::vector<unsigned int> dof_indices;
+        dof_map_sediment.local_variable_indices(dof_indices, mesh, vars[nvars-1]);
+        for(int idof; idof  < dof_indices.size(); idof++)
+        {
+            Real value = flow_system.solution->el(idof);
+            local_min[nvars-1]     = std::min(local_min[nvars-1], value);
+            local_max[nvars-1]     = std::max(local_min[nvars-1], value);
+            local_l2norm[nvars-1]  += value*value;
+        }
+    }
+    */
+    
+    MeshBase::const_node_iterator iter = mesh.local_nodes_begin();
+    for( ;  iter != mesh.local_nodes_end(); iter++)
+    {
+        
+        const Node* node = (*iter);
+        for(int v = 0; v < nvars; v++)
+        {
+            int dof = node->dof_number(sys[v], vars[v], 0);
+            const System & s = es.get_system(sys[v]);
+            if( dof >= s.solution->first_local_index() && dof < s.solution->last_local_index()) 
+            {
+                Real value =     s.solution->el(dof);
+                local_min[v]     = std::min(local_min[v], value);
+                local_max[v]     = std::max(local_max[v], value);
+                local_l2norm[v]  += value*value;
+            }
+        }
+       
+            
+    }
+    
+  
+    std::vector<Real> global_min(vars.size());
+    std::vector<Real> global_max(vars.size());
+    std::vector<Real> global_l2norm(vars.size());
+    
+    MPI_Reduce(&local_min[0]   , &global_min[0]   , nvars, MPI_DOUBLE, MPI_MIN, 0 , MPI_COMM_WORLD);
+    MPI_Reduce(&local_max[0]   , &global_max[0]   , nvars, MPI_DOUBLE, MPI_MAX, 0 , MPI_COMM_WORLD);
+    MPI_Reduce(&local_l2norm[0], &global_l2norm[0], nvars, MPI_DOUBLE, MPI_SUM, 0 , MPI_COMM_WORLD);
+    
+    //if(libMesh::global_processor_id() == 0) 
+   // {
+        
+        //           123456789012345678901234567890123456789012345678901234567890123456789
+        std::cout <<"______________________________________________________"<<std::endl;
+        std::cout <<"------------------------------------------------------"<<std::endl;
+        std::cout <<"   S I M U L A T I O N   I N F O                      "<<std::endl;
+        std::cout <<"------------------------------------------------------"<<std::endl;
+        std::cout <<" Vars      Min             Max             L2-Norm    "<<std::endl;
+        std::cout<< "------------------------------------------------------"<<std::endl;
+        for(int v = 0; v < vars.size(); v++) {
+           std::ostringstream out;
+           out.precision(5);
+           out << std::left << std::setfill (' ') << std::setw(10) << vname[v]  
+                                                  << std::setw(15) << std::scientific << global_min[v] 
+                                                  << std::setw(15) << global_max[v] 
+                                                  << std::setw(15) << std::sqrt(global_l2norm[v]) << "\n" ;
+           std::cout << out.str() << std::flush;
+        }
+        std::cout<<"______________________________________________________"<<std::endl;
+        
+   
 }

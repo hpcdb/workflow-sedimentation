@@ -59,8 +59,6 @@
 #include "libmesh/parallel_ghost_sync.h"
 #include "define.h"
 
-//#define MESH_MOVIMENT
-
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 

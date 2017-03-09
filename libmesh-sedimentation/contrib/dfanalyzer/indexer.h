@@ -81,7 +81,7 @@ public:
             sprintf(buffer, "%s;cd ../..", buffer);
         }
 	    cout << buffer << endl;
-        int exitStatus = system(buffer);
+        system(buffer);
     }
 
 };

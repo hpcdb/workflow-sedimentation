@@ -93,7 +93,11 @@ void MeshMoviment::setup(GetPot &infile)
 
 void MeshMoviment::assemble()
 {
-
+   
+  PerfLog* perf_log = es.parameters.get<PerfLog*>("PerfLog");
+  perf_log->pause_event("Solver","Mesh Moviment");
+  perf_log->start_event("Assembly","Mesh Moviment");
+  
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
@@ -104,13 +108,14 @@ void MeshMoviment::assemble()
   LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("MeshMoving");
 
   
-  ExplicitSystem        &  deposition_system = es.get_system<ExplicitSystem>("deposition");
-  NumericVector<Number> &  deposition_rate   = deposition_system .get_vector("deposition_rate");
+  //ExplicitSystem        &  deposition_system = es.get_system<ExplicitSystem>("deposition");
+  ExplicitSystem        &  deposition_rate = es.get_system<ExplicitSystem>("deposition rate");
+  //NumericVector<Number> &  deposition_rate   = deposition_system .get_vector("deposition_rate");
 
 
   // Numeric ids corresponding to each variable in the system
   const unsigned int dispz_var     = system.variable_number ("disp-z");
-  const unsigned int d_var         = deposition_system.variable_number("d");
+  const unsigned int r_var         = deposition_rate.variable_number("r");
 
   
   
@@ -163,7 +168,7 @@ void MeshMoviment::assemble()
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
   const DofMap& dof_map      = system.get_dof_map();
-  const DofMap& dof_map_dep  = deposition_system.get_dof_map();
+  const DofMap& dof_map_dep  = deposition_rate.get_dof_map();
 
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
@@ -174,7 +179,9 @@ void MeshMoviment::assemble()
   std::vector<dof_id_type> dof_indices;
   std::vector<dof_id_type> dof_indices_dep;
   std::vector<dof_id_type> dof_indices_dep_face;
+  
 
+ 
   Number aux1, aux2;
 
   {
@@ -214,7 +221,8 @@ void MeshMoviment::assemble()
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
   
-
+   NumericVector<Number> & sys_soln(*deposition_rate.current_local_solution);
+   
   for ( ; el != end_el; ++el)
     {
       // Store a pointer to the element we are currently
@@ -256,7 +264,8 @@ void MeshMoviment::assemble()
             }
       }
 
-
+      //std::cout << " DoF Size = " << dof_indices.size() <<  std::endl;
+      
       {
 
        // The penalty value.
@@ -276,9 +285,11 @@ void MeshMoviment::assemble()
                  dof_map_dep.dof_indices(side.get(),dof_indices_dep_face);
                  
                  for(int i =0; i < dof_indices_dep_face.size(); i++)
-                     elem_soln[i] = deposition_rate(dof_indices_dep_face[i]);
+                     elem_soln[i] = sys_soln(dof_indices_dep_face[i]);
                  
                  FEInterface::nodal_soln(dim,fe_type,side.get(),elem_soln, nodal_soln);
+                 
+                 libmesh_assert(nodal_soln.size() == elem_soln.size());
                   
                  for(int n = 0; n < elem->n_nodes(); n++)
                      for(int i =0; i < side->n_nodes(); i++)
@@ -287,6 +298,7 @@ void MeshMoviment::assemble()
                          {
                              Ke(n,n) += penalty;
                              Fe(n)   += nodal_soln[i]*penalty*c_factor;
+                            
                          }
                     
                      }
@@ -310,7 +322,9 @@ void MeshMoviment::assemble()
         system.matrix->add_matrix (Ke, dof_indices);
         system.rhs->add_vector    (Fe, dof_indices);
     }
-
+  
+    perf_log->stop_event("Assembly","Mesh Moviment");
+    perf_log->restart_event("Solver","Mesh Moviment");
 
 }
 

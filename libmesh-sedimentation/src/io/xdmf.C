@@ -42,6 +42,8 @@ using namespace std;
 
 #include "xdmf.h"
 
+#define XDMF_FILE_SIZE 512
+
 #ifdef LIBMESH_HAVE_HDF5
 void H5_WriteInteger(hid_t file_id, const char *datasetname, int *dataset, long size, bool using_compression)
 {
@@ -128,6 +130,7 @@ XDMFWriter::XDMFWriter(const Mesh & mesh) : mesh(mesh),
 {
     this->processor_id = libMesh::global_processor_id();
     this->n_processors = libMesh::global_n_processors();
+    this->is_mesh_changed = true;
     
    
 }
@@ -154,8 +157,8 @@ void XDMFWriter::set_dir_path(std::string path)
 
 string* XDMFWriter::write_time_step(EquationSystems& es, double time)
 {
-    char filename[511];
-    char xdmf_filename[511];
+    char filename[XDMF_FILE_SIZE];
+    char xdmf_filename[XDMF_FILE_SIZE];
     string* files = new string[2];
         
     std::vector<double> coords;
@@ -197,11 +200,19 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     
     solution.resize(this->n_local_nodes);
     
+    char stepdir[XDMF_FILE_SIZE];
+    sprintf(stepdir,"%s/step%d", this->dir.c_str(), this->n_timestep);
+    struct stat st = {0};
+    if (stat(stepdir, &st) == -1) {
+        mkdir(stepdir, 0700);
+    }
+    
+    
 #ifdef LIBMESH_HAVE_HDF5
     hid_t   file_id;
     herr_t  status;
     
-    sprintf(filename,"%s%s_%d_%03d_%05d.h5",this->dir.c_str(),this->basename.c_str(),n_processors,processor_id, this->n_timestep);
+    sprintf(filename,"%s/%s_%d_%03d_%05d.h5",stepdir,this->basename.c_str(),n_processors,processor_id, this->n_timestep);
     file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     H5_WriteInteger(file_id,"/conn",&conn[0],conn.size(),false);
     H5_WriteDouble(file_id,"/coords",&coords[0],coords.size(),false);
@@ -221,9 +232,9 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     status = H5Fclose(file_id);
 #else
 
-    sprintf(filename,"%s%s.xyz.%d.%03d.%05d.bin",this->dir.c_str(),this->basename.c_str(),n_processors,processor_id, this->n_timestep);
+    sprintf(filename,"%s/%s.xyz.%d.%03d.%05d.bin",stepdir,this->basename.c_str(),n_processors,processor_id, this->n_timestep);
     BIN_WriteDouble(filename,&coords[0],coords.size());
-    sprintf(filename,"%s%s.con.%d.%03d.%05d.bin",this->dir.c_str(),this->basename.c_str(),n_processors,processor_id, this->n_timestep);
+    sprintf(filename,"%s/%s.con.%d.%03d.%05d.bin",stepdir,this->basename.c_str(),n_processors,processor_id, this->n_timestep);
     BIN_WriteInt(filename,&conn[0],conn.size());
     
     //LOOP over all system
@@ -235,7 +246,7 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
             this->get_variable_solution(es,ns,nv,solution);
             std::string v = es.get_system(ns).variable_name(nv);
 
-            sprintf(filename,"%s%s.%s.%d.%03d.%05d.bin",this->dir.c_str(),this->basename.c_str(),v.c_str(),
+            sprintf(filename,"%s/%s.%s.%d.%03d.%05d.bin",stepdir,this->basename.c_str(),v.c_str(),
                                                       n_processors,processor_id, this->n_timestep);
             BIN_WriteDouble(filename,&solution[0],solution.size());
         }
@@ -287,14 +298,20 @@ void XDMFWriter::write_spatial_collection(EquationSystems& es, double time)
             elem_name = "Quadrilateral";
             nnoel = 4;
         } 
+        
+        char stepdir[XDMF_FILE_SIZE];
+        sprintf(stepdir,"%s/step%d", this->dir.c_str(), this->n_timestep);
+        char stepfile[XDMF_FILE_SIZE];
+        sprintf(stepfile,"step%d/%s",this->n_timestep ,this->basename.c_str());
+        
        
-        sprintf(filename,"%s%s_%d_%05d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors,this->n_timestep);
+        sprintf(filename,"%s/%s_%d_%05d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors,this->n_timestep);
         FILE * fxml = fopen(filename, "w");
         fprintf(fxml,"<?xml version=\"1.0\" ?>\n");
         fprintf(fxml,"<!-- DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" [] --> \n");
         fprintf(fxml,"<Xdmf xmlns:xi=\"http://www.w3.org/2001/XInclude\" Version=\"2.0\"> \n");
         fprintf(fxml,"<Domain Name=\"libMesh\">\n");
-        fprintf(fxml," <Grid Name=\"%s_%d_%05d\" GridType=\"Collection\" CollectionType=\"Spatial\">\n", this->basename.c_str(), n_processors,this->n_timestep );
+        fprintf(fxml," <Grid Name=\"%s_%d_%05d\" GridType=\"Collection\" CollectionType=\"Spatial\">\n", stepfile, n_processors,this->n_timestep );
         fprintf(fxml,"  <Time Type=\"Single\" Value=\"%f\" />\n", time);
         for(int p=0; p < n_processors; p++)
         {
@@ -303,17 +320,17 @@ void XDMFWriter::write_spatial_collection(EquationSystems& es, double time)
             fprintf(fxml," <Grid Name=\"%s_%d_%03d\" Type=\"Uniform\"> \n",this->basename.c_str(), n_processors, p);  
             fprintf(fxml,"  <Topology Type=\"%s\" NumberOfElements=\"%d\"  BaseOffset=\"0\">\n",elem_name.c_str(),lelem);
 #ifdef LIBMESH_HAVE_HDF5
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Int\" Format=\"HDF\"> %s_%d_%03d_%05d.h5:/conn</DataItem>\n",lelem*nnoel,this->basename.c_str(),n_processors,p,this->n_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Int\" Format=\"HDF\"> %s_%d_%03d_%05d.h5:/conn</DataItem>\n",lelem*nnoel,stepfile,n_processors,p,this->n_timestep);
 #else
-           fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Int\" Format=\"Binary\" Endian=\"Little\"> %s.con.%d.%03d.%05d.bin </DataItem>\n",lelem*nnoel,this->basename.c_str(),n_processors,p,this->n_timestep);
+           fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Int\" Format=\"Binary\" Endian=\"Little\"> %s.con.%d.%03d.%05d.bin </DataItem>\n",lelem*nnoel,stepfile,n_processors,p,this->n_timestep);
 #endif
 
             fprintf(fxml,"  </Topology>\n");
             fprintf(fxml,"  <Geometry Type=\"XYZ\">\n");
 #ifdef LIBMESH_HAVE_HDF5
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/coords</DataItem>\n",lnodes*3,this->basename.c_str(),n_processors,p,this->n_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/coords</DataItem>\n",lnodes*3,stepfile,n_processors,p,this->n_timestep);
 #else
-            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"Binary\" Endian=\"Little\">%s.xyz.%d.%03d.%05d.bin </DataItem>\n",lnodes*3,this->basename.c_str(),n_processors,p,this->n_timestep);
+            fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"Binary\" Endian=\"Little\">%s.xyz.%d.%03d.%05d.bin </DataItem>\n",lnodes*3,stepfile,n_processors,p,this->n_timestep);
 #endif
             fprintf(fxml,"  </Geometry>\n");
             
@@ -326,9 +343,9 @@ void XDMFWriter::write_spatial_collection(EquationSystems& es, double time)
                     std::string dataset_name = es.get_system(ns).variable_name(nv);
                     fprintf(fxml,"  <Attribute Name=\"%s\" AttributeType=\"Scalar\" Center=\"Node\">\n", dataset_name.c_str());
 #ifdef LIBMESH_HAVE_HDF5
-                    fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">%s_%d_%03d_%05d.h5:/%s</DataItem>\n",lnodes,this->basename.c_str(),n_processors,p,this->n_timestep, dataset_name.c_str());
+                    fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\"> %s_%d_%03d_%05d.h5:/%s</DataItem>\n",lnodes,stepfile,n_processors,p,this->n_timestep, dataset_name.c_str());
 #else
-           fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"Binary\" Endian=\"Little\">%s.%s.%d.%03d.%05d.bin </DataItem>\n",lnodes,this->basename.c_str(),dataset_name.c_str(),n_processors,p,this->n_timestep);
+		   fprintf(fxml,"    <DataItem Dimensions=\"%d\" NumberType=\"Float\" Precision=\"8\" Format=\"Binary\" Endian=\"Little\">%s.%s.%d.%03d.%05d.bin </DataItem>\n",lnodes,stepfile,dataset_name.c_str(),n_processors,p,this->n_timestep);
 #endif
                     fprintf(fxml,"  </Attribute>\n");
             
@@ -350,7 +367,7 @@ void XDMFWriter::write_temporal_collection()
 {
     if(processor_id == 0)
     {
-        char filename[255];   
+        char filename[XDMF_FILE_SIZE];   
         sprintf(filename,"%s%s_%d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors);
         FILE * fxml = fopen(filename, "w");
         fprintf(fxml,"<?xml version=\"1.0\" ?>\n");
@@ -369,9 +386,17 @@ void XDMFWriter::write_temporal_collection()
 }
 
 
+void XDMFWriter::mesh_changed_on()
+{
+    this->is_mesh_changed = true;
+}
+
 
 void XDMFWriter::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &conn)
 {
+    
+    //if(!this->is_mesh_changed) return;
+    
     g2l.clear();
    
     MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
@@ -427,6 +452,7 @@ void XDMFWriter::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &
     
     this->n_local_elem  = local_elem_counter;
     this->n_local_nodes = local_node_counter;
+    this->is_mesh_changed =false;
    
 }
     
