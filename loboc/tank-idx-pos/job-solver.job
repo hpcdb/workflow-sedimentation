@@ -1,9 +1,11 @@
-#PBS -l select=41:ncpus=48:mpiprocs=12
+#PBS -l select=21:ncpus=48:mpiprocs=12
 #PBS -l walltime=999:00:00
 #PBS -j oe  
-#PBS -N tank-idx-pos
+#PBS -N tank-pos
 #PBS -V 
-JCORES=480
+#PBS -m bae
+#PBS -M vitor.silva.sousa@gmail.com
+JCORES=240
 
 echo "Starting job..."
 module load intel
