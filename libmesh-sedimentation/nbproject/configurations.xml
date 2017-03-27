@@ -162,12 +162,10 @@
               <pElem>include/io</pElem>
               <pElem>include/mesh_mov</pElem>
               <pElem>include/sediment</pElem>
-              <pElem>../../../program/paraview/include/paraview-5.1</pElem>
-              <pElem>../../../program/libmesh/include</pElem>
-              <pElem>../../../program/hdf5/include</pElem>
-              <pElem>../../../program/petsc/3.7.2/include</pElem>
-              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent</pElem>
-              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include</pElem>
+              <pElem>../../../../program/paraview/include/paraview-5.2</pElem>
+              <pElem>../../../../program/libmesh/include</pElem>
+              <pElem>../../../../program/hdf5/include</pElem>
+              <pElem>../../../../program/petsc/include</pElem>
               <pElem>/usr/lib/openmpi/include</pElem>
               <pElem>/usr/lib/openmpi/include/openmpi</pElem>
             </incDir>
