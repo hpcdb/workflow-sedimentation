@@ -58,7 +58,7 @@ public:
     void inputVisualization(int lineID, int taskID);
     void outputVisualization(int lineID, int taskID, int time_step);
 
-    void meshAggregator(string xdmf, int n_processors, vector<string> meshDependencies);
+    void meshAggregator(string xdmf, int n_processors, vector<int> meshDependencies);
 
     void finishDataIngestor();
 
@@ -67,6 +67,86 @@ public:
     void storeSolverCost(double elapsedTime);
 
     void createIndexDirectory();
+
+    int getIndexerID() {
+        return this->indexerID;
+    }
+
+    void setIndexerID(int indexerID) {
+        this->indexerID = indexerID;
+    }
+
+    void incrementIndexerID() {
+        this->indexerID++;
+    }
+    
+    void addMeshDependencyToList(int taskID) {
+        meshDependencies.push_back(taskID);
+    }
+    
+    vector<int> getMeshDependencies(){
+        return meshDependencies;
+    }
+    
+    int getNumberIterationsFluid() const {
+        return numberIterationsFluid;
+    }
+
+    void setNumberIterationsFluid(int numberIterationsFluid) {
+        this->numberIterationsFluid = numberIterationsFluid;
+    }
+
+    int getNumberIterationsMeshRefinements() const {
+        return numberIterationsMeshRefinements;
+    }
+
+    void setNumberIterationsMeshRefinements(int numberIterationsMeshRefinements) {
+        this->numberIterationsMeshRefinements = numberIterationsMeshRefinements;
+    }
+
+    int getNumberIterationsSediments() const {
+        return numberIterationsSediments;
+    }
+
+    void setNumberIterationsSediments(int numberIterationsSediments) {
+        this->numberIterationsSediments = numberIterationsSediments;
+    }
+
+    int getSubTaskID() const {
+        return subTaskID;
+    }
+
+    void setSubTaskID(int subTaskID) {
+        this->subTaskID = subTaskID;
+    }
+
+    int getTaskID() const {
+        return taskID;
+    }
+
+    void setTaskID(int taskID) {
+        this->taskID = taskID;
+    }
+    
+    void incrementTaskID(){
+        this->taskID++;
+    }
+    
+    void incrementSubTaskID(){
+        this->subTaskID++;
+    }
+    
+    void incrementNumberIterationsFluid(){
+        this->numberIterationsFluid++;
+    }
+    
+    void incrementNumberIterationsMeshRefinements(){
+        this->numberIterationsMeshRefinements++;
+    }
+    
+    void incrementNumberIterationsSediments(){
+        this->numberIterationsSediments++;
+    }
 
 private:
     int processor_id;
@@ -85,6 +165,15 @@ private:
     string pgDirectory = "";
     string rawDataAccess = "";
     string cartridge = "";
+
+    int indexerID = 0;
+    vector<int> meshDependencies;
+    
+    int taskID = 0;
+    int subTaskID = 0;
+    int numberIterationsFluid = 0;
+    int numberIterationsSediments = 0;
+    int numberIterationsMeshRefinements = 0;    
 };
 
 

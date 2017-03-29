@@ -225,6 +225,7 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
             simulationID, Reynolds, Gr, Sc, Us, Diffusivity, xlock, fopc, theta, ex, ey, ez, c_factor);
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
+    
 
     PerformanceMetric p;
     p.SetDescription("libMeshSedimentation::" + transformation);
@@ -1339,7 +1340,7 @@ void Provenance::outputDataExtraction(int taskID, int subTaskID, int lineID, int
     file.close();
 }
 
-void Provenance::meshAggregator(string xdmf, int n_processors, vector<string> meshDependencies) {
+void Provenance::meshAggregator(string xdmf, int n_processors, vector<int> meshDependencies) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Mesh Writer" << endl;
@@ -1358,8 +1359,8 @@ void Provenance::meshAggregator(string xdmf, int n_processors, vector<string> me
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
     t.addDtDependency("meshwriter");
-    for (string dep : meshDependencies) {
-        t.addIdDependency(dep);
+    for (int dep : meshDependencies) {
+        t.addIdDependency(to_string(dep));
     }
 
     File f1(directory, xdmf);

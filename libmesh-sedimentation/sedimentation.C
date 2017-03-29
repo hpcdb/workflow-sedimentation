@@ -131,9 +131,6 @@ int main(int argc, char** argv) {
 
     GetPot infile(input);
 
-    char meshDependenciesList[256];
-    int indexerID = 0;
-
 #ifdef PROV
     Performance solverPerformance;
     solverPerformance.begin();
@@ -330,7 +327,7 @@ int main(int argc, char** argv) {
         init_tstep = restart("init_tstep", 0);
 
 #ifdef PROV
-        indexerID = restart("indexerID", 0);
+        prov.setIndexerID(restart("indexerID", 0));
 #endif
 
         sediment_transport.init_mass = restart("initial_mass", 0.0);
@@ -433,8 +430,8 @@ int main(int argc, char** argv) {
         performance.end();
         prov.storeCatalystCost(0, 1, performance.getElapsedTime());
         extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
-        indexerID++;
-        prov.outputInitDataExtraction(-1, current_files[1], dim, indexerID);
+        prov.incrementIndexerID();
+        prov.outputInitDataExtraction(-1, current_files[1], dim, prov.getIndexerID());
 #endif        
     } else if (dim == 3) {
         // 3D analysis
@@ -456,9 +453,9 @@ int main(int argc, char** argv) {
             performance.end();
             extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
             prov.storeCatalystCost(0, 1, performance.getElapsedTime());
-            indexerID++;
+            prov.incrementIndexerID();
             prov.outputInitVisualization(lineID, t_step);
-            prov.outputInitDataExtraction(lineID, current_files[1], dim, indexerID);
+            prov.outputInitDataExtraction(lineID, current_files[1], dim, prov.getIndexerID());
 #endif
         }
     }
@@ -466,18 +463,10 @@ int main(int argc, char** argv) {
 
     // STEP LOOP
     // Loop in time steps
-    // TODO: PROV 
-    int taskID = 0;
-    int numberIterationsFluid = 0;
-    int numberIterationsSediments = 0;
-    int numberIterationsMeshRefinements = 0;
-    int subTaskID = 0;
-    vector<string> meshDependencies;
-
     equation_systems.parameters.set<PerfLog*> ("PerfLog") = &perf_log;
 
     for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
-        taskID++;
+        prov.incrementTaskID();
         if (is_file_exist("abort.run")) break;
 
         if (is_file_exist("reset.run")) {
@@ -580,10 +569,9 @@ int main(int argc, char** argv) {
             // Fluid
             // FLOW NONLINEAR LOOP
             for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
-                // TODO: PROV
-                numberIterationsFluid++;
 #ifdef PROV
-                prov.inputSolverSimulationFluid(taskID, numberIterationsFluid);
+                prov.incrementNumberIterationsFluid();
+                prov.inputSolverSimulationFluid(prov.getTaskID(), prov.getNumberIterationsFluid());
 #endif
                 // Update the nonlinear solution.
                 flow_last_nonlinear_soln->zero();
@@ -639,7 +627,7 @@ int main(int argc, char** argv) {
                 n_nonlinear_iterations_flow++;
 
 #ifdef PROV
-                prov.outputSolverSimulationFluid(taskID, numberIterationsFluid, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
+                prov.outputSolverSimulationFluid(prov.getTaskID(), prov.getNumberIterationsFluid(), t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
 #endif  
 
                 // Terminate the solution iteration if the difference between
@@ -705,10 +693,9 @@ int main(int argc, char** argv) {
             // Sediments
             // FLOW NON-LINEAR LOOP
             for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
-                //TODO: PROV
-                numberIterationsSediments++;
 #ifdef PROV
-                prov.inputSolverSimulationSediments(taskID, numberIterationsSediments);
+                prov.incrementNumberIterationsSediments();
+                prov.inputSolverSimulationSediments(prov.getTaskID(), prov.getNumberIterationsSediments());
 #endif
                 // Update the nonlinear solution.
                 sed_last_nonlinear_soln->zero();
@@ -762,7 +749,7 @@ int main(int argc, char** argv) {
                 n_nonlinear_iterations_transport++;
 
 #ifdef PROV
-                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
+                prov.outputSolverSimulationSediments(prov.getTaskID(), prov.getNumberIterationsSediments(), t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
 #endif
 
                 // Terminate the solution iteration if the difference between
@@ -795,7 +782,7 @@ int main(int argc, char** argv) {
             redo_nl = false;
 
             if (first_step_refinement || (((r + 1) != max_r_steps) && (t_step + 1) % ref_interval == 0)) {
-                numberIterationsMeshRefinements++;
+                prov.incrementNumberIterationsMeshRefinements();
                 std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
                 std::cout << " Considering Transport" << ((amrc_flow_transp && !first_step_refinement) ? " & Flow Variables\n" : " Variable\n");
                 std::cout << "Number of elements before AMR step: " << mesh.n_active_elem() << std::endl;
@@ -844,7 +831,7 @@ int main(int argc, char** argv) {
 #endif 
                 std::cout << "Number of elements after AMR step: " << mesh.n_active_elem() << std::endl;
 #ifdef PROV
-                prov.outputMeshRefinement(taskID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
+                prov.outputMeshRefinement(prov.getTaskID(), prov.getNumberIterationsMeshRefinements(), first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
 
 #endif
 
@@ -874,8 +861,7 @@ int main(int argc, char** argv) {
 
             // Output every write_interval timesteps to file.
             if ((t_step + 1) % write_interval == 0) {
-                //TODO: PROV
-                subTaskID++;
+                prov.incrementSubTaskID();
 
                 const std::string mesh_restart = rname + "_mesh_restart.xdr";
                 const std::string solution_restart = rname + "_solution_restart.xdr";
@@ -893,13 +879,13 @@ int main(int argc, char** argv) {
                 fout << "solution_restart = " << solution_restart << std::endl;
                 fout << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
 #ifdef PROV
-                fout << "indexerID = " << indexerID << std::endl;
+                fout << "indexerID = " << prov.getIndexerID() << std::endl;
 
 #endif         
 
                 fout.close();
 #ifdef PROV
-                prov.inputMeshWriter(taskID, subTaskID);
+                prov.inputMeshWriter(prov.getTaskID(), prov.getSubTaskID());
 #endif
 
                 perf_log.start_event("Write", "XDMF_IO");
@@ -908,7 +894,7 @@ int main(int argc, char** argv) {
                 cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
 #ifdef PROV
-                prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
+                prov.outputMeshWriter(prov.getTaskID(), prov.getSubTaskID(), t_step, current_files[1]);
 #endif
 
                 int step = t_step + 1;
@@ -917,7 +903,7 @@ int main(int argc, char** argv) {
 #ifdef USE_CATALYST
                     if (dim == 2) {
 #ifdef PROV
-                        prov.inputDataExtraction(taskID, subTaskID, -1);
+                        prov.inputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), -1);
                         performance.begin();
 #endif
                         perf_log.start_event("CATALYST:CoProcess");
@@ -925,17 +911,17 @@ int main(int argc, char** argv) {
                         perf_log.stop_event("CATALYST:CoProcess");
 #ifdef PROV
                         performance.end();
-                        prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                        prov.storeCatalystCost(prov.getTaskID(), prov.getSubTaskID(), performance.getElapsedTime());
                         extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
-                        indexerID++;
-                        prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
+                        prov.incrementIndexerID();
+                        prov.outputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), -1, step, current_files[1], dim, prov.getIndexerID());
 #endif
                     } else if (dim == 3) {
                         // 3D analysis
                         for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROV
-                            prov.inputVisualization(lineID, taskID);
-                            prov.inputDataExtraction(taskID, subTaskID, lineID);
+                            prov.inputVisualization(lineID, prov.getTaskID());
+                            prov.inputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), lineID);
                             performance.begin();
 #endif
                             if (lineID == 0) {
@@ -946,14 +932,15 @@ int main(int argc, char** argv) {
 #ifdef PROV
                             performance.end();
                             extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
-                            prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
-                            indexerID++;
-                            prov.outputVisualization(lineID, taskID, step);
-                            prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
+                            prov.storeCatalystCost(prov.getTaskID(), prov.getSubTaskID(), performance.getElapsedTime());
+                            prov.incrementIndexerID();
+                            prov.outputVisualization(lineID, prov.getTaskID(), step);
+                            prov.outputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), lineID, step, current_files[1], dim, prov.getIndexerID());
 #endif
                         }
-                        sprintf(meshDependenciesList, "%d", taskID);
-                        meshDependencies.push_back(meshDependenciesList);
+                        prov.addMeshDependencyToList(prov.getTaskID());
+//                        sprintf(meshDependenciesList, "%d", taskID);
+//                        meshDependencies.push_back(meshDependenciesList);
                     }
 #endif
                 }
@@ -966,9 +953,9 @@ int main(int argc, char** argv) {
 
     if ((t_step + 1) % write_interval != 0) {
         //TODO: Prov
-        subTaskID++;
+        prov.incrementSubTaskID();
 #ifdef PROV
-        prov.inputMeshWriter(taskID, subTaskID);
+        prov.inputMeshWriter(prov.getTaskID(), prov.getSubTaskID());
 #endif
 
 
@@ -979,14 +966,14 @@ int main(int argc, char** argv) {
 
 
 #ifdef PROV
-        prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
+        prov.outputMeshWriter(prov.getTaskID(), prov.getSubTaskID(), t_step, current_files[1]);
 #endif
 
         int step = t_step + 1;
 #ifdef USE_CATALYST
         if (dim == 2) {
 #ifdef PROV
-            prov.inputDataExtraction(taskID, subTaskID, -1);
+            prov.inputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), -1);
             performance.begin();
 #endif
             perf_log.start_event("CATALYST:CoProcess");
@@ -994,18 +981,18 @@ int main(int argc, char** argv) {
             perf_log.stop_event("CATALYST:CoProcess");
 #ifdef PROV
             performance.end();
-            prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+            prov.storeCatalystCost(prov.getTaskID(), prov.getSubTaskID(), performance.getElapsedTime());
 
             extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
-            indexerID++;
-            prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
+            prov.incrementIndexerID();
+            prov.outputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), -1, step, current_files[1], dim, prov.getIndexerID());
 #endif
         } else if (dim == 3) {
             // 3D analysis
             for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROV
-                prov.inputVisualization(lineID, taskID);
-                prov.inputDataExtraction(taskID, subTaskID, lineID);
+                prov.inputVisualization(lineID, prov.getTaskID());
+                prov.inputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), lineID);
                 performance.begin();
 #endif
                 if (lineID == 0) {
@@ -1016,16 +1003,17 @@ int main(int argc, char** argv) {
 #ifdef PROV
                 performance.end();
                 extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
-                prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
-                indexerID++;
-                prov.outputVisualization(lineID, taskID, step);
-                prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
+                prov.storeCatalystCost(prov.getTaskID(), prov.getSubTaskID(), performance.getElapsedTime());
+                prov.incrementIndexerID();
+                prov.outputVisualization(lineID, prov.getTaskID(), step);
+                prov.outputDataExtraction(prov.getTaskID(), prov.getSubTaskID(), lineID, step, current_files[1], dim, prov.getIndexerID());
 #endif
             }
         }
 #endif
-        sprintf(meshDependenciesList, "%d", taskID);
-        meshDependencies.push_back(meshDependenciesList);
+        prov.addMeshDependencyToList(prov.getTaskID());
+//        sprintf(meshDependenciesList, "%d", taskID);
+//        meshDependencies.push_back(meshDependenciesList);
     }
 
     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
@@ -1040,9 +1028,9 @@ int main(int argc, char** argv) {
 
     char out_filename[256];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
-    sort(meshDependencies.begin(), meshDependencies.end());
-    meshDependencies.erase(unique(meshDependencies.begin(), meshDependencies.end()), meshDependencies.end());
-    prov.meshAggregator(out_filename, libMesh::global_n_processors(), meshDependencies);
+//    sort(meshDependencies.begin(), meshDependencies.end());
+//    meshDependencies.erase(unique(meshDependencies.begin(), meshDependencies.end()), meshDependencies.end());
+    prov.meshAggregator(out_filename, libMesh::global_n_processors(), prov.getMeshDependencies());
     prov.finishDataIngestor();
 #endif
 
