@@ -669,7 +669,7 @@ int main(int argc, char** argv) {
                         std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
             } // end nonlinear loop
 
-            
+
             std::cout << " Solving sedimentation equation..." << std::endl;
             {
                 std::ostringstream out;
@@ -845,9 +845,9 @@ int main(int argc, char** argv) {
                 std::cout << "Number of elements after AMR step: " << mesh.n_active_elem() << std::endl;
 #ifdef PROV
                 prov.outputMeshRefinement(taskID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
-                
+
 #endif
-                
+
                 xdmf_writer.mesh_changed_on();
             }
 
@@ -876,8 +876,8 @@ int main(int argc, char** argv) {
             if ((t_step + 1) % write_interval == 0) {
                 //TODO: PROV
                 subTaskID++;
-                
-                const std::string mesh_restart     = rname + "_mesh_restart.xdr";
+
+                const std::string mesh_restart = rname + "_mesh_restart.xdr";
                 const std::string solution_restart = rname + "_solution_restart.xdr";
 
                 mesh.write(mesh_restart);
@@ -896,7 +896,7 @@ int main(int argc, char** argv) {
                 fout << "indexerID = " << indexerID << std::endl;
 
 #endif         
-                
+
                 fout.close();
 #ifdef PROV
                 prov.inputMeshWriter(taskID, subTaskID);
@@ -912,54 +912,56 @@ int main(int argc, char** argv) {
 #endif
 
                 int step = t_step + 1;
-                
+
+                if (!redo_nl) {
 #ifdef USE_CATALYST
-                if (dim == 2) {
+                    if (dim == 2) {
 #ifdef PROV
-                    prov.inputDataExtraction(taskID, subTaskID, -1);
-                    performance.begin();
-#endif
-                    perf_log.start_event("CATALYST:CoProcess");
-                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                    perf_log.stop_event("CATALYST:CoProcess");
-#ifdef PROV
-                    performance.end();
-                    prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
-                    extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
-                    indexerID++;
-                    prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
-#endif
-                } else if (dim == 3) {
-                    // 3D analysis
-                    for (int lineID = 0; lineID <= 3; lineID++) {
-#ifdef PROV
-                        prov.inputVisualization(lineID, taskID);
-                        prov.inputDataExtraction(taskID, subTaskID, lineID);
+                        prov.inputDataExtraction(taskID, subTaskID, -1);
                         performance.begin();
 #endif
-                        if (lineID == 0) {
-                            perf_log.start_event("CATALYST:CoProcess");
-                            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                            perf_log.stop_event("CATALYST:CoProcess");
-                        }
+                        perf_log.start_event("CATALYST:CoProcess");
+                        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
+                        perf_log.stop_event("CATALYST:CoProcess");
 #ifdef PROV
                         performance.end();
-                        extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
                         prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                        extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
                         indexerID++;
-                        prov.outputVisualization(lineID, taskID, step);
-                        prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
+                        prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
 #endif
+                    } else if (dim == 3) {
+                        // 3D analysis
+                        for (int lineID = 0; lineID <= 3; lineID++) {
+#ifdef PROV
+                            prov.inputVisualization(lineID, taskID);
+                            prov.inputDataExtraction(taskID, subTaskID, lineID);
+                            performance.begin();
+#endif
+                            if (lineID == 0) {
+                                perf_log.start_event("CATALYST:CoProcess");
+                                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
+                                perf_log.stop_event("CATALYST:CoProcess");
+                            }
+#ifdef PROV
+                            performance.end();
+                            extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
+                            prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                            indexerID++;
+                            prov.outputVisualization(lineID, taskID, step);
+                            prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
+#endif
+                        }
+                        sprintf(meshDependenciesList, "%d", taskID);
+                        meshDependencies.push_back(meshDependenciesList);
                     }
-                    sprintf(meshDependenciesList, "%d", taskID);
-                    meshDependencies.push_back(meshDependenciesList);
-                }
 #endif
+                }
             }
         }
-        
+
         PrintStats(equation_systems);
-        
+
     }
 
     if ((t_step + 1) % write_interval != 0) {
@@ -969,13 +971,13 @@ int main(int argc, char** argv) {
         prov.inputMeshWriter(taskID, subTaskID);
 #endif
 
-        
+
         perf_log.start_event("Write", "XDMF_IO");
         current_files = xdmf_writer.write_time_step(equation_systems, time);
-       perf_log.stop_event("Write", "XDMF_IO");
+        perf_log.stop_event("Write", "XDMF_IO");
         cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-        
-        
+
+
 #ifdef PROV
         prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
 #endif
@@ -1054,63 +1056,60 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-
-void PrintStats(EquationSystems& es)
-{
+void PrintStats(EquationSystems& es) {
     std::vector<string> vname;
     std::vector<Real> local_min;
     std::vector<Real> local_max;
     std::vector<Real> local_l2norm;
     std::vector<unsigned int> vars;
     std::vector<unsigned int> sys;
-    
-    
-    const MeshBase & mesh  = es.get_mesh();
+
+
+    const MeshBase & mesh = es.get_mesh();
     const unsigned int dim = mesh.mesh_dimension();
-    
-    
-    const System & flow_system        = es.get_system("flow");
-    const System & sediment_system    = es.get_system("sediment");
-    
+
+
+    const System & flow_system = es.get_system("flow");
+    const System & sediment_system = es.get_system("sediment");
+
     vars.push_back(flow_system.variable_number("u"));
     sys.push_back(flow_system.number());
     vname.push_back("u");
-    
+
     vars.push_back(flow_system.variable_number("v"));
     sys.push_back(flow_system.number());
     vname.push_back("v");
-   
-    if(dim > 2) {
+
+    if (dim > 2) {
         vars.push_back(flow_system.variable_number("w"));
         sys.push_back(flow_system.number());
         vname.push_back("w");
     }
-    
+
     vars.push_back(flow_system.variable_number("p"));
     sys.push_back(flow_system.number());
     vname.push_back("p");
-    
+
     vars.push_back(sediment_system.variable_number("s"));
     sys.push_back(sediment_system.number());
     vname.push_back("s");
-    
+
     const int nvars = vname.size();
-    
+
     local_min.resize(nvars);
     local_max.resize(nvars);
     local_l2norm.resize(nvars);
-    
-    for(int v = 0; v < nvars; v++)
-    {
-        local_min[v]    =  1.0E10;
-        local_max[v]    = -1.0E10;
+
+    for (int v = 0; v < nvars; v++) {
+        local_min[v] = 1.0E10;
+        local_max[v] = -1.0E10;
         local_l2norm[v] = 0.0;
     }
-    
-    
-    const DofMap & dof_map_flow     = flow_system.get_dof_map();
+
+
+    const DofMap & dof_map_flow = flow_system.get_dof_map();
     const DofMap & dof_map_sediment = sediment_system.get_dof_map();
-    
+
     /*
     for(int v = 0; v < nvars-1; v++) {
         std::vector<unsigned int> dof_indices;
@@ -1136,58 +1135,55 @@ void PrintStats(EquationSystems& es)
             local_l2norm[nvars-1]  += value*value;
         }
     }
-    */
-    
+     */
+
     MeshBase::const_node_iterator iter = mesh.local_nodes_begin();
-    for( ;  iter != mesh.local_nodes_end(); iter++)
-    {
-        
+    for (; iter != mesh.local_nodes_end(); iter++) {
+
         const Node* node = (*iter);
-        for(int v = 0; v < nvars; v++)
-        {
+        for (int v = 0; v < nvars; v++) {
             int dof = node->dof_number(sys[v], vars[v], 0);
             const System & s = es.get_system(sys[v]);
-            if( dof >= s.solution->first_local_index() && dof < s.solution->last_local_index()) 
-            {
-                Real value =     s.solution->el(dof);
-                local_min[v]     = std::min(local_min[v], value);
-                local_max[v]     = std::max(local_max[v], value);
-                local_l2norm[v]  += value*value;
+            if (dof >= s.solution->first_local_index() && dof < s.solution->last_local_index()) {
+                Real value = s.solution->el(dof);
+                local_min[v] = std::min(local_min[v], value);
+                local_max[v] = std::max(local_max[v], value);
+                local_l2norm[v] += value*value;
             }
         }
-       
-            
+
+
     }
-    
-  
+
+
     std::vector<Real> global_min(vars.size());
     std::vector<Real> global_max(vars.size());
     std::vector<Real> global_l2norm(vars.size());
-    
-    MPI_Reduce(&local_min[0]   , &global_min[0]   , nvars, MPI_DOUBLE, MPI_MIN, 0 , MPI_COMM_WORLD);
-    MPI_Reduce(&local_max[0]   , &global_max[0]   , nvars, MPI_DOUBLE, MPI_MAX, 0 , MPI_COMM_WORLD);
-    MPI_Reduce(&local_l2norm[0], &global_l2norm[0], nvars, MPI_DOUBLE, MPI_SUM, 0 , MPI_COMM_WORLD);
-    
+
+    MPI_Reduce(&local_min[0], &global_min[0], nvars, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_max[0], &global_max[0], nvars, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_l2norm[0], &global_l2norm[0], nvars, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
     //if(libMesh::global_processor_id() == 0) 
-   // {
-        
-        //           123456789012345678901234567890123456789012345678901234567890123456789
-        std::cout <<"______________________________________________________"<<std::endl;
-        std::cout <<"------------------------------------------------------"<<std::endl;
-        std::cout <<"   S I M U L A T I O N   I N F O                      "<<std::endl;
-        std::cout <<"------------------------------------------------------"<<std::endl;
-        std::cout <<" Vars      Min             Max             L2-Norm    "<<std::endl;
-        std::cout<< "------------------------------------------------------"<<std::endl;
-        for(int v = 0; v < vars.size(); v++) {
-           std::ostringstream out;
-           out.precision(5);
-           out << std::left << std::setfill (' ') << std::setw(10) << vname[v]  
-                                                  << std::setw(15) << std::scientific << global_min[v] 
-                                                  << std::setw(15) << global_max[v] 
-                                                  << std::setw(15) << std::sqrt(global_l2norm[v]) << "\n" ;
-           std::cout << out.str() << std::flush;
-        }
-        std::cout<<"______________________________________________________"<<std::endl;
-        
-   
+    // {
+
+    //           123456789012345678901234567890123456789012345678901234567890123456789
+    std::cout << "______________________________________________________" << std::endl;
+    std::cout << "------------------------------------------------------" << std::endl;
+    std::cout << "   S I M U L A T I O N   I N F O                      " << std::endl;
+    std::cout << "------------------------------------------------------" << std::endl;
+    std::cout << " Vars      Min             Max             L2-Norm    " << std::endl;
+    std::cout << "------------------------------------------------------" << std::endl;
+    for (int v = 0; v < vars.size(); v++) {
+        std::ostringstream out;
+        out.precision(5);
+        out << std::left << std::setfill(' ') << std::setw(10) << vname[v]
+                << std::setw(15) << std::scientific << global_min[v]
+                << std::setw(15) << global_max[v]
+                << std::setw(15) << std::sqrt(global_l2norm[v]) << "\n";
+        std::cout << out.str() << std::flush;
+    }
+    std::cout << "______________________________________________________" << std::endl;
+
+
 }
