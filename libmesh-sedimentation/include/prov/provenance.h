@@ -36,24 +36,24 @@ public:
     void outputGetMaximumIterations(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, int max_r_steps, unsigned int write_interval, string xdmf);
 
     void inputInitDataExtraction(int lineID);
-    void outputInitDataExtraction(int lineID, string xdmf, int dimension, int indexerID);
+    void outputInitDataExtraction(int lineID, string xdmf, int dimension);
 
     void inputInitVisualization(int lineID);
     void outputInitVisualization(int lineID, int timeStep);
 
-    void inputSolverSimulationFluid(int taskID, int subTaskID);
-    void outputSolverSimulationFluid(int taskID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void inputSolverSimulationFluid();
+    void outputSolverSimulationFluid(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
 
-    void inputSolverSimulationSediments(int taskID, int subTaskID);
-    void outputSolverSimulationSediments(int taskID, int subTaskID, int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void inputSolverSimulationSediments();
+    void outputSolverSimulationSediments(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
 
-    void outputMeshRefinement(int taskID, int subTaskID, bool first_step_refinement, int time_step, int before_n_active_elem, int after_n_active_elem);
+    void outputMeshRefinement(bool first_step_refinement, int time_step, int before_n_active_elem, int after_n_active_elem);
 
-    void inputMeshWriter(int taskID, int subTaskID);
-    void outputMeshWriter(int taskID, int subTaskID, int time_step, string xdmf);
+    void inputMeshWriter();
+    void outputMeshWriter(int time_step, string xdmf);
 
-    void inputDataExtraction(int taskID, int subTaskID, int lineID);
-    void outputDataExtraction(int taskID, int subTaskID, int lineID, int time_step, string xdmf, int dimension, int indexerID);
+    void inputDataExtraction(int lineID);
+    void outputDataExtraction(int lineID, int time_step, string xdmf, int dimension);
 
     void inputVisualization(int lineID, int taskID);
     void outputVisualization(int lineID, int taskID, int time_step);

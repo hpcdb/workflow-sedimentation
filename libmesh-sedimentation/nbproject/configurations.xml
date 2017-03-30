@@ -162,7 +162,7 @@
               <pElem>include/io</pElem>
               <pElem>include/mesh_mov</pElem>
               <pElem>include/sediment</pElem>
-              <pElem>../../../../program/paraview/include/paraview-5.2</pElem>
+              <pElem>../../../../program/paraview-5.3.0/include/paraview-5.3</pElem>
               <pElem>../../../../program/libmesh/include</pElem>
               <pElem>../../../../program/hdf5/include</pElem>
               <pElem>../../../../program/petsc/include</pElem>
