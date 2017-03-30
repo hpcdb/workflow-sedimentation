@@ -403,9 +403,9 @@ int main(int argc, char** argv) {
 
 
     string* current_files;
-    perf_log.start_event("XDMF:Write");
+    perf_log.start_event("XDMF", "Write");
     current_files = xdmf_writer.write_time_step(equation_systems, time);
-    perf_log.stop_event("XDMF:Write");
+    perf_log.stop_event("XDMF", "Write");
     cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
 #ifdef PROV
@@ -420,12 +420,12 @@ int main(int argc, char** argv) {
         prov.inputInitDataExtraction(-1);
         performance.begin();
 #endif
-        perf_log.start_event("CATALYST", "Init");
+        perf_log.start_event("Init", "Catalyst");
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
-        perf_log.stop_event("CATALYST", "Init");
-        perf_log.start_event("CATALYST", "CoProcess");
+        perf_log.stop_event("Init", "Catalyst");
+        perf_log.start_event("CoProcess", "Catalyst");
         FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
-        perf_log.stop_event("CATALYST", "CoProcess");
+        perf_log.stop_event("CoProcess", "Catalyst");
 #ifdef PROV
         performance.end();
         prov.storeCatalystCost(performance.getElapsedTime());
@@ -442,12 +442,12 @@ int main(int argc, char** argv) {
             performance.begin();
 #endif
             if (lineID == 0) {
-                perf_log.start_event("CATALYST", "Init");
+                perf_log.start_event("Init", "Catalyst");
                 FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
-                perf_log.stop_event("CATALYST", "Init");
-                perf_log.start_event("CATALYST", "CoProcess");
+                perf_log.stop_event("Init", "Catalyst");
+                perf_log.start_event("CoProcess", "Catalyst");
                 FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
-                perf_log.stop_event("CATALYST", "CoProcess");
+                perf_log.stop_event("CoProcess", "Catalyst");
             }
 #ifdef PROV
             performance.end();
@@ -580,9 +580,9 @@ int main(int argc, char** argv) {
                 flow_last_nonlinear_soln->add(*flow_system.solution);
 
                 // Assemble & solve the linear system.
-                perf_log.start_event("Solver", "Flow");
+                perf_log.start_event("Flow", "Solver");
                 flow_system.solve();
-                perf_log.stop_event("Solver", "Flow");
+                perf_log.stop_event("Flow", "Solver");
 
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
@@ -704,9 +704,9 @@ int main(int argc, char** argv) {
                 sed_last_nonlinear_soln->add(*transport_system.solution);
 
                 // Assemble & solve the linear system.
-                perf_log.start_event("Solver", "Transport");
+                perf_log.start_event("Transport", "Solver");
                 transport_system.solve();
-                perf_log.stop_event("Solver", "Transport");
+                perf_log.stop_event("Transport", "Solver");
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
                 sed_last_nonlinear_soln->add(-1., *transport_system.solution);
@@ -796,7 +796,7 @@ int main(int argc, char** argv) {
                 KellyErrorEstimator error_estimator_flow;
                 KellyErrorEstimator error_estimator_transp;
 
-                perf_log.start_event("estimate_error", "AMR");
+                perf_log.start_event("EstimateError", "AMR");
                 // First compute error for transport only
                 error_estimator_transp.estimate_error(transport_system, error);
 
@@ -813,20 +813,20 @@ int main(int argc, char** argv) {
                         error[i] += error_flow[i];
                 }
 
-                perf_log.stop_event("estimate_error", "AMR");
+                perf_log.stop_event("EstimateError", "AMR");
 
-                perf_log.start_event("flag_elements", "AMR");
+                perf_log.start_event("FlagElements", "AMR");
                 refinement.flag_elements_by_error_fraction(error);
-                perf_log.stop_event("flag_elements", "AMR");
+                perf_log.stop_event("FlagElements", "AMR");
 
-                perf_log.start_event("refine_and_coarse", "AMR");
+                perf_log.start_event("RefineAndCoarse", "AMR");
                 refinement.refine_and_coarsen_elements();
-                perf_log.stop_event("refine_and_coarse", "AMR");
+                perf_log.stop_event("RefineAndCoarse", "AMR");
 
                 //equation_systems.update();
-                perf_log.start_event("reinit systems", "AMR");
+                perf_log.start_event("ReinitSystems", "AMR");
                 equation_systems.reinit();
-                perf_log.stop_event("reinit systems", "AMR");
+                perf_log.stop_event("ReinitSystems", "AMR");
 
                 redo_nl = true;
                 first_step_refinement = false;
@@ -893,9 +893,9 @@ int main(int argc, char** argv) {
                 prov.inputMeshWriter();
 #endif
 
-                perf_log.start_event("Write", "XDMF_IO");
+                perf_log.start_event("XDMF", "Write");
                 current_files = xdmf_writer.write_time_step(equation_systems, time);
-                perf_log.stop_event("Write", "XDMF_IO");
+                perf_log.stop_event("XDMF", "Write");
                 cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
 #ifdef PROV
@@ -911,9 +911,9 @@ int main(int argc, char** argv) {
                         prov.inputDataExtraction(-1);
                         performance.begin();
 #endif
-                        perf_log.start_event("CATALYST:CoProcess");
+                        perf_log.start_event("CoProcess", "Catalyst");
                         FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                        perf_log.stop_event("CATALYST:CoProcess");
+                        perf_log.stop_event("CoProcess", "Catalyst");
 #ifdef PROV
                         performance.end();
                         prov.storeCatalystCost(performance.getElapsedTime());
@@ -930,9 +930,9 @@ int main(int argc, char** argv) {
                             performance.begin();
 #endif
                             if (lineID == 0) {
-                                perf_log.start_event("CATALYST:CoProcess");
+                                perf_log.start_event("CoProcess", "Catalyst");
                                 FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                                perf_log.stop_event("CATALYST:CoProcess");
+                                perf_log.stop_event("CoProcess", "Catalyst");
                             }
 #ifdef PROV
                             performance.end();
@@ -944,8 +944,8 @@ int main(int argc, char** argv) {
 #endif
                         }
                         prov.addMeshDependencyToList();
-//                        sprintf(meshDependenciesList, "%d", taskID);
-//                        meshDependencies.push_back(meshDependenciesList);
+                        //                        sprintf(meshDependenciesList, "%d", taskID);
+                        //                        meshDependencies.push_back(meshDependenciesList);
                     }
 #endif
                 }
@@ -963,9 +963,9 @@ int main(int argc, char** argv) {
 #endif
 
 
-        perf_log.start_event("Write", "XDMF_IO");
+        perf_log.start_event("XDMF", "Write");
         current_files = xdmf_writer.write_time_step(equation_systems, time);
-        perf_log.stop_event("Write", "XDMF_IO");
+        perf_log.stop_event("XDMF", "Write");
         cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
 
@@ -980,9 +980,9 @@ int main(int argc, char** argv) {
             prov.inputDataExtraction(-1);
             performance.begin();
 #endif
-            perf_log.start_event("CATALYST:CoProcess");
+            perf_log.start_event("CoProcess", "Catalyst");
             FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
-            perf_log.stop_event("CATALYST:CoProcess");
+            perf_log.stop_event("CoProcess", "Catalyst");
 #ifdef PROV
             performance.end();
             prov.storeCatalystCost(performance.getElapsedTime());
@@ -1000,9 +1000,9 @@ int main(int argc, char** argv) {
                 performance.begin();
 #endif
                 if (lineID == 0) {
-                    perf_log.start_event("CATALYST:CoProcess");
+                    perf_log.start_event("CoProcess", "Catalyst");
                     FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
-                    perf_log.stop_event("CATALYST:CoProcess");
+                    perf_log.stop_event("CoProcess", "Catalyst");
                 }
 #ifdef PROV
                 performance.end();
@@ -1016,8 +1016,8 @@ int main(int argc, char** argv) {
         }
 #endif
         prov.addMeshDependencyToList();
-//        sprintf(meshDependenciesList, "%d", taskID);
-//        meshDependencies.push_back(meshDependenciesList);
+        //        sprintf(meshDependenciesList, "%d", taskID);
+        //        meshDependencies.push_back(meshDependenciesList);
     }
 
     std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
@@ -1032,8 +1032,8 @@ int main(int argc, char** argv) {
 
     char out_filename[256];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
-//    sort(meshDependencies.begin(), meshDependencies.end());
-//    meshDependencies.erase(unique(meshDependencies.begin(), meshDependencies.end()), meshDependencies.end());
+    //    sort(meshDependencies.begin(), meshDependencies.end());
+    //    meshDependencies.erase(unique(meshDependencies.begin(), meshDependencies.end()), meshDependencies.end());
     prov.meshAggregator(out_filename, libMesh::global_n_processors(), prov.getMeshDependencies());
     prov.finishDataIngestor();
 #endif
