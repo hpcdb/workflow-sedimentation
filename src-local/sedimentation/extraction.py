@@ -98,7 +98,7 @@ def CreateCoProcessor():
       self.Pipeline = _CreatePipeline(self, datadescription)
 
   coprocessor = CoProcessor()
-  freqs = {'input': [50]}
+  freqs = {'input': [2]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 

@@ -486,7 +486,7 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
     }
 
     rdiPerf.end();
-    storeRDIComponentCost(0, 1, rdiPerf.getElapsedTime());
+    storeRDIComponentCost(rdiPerf.getElapsedTime());
 
     perf.begin();
 
@@ -770,14 +770,14 @@ void Provenance::inputSolverSimulationFluid() {
     PerformanceMetric p;
     char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, subTaskID);
+            transformation.c_str(), simulationID, numberIterationsFluid);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
 
     Task t(taskID);
     t.addPerformanceMetric(p);
-    t.setSubID(subTaskID);
+    t.setSubID(numberIterationsFluid);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
@@ -788,11 +788,11 @@ void Provenance::inputSolverSimulationFluid() {
     t.addIdDependency(memalloc);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
     t.writeJSON(memalloc);
 #endif
 
@@ -821,7 +821,7 @@ void Provenance::outputSolverSimulationFluid(int time_step, Real time,
 
     string transformation = "solversimulationfluid";
     Task t(taskID);
-    t.setSubID(subTaskID);
+    t.setSubID(numberIterationsFluid);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
@@ -841,18 +841,18 @@ void Provenance::outputSolverSimulationFluid(int time_step, Real time,
 
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, subTaskID);
+            transformation.c_str(), simulationID, numberIterationsFluid);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyEndTime();
     t.addPerformanceMetric(p);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
     t.writeJSON(memalloc);
 #endif
 
@@ -880,14 +880,14 @@ void Provenance::inputSolverSimulationSediments() {
     PerformanceMetric p;
     char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, subTaskID);
+            transformation.c_str(), simulationID, numberIterationsSediments);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
 
     Task t(taskID);
     t.addPerformanceMetric(p);
-    t.setSubID(subTaskID);
+    t.setSubID(numberIterationsSediments);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
@@ -898,11 +898,11 @@ void Provenance::inputSolverSimulationSediments() {
     t.addIdDependency(memalloc);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
     t.writeJSON(memalloc);
 #endif
 
@@ -931,7 +931,7 @@ void Provenance::outputSolverSimulationSediments(int time_step,
 
     string transformation = "solversimulationsediments";
     Task t(taskID);
-    t.setSubID(subTaskID);
+    t.setSubID(numberIterationsSediments);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
@@ -951,18 +951,18 @@ void Provenance::outputSolverSimulationSediments(int time_step,
 
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, subTaskID);
+            transformation.c_str(), simulationID, numberIterationsSediments);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyEndTime();
     t.addPerformanceMetric(p);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
     t.writeJSON(memalloc);
 #endif
 
@@ -991,13 +991,13 @@ void Provenance::outputMeshRefinement(bool first_step_refinement, int time_step,
     PerformanceMetric p;
     char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, subTaskID);
+            transformation.c_str(), simulationID, numberIterationsSediments);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
 
     Task t(taskID);
-    t.setSubID(subTaskID);
+    t.setSubID(numberIterationsSediments);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
@@ -1017,11 +1017,11 @@ void Provenance::outputMeshRefinement(bool first_step_refinement, int time_step,
     t.addPerformanceMetric(p);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
     t.writeJSON(memalloc);
 #endif
 
@@ -1284,7 +1284,7 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
     }
 
     rdiPerf.end();
-    storeRDIComponentCost(taskID, subTaskID, rdiPerf.getElapsedTime());
+    storeRDIComponentCost(rdiPerf.getElapsedTime());
 
     perf.begin();
 

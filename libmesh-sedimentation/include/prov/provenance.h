@@ -55,15 +55,15 @@ public:
     void inputDataExtraction(int lineID);
     void outputDataExtraction(int lineID, int time_step, string xdmf, int dimension);
 
-    void inputVisualization(int lineID, int taskID);
-    void outputVisualization(int lineID, int taskID, int time_step);
+    void inputVisualization(int lineID);
+    void outputVisualization(int lineID, int time_step);
 
     void meshAggregator(string xdmf, int n_processors, vector<int> meshDependencies);
 
     void finishDataIngestor();
 
-    void storeCatalystCost(int taskID, int subTaskID, double elapsedTime);
-    void storeRDIComponentCost(int taskID, int subTaskID, double elapsedTime);
+    void storeCatalystCost(double elapsedTime);
+    void storeRDIComponentCost(double elapsedTime);
     void storeSolverCost(double elapsedTime);
 
     void createIndexDirectory();
@@ -80,7 +80,7 @@ public:
         this->indexerID++;
     }
     
-    void addMeshDependencyToList(int taskID) {
+    void addMeshDependencyToList() {
         meshDependencies.push_back(taskID);
     }
     
