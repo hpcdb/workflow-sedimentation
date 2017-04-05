@@ -90,6 +90,9 @@
         </df>
       </df>
       <df name="src">
+        <df name="catalyst">
+          <in>FEAdaptor.C</in>
+        </df>
         <df name="common">
           <in>stab_helper.C</in>
         </df>
@@ -97,22 +100,25 @@
           <in>sedimentation_flow.C</in>
           <in>viscosity_flow.C</in>
         </df>
-        <df name="insitu">
-          <in>FEAdaptor.C</in>
-        </df>
         <df name="io">
           <in>xdmf.C</in>
         </df>
         <df name="mesh_mov">
           <in>mesh_moviment.C</in>
         </df>
-        <df name="prov">
+        <df name="provenance">
           <in>provenance.C</in>
         </df>
         <df name="sediment">
           <in>sediment_mass_energy.C</in>
           <in>sedimentation_deposition.C</in>
           <in>sedimentation_transport.C</in>
+        </df>
+        <df name="time_stepping">
+          <in>timeStepControlBase.C</in>
+          <in>timeStepControlPC11.C</in>
+          <in>timeStepControlPID.C</in>
+          <in>timeStepControlResidual.C</in>
         </df>
       </df>
       <in>sedimentation.C</in>
@@ -147,30 +153,33 @@
       <makefileType>
         <makeTool>
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
-          <buildCommand>${MAKE} -f Makefile PROV=1 CATALYST=1</buildCommand>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath></executablePath>
           <ccTool>
             <incDir>
-              <pElem>contrib</pElem>
-              <pElem>contrib/dfanalyzer</pElem>
-              <pElem>contrib/rapidjson</pElem>
-              <pElem>include/prov</pElem>
               <pElem>include/common</pElem>
               <pElem>include/flow</pElem>
-              <pElem>include/insitu</pElem>
               <pElem>include/io</pElem>
               <pElem>include/mesh_mov</pElem>
               <pElem>include/sediment</pElem>
-              <pElem>../../../../program/paraview-5.3.0/include/paraview-5.3</pElem>
-              <pElem>../../../../program/libmesh/include</pElem>
-              <pElem>../../../../program/hdf5/include</pElem>
-              <pElem>../../../../program/petsc/include</pElem>
+              <pElem>include/time_stepping</pElem>
+              <pElem>contrib</pElem>
+              <pElem>contrib/dfanalyzer/*.h</pElem>
+              <pElem>include/provenance</pElem>
+              <pElem>../../../program/paraview/include/paraview-5.1</pElem>
+              <pElem>include/catalyst</pElem>
+              <pElem>../../../program/libmesh/include</pElem>
+              <pElem>../../../program/hdf5/include</pElem>
+              <pElem>../../../program/petsc/3.7.2/include</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include</pElem>
               <pElem>/usr/lib/openmpi/include</pElem>
               <pElem>/usr/lib/openmpi/include/openmpi</pElem>
             </incDir>
             <preprocessorList>
               <Elem>NDEBUG</Elem>
+              <Elem>PROVENANCE</Elem>
               <Elem>USE_CATALYST</Elem>
             </preprocessorList>
           </ccTool>
@@ -713,6 +722,10 @@
         <ccTool flags="1">
         </ccTool>
       </item>
+      <item path="src/catalyst/FEAdaptor.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
       <item path="src/common/stab_helper.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="1">
         </ccTool>
@@ -725,10 +738,6 @@
         <ccTool flags="1">
         </ccTool>
       </item>
-      <item path="src/insitu/FEAdaptor.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
       <item path="src/io/xdmf.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="1">
         </ccTool>
@@ -737,7 +746,7 @@
         <ccTool flags="1">
         </ccTool>
       </item>
-      <item path="src/prov/provenance.C" ex="false" tool="1" flavor2="8">
+      <item path="src/provenance/provenance.C" ex="false" tool="1" flavor2="8">
         <ccTool flags="1">
         </ccTool>
       </item>
@@ -756,6 +765,34 @@
         </ccTool>
       </item>
       <item path="src/sediment/sedimentation_transport.C"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="src/time_stepping/timeStepControlBase.C"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="src/time_stepping/timeStepControlPC11.C"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="src/time_stepping/timeStepControlPID.C"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="1">
+        </ccTool>
+      </item>
+      <item path="src/time_stepping/timeStepControlResidual.C"
             ex="false"
             tool="1"
             flavor2="8">

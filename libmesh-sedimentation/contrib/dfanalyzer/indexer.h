@@ -43,24 +43,24 @@ public:
         this->delimeter = delimeter;
     }
 
-    void setBin(string dir) {
+    void setBin(string dir){
         this->bin = dir;
     }
 
-    void setExtraArguments(string arguments) {
+    void setExtraArguments(string arguments){
         this->extraArguments = arguments;
     }
 
     void index(string path, string filename, int indexerID) {
         char buffer[2048];
 
-        if (extension.compare("FASTBIT") == 0 || extension.compare("OPTIMIZED_FASTBIT") == 0) {
+        if(extension.compare("FASTBIT") == 0 || extension.compare("OPTIMIZED_FASTBIT") == 0){
             sprintf(buffer, "mkdir index/%d; cd index/%d; mv ../../%s .; cp -rf ../../FastBit .;", indexerID, indexerID, filename.c_str());
             sprintf(buffer, "%s%s%s:INDEX %s %s/index/%d %s [", buffer, commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), indexerID, filename.c_str());
-        } else {
+        }else{
             sprintf(buffer, "%s%s:INDEX %s %s %s [", commandLine.c_str(), extension.c_str(), name.c_str(), path.c_str(), filename.c_str());
         }
-
+        
         bool first = true;
         for (Attribute att : this->attributes) {
             if (first) {
@@ -75,12 +75,12 @@ public:
         }
         sprintf(buffer, "%s] -delimiter=\"%s\"", buffer, this->delimeter.c_str());
         sprintf(buffer, "%s -performance=%s/%s", buffer, path.c_str(), "prov/indexing/rdi-component.prov");
-        if (extension.compare("FASTBIT") == 0 || extension.compare("OPTIMIZED_FASTBIT") == 0) {
+        if(extension.compare("FASTBIT") == 0 || extension.compare("OPTIMIZED_FASTBIT") == 0){
             sprintf(buffer, "%s -bin=\"%s\"", buffer, this->bin.c_str());
             sprintf(buffer, "%s -option=%s", buffer, this->extraArguments.c_str());
             sprintf(buffer, "%s;cd ../..", buffer);
         }
-        cout << buffer << endl;
+	    cout << buffer << endl;
         system(buffer);
     }
 

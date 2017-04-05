@@ -71,7 +71,7 @@ void SedimentationTransport::PrintMass(const char *fname) {
 
     const unsigned int dim = mesh.mesh_dimension();
     TransientLinearImplicitSystem & system =
-            es.get_system<TransientLinearImplicitSystem> ("sediment");
+            es.get_system<TransientLinearImplicitSystem> ("transport");
 
     const unsigned int s_var = system.variable_number("s");
 

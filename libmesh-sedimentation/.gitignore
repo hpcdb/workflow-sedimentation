@@ -5,7 +5,7 @@
 *.o
 *.e
 *.bin
-
+*.dat
 
 ./sediment-opt
 ./runs

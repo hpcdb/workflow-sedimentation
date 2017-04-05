@@ -63,16 +63,17 @@
         </df>
       </df>
       <df name="include">
+        <df name="catalyst">
+          <in>FEAdaptor.h</in>
+        </df>
         <df name="common">
           <in>define.h</in>
+          <in>performance.h</in>
           <in>stab_helper.h</in>
         </df>
         <df name="flow">
           <in>sedimentation_flow.h</in>
           <in>viscosity_flow.h</in>
-        </df>
-        <df name="insitu">
-          <in>FEAdaptor.h</in>
         </df>
         <df name="io">
           <in>xdmf.h</in>
@@ -80,12 +81,18 @@
         <df name="mesh_mov">
           <in>mesh_moviment.h</in>
         </df>
-        <df name="prov">
+        <df name="provenance">
           <in>provenance.h</in>
         </df>
         <df name="sediment">
           <in>sedimentation_deposition.h</in>
           <in>sedimentation_transport.h</in>
+        </df>
+        <df name="time_stepping">
+          <in>timeStepControlBase.h</in>
+          <in>timeStepControlPC11.h</in>
+          <in>timeStepControlPID.h</in>
+          <in>timeStepControlResidual.h</in>
         </df>
       </df>
       <df name="input">
@@ -94,7 +101,16 @@
         <df name="3D">
         </df>
       </df>
+      <df name="runs">
+        <df name="out">
+          <df name="step1">
+          </df>
+        </df>
+      </df>
       <df name="src">
+        <df name="catalyst">
+          <in>FEAdaptor.C</in>
+        </df>
         <df name="common">
           <in>stab_helper.C</in>
         </df>
@@ -102,22 +118,25 @@
           <in>sedimentation_flow.C</in>
           <in>viscosity_flow.C</in>
         </df>
-        <df name="insitu">
-          <in>FEAdaptor.C</in>
-        </df>
         <df name="io">
           <in>xdmf.C</in>
         </df>
         <df name="mesh_mov">
           <in>mesh_moviment.C</in>
         </df>
-        <df name="prov">
+        <df name="provenance">
           <in>provenance.C</in>
         </df>
         <df name="sediment">
           <in>sediment_mass_energy.C</in>
           <in>sedimentation_deposition.C</in>
           <in>sedimentation_transport.C</in>
+        </df>
+        <df name="time_stepping">
+          <in>timeStepControlBase.C</in>
+          <in>timeStepControlPC11.C</in>
+          <in>timeStepControlPID.C</in>
+          <in>timeStepControlResidual.C</in>
         </df>
       </df>
       <in>sedimentation.C</in>

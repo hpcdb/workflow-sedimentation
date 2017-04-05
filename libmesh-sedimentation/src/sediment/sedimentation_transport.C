@@ -73,10 +73,10 @@ Number init_value(const Point& p,
 
 void init_sedimentation(EquationSystems& es, const std::string& system_name) {
 
-    libmesh_assert_equal_to(system_name, "sediment");
+    libmesh_assert_equal_to(system_name, "transport");
 
     TransientLinearImplicitSystem & system =
-            es.get_system<TransientLinearImplicitSystem>("sediment");
+            es.get_system<TransientLinearImplicitSystem>("transport");
 
     es.parameters.set<Real> ("time") = system.time = 0;
 
@@ -89,23 +89,22 @@ void SedimentationTransport::init() {
     // The dimension that we are running
     this->dim = mesh.mesh_dimension();
 
-    TransientLinearImplicitSystem & transport_system = this->es.add_system<TransientLinearImplicitSystem> ("sediment");
+    TransientLinearImplicitSystem & transport_system = this->es.add_system<TransientLinearImplicitSystem> ("transport");
 
     unsigned int s_var = transport_system.add_variable("s");
-
-
 
 
 }
 
 void SedimentationTransport::setup(GetPot &infile) {
+    
     const MeshBase& mesh = es.get_mesh();
 
     // The dimension that we are running
     this->dim = mesh.mesh_dimension();
 
-    TransientLinearImplicitSystem & transport_system = this->es.get_system<TransientLinearImplicitSystem> ("sediment");
-
+    TransientLinearImplicitSystem & transport_system = this->es.get_system<TransientLinearImplicitSystem> ("transport");
+    
     unsigned int s_var = transport_system.variable_number("s");
 
     transport_system.attach_assemble_object(*this);
@@ -115,23 +114,10 @@ void SedimentationTransport::setup(GetPot &infile) {
 
     std::vector<unsigned int> sed_vars(1);
     sed_vars[0] = s_var;
-    ZeroFunction<Number> zero;
 
-    int size = infile.vector_variable_size("dirichlet/czero");
+    int size = infile.vector_variable_size("transport/dirichlet/prescribed");
     for (int i = 0; i < size; i++) {
-        int czero_id = infile("dirichlet/czero", -1, i);
-        if (czero_id != -1) {
-            czero.insert(czero_id);
-
-        }
-    }
-    if (czero.size() != 0)
-        transport_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(czero, sed_vars, &zero));
-
-
-    size = infile.vector_variable_size("dirichlet/sediment/prescribed");
-    for (int i = 0; i < size; i++) {
-        int prescribed_id = infile("dirichlet/sediment/prescribed", -1, i);
+        int prescribed_id = infile("transport/dirichlet/prescribed", -1, i);
         if (prescribed_id != -1) {
             cprescribed.insert(prescribed_id);
 
@@ -144,11 +130,11 @@ void SedimentationTransport::setup(GetPot &infile) {
     }
 
 
-    this->noflux_bc_id = infile("flux/noflux", -1);
-    this->erosion_bc_id = infile("flux/erosion", -1);
-    this->deposition_id = infile("dirichlet/deposition", -1);
+    this->noflux_bc_id  = infile("transport/neumann/noflux", -1);
+    this->erosion_bc_id = infile("transport/neumann/erosion", -1);
+    this->deposition_id = infile("transport/deposition", -1);
 
-    bool init = infile("sediment/init_condition", true);
+    bool init           = infile("sediment/init_condition", true);
     if (init) transport_system.attach_init_function(init_sedimentation);
 
 }
@@ -170,7 +156,7 @@ void SedimentationTransport::assemble2D() {
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & system =
-            es.get_system<TransientLinearImplicitSystem> ("sediment");
+            es.get_system<TransientLinearImplicitSystem> ("transport");
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & flow_system =
@@ -427,7 +413,6 @@ void SedimentationTransport::assemble2D() {
         // side MUST live on a boundary of the domain.
         {
 
-
             for (unsigned int s = 0; s < elem->n_sides(); s++)
                 if (elem->neighbor(s) == NULL) {
 
@@ -492,12 +477,12 @@ void SedimentationTransport::assemble2D() {
 
                             // RHS contribution
                             for (unsigned int i = 0; i < phi_face.size(); i++)
-                                Fe(i) -= (1 - theta) * tmp * s_old * phi_face[i][qp];
+                                Fe(i) += (1 - theta) * tmp * s_old * phi_face[i][qp];
 
                             //Matrix contribution
                             for (unsigned int i = 0; i < phi_face.size(); i++)
                                 for (unsigned int j = 0; j < phi_face.size(); j++)
-                                    Ke(i, j) -= theta * tmp * phi_face[i][qp] * phi_face[j][qp];
+                                    Ke(i, j) += theta * tmp * phi_face[i][qp] * phi_face[j][qp];
 
                         }
 
@@ -557,7 +542,7 @@ void SedimentationTransport::assemble3D() {
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & system =
-            es.get_system<TransientLinearImplicitSystem> ("sediment");
+            es.get_system<TransientLinearImplicitSystem> ("transport");
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & flow_system =

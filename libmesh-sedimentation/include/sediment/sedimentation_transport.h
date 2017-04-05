@@ -54,6 +54,8 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/getpot.h"
 
+#include "timeStepControlBase.h"
+
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 #ifndef SEDIMENTATION_TRANSPORT_H
@@ -69,6 +71,7 @@ public:
   void init();
   void assemble ();
   void setup(GetPot &infile);
+  //void attach_time_stepping(timeStepControlBase *ts) {this->tsControl = ts;}
   void PrintMass(const char* fname);
   
   double   mass_dep;
@@ -78,6 +81,8 @@ public:
   
 private:
   EquationSystems &es;
+  timeStepControlBase *tsControl;
+  
   Real Reynolds;
   Real Grashof;
   int dim;
@@ -86,6 +91,13 @@ private:
   int erosion_bc_id;
   int noflux_bc_id;
   int deposition_id;
+  
+  //unsigned int n_transport_nonlinear_iterations_total;
+  //unsigned int n_transport_linear_iterations_total;
+  //unsigned int n_rejected_transport_linear_iterations_total;
+  
+  //unsigned int old_n_non_linear_iter_transport;
+  
 };
 
 

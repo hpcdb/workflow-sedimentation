@@ -368,7 +368,7 @@ void XDMFWriter::write_temporal_collection()
     if(processor_id == 0)
     {
         char filename[XDMF_FILE_SIZE];   
-        sprintf(filename,"%s%s_%d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors);
+        sprintf(filename,"%s/%s_%d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors);
         FILE * fxml = fopen(filename, "w");
         fprintf(fxml,"<?xml version=\"1.0\" ?>\n");
         fprintf(fxml,"<!-- DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" [] --> \n");

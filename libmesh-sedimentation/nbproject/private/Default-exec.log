@@ -1,5 +1,5 @@
 called: /usr/bin/g++
-	/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation-make
+	/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation
 	/usr/bin/g++
 	-DNDEBUG
 	-std=gnu++11
@@ -10,6 +10,18 @@ called: /usr/bin/g++
 	-Wdisabled-optimization
 	-Wno-variadic-macros
 	-fopenmp
+	-I./contrib
+	-I./contrib/dfanalyzer
+	-I./contrib/rapidjson
+	-I./include/prov
+	-I./include/common
+	-I./include/flow
+	-I./include/insitu
+	-I./include/io
+	-I./include/mesh_mov
+	-I./include/sediment
+	-I/home/vitor/Documents/program/paraview/include/paraview-5.1
+	-DUSE_CATALYST
 	-I/home/vitor/Documents/program/libmesh/include
 	-I/home/vitor/Documents/program/hdf5/include
 	-I/home/vitor/Documents/program/petsc/3.7.2/include

@@ -32,7 +32,7 @@ rm output-statistics.log
 # without catalyst
 # time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/ | tee -a "output-solver.log"
 # with catalyst
-time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/ | tee -a "output-solver.log"
+time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"
 
 #time ../libmesh-sedimentation/libmesh-sedimentation-opt
 # Calculate total elapsed time for provenance gathering

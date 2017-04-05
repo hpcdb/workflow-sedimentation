@@ -52,7 +52,9 @@
 // The definition of a geometric element
 #include "libmesh/elem.h"
 
+#ifdef USE_CATALYST
 #include "FEAdaptor.h"
+#endif
 
 #include "xdmf.h"
 
@@ -64,9 +66,17 @@ using namespace std;
 #include "sedimentation_transport.h"
 #include "sedimentation_deposition.h"
 #include "mesh_moviment.h"
+
+#include "timeStepControlBase.h"
+#include "timeStepControlPID.h"
+#include "timeStepControlResidual.h"
+#include "timeStepControlPC11.h"
+
+#ifdef PROVENANCE
 #include "provenance.h"
 #include "performance.h"
-#include "extractor.h"
+#include "contrib/dfanalyzer/extractor.h"
+#endif
 
 void PrintStats(EquationSystems& es);
 
@@ -91,20 +101,10 @@ double ramp(double t) {
 
 }
 
-void WriteRestartFile(EquationSystems &es, std::string rname) {
-    const std::string mesh_restart = rname + "_mesh_restart.xda";
-    const std::string solution_restart = rname + "_solution_restart.xda";
-
-    Real time = es.parameters.get<Real> ("time");
-    Real dt = es.parameters.get<Real> ("dt");
-}
-
 bool is_file_exist(const char *fileName) {
     std::ifstream infile(fileName);
     return infile.good();
 }
-
-//#define MESH_MOVIMENT
 
 // We can now begin the main program.  Note that this
 // example will fail if you are using complex numbers
@@ -122,6 +122,7 @@ int main(int argc, char** argv) {
     GetPot command_line(argc, argv);
     std::string input;
 
+
     if (command_line.search(1, "-i"))
         input = command_line.next(input);
     else {
@@ -130,8 +131,15 @@ int main(int argc, char** argv) {
     }
 
     GetPot infile(input);
+    double v = infile("version", 1.0);
+    if (v == 1.0) {
+        libmesh_error_msg("This input file is not compatible with this libMesh-Sedimentation version !");
+    }
 
-#ifdef PROV
+
+#ifdef PROVENANCE
+    char meshDependenciesList[256];
+    int indexerID = 0;
     Performance solverPerformance;
     solverPerformance.begin();
     Provenance prov(libMesh::global_processor_id());
@@ -141,35 +149,35 @@ int main(int argc, char** argv) {
     cout << libMesh::global_n_processors() << endl;
     cout << libMesh::global_processor_id() << endl;
 
-    int init_tstep = 1;
+    //Define performance parameters
+    unsigned int n_flow_nonlinear_iterations_total = 0;
+    unsigned int n_transport_nonlinear_iterations_total = 0;
+    unsigned int n_flow_linear_iterations_total = 0;
+    unsigned int n_transport_linear_iterations_total = 0;
+    unsigned int n_rejected_flow_nonlinear_iterations_total = 0;
+    unsigned int n_rejected_transport_nonlinear_iterations_total = 0;
+    unsigned int n_rejected_flow_linear_iterations_total = 0;
+    unsigned int n_rejected_transport_linear_iterations_total = 0;
 
-    int dim = infile("dim", 2);
-    int ncellx = infile("ncellx", 10);
-    int ncelly = infile("ncelly", 10);
-    int ncellz = infile("ncellz", 10);
-    double xmin = infile("xmin", 0.0);
-    double ymin = infile("ymin", 0.0);
-    double zmin = infile("zmin", 0.0);
-    double xmax = infile("xmax", 1.0);
-    double ymax = infile("ymax", 1.0);
-    double zmax = infile("zmax", 1.0);
+    int dim = infile("dim", 3);
 
-#ifdef PROV
+
+#ifdef PROVENANCE
     prov.inputInputMesh(dim);
 #endif
     // Create a mesh object, with dimension to be overridden later,
     // distributed across the default MPI communicator.
     Mesh mesh(init.comm());
 
-    double r_fraction = infile("r_fraction", 0.70);
-    double c_fraction = infile("c_fraction", 0.10);
-    double max_h_level = infile("max_h_level", 1);
-    const unsigned int hlevels = infile("hlevels", 0);
-    bool first_step_refinement = infile("first_step_refinement", false);
-    bool amrc_flow_transp = infile("amrc_flow_transp", false);
-
-    int ref_interval = infile("r_interval", 1);
-    int max_r_steps = infile("max_r_steps", 1);
+    // Getting mesh refinement parameters
+    double r_fraction = infile("amr/r_fraction", 0.70);
+    double c_fraction = infile("amr/c_fraction", 0.10);
+    double max_h_level = infile("amr/max_h_level", 1);
+    const unsigned int hlevels = infile("amr/hlevels", 0);
+    bool first_step_refinement = infile("amr/first_step_refinement", false);
+    bool amrc_flow_transp = infile("amr/amrc_flow_transp", false);
+    int ref_interval = infile("amr/r_interval", 1);
+    int max_r_steps = infile("amr/max_r_steps", 1);
 
     MeshRefinement refinement(mesh);
     refinement.refine_fraction() = r_fraction;
@@ -187,7 +195,7 @@ int main(int argc, char** argv) {
     MeshMoviment moving_mesh(equation_systems);
 #endif
 
-    // INPUT: Physical parameters
+    //Getting physical parameters
     Real Reynolds = infile("Reynolds", 1.0E03);
     Real Gr = infile("Grashof", 1.0E05);
     Real Sc = infile("Sc", 0.71);
@@ -200,6 +208,7 @@ int main(int argc, char** argv) {
     Real ey = infile("ey", 0.0);
     Real ez = infile("ez", -1.0);
     Real c_factor = infile("c_factor", 1.0);
+
     Real fopc = infile("fopc", 0.2);
 
     if (Reynolds == 0.0)
@@ -224,29 +233,68 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("ez") = ez;
     equation_systems.parameters.set<Real> ("c_factor") = c_factor;
     equation_systems.parameters.set<Real> ("fopc") = fopc;
-    equation_systems.parameters.set<Real> ("dt_stab") = infile("dt_stab", 0.1);
+
     equation_systems.parameters.set<Real> ("erosion/Rp") = infile("erosion/Rp", 0.0);
+
+    std::string mass_file = infile("mass_file", "mass_over_time.dat");
+    //sediment_transport.init_transport    = infile("sediment/init_condition", true);
 
     // LOOP 
     Real init_time = 0.0;
+    int init_tstep = 0;
+    unsigned int t_step = 0;
 
-    //#ifdef PROV
-    //    prov.createIndexDirectory();
-    //#endif
 
     // INPUT: TIME INTEGRATION
-    Real dt = infile("deltat", 0.005);
-    Real tmax = infile("tmax", 0.1);
-    unsigned int n_time_steps = infile("n_time_steps", 10);
+    Real dt_init = infile("time/deltat", 0.005);
+    equation_systems.parameters.set<Real> ("dt_stab") = infile("time/dt_stab", 0.1);
+    unsigned int n_time_steps = infile("time/n_time_steps", 1000);
+    Real tmax = infile("time/tmax", 0.1);
 
-    //INPUT: NONLINEAR SOLVER
-    unsigned int n_nonlinear_steps = infile("n_nonlinear_steps", 10);
-    double nonlinear_tolerance = infile("nonlinear_tolerance", 1.0E-03);
-    int max_linear_iters = infile("max_linear_iterations", 2000);
+    // Time step control input data
+    //-----------------------------
+    std::string ts_control_model_name = infile("ts_control/model_name", "PC11");
+
+    double dt_min = infile("ts_control/dt_min", 0.001);
+    double dt_max = infile("ts_control/dt_max", 0.1);
+    double tol_u = infile("ts_control/tol_u", 0.1);
+    double tol_s = infile("ts_control/tol_s", 0.1);
+    double kp = infile("ts_control/kp", 0.075);
+    double ki = infile("ts_control/ki", 0.175);
+    double kd = infile("ts_control/kd", 0.01);
+    unsigned int nsa_max = infile("ts_control/nsa_max", 10);
+    unsigned int nsa_target_flow = infile("ts_control/nsa_target_flow", 4);
+    unsigned int nsa_target_transport = infile("ts_control/nsa_target_transport", 4);
+    unsigned int nsa_limit_flow = infile("ts_control/nsa_limit_flow", 8);
+    unsigned int nsa_limit_transport = infile("ts_control/nsa_limit_transport", 8);
+    double mult_factor_max = infile("ts_control/mult_factor_max", 2.0);
+    double mult_factor_min = infile("ts_control/mult_factor_min", 0.7);
+    double pc11_theta = infile("ts_control/pc11_theta", 1.0);
+    double alpha = infile("ts_control/alpha", 0.8);
+    double k_exp = infile("ts_control/k_exp", 2.0);
+    double s_min = infile("ts_control/s_min", 0.1);
+    double s_max = infile("ts_control/s_max", 2.0);
+    double reduct_factor = infile("ts_control/reduct_factor", 0.5);
+    bool complete_flow_norm = infile("ts_control/complete_flow_norm", false);
+
+    // Linear and non-linear solver parameters 
+    int flow_n_nonlinear_steps = infile("flow_n_nonlinear_steps", 10);
+    int transport_n_nonlinear_steps = infile("transport_n_nonlinear_steps", 10);
+    double flow_nonlinear_tolerance = infile("flow_nonlinear_tolerance", 1.0E-03);
+    double transport_nonlinear_tolerance = infile("transport_nonlinear_tolerance", 1.0E-03);
+    int max_linear_iter = infile("max_linear_iterations", 2000);
+    double initial_linear_solver_tol = infile("linear_solver_tolerance", 1.0E-6);
+
+    unsigned int n_flow_sstate = infile("n_flow_sstate", 50);
+    unsigned int n_transport_sstate = infile("n_transport_sstate", 50);
 
     unsigned int write_interval = infile("write_interval", 10);
+    bool write_restart = infile("write_restart", false);
+
+
     std::string rname = "out";
     std::string dpath = "output";
+
     int numberOfScripts = 0;
     std::string extractionScript = "";
     std::string visualizationScript = "";
@@ -278,6 +326,8 @@ int main(int argc, char** argv) {
 
     if (!is_file_exist("restart.run")) {
 
+        // Starting simulation from the begining...
+
         string mesh_file;
         if (command_line.search(1, "-m"))
             mesh_file = command_line.next(mesh_file);
@@ -307,13 +357,13 @@ int main(int argc, char** argv) {
         moving_mesh.setup(infile);
 #endif
 
-#ifdef PROV
+#ifdef PROVENANCE
         prov.outputInputMesh(r_fraction, c_fraction, max_h_level, hlevels);
 #endif
         // Initialize the data structures for the equation system.
         equation_systems.init();
 
-#ifdef PROV
+#ifdef PROVENANCE
         prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
 #endif
 
@@ -323,11 +373,11 @@ int main(int argc, char** argv) {
         const string mesh_restart = restart("mesh_restart", "0");
         const string solution_restart = restart("solution_restart", "0");
         init_time = restart("time", 0.0);
-        dt = restart("dt", 0.0);
+        dt_init = restart("dt", 0.0);
         init_tstep = restart("init_tstep", 0);
 
-#ifdef PROV
-        prov.setIndexerID(restart("indexerID", 0));
+#ifdef PROVENANCE
+        indexerID = restart("indexerID", 0);
 #endif
 
         sediment_transport.init_mass = restart("initial_mass", 0.0);
@@ -337,9 +387,17 @@ int main(int argc, char** argv) {
         int xdmf_file_id = restart("xdmf_file_id", 0);
         xdmf_writer.set_file_id(xdmf_file_id);
 
+        n_flow_nonlinear_iterations_total = restart("n_flow_nonlinear_iterations_total", 0);
+        n_transport_nonlinear_iterations_total = restart("n_transport_nonlinear_iterations_total", 0);
+        n_flow_linear_iterations_total = restart("n_flow_linear_iterations_total", 0);
+        n_transport_linear_iterations_total = restart("n_transport_linear_iterations_total", 0);
+        n_rejected_flow_nonlinear_iterations_total = restart("n_rejected_flow_nonlinear_iterations_total", 0);
+        n_rejected_transport_nonlinear_iterations_total = restart("n_rejected_transport_nonlinear_iterations_total", 0);
+        n_rejected_flow_linear_iterations_total = restart("n_rejected_flow_linear_iterations_total", 0);
+        n_rejected_transport_linear_iterations_total = restart("n_rejected_transport_linear_iterations_total", 0);
+
 
         mesh.read(mesh_restart);
-
 
         equation_systems.read(solution_restart, READ);
         equation_systems.parameters.set<int> ("dim") = mesh.mesh_dimension();
@@ -358,7 +416,7 @@ int main(int argc, char** argv) {
 
         // Get a reference to the Convection-Diffusion system object.
         TransientLinearImplicitSystem & transport_system =
-                equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
+                equation_systems.get_system<TransientLinearImplicitSystem> ("transport");
         //transport_system.add_vector("volume");
 
 
@@ -378,7 +436,7 @@ int main(int argc, char** argv) {
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & transport_system =
-            equation_systems.get_system<TransientLinearImplicitSystem> ("sediment");
+            equation_systems.get_system<TransientLinearImplicitSystem> ("transport");
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & flow_system =
@@ -394,68 +452,145 @@ int main(int argc, char** argv) {
     transport_system.time = time;
     flow_system.time = time;
 
-    unsigned int t_step = 0;
-    unsigned int n_linear_iterations_flow = 0;
-    unsigned int n_nonlinear_iterations_flow = 0;
-    unsigned int n_nonlinear_iterations_transport = 0;
-    unsigned int n_linear_iterations_transport = 0;
+    // defining an instance of Time-step Control
+    timeStepControlBase* ts_control = 0;
+
+    bool control_ts = false;
+    double dt;
+    bool accepted = true;
+    std::ofstream foutDt, foutMass;
+    std::string out_dat_name;
+    if (ts_control_model_name == "PID") {
+        ts_control = new timeStepControlPID(dt_init, dt_min, dt_max, nsa_max, tol_u, tol_s, kp, ki, kd);
+        //        if( !does_file_exist("restart.in") ) // use dt_min as first time-step whether this is a "non-restart" simulation
+        //            dt = dt_min;
+        //        else
+        dt = dt_init;
+        control_ts = true;
+        if (mesh.processor_id() == 0) {
+            out_dat_name = rname + "_dtXtime_PID.dat";
+            foutDt.open(out_dat_name);
+            out_dat_name = rname + "_massXtime_PID.dat";
+            foutMass.open(out_dat_name);
+        }
+    } else if (ts_control_model_name == "RES") {
+        ts_control = new timeStepControlResidual(dt_init, dt_min, dt_max, nsa_target_flow, nsa_target_transport, nsa_max, nsa_limit_flow, nsa_limit_transport, mult_factor_max, mult_factor_min, reduct_factor);
+        // to ensure not to use number NLI ratio for the first time-step control
+        equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_flow") = flow_n_nonlinear_steps + 1;
+        equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_transport") = transport_n_nonlinear_steps + 1;
+        dt = dt_init;
+        control_ts = true;
+        if (mesh.processor_id() == 0) {
+            out_dat_name = rname + "_dtXtime_RES.dat";
+            foutDt.open(out_dat_name);
+            out_dat_name = rname + "_massXtime_RES.dat";
+            foutMass.open(out_dat_name);
+        }
+    } else if (ts_control_model_name == "PC11") {
+        ts_control = new timeStepControlPC11(dt_init, dt_min, dt_max, nsa_max, tol_u, tol_s, pc11_theta, alpha, k_exp, s_min, s_max, complete_flow_norm);
+        dt = dt_init;
+        control_ts = true;
+        if (mesh.processor_id() == 0) {
+            out_dat_name = rname + "_dtXtime_PC11.dat";
+            foutDt.open(out_dat_name);
+            out_dat_name = rname + "_massXtime_PC11.dat";
+            foutMass.open(out_dat_name);
+        }
+    } else {
+        cout << "\n Fixed time-step adopted!\n";
+        dt = dt_init;
+        delete ts_control;
+        if (mesh.processor_id() == 0) {
+            out_dat_name = rname + "_dtXtime_CTE.dat";
+            foutDt.open(out_dat_name);
+            out_dat_name = rname + "_massXtime_CTE.dat";
+            foutMass.open(out_dat_name);
+        }
+    }
+    equation_systems.parameters.set<Real> ("dt") = dt;
+
+    // assert for time-step control the maximum number of successive approximation (nsa_max) parameter
+    if (ts_control) {
+        if (nsa_max > flow_n_nonlinear_steps || nsa_max > transport_n_nonlinear_steps) {
+            std::cout << "\nError: Maximum number of successive approximation greater than number NLI for Flow and/or Transport problem! ";
+            std::cout << "Simulation will be abort.";
+            return 0;
+        }
+        equation_systems.parameters.set<Real> ("tmax") = tmax;
+    }
+
+    //Define performance parameters
+    unsigned int n_rejected_flow_linear_iterations_per_ts = 0;
+    unsigned int n_rejected_transport_linear_iterations_per_ts = 0;
+    unsigned int n_flow_nonlinear_iterations_reject_per_ts;
+    unsigned int n_transport_nonlinear_iterations_reject_per_ts;
+    // Steady-state control parameters
+    unsigned int flow_sstate_count = 0;
+    unsigned int transport_sstate_count = 0;
+
     bool redo_nl;
 
+    // non-linear iteration counter
+    unsigned int flow_nli_counter = 0;
+    unsigned int transport_nli_counter = 0;
+    bool diverged = false;
 
     string* current_files;
-    perf_log.start_event("XDMF", "Write");
+    perf_log.start_event("XDMF:Write");
     current_files = xdmf_writer.write_time_step(equation_systems, time);
-    perf_log.stop_event("XDMF", "Write");
+    perf_log.stop_event("XDMF:Write");
     cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
-#ifdef PROV
-    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
+#ifdef PROVENANCE
+    //    TODO:CAMATA
+    //    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
+    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, max_r_steps, write_interval, current_files[1]);
     Performance performance;
 #endif
 
 #ifdef USE_CATALYST    
     if (dim == 2) {
         // 2D analysis        
-#ifdef PROV
+#ifdef PROVENANCE
         prov.inputInitDataExtraction(-1);
         performance.begin();
 #endif
-        perf_log.start_event("Init", "Catalyst");
+        perf_log.start_event("CATALYST", "Init");
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
-        perf_log.stop_event("Init", "Catalyst");
-        perf_log.start_event("CoProcess", "Catalyst");
+        perf_log.stop_event("CATALYST", "Init");
+        perf_log.start_event("CATALYST", "CoProcess");
         FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
-        perf_log.stop_event("CoProcess", "Catalyst");
-#ifdef PROV
+        perf_log.stop_event("CATALYST", "CoProcess");
+#ifdef PROVENANCE
         performance.end();
-        prov.storeCatalystCost(performance.getElapsedTime());
+        prov.storeCatalystCost(0, 1, performance.getElapsedTime());
         extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
-        prov.incrementIndexerID();
-        prov.outputInitDataExtraction(-1, current_files[1], dim);
+        indexerID++;
+        prov.outputInitDataExtraction(-1, current_files[1], dim, indexerID);
 #endif        
     } else if (dim == 3) {
         // 3D analysis
         for (int lineID = 0; lineID <= 3; lineID++) {
-#ifdef PROV
+#ifdef PROVENANCE
             prov.inputInitVisualization(lineID);
             prov.inputInitDataExtraction(lineID);
             performance.begin();
 #endif
             if (lineID == 0) {
-                perf_log.start_event("Init", "Catalyst");
+                perf_log.start_event("CATALYST", "Init");
                 FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
-                perf_log.stop_event("Init", "Catalyst");
-                perf_log.start_event("CoProcess", "Catalyst");
+                perf_log.stop_event("CATALYST", "Init");
+                perf_log.start_event("CATALYST", "CoProcess");
                 FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, 0.0, t_step, write_interval, false, false);
-                perf_log.stop_event("CoProcess", "Catalyst");
+                perf_log.stop_event("CATALYST", "CoProcess");
             }
-#ifdef PROV
+#ifdef PROVENANCE
             performance.end();
             extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
-            prov.storeCatalystCost(performance.getElapsedTime());
-            prov.incrementIndexerID();
+            prov.storeCatalystCost(0, 1, performance.getElapsedTime());
+            indexerID++;
             prov.outputInitVisualization(lineID, t_step);
-            prov.outputInitDataExtraction(lineID, current_files[1], dim);
+            prov.outputInitDataExtraction(lineID, current_files[1], dim, indexerID);
 #endif
         }
     }
@@ -463,24 +598,45 @@ int main(int argc, char** argv) {
 
     // STEP LOOP
     // Loop in time steps
+    // TODO: PROVENANCE
+#ifdef PROVENANCE
+    int taskID = 0;
+    int numberIterationsFluid = 0;
+    int numberIterationsSediments = 0;
+    int numberIterationsMeshRefinements = 0;
+    int subTaskID = 0;
+    vector<string> meshDependencies;
+#endif
+
     equation_systems.parameters.set<PerfLog*> ("PerfLog") = &perf_log;
 
-    for (t_step = init_tstep; (t_step < n_time_steps)&&(time < tmax); t_step++) {
-#ifdef PROV
-        prov.incrementTaskID();
+    UniquePtr<NumericVector<Number> > flow_last_nonlinear_soln, flow_last_timestep_soln,
+            transport_last_nonlinear_soln, transport_last_timestep_soln;
+
+    for (t_step = init_tstep; (t_step < n_time_steps) && abs(time - tmax) > 1.0e-08 &&
+            (flow_sstate_count < n_flow_sstate || transport_sstate_count < n_transport_sstate) && (!diverged); ++t_step) {
+
+#ifdef PROVENANCE       
+        taskID++;
 #endif
+
         if (is_file_exist("abort.run")) break;
 
         if (is_file_exist("reset.run")) {
 
             GetPot reset(input);
-            dt = reset("deltat", 0.005);
-            tmax = reset("tmax", 0.1);
-            n_time_steps = reset("n_time_steps", 10);
-            n_nonlinear_steps = reset("n_nonlinear_steps", 10);
+            dt = reset("time/deltat", 0.005);
+            tmax = reset("time/tmax", 0.1);
+            n_time_steps = reset("time/n_time_steps", 10);
+
+            flow_n_nonlinear_steps = reset("flow_n_nonlinear_steps", 10);
+            transport_n_nonlinear_steps = reset("transport_n_nonlinear_steps", 10);
+            flow_nonlinear_tolerance = reset("flow_nonlinear_tolerance", 1.0E-03);
+            transport_nonlinear_tolerance = reset("transport_nonlinear_tolerance", 1.0E-03);
             write_interval = reset("write_interval", 10);
-            nonlinear_tolerance = reset("nonlinear_tolerance", 1.0E-03);
-            max_linear_iters = reset("max_linear_iterations", 2000);
+            max_linear_iter = reset("max_linear_iterations", 2000);
+            // AKI DEVO INCLUIR TODOS OS PARÂMETROS LIDOS NO RESET
+            equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iter;
 
         }
 
@@ -490,9 +646,14 @@ int main(int argc, char** argv) {
         flow_system.time += dt;
         transport_system.time += dt;
 
-        Real tmp = Reynolds;
-        equation_systems.parameters.set<Real> ("Reynolds") = tmp;
-        equation_systems.parameters.set<Real> ("Diffusivity") = 1.0 / (Sc * tmp);
+        n_rejected_flow_linear_iterations_per_ts = 0;
+        n_rejected_transport_linear_iterations_per_ts = 0;
+        n_flow_nonlinear_iterations_reject_per_ts = 0;
+        n_transport_nonlinear_iterations_reject_per_ts = 0;
+
+
+        equation_systems.parameters.set<Real> ("Reynolds") = Reynolds;
+        equation_systems.parameters.set<Real> ("Diffusivity") = 1.0 / (Sc * Reynolds);
         equation_systems.parameters.set<Real> ("time") = time;
         equation_systems.parameters.set<Real> ("dt") = dt;
 
@@ -510,10 +671,10 @@ int main(int argc, char** argv) {
                     << "  simulation time = "
                     << std::fixed
                     << std::setw(6)
-                    << std::setprecision(3)
+                    << std::setprecision(5)
                     << std::setfill('0')
                     << std::left
-                    << transport_system.time
+                    << time
                     << "...";
 
             std::cout << out.str() << std::endl;
@@ -526,7 +687,7 @@ int main(int argc, char** argv) {
         // to a "reasonable" starting value.
         const Real initial_linear_solver_tol = 1.e-6;
         equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
-        equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iters;
+        equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iter;
 
         // AMR/C Loop
         redo_nl = true;
@@ -535,7 +696,20 @@ int main(int argc, char** argv) {
 
         // Loop in linear steps
         for (unsigned int r = 0; r < max_r_steps; r++) {
+
             if (!redo_nl) break;
+
+            // The first thing to do is to get a copy of the systems solution before the beginning of the nonlinear iteration.
+            // These values will be used to determine if we can exit the nonlinear loop.
+            flow_last_nonlinear_soln = flow_system.solution->clone();
+            transport_last_nonlinear_soln = transport_system.solution->clone();
+
+            // to be used to compute the norm of the difference between two successive solution  
+            if (accepted) {
+                flow_last_timestep_soln = flow_last_nonlinear_soln->clone();
+                transport_last_timestep_soln = transport_last_nonlinear_soln->clone();
+            }
+
             std::cout << " Solving Navier-Stokes equation..." << std::endl;
             {
                 std::ostringstream out;
@@ -570,19 +744,27 @@ int main(int argc, char** argv) {
 
             // Fluid
             // FLOW NONLINEAR LOOP
-            for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
-#ifdef PROV
-                prov.incrementNumberIterationsFluid();
-                prov.inputSolverSimulationFluid();
+            for (flow_nli_counter = 0; flow_nli_counter < flow_n_nonlinear_steps; ++flow_nli_counter) {
+
+#ifdef PROVENANCE
+                numberIterationsFluid++;
+                prov.inputSolverSimulationFluid(taskID, numberIterationsFluid);
 #endif
                 // Update the nonlinear solution.
                 flow_last_nonlinear_soln->zero();
-                flow_last_nonlinear_soln->add(*flow_system.solution);
+
+                if (accepted)
+                    flow_last_nonlinear_soln->add(*flow_system.solution); // last system solution
+                else {
+                    flow_last_nonlinear_soln->add(*flow_last_timestep_soln); // last time-step solution
+                    flow_last_timestep_soln->close();
+                    accepted = true;
+                }
 
                 // Assemble & solve the linear system.
-                perf_log.start_event("Flow", "Solver");
+                perf_log.start_event("Solver", "Flow");
                 flow_system.solve();
-                perf_log.stop_event("Flow", "Solver");
+                perf_log.stop_event("Solver", "Flow");
 
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
@@ -597,11 +779,16 @@ int main(int argc, char** argv) {
 
                 // How many iterations were required to solve the linear system?
                 const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
+
                 //Total number of linear iterations (so far)
-                n_linear_iterations_flow = n_linear_iterations_flow + n_linear_iterations;
+                n_flow_linear_iterations_total += n_linear_iterations;
 
                 // What was the final residual of the linear system?
                 const Real final_linear_residual = flow_system.final_linear_residual();
+
+                // Number of linear iterations for the current time-step is stored
+                // to compute number of non-effective linear iterations in case of non acceptance of current time-step
+                n_rejected_flow_linear_iterations_per_ts += n_linear_iterations;
 
                 {
                     std::ostringstream out;
@@ -609,7 +796,7 @@ int main(int argc, char** argv) {
                     // We write the file in the ExodusII format.
                     out << std::setw(5)
                             << std::left
-                            << l
+                            << flow_nli_counter
                             << std::setw(5)
                             << n_linear_iterations
                             << std::setw(15)
@@ -623,21 +810,16 @@ int main(int argc, char** argv) {
                     std::cout << out.str() << std::flush;
                 }
 
-                bool converged = (norm_delta < nonlinear_tolerance);
-
                 //Total number of non-linear iterations (so far)
-                n_nonlinear_iterations_flow++;
+                n_flow_nonlinear_iterations_total++;
+                n_flow_nonlinear_iterations_reject_per_ts++;
 
-#ifdef PROV
-                prov.outputSolverSimulationFluid(t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
-#endif  
 
                 // Terminate the solution iteration if the difference between
                 // this nonlinear iterate and the last is sufficiently small, AND
                 // if the most recent linear system was solved to a sufficient tolerance.
-                if ((norm_delta < nonlinear_tolerance)
-                        // && (flow_system.final_linear_residual() < nonlinear_tolerance)
-                        ) {
+                if ((norm_delta < flow_nonlinear_tolerance)) // && (flow_system.final_linear_residual() < nonlinear_tolerance)
+                {
                     std::ostringstream out;
                     // We write the file in the ExodusII format.
                     out << std::setw(55)
@@ -645,10 +827,19 @@ int main(int argc, char** argv) {
                             << "\n";
                     std::cout << out.str()
                             << " Nonlinear solver converged at step "
-                            << l
+                            << flow_nli_counter + 1
                             << std::endl;
+                    diverged = false;
                     break;
-                }
+                } else if (flow_nli_counter == flow_n_nonlinear_steps - 1)
+                    std::cout << " Nonlinear solver did not converge after " << flow_n_nonlinear_steps << " iterations." << endl;
+                // check for aborting simulation due divergence in flow solution
+                if (norm_delta > 1.0e+10)
+                    diverged = true;
+
+#ifdef PROVENANCE
+                prov.outputSolverSimulationFluid(taskID, numberIterationsFluid, t_step, time, r, flow_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+#endif  
 
                 // Otherwise, decrease the linear system tolerance.  For the inexact Newton
                 // method, the linear solver tolerance needs to decrease as we get closer to
@@ -658,6 +849,12 @@ int main(int argc, char** argv) {
                 equation_systems.parameters.set<Real> ("linear solver tolerance") =
                         std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
             } // end nonlinear loop
+
+            // storing current number of non-linear iterations for flow solution
+            if (flow_nli_counter == flow_n_nonlinear_steps)
+                equation_systems.parameters.set<unsigned int> ("n_non_linear_iter_flow") = flow_nli_counter;
+            else
+                equation_systems.parameters.set<unsigned int> ("n_non_linear_iter_flow") = flow_nli_counter + 1;
 
 
             std::cout << " Solving sedimentation equation..." << std::endl;
@@ -690,48 +887,65 @@ int main(int argc, char** argv) {
             equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
 
             // determine if we can exit the nonlinear loop.
-            UniquePtr<NumericVector<Number> > sed_last_nonlinear_soln(transport_system.solution->clone());
+            //UniquePtr<NumericVector<Number> > sed_last_nonlinear_soln(transport_system.solution->clone());
 
             // Sediments
             // FLOW NON-LINEAR LOOP
-            for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
-#ifdef PROV
-                prov.incrementNumberIterationsSediments();
-                prov.inputSolverSimulationSediments();
+            for (transport_nli_counter = 0; transport_nli_counter < transport_n_nonlinear_steps; ++transport_nli_counter) {
+                //TODO: PROVENANCE
+
+#ifdef PROVENANCE
+                numberIterationsSediments++;
+                prov.inputSolverSimulationSediments(taskID, numberIterationsSediments);
 #endif
                 // Update the nonlinear solution.
-                sed_last_nonlinear_soln->zero();
-                sed_last_nonlinear_soln->add(*transport_system.solution);
+                transport_last_nonlinear_soln->zero();
+
+                if (accepted)
+                    transport_last_nonlinear_soln->add(*transport_system.solution); // last system solution
+                else {
+                    transport_last_nonlinear_soln->add(*transport_last_timestep_soln); // last time-step solution
+                    transport_last_timestep_soln->close();
+                    accepted = true;
+                }
+
+
 
                 // Assemble & solve the linear system.
-                perf_log.start_event("Transport", "Solver");
+                perf_log.start_event("Solver", "Transport");
                 transport_system.solve();
-                perf_log.stop_event("Transport", "Solver");
+                perf_log.stop_event("Solver", "Transport");
+
                 // Compute the difference between this solution and the last
                 // nonlinear iterate.
-                sed_last_nonlinear_soln->add(-1., *transport_system.solution);
+                transport_last_nonlinear_soln->add(-1., *transport_system.solution);
 
                 // Close the vector before computing its norm
-                sed_last_nonlinear_soln->close();
+                transport_last_nonlinear_soln->close();
 
                 // Compute the l2 norm of the difference
-                const Real norm_delta = sed_last_nonlinear_soln->l2_norm();
+                const Real norm_delta = transport_last_nonlinear_soln->l2_norm();
                 const Real u_norm = transport_system.solution->l2_norm();
 
                 // How many iterations were required to solve the linear system?
                 const unsigned int n_linear_iterations = transport_system.n_linear_iterations();
                 //Total number of linear iterations (so far)
-                n_linear_iterations_transport += n_linear_iterations;
+                n_transport_linear_iterations_total += n_linear_iterations;
 
                 // What was the final residual of the linear system?
                 const Real final_linear_residual = transport_system.final_linear_residual();
 
+                // Number of linear iterations for the current time-step is stored
+                // to compute number of non-effective linear iterations in case of non acceptance of current time-step
+                n_rejected_transport_linear_iterations_per_ts += n_linear_iterations;
+
                 {
                     std::ostringstream out;
+
                     // We write the file in the ExodusII format.
                     out << std::setw(5)
                             << std::left
-                            << l
+                            << transport_nli_counter + 1
                             << std::setw(5)
                             << n_linear_iterations
                             << std::setw(15)
@@ -741,35 +955,43 @@ int main(int argc, char** argv) {
                             << std::setw(15)
                             << norm_delta / u_norm
                             << "\n";
+
                     std::cout << out.str() << std::flush;
                 }
 
-                bool converged = (norm_delta < nonlinear_tolerance) &&
-                        (transport_system.final_linear_residual() < nonlinear_tolerance);
-
                 //Total number of non-linear iterations (so far)
-                n_nonlinear_iterations_transport++;
+                n_transport_nonlinear_iterations_total++;
+                n_transport_nonlinear_iterations_reject_per_ts++;
 
-#ifdef PROV
-                prov.outputSolverSimulationSediments(t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, converged);
-#endif
 
                 // Terminate the solution iteration if the difference between
                 // this nonlinear iterate and the last is sufficiently small, AND
                 // if the most recent linear system was solved to a sufficient tolerance.
-                if ((norm_delta < nonlinear_tolerance) &&
-                        (transport_system.final_linear_residual() < nonlinear_tolerance)) {
-                    // std::ostringstream out;
-                    //  // We write the file in the ExodusII format.
-                    //  out << std::setw(55)
-                    //      << std::setfill('-')
-                    //      << "\n";
-                    //  std::cout << out.str()
-                    //           << " Nonlinear solver converged at step "
-                    //           << l
-                    //           << std::endl;
+                if ((norm_delta < transport_nonlinear_tolerance)) //&& (transport_system.final_linear_residual() < transport_nonlinear_tolerance))
+                {
+                    std::ostringstream out;
+                    // We write the file in the ExodusII format.
+                    out << std::setw(55)
+                            << std::setfill('-')
+                            << "\n";
+                    std::cout << out.str()
+                            << " Nonlinear solver converged at step "
+                            << transport_nli_counter + 1
+                            << std::endl;
+                    diverged = false;
                     break;
-                }
+                } else if (transport_nli_counter == transport_n_nonlinear_steps - 1)
+                    std::cout << " Nonlinear solver did not converge after " << transport_n_nonlinear_steps << " iterations." << endl;
+
+                // check for aborting simulation due divergence in transport solution
+                if (norm_delta > 1.0e+10)
+                    diverged = true;
+
+#ifdef PROVENANCE
+                //                TODO:CAMATA
+                //                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, transport_system.time, r, transport_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+#endif
 
                 // Otherwise, decrease the linear system tolerance.  For the inexact Newton
                 // method, the linear solver tolerance needs to decrease as we get closer to
@@ -781,22 +1003,60 @@ int main(int argc, char** argv) {
 
             } // end nonlinear loop
 
+            // Storing current number of non-linear iterations for transport solution
+            if (transport_nli_counter == transport_n_nonlinear_steps)
+                equation_systems.parameters.set<unsigned int> ("n_non_linear_iter_transport") = transport_nli_counter;
+            else
+                equation_systems.parameters.set<unsigned int> ("n_non_linear_iter_transport") = transport_nli_counter + 1;
+
+            //TODO:
+            /*
+            if (control_ts) 
+            {
+              
+                if (t_step >= (ts_control->getStartTimeStepControl() - 1) && abs(time - tmax) > 1.0e-08 &&
+                        (flow_sstate_count <= n_flow_sstate || transport_sstate_count <= n_transport_sstate)  && (r+1) != max_r_steps) 
+                { // Only after the first 'n_start' solutions have been accomplished and before "tmax" has been reached
+                    //Measure Time Control performance
+                    perf_log.start_event("Time-Step Control");
+                    // new from Class!
+                    ts_control->computeSolutionChangeInTime(equation_systems);
+                    ts_control->checkTimeStepAcceptance(equation_systems, dt, t_step, accepted);
+                    equation_systems.parameters.set<Real> ("dt") = dt;
+                    time = equation_systems.parameters.get<Real> ("time");
+
+                    if (accepted) {
+                        // storing current number of non-linear iterations as "old" for flow and transport solutions
+                        equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_flow")      = flow_nli_counter + 1;
+                        equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_transport") = transport_nli_counter + 1;
+                    } else {
+                        n_rejected_flow_nonlinear_iterations_total      += n_flow_nonlinear_iterations_reject_per_ts;
+                        n_rejected_flow_linear_iterations_total         += n_rejected_flow_linear_iterations_per_ts;
+                        n_rejected_transport_nonlinear_iterations_total += n_transport_nonlinear_iterations_reject_per_ts;
+                        n_rejected_transport_linear_iterations_total    += n_rejected_transport_linear_iterations_per_ts;
+                    }
+                    perf_log.stop_event("Time-Step Control");
+                } // end time-step control. 
+                
+            }
+            
+             if (!accepted) continue;
+             */
+
             redo_nl = false;
 
             if (first_step_refinement || (((r + 1) != max_r_steps) && (t_step + 1) % ref_interval == 0)) {
-#ifdef PROV
-                prov.incrementNumberIterationsMeshRefinements();
-#endif
-                std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
-                std::cout << " Considering Transport" << ((amrc_flow_transp && !first_step_refinement) ? " & Flow Variables\n" : " Variable\n");
-                std::cout << "Number of elements before AMR step: " << mesh.n_active_elem() << std::endl;
 
                 int beforeNActiveElem = mesh.n_active_elem();
+                std::cout << "\n****************** Mesh Refinement ********************  " << std::endl;
+                std::cout << " Considering Transport" << ((amrc_flow_transp && !first_step_refinement) ? " & Flow Variables\n" : " Variable\n");
+                std::cout << "Number of elements before AMR step: " << beforeNActiveElem << std::endl;
+
                 ErrorVector error_flow, error;
                 KellyErrorEstimator error_estimator_flow;
                 KellyErrorEstimator error_estimator_transp;
 
-                perf_log.start_event("EstimateError", "AMR");
+                perf_log.start_event("estimate_error", "AMR");
                 // First compute error for transport only
                 error_estimator_transp.estimate_error(transport_system, error);
 
@@ -813,217 +1073,278 @@ int main(int argc, char** argv) {
                         error[i] += error_flow[i];
                 }
 
-                perf_log.stop_event("EstimateError", "AMR");
+                perf_log.stop_event("estimate_error", "AMR");
 
-                perf_log.start_event("FlagElements", "AMR");
+                perf_log.start_event("flag_elements", "AMR");
                 refinement.flag_elements_by_error_fraction(error);
-                perf_log.stop_event("FlagElements", "AMR");
+                perf_log.stop_event("flag_elements", "AMR");
 
-                perf_log.start_event("RefineAndCoarse", "AMR");
+                perf_log.start_event("refine_and_coarse", "AMR");
                 refinement.refine_and_coarsen_elements();
-                perf_log.stop_event("RefineAndCoarse", "AMR");
+                perf_log.stop_event("refine_and_coarse", "AMR");
 
                 //equation_systems.update();
-                perf_log.start_event("ReinitSystems", "AMR");
+                perf_log.start_event("reinit systems", "AMR");
                 equation_systems.reinit();
-                perf_log.stop_event("ReinitSystems", "AMR");
+                perf_log.stop_event("reinit systems", "AMR");
 
                 redo_nl = true;
                 first_step_refinement = false;
+
 #ifdef USE_CATALYST
                 FEAdaptor::mark_to_rebuild_grid();
 #endif 
-                std::cout << "Number of elements after AMR step: " << mesh.n_active_elem() << std::endl;
-#ifdef PROV
-                prov.outputMeshRefinement(first_step_refinement, t_step, beforeNActiveElem, mesh.n_active_elem());
-#endif
 
+                int AfterNActiveElem = mesh.n_active_elem();
+                std::cout << "Number of elements after AMR step: " << AfterNActiveElem << std::endl;
+                double var_nelem = double((AfterNActiveElem - beforeNActiveElem)) / beforeNActiveElem * 100;
+                std::cout << "Nelem variation = " << var_nelem << " %." << endl;
+
+#ifdef PROVENANCE
+                numberIterationsMeshRefinements++;
+                prov.outputMeshRefinement(taskID, numberIterationsMeshRefinements, first_step_refinement, t_step, beforeNActiveElem, AfterNActiveElem);
+#endif
                 xdmf_writer.mesh_changed_on();
-            }
-
-            sediment_deposition.ComputeDeposition();
-            //sediment_deposition.print();
-
-#ifdef MESH_MOVIMENT
-            std::cout << "Solving Mesh moviment..." << std::endl;
-
-            equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
-            mesh_system.solve();
-
-            // How many iterations were required to solve the linear system?
-            const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
-            std::cout << " Number of iterations: " << n_linear_iterations << std::endl;
-
-
-            // What was the final residual of the linear system?
-            const Real final_linear_residual = flow_system.final_linear_residual();
-            std::cout << " final residual " << final_linear_residual << std::endl;
-
-            moving_mesh.updateMesh();
-#endif
-
-            // Output every write_interval timesteps to file.
-            if ((t_step + 1) % write_interval == 0) {
-#ifdef PROV                
-                prov.incrementSubTaskID();
-#endif
-
-                const std::string mesh_restart = rname + "_mesh_restart.xdr";
-                const std::string solution_restart = rname + "_solution_restart.xdr";
-
-                mesh.write(mesh_restart);
-                equation_systems.write(solution_restart, WRITE);
-
-                std::ofstream fout;
-                fout.open("restart.in");
-                fout << "#Restart file: " << std::endl;
-                fout << "time = " << time << std::endl;
-                fout << "dt   = " << dt << std::endl;
-                fout << "init_tstep = " << t_step << std::endl;
-                fout << "mesh_restart = " << mesh_restart << std::endl;
-                fout << "solution_restart = " << solution_restart << std::endl;
-                fout << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
-#ifdef PROV
-                fout << "indexerID = " << prov.getIndexerID() << std::endl;
-
-#endif         
-
-                fout.close();
-#ifdef PROV
-                prov.inputMeshWriter();
-#endif
-
-                perf_log.start_event("XDMF", "Write");
-                current_files = xdmf_writer.write_time_step(equation_systems, time);
-                perf_log.stop_event("XDMF", "Write");
-                cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
-
-#ifdef PROV
-                prov.outputMeshWriter(t_step, current_files[1]);
-#endif
-
-                int step = t_step + 1;
-
-                if (!redo_nl) {
-#ifdef USE_CATALYST
-                    if (dim == 2) {
-#ifdef PROV
-                        prov.inputDataExtraction(-1);
-                        performance.begin();
-#endif
-                        perf_log.start_event("CoProcess", "Catalyst");
-                        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                        perf_log.stop_event("CoProcess", "Catalyst");
-#ifdef PROV
-                        performance.end();
-                        prov.storeCatalystCost(performance.getElapsedTime());
-                        extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
-                        prov.incrementIndexerID();
-                        prov.outputDataExtraction(-1, step, current_files[1], dim);
-#endif
-                    } else if (dim == 3) {
-                        // 3D analysis
-                        for (int lineID = 0; lineID <= 3; lineID++) {
-#ifdef PROV
-                            prov.inputVisualization(lineID);
-                            prov.inputDataExtraction(lineID);
-                            performance.begin();
-#endif
-                            if (lineID == 0) {
-                                perf_log.start_event("CoProcess", "Catalyst");
-                                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                                perf_log.stop_event("CoProcess", "Catalyst");
-                            }
-#ifdef PROV
-                            performance.end();
-                            extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
-                            prov.storeCatalystCost(performance.getElapsedTime());
-                            prov.incrementIndexerID();
-                            prov.outputVisualization(lineID, step);
-                            prov.outputDataExtraction(lineID, step, current_files[1], dim);
-#endif
-                        }
-                        prov.addMeshDependencyToList();
-                        //                        sprintf(meshDependenciesList, "%d", taskID);
-                        //                        meshDependencies.push_back(meshDependenciesList);
-                    }
-#endif
-                }
             }
         }
 
-        PrintStats(equation_systems);
 
-    }
+        if (control_ts) {
+            if (t_step >= (ts_control->getStartTimeStepControl() - 1) && abs(time - tmax) > 1.0e-08 &&
+                    (flow_sstate_count <= n_flow_sstate || transport_sstate_count <= n_transport_sstate)) { // Only after the first 'n_start' solutions have been accomplished and before "tmax" has been reached
+                //Measure Time Control performance
+                perf_log.start_event("Time-Step Control");
+                // new from Class!
+                ts_control->computeSolutionChangeInTime(equation_systems);
+                ts_control->checkTimeStepAcceptance(equation_systems, dt, t_step, accepted);
+                equation_systems.parameters.set<Real> ("dt") = dt;
+                time = equation_systems.parameters.get<Real> ("time");
 
-    if ((t_step + 1) % write_interval != 0) {
-#ifdef PROV
-        prov.incrementSubTaskID();
-        prov.inputMeshWriter();
+                if (accepted) {
+                    // storing current number of non-linear iterations as "old" for flow and transport solutions
+                    equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_flow") = flow_nli_counter + 1;
+                    equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_transport") = transport_nli_counter + 1;
+                } else {
+                    n_rejected_flow_nonlinear_iterations_total += n_flow_nonlinear_iterations_reject_per_ts;
+                    n_rejected_flow_linear_iterations_total += n_rejected_flow_linear_iterations_per_ts;
+                    n_rejected_transport_nonlinear_iterations_total += n_transport_nonlinear_iterations_reject_per_ts;
+                    n_rejected_transport_linear_iterations_total += n_rejected_transport_linear_iterations_per_ts;
+                }
+                perf_log.stop_event("Time-Step Control");
+            } // end time-step control. 
+        }
+
+        sediment_deposition.ComputeDeposition();
+
+
+#ifdef MESH_MOVIMENT
+        std::cout << "Solving Mesh moviment..." << std::endl;
+
+        equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+        mesh_system.solve();
+
+        // How many iterations were required to solve the linear system?
+        const unsigned int n_linear_iterations = flow_system.n_linear_iterations();
+        std::cout << " Number of iterations: " << n_linear_iterations << std::endl;
+
+
+        // What was the final residual of the linear system?
+        const Real final_linear_residual = flow_system.final_linear_residual();
+        std::cout << " final residual " << final_linear_residual << std::endl;
+
+        moving_mesh.updateMesh();
 #endif
 
+        // Output every write_interval timesteps to file.
+        if ((t_step + 1) % write_interval == 0) {
+            //TODO: PROVENANCE
+            const std::string mesh_restart = rname + "_mesh_restart.xdr";
+            const std::string solution_restart = rname + "_solution_restart.xdr";
 
-        perf_log.start_event("XDMF", "Write");
+            mesh.write(mesh_restart);
+            equation_systems.write(solution_restart, WRITE);
+
+            std::ofstream f_restart;
+            f_restart.open("restart.in");
+            f_restart << "#Restart file: " << std::endl;
+            f_restart << "time = " << time << std::endl;
+            f_restart << "dt   = " << dt << std::endl;
+            f_restart << "init_tstep = " << t_step << std::endl;
+            f_restart << "mesh_restart = " << mesh_restart << std::endl;
+            f_restart << "solution_restart = " << solution_restart << std::endl;
+            f_restart << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
+            f_restart << "first_step_refinement = " << false << std::endl;
+            f_restart << "mesh_restart = " << mesh_restart << std::endl;
+            f_restart << "solution_restart = " << solution_restart << std::endl;
+            f_restart << "mass_dep = " << sediment_transport.mass_dep << std::endl;
+            f_restart << "initial_mass = " << sediment_transport.init_mass << std::endl;
+            f_restart << "init_transport = " << false << std::endl;
+            f_restart << "n_flow_nonlinear_iterations_total = " << n_flow_nonlinear_iterations_total << std::endl;
+            f_restart << "n_transport_nonlinear_iterations_total = " << n_transport_nonlinear_iterations_total << std::endl;
+            f_restart << "n_flow_linear_iterations_total    = " << n_flow_linear_iterations_total << std::endl;
+            f_restart << "n_transport_linear_iterations_total    =  " << n_transport_linear_iterations_total << std::endl;
+            f_restart << "n_rejected_flow_nonlinear_iterations_total = " << n_rejected_flow_nonlinear_iterations_total << std::endl;
+            f_restart << "n_rejected_transport_nonlinear_iterations_total = " << n_rejected_transport_nonlinear_iterations_total << std::endl;
+            f_restart << "n_rejected_flow_linear_iterations_total    =  " << n_rejected_flow_linear_iterations_total << std::endl;
+            f_restart << "n_rejected_transport_linear_iterations_total    =  " << n_rejected_transport_linear_iterations_total << std::endl;
+
+#ifdef PROVENANCE
+            subTaskID++;
+            f_restart << "indexerID = " << indexerID << std::endl;
+            prov.inputMeshWriter(taskID, subTaskID);
+#endif
+            f_restart.close();
+
+            perf_log.start_event("Write", "XDMF_IO");
+            current_files = xdmf_writer.write_time_step(equation_systems, time);
+            perf_log.stop_event("Write", "XDMF_IO");
+            cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
+
+#ifdef PROVENANCE
+            prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
+#endif
+
+#ifdef USE_CATALYST
+            int step = t_step + 1;
+            if (dim == 2) {
+#ifdef PROVENANCE
+                prov.inputDataExtraction(taskID, subTaskID, -1);
+                performance.begin();
+#endif
+                perf_log.start_event("CATALYST:CoProcess");
+                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
+                perf_log.stop_event("CATALYST:CoProcess");
+#ifdef PROVENANCE
+                performance.end();
+                prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
+                indexerID++;
+                prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
+#endif
+            } else if (dim == 3) {
+                // 3D analysis
+                for (int lineID = 0; lineID <= 3; lineID++) {
+#ifdef PROVENANCE
+                    prov.inputVisualization(lineID, taskID);
+                    prov.inputDataExtraction(taskID, subTaskID, lineID);
+                    performance.begin();
+#endif
+                    if (lineID == 0) {
+                        perf_log.start_event("CATALYST:CoProcess");
+                        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
+                        perf_log.stop_event("CATALYST:CoProcess");
+                    }
+#ifdef PROVENANCE
+                    performance.end();
+                    extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
+                    prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                    indexerID++;
+                    prov.outputVisualization(lineID, taskID, step);
+                    prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
+#endif
+                }
+#ifdef PROVENANCE
+                sprintf(meshDependenciesList, "%d", taskID);
+                meshDependencies.push_back(meshDependenciesList);
+#endif
+            }
+#endif
+        }
+
+        // Writing into a file the time-step size at current simulation time
+        if (control_ts && abs(time - tmax) > 1.0e-08) {
+            if (mesh.processor_id() == 0)
+                foutDt << t_step + 1 << "  " << time << "  " << ts_control->getLastAcceptedTS() << endl;
+        } else {
+            if (mesh.processor_id() == 0)
+                foutDt << t_step + 1 << "  " << time << "  " << dt << endl;
+        }
+
+        // Writing into a file the suspended mass normalized by the initial one at current simulation time
+        //if (mesh.processor_id() == 0)
+        //    sediment_transport.PrintMass(mass_file.c_str());
+
+        PrintStats(equation_systems);
+    }
+
+
+    if ((t_step + 1) % write_interval != 0) {
+
+#ifdef PROVENANCE
+        subTaskID++;
+        prov.inputMeshWriter(taskID, subTaskID);
+#endif
+
+        perf_log.start_event("Write", "XDMF_IO");
         current_files = xdmf_writer.write_time_step(equation_systems, time);
-        perf_log.stop_event("XDMF", "Write");
+        perf_log.stop_event("Write", "XDMF_IO");
         cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
 
-#ifdef PROV
-        prov.outputMeshWriter(t_step, current_files[1]);
+#ifdef PROVENANCE
+        prov.outputMeshWriter(taskID, subTaskID, t_step, current_files[1]);
 #endif
 
-        int step = t_step + 1;
 #ifdef USE_CATALYST
+        int step = t_step + 1;
         if (dim == 2) {
-#ifdef PROV
-            prov.inputDataExtraction(-1);
+#ifdef PROVENANCE
+
+            prov.inputDataExtraction(taskID, subTaskID, -1);
             performance.begin();
 #endif
-            perf_log.start_event("CoProcess", "Catalyst");
+            perf_log.start_event("CATALYST:CoProcess");
             FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
-            perf_log.stop_event("CoProcess", "Catalyst");
-#ifdef PROV
+            perf_log.stop_event("CATALYST:CoProcess");
+#ifdef PROVENANCE
             performance.end();
-            prov.storeCatalystCost(performance.getElapsedTime());
+            prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
 
             extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
-            prov.incrementIndexerID();
-            prov.outputDataExtraction(-1, step, current_files[1], dim);
+            indexerID++;
+            prov.outputDataExtraction(taskID, subTaskID, -1, step, current_files[1], dim, indexerID);
 #endif
         } else if (dim == 3) {
             // 3D analysis
             for (int lineID = 0; lineID <= 3; lineID++) {
-#ifdef PROV
-                prov.inputVisualization(lineID);
-                prov.inputDataExtraction(lineID);
+#ifdef PROVENANCE
+                prov.inputVisualization(lineID, taskID);
+                prov.inputDataExtraction(taskID, subTaskID, lineID);
                 performance.begin();
 #endif
                 if (lineID == 0) {
-                    perf_log.start_event("CoProcess", "Catalyst");
+                    perf_log.start_event("CATALYST:CoProcess");
                     FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
-                    perf_log.stop_event("CoProcess", "Catalyst");
+                    perf_log.stop_event("CATALYST:CoProcess");
                 }
-#ifdef PROV
+#ifdef PROVENANCE
                 performance.end();
                 extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
-                prov.storeCatalystCost(performance.getElapsedTime());
-                prov.incrementIndexerID();
-                prov.outputVisualization(lineID, step);
-                prov.outputDataExtraction(lineID, step, current_files[1], dim);
+                prov.storeCatalystCost(taskID, subTaskID, performance.getElapsedTime());
+                indexerID++;
+                prov.outputVisualization(lineID, taskID, step);
+                prov.outputDataExtraction(taskID, subTaskID, lineID, step, current_files[1], dim, indexerID);
 #endif
             }
         }
 #endif
-        prov.addMeshDependencyToList();
-        //        sprintf(meshDependenciesList, "%d", taskID);
-        //        meshDependencies.push_back(meshDependenciesList);
+
+#ifdef PROVENANCE
+        sprintf(meshDependenciesList, "%d", taskID);
+        meshDependencies.push_back(meshDependenciesList);
+#endif
+
+        // Writing into a file time-step at current simulation time
+        if (mesh.processor_id() == 0)
+            foutDt << t_step + 1 << "  " << equation_systems.parameters.get<Real> ("time") << "  " << dt << endl;
+
+        //        TODO:CAMATA
+        //        // Writing into a file the suspended mass normalized by the initial one at current simulation time
+        //        if (mesh.processor_id()==0)
+        //            sediment_transport.PrintMass(mass_file.c_str());
     }
 
-    std::cout << "FLOW SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_flow << std::endl;
-    std::cout << "TRANSPORT SOLVER - TOTAL LINEAR ITERATIONS : " << n_linear_iterations_transport << std::endl;
-
-#ifdef PROV
+#ifdef PROVENANCE
     //    #ifdef USE_CATALYST
     //        sprintf(memalloc, "rm video.mp4;cat image_*.png | ffmpeg -i - -r 30 video.mp4");
     //        cout << memalloc << endl;
@@ -1032,23 +1353,68 @@ int main(int argc, char** argv) {
 
     char out_filename[256];
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
-    //    sort(meshDependencies.begin(), meshDependencies.end());
-    //    meshDependencies.erase(unique(meshDependencies.begin(), meshDependencies.end()), meshDependencies.end());
-    prov.meshAggregator(out_filename, libMesh::global_n_processors(), prov.getMeshDependencies());
+    sort(meshDependencies.begin(), meshDependencies.end());
+    meshDependencies.erase(unique(meshDependencies.begin(), meshDependencies.end()), meshDependencies.end());
+    prov.meshAggregator(out_filename, libMesh::global_n_processors(), meshDependencies);
     prov.finishDataIngestor();
-#endif
 
-#ifdef PROV
     solverPerformance.end();
     prov.storeSolverCost(solverPerformance.getElapsedTime());
 #endif
+
+    // Write time-step control performance
+    if (control_ts)
+        std::cout << *ts_control;
+
+    // Write performance parameters to output file
+    std::cout << "     \n"
+            << "End of Simulation: " << ((flow_sstate_count > n_flow_sstate && transport_sstate_count > n_transport_sstate) ? "Steady-State reached!\n                   ---------------------" : "Final Simulation time reached!\n                   ----------------------------")
+            << "\n Final number of active elements = " << mesh.n_active_elem() << endl;
+    std::cout << "\nPERFORMANCE PARAMETERS"
+            << "\n Total number of non-linear iterations: "
+            << n_flow_nonlinear_iterations_total + n_transport_nonlinear_iterations_total
+            << "\n Total number of non-linear iterations for Flow : "
+            << n_flow_nonlinear_iterations_total
+            << "\n Total number of non-linear iterations for Transport : "
+            << n_transport_nonlinear_iterations_total
+            << "\n Total number of linear iterations: "
+            << n_flow_linear_iterations_total + n_transport_linear_iterations_total
+            << "\n Total number of linear iterations for flow: "
+            << n_flow_linear_iterations_total
+            << "\n Total number of linear iterations for transport: "
+            << n_transport_linear_iterations_total
+            << "\n Total number of rejected non-linear iterations: "
+            << n_rejected_flow_nonlinear_iterations_total + n_rejected_transport_nonlinear_iterations_total
+            << "\n Total number of rejected non-linear iterations for flow: "
+            << n_rejected_flow_nonlinear_iterations_total
+            << "\n Total number of rejected non-linear iterations for transport: "
+            << n_rejected_transport_nonlinear_iterations_total
+            << "\n Total number of rejected linear iterations: "
+            << n_rejected_flow_linear_iterations_total + n_rejected_transport_linear_iterations_total
+            << "\n Total number of rejected linear iterations for flow: "
+            << n_rejected_flow_linear_iterations_total
+            << "\n Total number of rejected linear iterations for transport: "
+            << n_rejected_transport_linear_iterations_total
+            << "\n Rate Rejected/Total non-linear iterations: "
+            << 100.0 * (n_rejected_flow_nonlinear_iterations_total + n_rejected_transport_nonlinear_iterations_total) / (n_flow_nonlinear_iterations_total + n_transport_nonlinear_iterations_total) << "%"
+            << "\n Rate Rejected/Total non-linear iterations for Flow: "
+            << 100.0 * n_rejected_flow_nonlinear_iterations_total / (n_flow_nonlinear_iterations_total) << "%"
+            << "\n Rate Rejected/Total non-linear iterations for Transport: "
+            << 100.0 * n_rejected_transport_nonlinear_iterations_total / (n_transport_nonlinear_iterations_total) << "%"
+            << "\n Rate Rejected/Total linear iterations: "
+            << 100.0 * (n_rejected_flow_linear_iterations_total + n_rejected_transport_linear_iterations_total) / (n_flow_linear_iterations_total + n_transport_linear_iterations_total) << "%"
+            << "\n Rate Rejected/Total linear iterations for Flow: "
+            << 100.0 * n_rejected_flow_linear_iterations_total / (n_flow_linear_iterations_total) << "%"
+            << "\n Rate Rejected/Total linear iterations for Transport: "
+            << 100.0 * n_rejected_transport_linear_iterations_total / (n_transport_linear_iterations_total) << "%"
+            << std::endl;
 
     // All done.
     cout << "All done!" << endl;
     return 0;
 }
 
-void PrintStats(EquationSystems& es) {
+void PrintStats(EquationSystems & es) {
     std::vector<string> vname;
     std::vector<Real> local_min;
     std::vector<Real> local_max;
@@ -1062,7 +1428,7 @@ void PrintStats(EquationSystems& es) {
 
 
     const System & flow_system = es.get_system("flow");
-    const System & sediment_system = es.get_system("sediment");
+    const System & sediment_system = es.get_system("transport");
 
     vars.push_back(flow_system.variable_number("u"));
     sys.push_back(flow_system.number());

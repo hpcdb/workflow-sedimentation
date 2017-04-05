@@ -7,6 +7,7 @@
 
 #ifndef SEDIMENTATION_FLOW_H
 #define	SEDIMENTATION_FLOW_H
+
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
@@ -58,6 +59,10 @@
 
 #include "define.h"
 
+#include "timeStepControlBase.h"
+
+
+
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
@@ -65,24 +70,45 @@ class SedimentationFlow : public System::Assembly
 {
   public:
     
-  SedimentationFlow (EquationSystems &es_in) : es (es_in), Reynolds(1.0), boussinesq(0.0) 
+  SedimentationFlow (EquationSystems &es_in) : es (es_in), Reynolds(1.0)
   {};
   
-
   void assemble ();
   void init();
   void setup(GetPot &infile);
   void solve();
-  void set_gravitational_current_on();
+  void restart(GetPot &restart);
+  void attach_time_stepping(timeStepControlBase *ts) {this->tsControl = ts;}
 
 private:
   void assemble2D();
   void assemble3D();
-  EquationSystems &es;
+  
   Real Reynolds;
-  Real boussinesq;
-  int boundary_id[NBOUNDARY];
+  Point normal;
+  Real gravity;
+  Real rho;
+  Real viscosity;
+  
+  int outbflow_id;
+  
+  Real         non_linear_tolerance;
+  Real         linear_tolerance;
+
+ 
+  //unsigned int n_flow_nonlinear_iterations_total;
+  //unsigned int n_flow_linear_iterations_total;
+  //unsigned int n_rejected_flow_nonlinear_iterations_total;
+  
+  //unsigned int old_n_non_linear_iter_flow;
+  
   int dim;
+  EquationSystems &es;
+  timeStepControlBase *tsControl;
+  
+  //TODO:
+  // Add pointer to TsControl and Provenance Objects.
+  
 };
 
 #endif

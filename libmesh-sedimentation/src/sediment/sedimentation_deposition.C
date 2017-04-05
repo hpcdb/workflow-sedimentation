@@ -8,7 +8,7 @@
 void SedimentationDeposition::init() {
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & sediment_system =
-            es.get_system<TransientLinearImplicitSystem> ("sediment");
+            es.get_system<TransientLinearImplicitSystem> ("transport");
 
     ExplicitSystem & deposition_system = es.add_system<ExplicitSystem>("deposition");
     ExplicitSystem & deposition_rate   = es.add_system<ExplicitSystem>("deposition rate");
@@ -28,7 +28,7 @@ void SedimentationDeposition::setup(GetPot &infile)
 {
     ExplicitSystem & deposition_system = es.get_system<ExplicitSystem>("deposition"); 
     deposition_system.add_vector("deposition_rate");
-    this->deposition_id = infile("dirichlet/deposition", -1);
+    this->deposition_id = infile("transport/deposition", -1);
 }
 
 
@@ -36,7 +36,7 @@ void SedimentationDeposition::print()
 {
     
     TransientLinearImplicitSystem & sediment_system =
-            es.get_system<TransientLinearImplicitSystem> ("sediment");
+            es.get_system<TransientLinearImplicitSystem> ("transport");
 
     ExplicitSystem & deposition_system = es.get_system<ExplicitSystem>("deposition");
 
@@ -60,7 +60,7 @@ void SedimentationDeposition::ComputeDeposition() {
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & sediment_system =
-            es.get_system<TransientLinearImplicitSystem> ("sediment");
+            es.get_system<TransientLinearImplicitSystem> ("transport");
 
     ExplicitSystem & deposition_system = es.get_system<ExplicitSystem>("deposition");
 
