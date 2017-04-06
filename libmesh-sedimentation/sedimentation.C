@@ -130,6 +130,14 @@ int main(int argc, char** argv) {
         libmesh_error_msg("You need specify a input file!");
     }
 
+    string mesh_file;
+    if (command_line.search(1, "-m"))
+        mesh_file = command_line.next(mesh_file);
+    else {
+        std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh" << std::endl;
+        libmesh_error_msg("You need specify a mesh file!");
+    }
+
     GetPot infile(input);
     double v = infile("version", 1.0);
     if (v == 1.0) {
@@ -163,6 +171,7 @@ int main(int argc, char** argv) {
 
 
 #ifdef PROVENANCE
+    //TODO: prov.inputInputMesh(dim, mesh_file);
     prov.inputInputMesh(dim);
 #endif
     // Create a mesh object, with dimension to be overridden later,
@@ -184,6 +193,10 @@ int main(int argc, char** argv) {
     refinement.coarsen_fraction() = c_fraction;
     refinement.max_h_level() = max_h_level;
 
+#ifdef PROVENANCE
+    // TODO: prov.outputInputAMRConfig(...)
+    prov.outputInputMesh(r_fraction, c_fraction, max_h_level, hlevels);
+#endif
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
 
@@ -239,6 +252,10 @@ int main(int argc, char** argv) {
     std::string mass_file = infile("mass_file", "mass_over_time.dat");
     //sediment_transport.init_transport    = infile("sediment/init_condition", true);
 
+#ifdef PROVENANCE
+    prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
+#endif
+
     // LOOP 
     Real init_time = 0.0;
     int init_tstep = 0;
@@ -276,7 +293,14 @@ int main(int argc, char** argv) {
     double s_max = infile("ts_control/s_max", 2.0);
     double reduct_factor = infile("ts_control/reduct_factor", 0.5);
     bool complete_flow_norm = infile("ts_control/complete_flow_norm", false);
-
+    
+    
+#ifdef PROVENANCE
+    //TODO:
+    //prov.outputTSControlConfig(...);
+#endif
+    
+    
     // Linear and non-linear solver parameters 
     int flow_n_nonlinear_steps = infile("flow_n_nonlinear_steps", 10);
     int transport_n_nonlinear_steps = infile("transport_n_nonlinear_steps", 10);
@@ -319,7 +343,12 @@ int main(int argc, char** argv) {
     std::cout << "  Extraction script: " << extractionScript << endl;
     std::cout << "  Visualization script: " << visualizationScript << endl;
 
-
+#ifdef PROVENANCE
+    //TODO:
+    //prov.outputIOConfig(dpath, rpath, write_interval, catalyst_interval);
+#endif
+    
+    
     XDMFWriter xdmf_writer(mesh);
     xdmf_writer.set_file_name(rname);
     xdmf_writer.set_dir_path(dpath);
@@ -328,13 +357,7 @@ int main(int argc, char** argv) {
 
         // Starting simulation from the begining...
 
-        string mesh_file;
-        if (command_line.search(1, "-m"))
-            mesh_file = command_line.next(mesh_file);
-        else {
-            std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh" << std::endl;
-            libmesh_error_msg("You need specify a mesh file!");
-        }
+
 
         std::cout << "Opening file: " << mesh_file << std::endl;
 
@@ -357,15 +380,11 @@ int main(int argc, char** argv) {
         moving_mesh.setup(infile);
 #endif
 
-#ifdef PROVENANCE
-        prov.outputInputMesh(r_fraction, c_fraction, max_h_level, hlevels);
-#endif
+
         // Initialize the data structures for the equation system.
         equation_systems.init();
 
-#ifdef PROVENANCE
-        prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
-#endif
+
 
     } else {
 
@@ -545,6 +564,7 @@ int main(int argc, char** argv) {
     //    TODO:CAMATA
     //    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
     prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, max_r_steps, write_interval, current_files[1]);
+    // prov.outputFlowSolverConfig();
     Performance performance;
 #endif
 
@@ -990,7 +1010,7 @@ int main(int argc, char** argv) {
 #ifdef PROVENANCE
                 //                TODO:CAMATA
                 //                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
-                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, transport_system.time, r, transport_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, time, r, transport_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
 #endif
 
                 // Otherwise, decrease the linear system tolerance.  For the inexact Newton
