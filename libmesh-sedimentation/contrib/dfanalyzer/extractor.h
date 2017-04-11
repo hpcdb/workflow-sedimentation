@@ -14,6 +14,15 @@ extern "C" {
 
     namespace extractor {
 
+        void ReplaceStringInPlace(std::string& subject, const std::string& search,
+                          const std::string& replace) {
+            size_t pos = 0;
+            while ((pos = subject.find(search, pos)) != std::string::npos) {
+                 subject.replace(pos, search.length(), replace);
+                 pos += replace.length();
+            }
+        }
+
         void invoke2DRawDataExtractor(int processorID, int timeStep) {
             if (processorID == 0) {
                 char firstFilename[256];
@@ -32,18 +41,21 @@ extern "C" {
                 string wordToReplace2(":");
 
                 string line;
-                size_t len = wordToReplace.length();
-                size_t len2 = wordToReplace2.length();
+                // size_t len = wordToReplace.length();
+                // size_t len2 = wordToReplace2.length();
                 while (getline(in, line))
                 {
                     if(line.find("nan") == std::string::npos){
-                        size_t pos = line.find(wordToReplace);
-                        if (pos != string::npos)
-                            line.replace(pos, len, "");
+                        ReplaceStringInPlace(line, wordToReplace, "");
+                        ReplaceStringInPlace(line, wordToReplace2, "");
+                        
+                        // size_t pos = line.find(wordToReplace);
+                        // if (pos != string::npos)
+                        //     line.replace(pos, len, "");
 
-                        size_t pos2 = line.find(wordToReplace2);
-                        if (pos2 != string::npos)
-                            line.replace(pos2, len2, "");
+                        // size_t pos2 = line.find(wordToReplace2);
+                        // if (pos2 != string::npos)
+                        //     line.replace(pos2, len2, "");
 
                         out << line << '\n';
                     }
@@ -69,18 +81,21 @@ extern "C" {
                 string wordToReplace2(":");
 
                 string line;
-                size_t len = wordToReplace.length();
-                size_t len2 = wordToReplace2.length();
+                // size_t len = wordToReplace.length();
+                // size_t len2 = wordToReplace2.length();
                 while (getline(in, line))
                 {
                     if(line.find("nan") == std::string::npos){
-                        size_t pos = line.find(wordToReplace);
-                        if (pos != string::npos)
-                            line.replace(pos, len, "");
+                        ReplaceStringInPlace(line, wordToReplace, "");
+                        ReplaceStringInPlace(line, wordToReplace2, "");
 
-                        size_t pos2 = line.find(wordToReplace2);
-                        if (pos2 != string::npos)
-                            line.replace(pos2, len2, "");
+                        // size_t pos = line.find(wordToReplace);
+                        // if (pos != string::npos)
+                        //     line.replace(pos, len, "");
+
+                        // size_t pos2 = line.find(wordToReplace2);
+                        // if (pos2 != string::npos)
+                        //     line.replace(pos2, len2, "");
 
                         out << line << '\n';
                     }

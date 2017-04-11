@@ -1,4 +1,6 @@
 # Input file for transport simulation
+version = 2.0
+
 #######################################################
 # Mesh Parameters
 #------------------------------------------------------
@@ -22,47 +24,55 @@ hlock = 1.999
 # back wall  : 6
 
 dim = 3
-dirichlet/inlet   = '3'
-dirichlet/inlet/constant/u = '0.5'
-dirichlet/inlet/constant/v = '0.0'
-dirichlet/inlet/constant/w = '0.0'
+flow/dirichlet/inlet   = '3'
+flow/dirichlet/inlet/constant/u = '0.5'
+flow/dirichlet/inlet/constant/v = '0.0'
+flow/dirichlet/inlet/constant/w = '0.0'
 
-dirichlet/deposition = '2'
-dirichlet/slipz      = '1'
-dirichlet/noslip     = '4'
-dirichlet/pnull      = '1'
-dirichlet/fixedwall  = '1'
-dirichlet/czero      = '1'
-dirichlet/sediment/prescribed = '3'
+flow/dirichlet/deposition = '2'
+flow/dirichlet/slipz      = '1'
+flow/dirichlet/noslip     = '4'
+flow/dirichlet/pnull      = '1'
+flow/dirichlet/fixedwall  = '1'
+flow/dirichlet/czero      = '1'
+flow/dirichlet/sediment/prescribed = '3'
 
 sediment/init_condition = false
 
 
 #------------------------------------------------------
 # refinement parameters
-hlevels     = 0
-max_r_steps = 1
-r_fraction  = 0.08
-c_fraction  = 0.01
-max_h_level = 1
-r_interval  = 100
-first_step_refinement = false
+
+amr/hlevels     = 0
+amr/max_r_steps = 1
+amr/r_fraction  = 0.08
+amr/c_fraction  = 0.01
+amr/max_h_level = 1
+amr/r_interval  = 100
+amr/first_step_refinement = false
 
 
 #----------------------------------------------------
 # TIME INTEGRATION PARAMETERS
-# The interval between our timesteps
-deltat = 0.005
 
-# And the number of timesteps to take
-n_time_steps          = 1000000
-max_linear_iterations = 100
+time/deltat = 0.005
+time/n_time_steps          = 1000000
+time/max_linear_iterations = 100
+time/tmax    = 100.0 
 
-# maximun time
-tmax    = 100.0 
+#----------------------------------------------------
+# Linear and Non-Linear parameters
+
+flow_n_nonlinear_steps        = 10
+flow_nonlinear_tolerance      = 1.0E-3
+transport_n_nonlinear_steps   = 10
+transport_nonlinear_tolerance = 1.0E-3
+max_linear_iterations         = 100
+linear_solver_tolerance       = 1.0E-6
 
 #------------------------------------------------------
 # EQUATION PARAMETERS
+
 Reynolds    =  2000.0
 Grashof     =  0.0
 Sc          =  1.0
@@ -72,6 +82,6 @@ ey          =  0.0
 ez          = -1.0
 
 # Write out every nth timestep to file.
-write_interval = 100
-#catalyst_interval=100
+write_interval    = 100
+catalyst_interval = 100
 
