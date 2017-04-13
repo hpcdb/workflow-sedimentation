@@ -167,11 +167,11 @@
               <pElem>contrib</pElem>
               <pElem>contrib/dfanalyzer/*.h</pElem>
               <pElem>include/provenance</pElem>
-              <pElem>../../../program/paraview/include/paraview-5.1</pElem>
+              <pElem>../../../../programs/paraview-5.3.0/include/paraview-5.3</pElem>
               <pElem>include/catalyst</pElem>
-              <pElem>../../../program/libmesh/include</pElem>
-              <pElem>../../../program/hdf5/include</pElem>
-              <pElem>../../../program/petsc/3.7.2/include</pElem>
+              <pElem>../../../../programs/libmesh/include</pElem>
+              <pElem>../../../../programs/hdf5/include</pElem>
+              <pElem>../../../../programs/petsc/include</pElem>
               <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent</pElem>
               <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include</pElem>
               <pElem>/usr/lib/openmpi/include</pElem>

@@ -1,0 +1,25 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "inputmesh",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::inputmesh",
+            "method": "COMPUTATION",
+            "endTime": "13.04.2017-02:45:56"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "oinputmesh",
+            "elements": [
+                "1;0.85;0.05;3.00;0"
+            ]
+        }
+    ],
+    "dependency": {},
+    "files": []
+}

@@ -1,0 +1,29 @@
+{
+    "id": "3",
+    "subid": "7",
+    "dataflow": "sedimentation",
+    "transformation": "solversimulationfluid",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::solversimulationfluid-1-7",
+            "method": "COMPUTATION",
+            "startTime": "13.04.2017-02:46:17"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "getmaximumiterations"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

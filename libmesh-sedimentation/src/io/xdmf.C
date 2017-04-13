@@ -258,7 +258,7 @@ string* XDMFWriter::write_time_step(EquationSystems& es, double time)
     write_spatial_collection(es, time);
     write_temporal_collection();
 
-    sprintf(xdmf_filename,"%s%s_%d_%05d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors,this->n_timestep);
+    sprintf(xdmf_filename,"%s/%s_%d_%05d.xmf", this->dir.c_str(),this->basename.c_str(), n_processors,this->n_timestep);
     // char the_path[2048];
     // getcwd(the_path, 2048);
     files[0] = filename;

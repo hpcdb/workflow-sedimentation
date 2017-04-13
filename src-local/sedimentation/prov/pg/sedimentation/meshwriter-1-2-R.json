@@ -1,0 +1,29 @@
+{
+    "id": "4",
+    "subid": "2",
+    "dataflow": "sedimentation",
+    "transformation": "meshwriter",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::meshwriter-1-2",
+            "method": "COMPUTATION",
+            "startTime": "13.04.2017-02:46:21"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationsediments"
+            }
+        ],
+        "ids": [
+            {
+                "id": "4"
+            }
+        ]
+    },
+    "files": []
+}

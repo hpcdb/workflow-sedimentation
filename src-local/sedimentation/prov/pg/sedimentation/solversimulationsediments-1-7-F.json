@@ -1,0 +1,36 @@
+{
+    "id": "3",
+    "subid": "7",
+    "dataflow": "sedimentation",
+    "transformation": "solversimulationsediments",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::solversimulationsediments-1-7",
+            "method": "COMPUTATION",
+            "endTime": "13.04.2017-02:46:18"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "osolversimulationsediments",
+            "elements": [
+                "1;2;0.0150000;0;0;4;0.000004083;0.002879752;0.000159625;true"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationfluid"
+            }
+        ],
+        "ids": [
+            {
+                "id": "3"
+            }
+        ]
+    },
+    "files": []
+}
