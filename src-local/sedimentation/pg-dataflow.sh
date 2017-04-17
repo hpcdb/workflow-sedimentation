@@ -34,20 +34,33 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation inputMe
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation inputMesh -tag oinputmesh -type output
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name simulationID -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name dim -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name mesh_file -type text
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name simulationID -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name r_fraction -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name c_fraction -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name max_h_level -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name hlevels -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name dim -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name mesh_file -type text
+
+echo "AMR Config"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag amrConfig
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation amrConfig -name libmesh-sedimentation-opt::AMRConfig -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation amrConfig -tag oinputmesh -type input -dependency inputMesh
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation amrConfig -tag oamrconfig -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name r_fraction -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name c_fraction -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name max_h_level -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name hlevels -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name first_step_refinement -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name amrc_flow_transp -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name ref_interval -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation amrConfig -set oamrconfig -name max_r_steps -type numeric
 
 echo "Create Equation Systems"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag createEquationSystems
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation createEquationSystems -name libmesh-sedimentation-opt::CreateEquationSystems -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag oinputmesh -type input -dependency inputMesh
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag oamrconfig -type input -dependency amrConfig
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag ocreateequationsystems -type output
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name simulationID -type numeric

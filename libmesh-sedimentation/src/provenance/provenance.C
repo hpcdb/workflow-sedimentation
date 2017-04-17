@@ -65,15 +65,14 @@ Provenance::Provenance(int processorID) {
 #endif
 }
 
-std::string GetCurrentWorkingDir( void ) {
-  char buff[FILENAME_MAX];
-  GetCurrentDir( buff, FILENAME_MAX );
-  std::string current_working_dir(buff);
-  return current_working_dir;
+std::string GetCurrentWorkingDir(void) {
+    char buff[FILENAME_MAX];
+    GetCurrentDir(buff, FILENAME_MAX);
+    std::string current_working_dir(buff);
+    return current_working_dir;
 }
 
-void Provenance::inputInputMesh(int dim, string mesh_file) 
-{
+void Provenance::inputInputMesh() {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Input Input Mesh" << endl;
@@ -95,7 +94,7 @@ void Provenance::inputInputMesh(int dim, string mesh_file)
     t.setStatus("RUNNING");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d;%d;%s/%s", simulationID, dim, GetCurrentWorkingDir().c_str(), mesh_file.c_str());
+    sprintf(memalloc, "%d", simulationID);
     vector<string> e = {memalloc};
     t.addSet("i" + transformation, e);
 
@@ -120,8 +119,7 @@ void Provenance::inputInputMesh(int dim, string mesh_file)
     file.close();
 }
 
-void Provenance::outputInputMesh(double r_fraction, double c_fraction,
-        double max_h_level, unsigned int hlevels) {
+void Provenance::outputInputMesh(int dim, string mesh_file) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Input Mesh" << endl;
@@ -138,7 +136,102 @@ void Provenance::outputInputMesh(double r_fraction, double c_fraction,
     t.setStatus("FINISHED");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d;%.2f;%.2f;%.2f;%d", simulationID, r_fraction, c_fraction, max_h_level, hlevels);
+    sprintf(memalloc, "%d;%d;%s/%s", simulationID, dim, GetCurrentWorkingDir().c_str(), mesh_file.c_str());
+    vector<string> e = {memalloc};
+    t.addSet("o" + transformation, e);
+
+    PerformanceMetric p;
+    p.SetDescription("libMeshSedimentation::" + transformation);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyEndTime();
+    t.addPerformanceMetric(p);
+
+#ifdef DATABASE
+    sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+#endif
+#ifdef BACKUP
+    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+#endif
+
+    perf.end();
+    double elapsedTime = perf.getElapsedTime();
+
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Output" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+
+    //    AMR Config
+    perf.begin();
+
+    transformation = "amrconfig";
+    p.SetDescription("libMeshSedimentation::" + transformation);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyStartTime();
+
+    Task t2(simulationID);
+    t2.addPerformanceMetric(p);
+    t2.setDataflow(dataflow);
+    t2.setTransformation(transformation);
+    t2.setWorkspace(directory);
+    t2.setStatus("RUNNING");
+    t2.addDtDependency("inputmesh");
+
+    sprintf(memalloc, "%d", simulationID);
+    t2.addIdDependency(memalloc);
+
+#ifdef DATABASE
+    sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t2.writeJSON(memalloc);
+#endif
+#ifdef BACKUP
+    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t2.writeJSON(memalloc);
+#endif
+
+    perf.end();
+    elapsedTime = perf.getElapsedTime();
+
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Input" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+}
+
+void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels, bool first_step_refinement,
+        bool amrc_flow_transp, int ref_interval, int max_r_steps) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Output Input Mesh" << endl;
+#endif
+
+    Performance perf;
+    perf.begin();
+
+    string transformation = "amrconfig";
+    Task t(simulationID);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("FINISHED");
+    t.addDtDependency("inputmesh");
+    
+    char memalloc[jsonArraySize];
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
+
+    sprintf(memalloc, "%d;%.2f;%.2f;%.2f;%d;%s;%s;%d;%d", 
+            simulationID, r_fraction, c_fraction, max_h_level, hlevels,
+            first_step_refinement ? "true" : "false",
+            amrc_flow_transp ? "true" : "false",
+            ref_interval, max_r_steps);            
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -182,7 +275,7 @@ void Provenance::outputInputMesh(double r_fraction, double c_fraction,
     t2.setTransformation(transformation);
     t2.setWorkspace(directory);
     t2.setStatus("RUNNING");
-    t2.addDtDependency("inputmesh");
+    t2.addDtDependency("amrconfig");
 
     sprintf(memalloc, "%d", simulationID);
     t2.addIdDependency(memalloc);
@@ -226,7 +319,7 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("inputmesh");
+    t.addDtDependency("amrconfig");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
@@ -817,7 +910,7 @@ void Provenance::inputSolverSimulationFluid() {
     file.close();
 }
 
-void Provenance::outputSolverSimulationFluid(int time_step, Real time, 
+void Provenance::outputSolverSimulationFluid(int time_step, Real time,
         int linear_step, int n_linear_step, unsigned int n_linear_iterations,
         Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
     if (processor_id != 0) return;
@@ -987,7 +1080,7 @@ void Provenance::outputSolverSimulationSediments(int time_step,
     file.close();
 }
 
-void Provenance::outputMeshRefinement(bool first_step_refinement, 
+void Provenance::outputMeshRefinement(bool first_step_refinement,
         int time_step, int before_n_active_elem, int after_n_active_elem) {
     if (processor_id != 0) return;
 #ifdef VERBOSE

@@ -30,8 +30,11 @@ public:
 
     Provenance(int processorID);
 
-    void inputInputMesh(int dim, string mesh_file);
-    void outputInputMesh(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels);
+    void inputInputMesh();
+    void outputInputMesh(int dim, string mesh_file);
+    
+    void outputAMRConfig(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels, bool first_step_refinement,
+            bool amrc_flow_transp, int ref_interval, int max_r_steps);
 
     void outputCreateEquationSystems(Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc, Real theta, Real ex, Real ey, Real ez, Real c_factor);
 
@@ -149,28 +152,28 @@ public:
         if (processor_id != 0) return;
         numberIterationsMeshRefinements = 0;
     }
-    
-    void incrementIndexerID(){
+
+    void incrementIndexerID() {
         if (processor_id != 0) return;
         indexerID++;
     }
-    
-    void setIndexerID(int id){
+
+    void setIndexerID(int id) {
         if (processor_id != 0) return;
         indexerID = id;
     }
-    
-    void resetIndexerID(){
+
+    void resetIndexerID() {
         if (processor_id != 0) return;
         indexerID = 0;
     }
-    
-    void resetMeshDependencies(){
+
+    void resetMeshDependencies() {
         if (processor_id != 0) return;
         meshDependencies.clear();
     }
-    
-    int getIndexerID(){
+
+    int getIndexerID() {
         return indexerID;
     }
 

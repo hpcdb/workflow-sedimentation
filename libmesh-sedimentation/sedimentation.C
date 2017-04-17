@@ -171,14 +171,19 @@ int main(int argc, char** argv) {
     int dim = infile("dim", 3);
 
 #ifdef PROVENANCE
-    //TODO: prov.inputInputMesh(dim, mesh_file);
     perf_log.start_event("InputMesh", "Provenance");
-    prov.inputInputMesh(dim, mesh_file);
+    prov.inputInputMesh();
     perf_log.stop_event("InputMesh", "Provenance");
 #endif
     // Create a mesh object, with dimension to be overridden later,
     // distributed across the default MPI communicator.
     Mesh mesh(init.comm());
+    
+#ifdef PROVENANCE
+    perf_log.start_event("InputMesh", "Provenance");
+    prov.outputInputMesh(dim, mesh_file);
+    perf_log.stop_event("InputMesh", "Provenance");
+#endif
 
     // Getting mesh refinement parameters
     double r_fraction = infile("amr/r_fraction", 0.70);
@@ -197,9 +202,10 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     // TODO: prov.outputInputAMRConfig(...)
-    perf_log.start_event("InputMesh", "Provenance");
-    prov.outputInputMesh(r_fraction, c_fraction, max_h_level, hlevels);
-    perf_log.stop_event("InputMesh", "Provenance");
+    perf_log.start_event("AMRConfig", "Provenance");
+    prov.outputAMRConfig(r_fraction, c_fraction, max_h_level, hlevels, first_step_refinement,
+            amrc_flow_transp, ref_interval, max_r_steps);
+    perf_log.stop_event("AMRConfig", "Provenance");
 #endif
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
