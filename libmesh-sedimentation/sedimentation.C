@@ -175,10 +175,11 @@ int main(int argc, char** argv) {
     prov.inputInputMesh();
     perf_log.stop_event("InputMesh", "Provenance");
 #endif
+
     // Create a mesh object, with dimension to be overridden later,
     // distributed across the default MPI communicator.
     Mesh mesh(init.comm());
-    
+
 #ifdef PROVENANCE
     perf_log.start_event("InputMesh", "Provenance");
     prov.outputInputMesh(dim, mesh_file);
@@ -201,12 +202,12 @@ int main(int argc, char** argv) {
     refinement.max_h_level() = max_h_level;
 
 #ifdef PROVENANCE
-    // TODO: prov.outputInputAMRConfig(...)
     perf_log.start_event("AMRConfig", "Provenance");
     prov.outputAMRConfig(r_fraction, c_fraction, max_h_level, hlevels, first_step_refinement,
             amrc_flow_transp, ref_interval, max_r_steps);
     perf_log.stop_event("AMRConfig", "Provenance");
 #endif
+
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
 
@@ -273,7 +274,6 @@ int main(int argc, char** argv) {
     int init_tstep = 0;
     unsigned int t_step = 0;
 
-
     // INPUT: TIME INTEGRATION
     Real dt_init = infile("time/deltat", 0.005);
     equation_systems.parameters.set<Real> ("dt_stab") = infile("time/dt_stab", 0.1);
@@ -306,12 +306,12 @@ int main(int argc, char** argv) {
     double reduct_factor = infile("ts_control/reduct_factor", 0.5);
     bool complete_flow_norm = infile("ts_control/complete_flow_norm", false);
 
-
 #ifdef PROVENANCE
-    //TODO:
-    //prov.outputTSControlConfig(...);
+    prov.outputTSControlConfig(ts_control_model_name, dt_min, dt_max, tol_u, tol_s,
+            kp, ki, kd, nsa_max, nsa_target_flow, nsa_target_transport,
+            nsa_limit_flow, nsa_limit_transport, mult_factor_max, mult_factor_min,
+            pc11_theta, alpha, k_exp, s_min, s_max, reduct_factor, complete_flow_norm);
 #endif
-
 
     // Linear and non-linear solver parameters 
     int flow_n_nonlinear_steps = infile("flow_n_nonlinear_steps", 10);
@@ -325,8 +325,8 @@ int main(int argc, char** argv) {
     unsigned int n_transport_sstate = infile("n_transport_sstate", 50);
 
     unsigned int write_interval = infile("write_interval", 10);
+    unsigned int catalyst_interval = infile("catalyst_interval", 10);
     bool write_restart = infile("write_restart", false);
-
 
     std::string rname = "out";
     std::string dpath = "output";
@@ -356,10 +356,8 @@ int main(int argc, char** argv) {
     std::cout << "  Visualization script: " << visualizationScript << endl;
 
 #ifdef PROVENANCE
-    //TODO:
-    //prov.outputIOConfig(dpath, rpath, write_interval, catalyst_interval);
+    prov.outputIOConfig(dpath, rname, write_interval, catalyst_interval, write_restart);
 #endif
-
 
     XDMFWriter xdmf_writer(mesh);
     xdmf_writer.set_file_name(rname);
@@ -368,9 +366,6 @@ int main(int argc, char** argv) {
     if (!is_file_exist("restart.run")) {
 
         // Starting simulation from the begining...
-
-
-
         std::cout << "Opening file: " << mesh_file << std::endl;
 
         mesh.read(mesh_file);
@@ -392,14 +387,9 @@ int main(int argc, char** argv) {
         moving_mesh.setup(infile);
 #endif
 
-
         // Initialize the data structures for the equation system.
         equation_systems.init();
-
-
-
     } else {
-
         GetPot restart("restart.in");
         const string mesh_restart = restart("mesh_restart", "0");
         const string solution_restart = restart("solution_restart", "0");
@@ -413,7 +403,6 @@ int main(int argc, char** argv) {
 
         sediment_transport.init_mass = restart("initial_mass", 0.0);
         sediment_transport.mass_dep = restart("mass_dep", 0.0);
-
 
         int xdmf_file_id = restart("xdmf_file_id", 0);
         xdmf_writer.set_file_id(xdmf_file_id);
@@ -450,16 +439,12 @@ int main(int argc, char** argv) {
                 equation_systems.get_system<TransientLinearImplicitSystem> ("transport");
         //transport_system.add_vector("volume");
 
-
         ExplicitSystem & deposition_system = equation_systems.get_system<ExplicitSystem>("deposition");
-
 
         flow_system.update();
         transport_system.update();
         deposition_system.update();
         equation_systems.update();
-
-
     }
 
     // Print information about the mesh to the screen.
@@ -945,7 +930,6 @@ int main(int argc, char** argv) {
             // Sediments
             // FLOW NON-LINEAR LOOP
             for (transport_nli_counter = 0; transport_nli_counter < transport_n_nonlinear_steps; ++transport_nli_counter) {
-                //TODO: PROVENANCE
 
 #ifdef PROVENANCE
                 prov.incrementIterationsSediments();
@@ -1214,7 +1198,6 @@ int main(int argc, char** argv) {
 
         // Output every write_interval timesteps to file.
         if ((t_step + 1) % write_interval == 0) {
-            //TODO: PROVENANCE
             const std::string mesh_restart = rname + "_mesh_restart.xdr";
             const std::string solution_restart = rname + "_solution_restart.xdr";
 

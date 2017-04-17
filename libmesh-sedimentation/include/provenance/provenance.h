@@ -35,8 +35,15 @@ public:
     
     void outputAMRConfig(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels, bool first_step_refinement,
             bool amrc_flow_transp, int ref_interval, int max_r_steps);
-
+    
     void outputCreateEquationSystems(Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc, Real theta, Real ex, Real ey, Real ez, Real c_factor);
+    
+    void outputTSControlConfig(string ts_control_model_name, double dt_min, double dt_max, double tol_u, double tol_s,
+            double kp, double ki, double kd, unsigned int nsa_max, unsigned int nsa_target_flow, unsigned int nsa_target_transport,
+            unsigned int nsa_limit_flow, unsigned int nsa_limit_transport, double mult_factor_max, double mult_factor_min,
+            double pc11_theta, double alpha, double k_exp, double s_min, double s_max, double reduct_factor, bool complete_flow_norm);
+    
+    void outputIOConfig(string dpath, string rname, unsigned int write_interval, unsigned int catalyst_interval, bool write_restart);
 
     void outputGetMaximumIterations(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, int max_r_steps, unsigned int write_interval, string xdmf);
 

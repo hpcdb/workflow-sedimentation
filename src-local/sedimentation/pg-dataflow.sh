@@ -60,7 +60,7 @@ echo "Create Equation Systems"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag createEquationSystems
 java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation createEquationSystems -name libmesh-sedimentation-opt::CreateEquationSystems -filepath $PGDIR
 
-java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag oamrconfig -type input -dependency amrConfig
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag oinputmesh -type input -dependency inputMesh
 java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation createEquationSystems -tag ocreateequationsystems -type output
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name simulationID -type numeric
@@ -76,6 +76,51 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation c
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name ey -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name ez -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation createEquationSystems -set ocreateequationsystems -name c_factor -type numeric
+
+echo "Time Step Control Config"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag timeStepControlConfig
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation timeStepControlConfig -name libmesh-sedimentation-opt::TimeStepControlConfig -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation timeStepControlConfig -tag oinputmesh -type input -dependency inputMesh
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation timeStepControlConfig -tag otimestepcontrolconfig -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name model_name -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name dt_min -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name dt_max -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name tol_u -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name tol_s -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name kp -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name ki -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name kd -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name nsa_max -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name nsa_target_flow -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name nsa_target_transport -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name nsa_limit_flow -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name nsa_limit_transport -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name mult_factor_max -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name mult_factor_min -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name pc11_theta -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name alpha -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name k_exp -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name s_min -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name s_max -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name reduct_factor -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation timeStepControlConfig -set otimestepcontrolconfig -name complete_flow_norm -type text
+
+echo "IO Config"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag ioConfig
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation ioConfig -name libmesh-sedimentation-opt::IOConfig -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation ioConfig -tag oinputmesh -type input -dependency inputMesh
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation ioConfig -tag oioconfig -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation ioConfig -set oioconfig -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation ioConfig -set oioconfig -name dpath -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation ioConfig -set oioconfig -name rname -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation ioConfig -set oioconfig -name write_interval -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation ioConfig -set oioconfig -name catalyst_interval -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation ioConfig -set oioconfig -name write_restart -type text
 
 echo "Get Maximum Iterations"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag getMaximumIterations
