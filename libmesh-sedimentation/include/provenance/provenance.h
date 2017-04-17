@@ -30,7 +30,7 @@ public:
 
     Provenance(int processorID);
 
-    void inputInputMesh(int dim);
+    void inputInputMesh(int dim, string mesh_file);
     void outputInputMesh(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels);
 
     void outputCreateEquationSystems(Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc, Real theta, Real ex, Real ey, Real ez, Real c_factor);

@@ -173,7 +173,7 @@ int main(int argc, char** argv) {
 #ifdef PROVENANCE
     //TODO: prov.inputInputMesh(dim, mesh_file);
     perf_log.start_event("InputMesh", "Provenance");
-    prov.inputInputMesh(dim);
+    prov.inputInputMesh(dim, mesh_file);
     perf_log.stop_event("InputMesh", "Provenance");
 #endif
     // Create a mesh object, with dimension to be overridden later,

@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctime>
+#include <unistd.h>
+#define GetCurrentDir getcwd
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -63,7 +65,14 @@ Provenance::Provenance(int processorID) {
 #endif
 }
 
-void Provenance::inputInputMesh(int dim) 
+std::string GetCurrentWorkingDir( void ) {
+  char buff[FILENAME_MAX];
+  GetCurrentDir( buff, FILENAME_MAX );
+  std::string current_working_dir(buff);
+  return current_working_dir;
+}
+
+void Provenance::inputInputMesh(int dim, string mesh_file) 
 {
     if (processor_id != 0) return;
 #ifdef VERBOSE
@@ -86,7 +95,7 @@ void Provenance::inputInputMesh(int dim)
     t.setStatus("RUNNING");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d;%d", simulationID, dim);
+    sprintf(memalloc, "%d;%d;%s/%s", simulationID, dim, GetCurrentWorkingDir().c_str(), mesh_file.c_str());
     vector<string> e = {memalloc};
     t.addSet("i" + transformation, e);
 

@@ -35,6 +35,7 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation inputMe
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name dim -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set iinputmesh -name mesh_file -type text
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation inputMesh -set oinputmesh -name r_fraction -type numeric
