@@ -149,9 +149,9 @@ int main(int argc, char** argv) {
     Performance solverPerformance;
     solverPerformance.begin();
     perf_log.start_event("Init", "Provenance");
-    Provenance prov(libMesh::global_processor_id());
+    Provenance provenance(libMesh::global_processor_id());
     perf_log.stop_event("Init", "Provenance");
-    prov.resetIndexerID();
+    provenance.resetIndexerID();
 #endif
 
     cout << "PROCESSOR ID:" << endl;
@@ -172,7 +172,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("InputMesh", "Provenance");
-    prov.inputInputMesh();
+    provenance.inputInputMesh();
     perf_log.stop_event("InputMesh", "Provenance");
 #endif
 
@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("InputMesh", "Provenance");
-    prov.outputInputMesh(dim, mesh_file);
+    provenance.outputInputMesh(dim, mesh_file);
     perf_log.stop_event("InputMesh", "Provenance");
 #endif
 
@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("AMRConfig", "Provenance");
-    prov.outputAMRConfig(r_fraction, c_fraction, max_h_level, hlevels, first_step_refinement,
+    provenance.outputAMRConfig(r_fraction, c_fraction, max_h_level, hlevels, first_step_refinement,
             amrc_flow_transp, ref_interval, max_r_steps);
     perf_log.stop_event("AMRConfig", "Provenance");
 #endif
@@ -265,7 +265,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("CreateEquationSystems", "Provenance");
-    prov.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
+    provenance.outputCreateEquationSystems(Reynolds, Gr, Sc, Us, Diffusivity, xlock, alfa, theta, ex, ey, ez, c_factor);
     perf_log.stop_event("CreateEquationSystems", "Provenance");
 #endif
 
@@ -307,7 +307,7 @@ int main(int argc, char** argv) {
     bool complete_flow_norm = infile("ts_control/complete_flow_norm", false);
 
 #ifdef PROVENANCE
-    prov.outputTSControlConfig(ts_control_model_name, dt_min, dt_max, tol_u, tol_s,
+    provenance.outputTSControlConfig(ts_control_model_name, dt_min, dt_max, tol_u, tol_s,
             kp, ki, kd, nsa_max, nsa_target_flow, nsa_target_transport,
             nsa_limit_flow, nsa_limit_transport, mult_factor_max, mult_factor_min,
             pc11_theta, alpha, k_exp, s_min, s_max, reduct_factor, complete_flow_norm);
@@ -351,12 +351,14 @@ int main(int argc, char** argv) {
 
     std::cout << "File name: " << rname << endl;
     std::cout << "  path: " << dpath << endl;
+    std::cout << "Write interval: " << to_string(write_interval) << endl;
+    std::cout << "Catalyst interval: " << to_string(catalyst_interval) << endl;
     std::cout << "Number of scripts: " << numberOfScripts << endl;
     std::cout << "  Extraction script: " << extractionScript << endl;
     std::cout << "  Visualization script: " << visualizationScript << endl;
 
 #ifdef PROVENANCE
-    prov.outputIOConfig(dpath, rname, write_interval, catalyst_interval, write_restart);
+    provenance.outputIOConfig(dpath, rname, write_interval, catalyst_interval, write_restart);
 #endif
 
     XDMFWriter xdmf_writer(mesh);
@@ -398,7 +400,7 @@ int main(int argc, char** argv) {
         init_tstep = restart("init_tstep", 0);
 
 #ifdef PROVENANCE
-        prov.setIndexerID(restart("indexerID", 0));
+        provenance.setIndexerID(restart("indexerID", 0));
 #endif
 
         sediment_transport.init_mass = restart("initial_mass", 0.0);
@@ -561,7 +563,7 @@ int main(int argc, char** argv) {
     //    TODO:CAMATA
     //    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
     perf_log.start_event("GetMaximumIterations", "Provenance");
-    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, max_r_steps, write_interval, current_files[1]);
+    provenance.outputGetMaximumIterations(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, max_r_steps, write_interval, current_files[1]);
     perf_log.stop_event("GetMaximumIterations", "Provenance");
     // prov.outputFlowSolverConfig();
     Performance performance;
@@ -572,7 +574,7 @@ int main(int argc, char** argv) {
         // 2D analysis        
 #ifdef PROVENANCE
         perf_log.start_event("InitDataExtraction", "Provenance");
-        prov.inputInitDataExtraction(-1);
+        provenance.inputInitDataExtraction(-1);
         perf_log.stop_event("InitDataExtraction", "Provenance");
         performance.begin();
 #endif
@@ -584,11 +586,11 @@ int main(int argc, char** argv) {
         perf_log.stop_event("CoProcess", "Catalyst");
 #ifdef PROVENANCE
         performance.end();
-        prov.storeCatalystCost(performance.getElapsedTime());
+        provenance.storeCatalystCost(performance.getElapsedTime());
         extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
-        prov.incrementIndexerID();
+        provenance.incrementIndexerID();
         perf_log.start_event("InitDataExtraction", "Provenance");
-        prov.outputInitDataExtraction(-1, current_files[1], dim);
+        provenance.outputInitDataExtraction(-1, current_files[1], dim);
         perf_log.stop_event("InitDataExtraction", "Provenance");
 #endif        
     } else if (dim == 3) {
@@ -596,11 +598,11 @@ int main(int argc, char** argv) {
         for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROVENANCE
             perf_log.start_event("InitVisualization", "Provenance");
-            prov.inputInitVisualization(lineID);
+            provenance.inputInitVisualization(lineID);
             perf_log.stop_event("InitVisualization", "Provenance");
 
             perf_log.start_event("InitDataExtraction", "Provenance");
-            prov.inputInitDataExtraction(lineID);
+            provenance.inputInitDataExtraction(lineID);
             perf_log.stop_event("InitDataExtraction", "Provenance");
 
             performance.begin();
@@ -616,15 +618,15 @@ int main(int argc, char** argv) {
 #ifdef PROVENANCE
             performance.end();
             extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
-            prov.storeCatalystCost(performance.getElapsedTime());
-            prov.incrementIndexerID();
+            provenance.storeCatalystCost(performance.getElapsedTime());
+            provenance.incrementIndexerID();
 
             perf_log.start_event("InitVisualization", "Provenance");
-            prov.outputInitVisualization(lineID, t_step);
+            provenance.outputInitVisualization(lineID, t_step);
             perf_log.stop_event("InitVisualization", "Provenance");
 
             perf_log.start_event("InitDataExtraction", "Provenance");
-            prov.outputInitDataExtraction(lineID, current_files[1], dim);
+            provenance.outputInitDataExtraction(lineID, current_files[1], dim);
             perf_log.stop_event("InitDataExtraction", "Provenance");
 #endif
         }
@@ -634,12 +636,12 @@ int main(int argc, char** argv) {
     // STEP LOOP
     // Loop in time steps
 #ifdef PROVENANCE
-    prov.resetTaskID();
-    prov.resetSubTaskID();
-    prov.resetIterationsFluid();
-    prov.resetIterationsSediments();
-    prov.resetIterationsMeshRefinement();
-    prov.resetMeshDependencies();
+    provenance.resetTaskID();
+    provenance.resetSubTaskID();
+    provenance.resetIterationsFluid();
+    provenance.resetIterationsSediments();
+    provenance.resetIterationsMeshRefinement();
+    provenance.resetMeshDependencies();
 #endif
 
     equation_systems.parameters.set<PerfLog*> ("PerfLog") = &perf_log;
@@ -651,7 +653,7 @@ int main(int argc, char** argv) {
             (flow_sstate_count < n_flow_sstate || transport_sstate_count < n_transport_sstate) && (!diverged); ++t_step) {
 
 #ifdef PROVENANCE       
-        prov.incrementTaskID();
+        provenance.incrementTaskID();
 #endif
 
         if (is_file_exist("abort.run")) break;
@@ -781,9 +783,9 @@ int main(int argc, char** argv) {
             for (flow_nli_counter = 0; flow_nli_counter < flow_n_nonlinear_steps; ++flow_nli_counter) {
 
 #ifdef PROVENANCE
-                prov.incrementIterationsFluid();
+                provenance.incrementIterationsFluid();
                 perf_log.start_event("SolverSimulationFluid", "Provenance");
-                prov.inputSolverSimulationFluid();
+                provenance.inputSolverSimulationFluid();
                 perf_log.stop_event("SolverSimulationFluid", "Provenance");
 #endif
                 // Update the nonlinear solution.
@@ -875,7 +877,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
                 perf_log.start_event("SolverSimulationFluid", "Provenance");
-                prov.outputSolverSimulationFluid(t_step, time, r, flow_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+                provenance.outputSolverSimulationFluid(t_step, time, r, flow_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
                 perf_log.stop_event("SolverSimulationFluid", "Provenance");
 #endif  
 
@@ -932,9 +934,9 @@ int main(int argc, char** argv) {
             for (transport_nli_counter = 0; transport_nli_counter < transport_n_nonlinear_steps; ++transport_nli_counter) {
 
 #ifdef PROVENANCE
-                prov.incrementIterationsSediments();
+                provenance.incrementIterationsSediments();
                 perf_log.start_event("SolverSimulationSediments", "Provenance");
-                prov.inputSolverSimulationSediments();
+                provenance.inputSolverSimulationSediments();
                 perf_log.stop_event("SolverSimulationSediments", "Provenance");
 #endif
                 // Update the nonlinear solution.
@@ -1028,7 +1030,7 @@ int main(int argc, char** argv) {
                 //                TODO:CAMATA
                 //                prov.outputSolverSimulationSediments(taskID, numberIterationsSediments, t_step, transport_system.time, r, l, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
                 perf_log.start_event("SolverSimulationSediments", "Provenance");
-                prov.outputSolverSimulationSediments(t_step, time, r, transport_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+                provenance.outputSolverSimulationSediments(t_step, time, r, transport_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
                 perf_log.stop_event("SolverSimulationSediments", "Provenance");
 #endif
 
@@ -1140,9 +1142,9 @@ int main(int argc, char** argv) {
                 std::cout << "Nelem variation = " << var_nelem << " %." << endl;
 
 #ifdef PROVENANCE
-                prov.incrementIterationsMeshRefinements();
+                provenance.incrementIterationsMeshRefinements();
                 perf_log.start_event("MeshRefinement", "Provenance");
-                prov.outputMeshRefinement(first_step_refinement, t_step, beforeNActiveElem, AfterNActiveElem);
+                provenance.outputMeshRefinement(first_step_refinement, t_step, beforeNActiveElem, AfterNActiveElem);
                 perf_log.stop_event("MeshRefinement", "Provenance");
 #endif
                 xdmf_writer.mesh_changed_on();
@@ -1229,10 +1231,10 @@ int main(int argc, char** argv) {
             f_restart << "n_rejected_transport_linear_iterations_total    =  " << n_rejected_transport_linear_iterations_total << std::endl;
 
 #ifdef PROVENANCE
-            prov.incrementSubTaskID();
-            f_restart << "indexerID = " << prov.getIndexerID() << std::endl;
+            provenance.incrementSubTaskID();
+            f_restart << "indexerID = " << provenance.getIndexerID() << std::endl;
             perf_log.start_event("MeshWriter", "Provenance");
-            prov.inputMeshWriter();
+            provenance.inputMeshWriter();
             perf_log.stop_event("MeshWriter", "Provenance");
 #endif
             f_restart.close();
@@ -1244,72 +1246,68 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
             perf_log.start_event("MeshWriter", "Provenance");
-            prov.outputMeshWriter(t_step, current_files[1]);
+            provenance.outputMeshWriter(t_step, current_files[1]);
             perf_log.stop_event("MeshWriter", "Provenance");
 #endif
+        }
 
-            if (!redo_nl) {
+        if (!redo_nl && ((t_step + 1) % catalyst_interval == 0)) {
 #ifdef USE_CATALYST
-                int step = t_step + 1;
-                if (dim == 2) {
+            if (dim == 2) {
 #ifdef PROVENANCE
+                perf_log.start_event("DataExtraction", "Provenance");
+                provenance.inputDataExtraction(-1);
+                perf_log.stop_event("DataExtraction", "Provenance");
+                performance.begin();
+#endif
+                perf_log.start_event("CoProcess", "Catalyst");
+                FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, t_step, write_interval, false, false);
+                perf_log.stop_event("CoProcess", "Catalyst");
+#ifdef PROVENANCE
+                performance.end();
+                provenance.storeCatalystCost(performance.getElapsedTime());
+                extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
+                provenance.incrementIndexerID();
+
+                perf_log.start_event("DataExtraction", "Provenance");
+                provenance.outputDataExtraction(-1, t_step, current_files[1], dim);
+                perf_log.stop_event("DataExtraction", "Provenance");
+#endif
+            } else if (dim == 3) {
+                // 3D analysis
+                for (int lineID = 0; lineID <= 3; lineID++) {
+#ifdef PROVENANCE
+                    perf_log.start_event("Visualization", "Provenance");
+                    provenance.inputVisualization(lineID);
+                    perf_log.stop_event("Visualization", "Provenance");
+
                     perf_log.start_event("DataExtraction", "Provenance");
-                    prov.inputDataExtraction(-1);
+                    provenance.inputDataExtraction(lineID);
                     perf_log.stop_event("DataExtraction", "Provenance");
                     performance.begin();
 #endif
-                    perf_log.start_event("CoProcess", "Catalyst");
-                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                    perf_log.stop_event("CoProcess", "Catalyst");
-#ifdef PROVENANCE
-                    performance.end();
-                    prov.storeCatalystCost(performance.getElapsedTime());
-                    extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
-                    prov.incrementIndexerID();
-
-                    perf_log.start_event("DataExtraction", "Provenance");
-                    prov.outputDataExtraction(-1, step, current_files[1], dim);
-                    perf_log.stop_event("DataExtraction", "Provenance");
-#endif
-                } else if (dim == 3) {
-                    // 3D analysis
-                    for (int lineID = 0; lineID <= 3; lineID++) {
-#ifdef PROVENANCE
-                        perf_log.start_event("Visualization", "Provenance");
-                        prov.inputVisualization(lineID);
-                        perf_log.stop_event("Visualization", "Provenance");
-
-                        perf_log.start_event("DataExtraction", "Provenance");
-                        prov.inputDataExtraction(lineID);
-                        perf_log.stop_event("DataExtraction", "Provenance");
-                        performance.begin();
-#endif
-                        if (lineID == 0) {
-                            perf_log.start_event("CoProcess", "Catalyst");
-                            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, false, false);
-                            perf_log.stop_event("CoProcess", "Catalyst");
-                        }
-#ifdef PROVENANCE
-                        performance.end();
-                        extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
-                        prov.storeCatalystCost(performance.getElapsedTime());
-                        prov.incrementIndexerID();
-
-                        perf_log.start_event("Visualization", "Provenance");
-                        prov.outputVisualization(lineID, step);
-                        perf_log.stop_event("Visualization", "Provenance");
-
-                        perf_log.start_event("DataExtraction", "Provenance");
-                        prov.outputDataExtraction(lineID, step, current_files[1], dim);
-                        perf_log.stop_event("DataExtraction", "Provenance");
-#endif
+                    if (lineID == 0) {
+                        perf_log.start_event("CoProcess", "Catalyst");
+                        FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, t_step, write_interval, false, false);
+                        perf_log.stop_event("CoProcess", "Catalyst");
                     }
 #ifdef PROVENANCE
-                    prov.addMeshDependencyToList();
+                    performance.end();
+                    extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
+                    provenance.storeCatalystCost(performance.getElapsedTime());
+                    provenance.incrementIndexerID();
+
+                    perf_log.start_event("Visualization", "Provenance");
+                    provenance.outputVisualization(lineID, t_step);
+                    perf_log.stop_event("Visualization", "Provenance");
+
+                    perf_log.start_event("DataExtraction", "Provenance");
+                    provenance.outputDataExtraction(lineID, t_step, current_files[1], dim);
+                    perf_log.stop_event("DataExtraction", "Provenance");
 #endif
                 }
-#endif
             }
+#endif
         }
 
         // Writing into a file the time-step size at current simulation time
@@ -1332,9 +1330,9 @@ int main(int argc, char** argv) {
     if ((t_step + 1) % write_interval != 0) {
 
 #ifdef PROVENANCE
-        prov.incrementSubTaskID();
+        provenance.incrementSubTaskID();
         perf_log.start_event("MeshWriter", "Provenance");
-        prov.inputMeshWriter();
+        provenance.inputMeshWriter();
         perf_log.stop_event("MeshWriter", "Provenance");
 #endif
 
@@ -1343,75 +1341,10 @@ int main(int argc, char** argv) {
         perf_log.stop_event("Write", "XDMF");
         cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
-
 #ifdef PROVENANCE
         perf_log.start_event("MeshWriter", "Provenance");
-        prov.outputMeshWriter(t_step, current_files[1]);
+        provenance.outputMeshWriter(t_step, current_files[1]);
         perf_log.stop_event("MeshWriter", "Provenance");
-#endif
-
-#ifdef USE_CATALYST
-        int step = t_step + 1;
-        if (dim == 2) {
-#ifdef PROVENANCE
-            perf_log.start_event("DataExtraction", "Provenance");
-            prov.inputDataExtraction(-1);
-            perf_log.stop_event("DataExtraction", "Provenance");
-            performance.begin();
-#endif
-            perf_log.start_event("CoProcess", "Catalyst");
-            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
-            perf_log.stop_event("CoProcess", "Catalyst");
-#ifdef PROVENANCE
-            performance.end();
-            prov.storeCatalystCost(performance.getElapsedTime());
-
-            extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), step);
-            prov.incrementIndexerID();
-
-            perf_log.start_event("DataExtraction", "Provenance");
-            prov.outputDataExtraction(-1, step, current_files[1], dim);
-            perf_log.stop_event("DataExtraction", "Provenance");
-#endif
-        } else if (dim == 3) {
-            // 3D analysis
-            for (int lineID = 0; lineID <= 3; lineID++) {
-#ifdef PROVENANCE
-
-                perf_log.start_event("Visualization", "Provenance");
-                prov.inputVisualization(lineID);
-                perf_log.stop_event("Visualization", "Provenance");
-
-                perf_log.start_event("DataExtraction", "Provenance");
-                prov.inputDataExtraction(lineID);
-                perf_log.stop_event("DataExtraction", "Provenance");
-                performance.begin();
-#endif
-                if (lineID == 0) {
-                    perf_log.start_event("CoProcess", "Catalyst");
-                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, step, write_interval, true, false);
-                    perf_log.stop_event("CoProcess", "Catalyst");
-                }
-#ifdef PROVENANCE
-                performance.end();
-                extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), step, lineID);
-                prov.storeCatalystCost(performance.getElapsedTime());
-                prov.incrementIndexerID();
-
-                perf_log.start_event("Visualization", "Provenance");
-                prov.outputVisualization(lineID, step);
-                perf_log.stop_event("Visualization", "Provenance");
-
-                perf_log.start_event("DataExtraction", "Provenance");
-                prov.outputDataExtraction(lineID, step, current_files[1], dim);
-                perf_log.stop_event("DataExtraction", "Provenance");
-#endif
-            }
-        }
-#endif
-
-#ifdef PROVENANCE
-        prov.addMeshDependencyToList();
 #endif
 
         // Writing into a file time-step at current simulation time
@@ -1422,6 +1355,67 @@ int main(int argc, char** argv) {
         //        // Writing into a file the suspended mass normalized by the initial one at current simulation time
         //        if (mesh.processor_id()==0)
         //            sediment_transport.PrintMass(mass_file.c_str());
+    }
+
+    if ((t_step + 1) % catalyst_interval == 0) {
+#ifdef USE_CATALYST
+        if (dim == 2) {
+#ifdef PROVENANCE
+            perf_log.start_event("DataExtraction", "Provenance");
+            provenance.inputDataExtraction(-1);
+            perf_log.stop_event("DataExtraction", "Provenance");
+            performance.begin();
+#endif
+            perf_log.start_event("CoProcess", "Catalyst");
+            FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, t_step, write_interval, true, false);
+            perf_log.stop_event("CoProcess", "Catalyst");
+#ifdef PROVENANCE
+            performance.end();
+            provenance.storeCatalystCost(performance.getElapsedTime());
+
+            extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
+            provenance.incrementIndexerID();
+
+            perf_log.start_event("DataExtraction", "Provenance");
+            provenance.outputDataExtraction(-1, t_step, current_files[1], dim);
+            perf_log.stop_event("DataExtraction", "Provenance");
+#endif
+        } else if (dim == 3) {
+            // 3D analysis
+            for (int lineID = 0; lineID <= 3; lineID++) {
+#ifdef PROVENANCE
+
+                perf_log.start_event("Visualization", "Provenance");
+                provenance.inputVisualization(lineID);
+                perf_log.stop_event("Visualization", "Provenance");
+
+                perf_log.start_event("DataExtraction", "Provenance");
+                provenance.inputDataExtraction(lineID);
+                perf_log.stop_event("DataExtraction", "Provenance");
+                performance.begin();
+#endif
+                if (lineID == 0) {
+                    perf_log.start_event("CoProcess", "Catalyst");
+                    FEAdaptor::CoProcess(numberOfScripts, extractionScript, visualizationScript, equation_systems, transport_system.time, t_step, write_interval, true, false);
+                    perf_log.stop_event("CoProcess", "Catalyst");
+                }
+#ifdef PROVENANCE
+                performance.end();
+                extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
+                provenance.storeCatalystCost(performance.getElapsedTime());
+                provenance.incrementIndexerID();
+
+                perf_log.start_event("Visualization", "Provenance");
+                provenance.outputVisualization(lineID, t_step);
+                perf_log.stop_event("Visualization", "Provenance");
+
+                perf_log.start_event("DataExtraction", "Provenance");
+                provenance.outputDataExtraction(lineID, t_step, current_files[1], dim);
+                perf_log.stop_event("DataExtraction", "Provenance");
+#endif
+            }
+        }
+#endif
     }
 
 #ifdef PROVENANCE
@@ -1435,13 +1429,13 @@ int main(int argc, char** argv) {
     sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
 
     perf_log.start_event("MeshAggregator", "Provenance");
-    prov.meshAggregator(out_filename, libMesh::global_n_processors());
+    provenance.meshAggregator(out_filename, libMesh::global_n_processors());
     perf_log.stop_event("MeshAggregator", "Provenance");
 
-    prov.finishDataIngestor();
+    provenance.finishDataIngestor();
 
     solverPerformance.end();
-    prov.storeSolverCost(solverPerformance.getElapsedTime());
+    provenance.storeSolverCost(solverPerformance.getElapsedTime());
 #endif
 
     // Write time-step control performance

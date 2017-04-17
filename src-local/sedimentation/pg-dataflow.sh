@@ -372,7 +372,7 @@ if [ "$dimension" == "2" ]; then
 	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag dataExtraction
 	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation dataExtraction -name libmesh-sedimentation-opt::DataExtraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag omeshwriter -type input -dependency meshWriter
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag osolversimulationsediments -type input -dependency solverSimulationSediments
 	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag odataextraction -type output
 
 	if [ "$access" == "extraction" ]; then
@@ -407,28 +407,28 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line0Extraction
 	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line0Extraction -name libmesh-sedimentation-opt::Line0Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line0Extraction -tag omeshwriter -type input -dependency meshWriter
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line0Extraction -tag osolversimulationsediments -type input -dependency solverSimulationSediments
 	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line0Extraction -tag oline0extraction -type output
 
 	echo "Vertical Line 1 Extraction"
 	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line1Extraction
 	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line1Extraction -name libmesh-sedimentation-opt::Line1Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line1Extraction -tag omeshwriter -type input -dependency meshWriter
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line1Extraction -tag osolversimulationsediments -type input -dependency solverSimulationSediments
 	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line1Extraction -tag oline1extraction -type output
 
 	echo "Vertical Line 2 Extraction"
 	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line2Extraction
 	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line2Extraction -name libmesh-sedimentation-opt::Line2Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line2Extraction -tag omeshwriter -type input -dependency meshWriter
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line2Extraction -tag osolversimulationsediments -type input -dependency solverSimulationSediments
 	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line2Extraction -tag oline2extraction -type output
 
 	echo "Vertical Line 3 Extraction"
 	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line3Extraction
 	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line3Extraction -name libmesh-sedimentation-opt::Line3Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line3Extraction -tag omeshwriter -type input -dependency meshWriter
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line3Extraction -tag osolversimulationsediments -type input -dependency solverSimulationSediments
 	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line3Extraction -tag oline3extraction -type output
 
 	if [ "$access" == "extraction" ]; then
@@ -525,7 +525,7 @@ elif [ "$dimension" == "3" ]; then
 	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag visualization
 	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation visualization -name libmesh-sedimentation-opt::Visualization -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag omeshwriter -type input -dependency meshWriter
+	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag osolversimulationsediments -type input -dependency solverSimulationSediments
 	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag ovisualization -type output
 
 	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name simulationID -type numeric

@@ -967,7 +967,7 @@ void Provenance::inputVisualization(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("meshwriter");
+    t.addDtDependency("solversimulationsediments");
 
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
@@ -1014,7 +1014,7 @@ void Provenance::outputVisualization(int lineID, int timeStep) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("meshwriter");
+    t.addDtDependency("solversimulationsediments");
 
     char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", taskID);
@@ -1439,6 +1439,8 @@ void Provenance::outputMeshWriter(int time_step, string xdmf) {
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
+    
+    addMeshDependencyToList();
 }
 
 void Provenance::inputDataExtraction(int lineID) {
@@ -1472,7 +1474,7 @@ void Provenance::inputDataExtraction(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("meshwriter");
+    t.addDtDependency("solversimulationsediments");
 
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
@@ -1530,7 +1532,7 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("meshwriter");
+    t.addDtDependency("solversimulationsediments");
 
     char memalloc[4096];
     sprintf(memalloc, "%d", taskID);
