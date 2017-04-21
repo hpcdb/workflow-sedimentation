@@ -563,7 +563,9 @@ int main(int argc, char** argv) {
     //    TODO:CAMATA
     //    prov.outputGetMaximumIterations(dt, tmax, n_time_steps, n_nonlinear_steps, nonlinear_tolerance, max_linear_iters, max_r_steps, write_interval, current_files[1]);
     perf_log.start_event("GetMaximumIterations", "Provenance");
-    provenance.outputGetMaximumIterations(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, max_r_steps, write_interval, current_files[1]);
+    provenance.outputGetMaximumIterationsToFluid(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, current_files[1]);
+    provenance.outputGetMaximumIterationsToSediments(dt, tmax, n_time_steps, n_transport_nonlinear_iterations_total, transport_nonlinear_tolerance, n_transport_linear_iterations_total, current_files[1]);
+    
     perf_log.stop_event("GetMaximumIterations", "Provenance");
     // prov.outputFlowSolverConfig();
     Performance performance;

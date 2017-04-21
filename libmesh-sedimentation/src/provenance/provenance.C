@@ -354,8 +354,8 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
-    
-//    Time Step Control Config
+
+    //    Time Step Control Config
     perf.begin();
 
     transformation = "timestepcontrolconfig";
@@ -397,7 +397,7 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
 void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_min, double dt_max, double tol_u, double tol_s,
         double kp, double ki, double kd, unsigned int nsa_max, unsigned int nsa_target_flow, unsigned int nsa_target_transport,
         unsigned int nsa_limit_flow, unsigned int nsa_limit_transport, double mult_factor_max, double mult_factor_min,
-        double pc11_theta, double alpha, double k_exp, double s_min, double s_max, double reduct_factor, bool complete_flow_norm){
+        double pc11_theta, double alpha, double k_exp, double s_min, double s_max, double reduct_factor, bool complete_flow_norm) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Time Step Control Config" << endl;
@@ -423,7 +423,7 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
             ki, kd, nsa_max, nsa_target_flow, nsa_target_transport, nsa_limit_flow,
             nsa_limit_transport, mult_factor_max, mult_factor_min, pc11_theta,
             alpha, k_exp, s_min, s_max, reduct_factor, complete_flow_norm ? "true" : "false");
-    
+
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -452,8 +452,8 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
-    
-//    IO Config
+
+    //    IO Config
     perf.begin();
 
     transformation = "ioconfig";
@@ -492,7 +492,7 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
     file.close();
 }
 
-void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_interval, unsigned int catalyst_interval, bool write_restart){
+void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_interval, unsigned int catalyst_interval, bool write_restart) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output IO Config" << endl;
@@ -515,7 +515,7 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
 
     sprintf(memalloc, "%d;%s;%s;%d;%d;%s",
             simulationID, dpath.c_str(), rname.c_str(), write_interval, catalyst_interval, write_restart ? "true" : "false");
-            
+
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -544,11 +544,11 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
-    
-//    Get Maximum Iterations
+
+    //    Get Maximum Iterations
     perf.begin();
 
-    transformation = "getmaximumiterations";
+    transformation = "getmaximumiterationstofluid";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
@@ -584,19 +584,19 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
     file.close();
 }
 
-void Provenance::outputGetMaximumIterations(Real dt, Real tmax,
+void Provenance::outputGetMaximumIterationsToFluid(Real dt, Real tmax,
         unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance,
-        int max_linear_iters, int max_r_steps, unsigned int write_interval, string xdmf) {
+        int max_linear_iters, string xdmf) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Output Get Maximum Iterations" << endl;
+    cout << "Output Get Maximum Iterations to Fluid" << endl;
 #endif
 
     Performance perf;
     perf.begin();
 
     char memalloc[1000];
-    string transformation = "getmaximumiterations";
+    string transformation = "getmaximumiterationstofluid";
     Task t(simulationID);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
@@ -607,10 +607,106 @@ void Provenance::outputGetMaximumIterations(Real dt, Real tmax,
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%.7f;%.7f;%d;%d;%.9f;%d;%d;%d;%s",
+    sprintf(memalloc, "%d;%.7f;%.7f;%d;%d;%.9f;%d;%s",
             simulationID, dt, tmax, n_time_steps, n_nonlinear_steps,
-            nonlinear_tolerance, max_linear_iters, max_r_steps,
-            write_interval, xdmf.c_str());
+            nonlinear_tolerance, max_linear_iters, xdmf.c_str());
+    vector<string> e = {memalloc};
+    t.addSet("o" + transformation, e);
+
+    PerformanceMetric p;
+    p.SetDescription("libMeshSedimentation::" + transformation);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyEndTime();
+    t.addPerformanceMetric(p);
+
+    File f(directory, xdmf);
+    t.addFile(f);
+
+#ifdef DATABASE
+    sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+#endif
+#ifdef BACKUP
+    sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t.writeJSON(memalloc);
+#endif
+
+    perf.end();
+    double elapsedTime = perf.getElapsedTime();
+
+    ofstream file;
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Output" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+
+    //    Get Maximum Iterations to Sediments
+    perf.begin();
+
+    transformation = "getmaximumiterationstosediments";
+    p.SetDescription("libMeshSedimentation::" + transformation);
+    p.SetMethod("COMPUTATION");
+    p.IdentifyStartTime();
+
+    Task t2(simulationID);
+    t2.addPerformanceMetric(p);
+    t2.setDataflow(dataflow);
+    t2.setTransformation(transformation);
+    t2.setWorkspace(directory);
+    t2.setStatus("RUNNING");
+    t2.addDtDependency("getmaximumiterationstofluid");
+
+    sprintf(memalloc, "%d", simulationID);
+    t2.addIdDependency(memalloc);
+
+#ifdef DATABASE
+    sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
+    t2.writeJSON(memalloc);
+#endif
+#ifdef BACKUP
+    sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
+    t2.writeJSON(memalloc);
+#endif
+
+    perf.end();
+    elapsedTime = perf.getElapsedTime();
+
+    file.open("prov/log/" + transformation + ".prov", ios_base::app);
+    file << "PROV:" + transformation + ":Input" << endl;
+    sprintf(memalloc, "%.5f", elapsedTime);
+    file << space << memalloc << endl;
+    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
+    file.close();
+}
+
+void Provenance::outputGetMaximumIterationsToSediments(Real dt, Real tmax,
+        unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance,
+        int max_linear_iters, string xdmf) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Output Get Maximum Iterations to Sediments" << endl;
+#endif
+
+    Performance perf;
+    perf.begin();
+
+    char memalloc[1000];
+    string transformation = "getmaximumiterationstosediments";
+    Task t(simulationID);
+    t.setDataflow(dataflow);
+    t.setTransformation(transformation);
+    t.setWorkspace(directory);
+    t.setStatus("FINISHED");
+    t.addDtDependency("getmaximumiterationstofluid");
+
+    sprintf(memalloc, "%d", simulationID);
+    t.addIdDependency(memalloc);
+
+    sprintf(memalloc, "%d;%.7f;%.7f;%d;%d;%.9f;%d;%s",
+            simulationID, dt, tmax, n_time_steps, n_nonlinear_steps,
+            nonlinear_tolerance, max_linear_iters, xdmf.c_str());
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -673,7 +769,7 @@ void Provenance::inputInitDataExtraction(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("getmaximumiterations");
+    t.addDtDependency("getmaximumiterationstosediments");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
@@ -730,7 +826,7 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
     t.setTransformation(transformationTag);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("getmaximumiterations");
+    t.addDtDependency("getmaximumiterationstosediments");
 
     char memalloc[4096];
     sprintf(memalloc, "%d", simulationID);
@@ -859,7 +955,7 @@ void Provenance::inputInitVisualization(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("getmaximumiterations");
+    t.addDtDependency("getmaximumiterationstosediments");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
@@ -906,7 +1002,7 @@ void Provenance::outputInitVisualization(int lineID, int timeStep) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("getmaximumiterations");
+    t.addDtDependency("getmaximumiterationstosediments");
 
     char memalloc[4096];
     sprintf(memalloc, "%d", simulationID);
@@ -1075,7 +1171,7 @@ void Provenance::inputSolverSimulationFluid() {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("getmaximumiterations");
+    t.addDtDependency("getmaximumiterationstosediments");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
@@ -1119,7 +1215,7 @@ void Provenance::outputSolverSimulationFluid(int time_step, Real time,
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("getmaximumiterations");
+    t.addDtDependency("getmaximumiterationstosediments");
 
     char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", simulationID);
@@ -1439,7 +1535,7 @@ void Provenance::outputMeshWriter(int time_step, string xdmf) {
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
-    
+
     addMeshDependencyToList();
 }
 

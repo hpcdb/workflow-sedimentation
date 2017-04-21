@@ -45,7 +45,9 @@ public:
     
     void outputIOConfig(string dpath, string rname, unsigned int write_interval, unsigned int catalyst_interval, bool write_restart);
 
-    void outputGetMaximumIterations(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, int max_r_steps, unsigned int write_interval, string xdmf);
+    void outputGetMaximumIterationsToFluid(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, string xdmf);
+    
+    void outputGetMaximumIterationsToSediments(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, string xdmf);
 
     void inputInitDataExtraction(int lineID);
     void outputInitDataExtraction(int lineID, string xdmf, int dimension);
