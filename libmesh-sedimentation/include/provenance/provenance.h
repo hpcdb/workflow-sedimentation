@@ -76,10 +76,6 @@ public:
 
     void finishDataIngestor();
 
-    void storeCatalystCost(double elapsedTime);
-    void storeRDIComponentCost(double elapsedTime);
-    void storeSolverCost(double elapsedTime);
-
     void createIndexDirectory();
 
     void incrementTaskID() {

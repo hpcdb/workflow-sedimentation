@@ -9,6 +9,12 @@
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation/sedimentation.C</file>
+            <file>file:/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation/include/provenance/provenance.h</file>
+            <file>file:/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation/contrib/dfanalyzer/indexer.h</file>
+            <file>file:/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation/src/provenance/provenance.C</file>
+            <file>file:/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation/contrib/dfanalyzer/extractor.h</file>
+        </group>
     </open-files>
 </project-private>

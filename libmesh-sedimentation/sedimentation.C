@@ -572,7 +572,6 @@ int main(int argc, char** argv) {
 
     perf_log.stop_event("GetMaximumIterations", "Provenance");
     // prov.outputFlowSolverConfig();
-    Performance performance;
 #endif
 
 #ifdef USE_CATALYST    
@@ -582,7 +581,6 @@ int main(int argc, char** argv) {
         perf_log.start_event("InitDataExtraction", "Provenance");
         provenance.inputInitDataExtraction(-1);
         perf_log.stop_event("InitDataExtraction", "Provenance");
-        performance.begin();
 #endif
         perf_log.start_event("Init", "Catalyst");
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
@@ -591,8 +589,6 @@ int main(int argc, char** argv) {
         FEAdaptor::CoProcess(equation_systems, 0.0, t_step, write_interval, false, false);
         perf_log.stop_event("CoProcess", "Catalyst");
 #ifdef PROVENANCE
-        performance.end();
-        provenance.storeCatalystCost(performance.getElapsedTime());
         extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
         provenance.incrementIndexerID();
         perf_log.start_event("InitDataExtraction", "Provenance");
@@ -614,8 +610,6 @@ int main(int argc, char** argv) {
                 provenance.inputInitDataExtraction(lineID);
                 perf_log.stop_event("InitDataExtraction", "Provenance");
             }
-
-            performance.begin();
 #endif
             if (lineID == 0) {
                 perf_log.start_event("Init", "Catalyst");
@@ -626,13 +620,10 @@ int main(int argc, char** argv) {
                 perf_log.stop_event("CoProcess", "Catalyst");
             }
 #ifdef PROVENANCE
-            performance.end();
-
             if (!extractionScript.empty()) {
                 extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
             }
 
-            provenance.storeCatalystCost(performance.getElapsedTime());
             provenance.incrementIndexerID();
 
             if (!visualizationScript.empty()) {
@@ -1276,14 +1267,11 @@ int main(int argc, char** argv) {
                 perf_log.start_event("DataExtraction", "Provenance");
                 provenance.inputDataExtraction(-1);
                 perf_log.stop_event("DataExtraction", "Provenance");
-                performance.begin();
 #endif
                 perf_log.start_event("CoProcess", "Catalyst");
                 FEAdaptor::CoProcess(equation_systems, transport_system.time, t_step, write_interval, false, false);
                 perf_log.stop_event("CoProcess", "Catalyst");
 #ifdef PROVENANCE
-                performance.end();
-                provenance.storeCatalystCost(performance.getElapsedTime());
                 extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
                 provenance.incrementIndexerID();
 
@@ -1306,8 +1294,6 @@ int main(int argc, char** argv) {
                         provenance.inputDataExtraction(lineID);
                         perf_log.stop_event("DataExtraction", "Provenance");
                     }
-
-                    performance.begin();
 #endif
                     if (lineID == 0) {
                         perf_log.start_event("CoProcess", "Catalyst");
@@ -1315,13 +1301,10 @@ int main(int argc, char** argv) {
                         perf_log.stop_event("CoProcess", "Catalyst");
                     }
 #ifdef PROVENANCE
-                    performance.end();
-
                     if (!extractionScript.empty()) {
                         extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
                     }
 
-                    provenance.storeCatalystCost(performance.getElapsedTime());
                     provenance.incrementIndexerID();
 
                     if (!visualizationScript.empty()) {
@@ -1395,15 +1378,11 @@ int main(int argc, char** argv) {
             perf_log.start_event("DataExtraction", "Provenance");
             provenance.inputDataExtraction(-1);
             perf_log.stop_event("DataExtraction", "Provenance");
-            performance.begin();
 #endif
             perf_log.start_event("CoProcess", "Catalyst");
             FEAdaptor::CoProcess(equation_systems, transport_system.time, t_step, write_interval, true, false);
             perf_log.stop_event("CoProcess", "Catalyst");
 #ifdef PROVENANCE
-            performance.end();
-            provenance.storeCatalystCost(performance.getElapsedTime());
-
             extractor::invoke2DRawDataExtractor(libMesh::global_processor_id(), t_step);
             provenance.incrementIndexerID();
 
@@ -1427,8 +1406,6 @@ int main(int argc, char** argv) {
                     provenance.inputDataExtraction(lineID);
                     perf_log.stop_event("DataExtraction", "Provenance");
                 }
-
-                performance.begin();
 #endif
                 if (lineID == 0) {
                     perf_log.start_event("CoProcess", "Catalyst");
@@ -1436,13 +1413,10 @@ int main(int argc, char** argv) {
                     perf_log.stop_event("CoProcess", "Catalyst");
                 }
 #ifdef PROVENANCE
-                performance.end();
-
                 if (!extractionScript.empty()) {
                     extractor::invoke3DRawDataExtractor(libMesh::global_processor_id(), t_step, lineID);
                 }
 
-                provenance.storeCatalystCost(performance.getElapsedTime());
                 provenance.incrementIndexerID();
 
                 if (!visualizationScript.empty()) {
@@ -1479,7 +1453,6 @@ int main(int argc, char** argv) {
     provenance.finishDataIngestor();
 
     solverPerformance.end();
-    provenance.storeSolverCost(solverPerformance.getElapsedTime());
 #endif
 
     // Write time-step control performance

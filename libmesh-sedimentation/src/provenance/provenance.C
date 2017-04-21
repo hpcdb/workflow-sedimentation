@@ -844,9 +844,6 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
-    Performance rdiPerf;
-    rdiPerf.begin();
-
     string extension = "data";
     if (rawDataAccess.compare("INDEXING") == 0) {
         extension = "index";
@@ -874,9 +871,6 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
 
         idx.index(directory, rawDataFile, indexerID);
     }
-
-    rdiPerf.end();
-    storeRDIComponentCost(rdiPerf.getElapsedTime());
 
     perf.begin();
 
@@ -1646,9 +1640,6 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
-    Performance rdiPerf;
-    rdiPerf.begin();
-
     string extension = "data";
     if (rawDataAccess.compare("INDEXING") == 0) {
         extension = "index";
@@ -1674,9 +1665,6 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
         }
         idx.index(directory, rawDataFile, indexerID);
     }
-
-    rdiPerf.end();
-    storeRDIComponentCost(rdiPerf.getElapsedTime());
 
     perf.begin();
 
@@ -1799,42 +1787,6 @@ void Provenance::meshAggregator(string xdmf, int n_processors) {
     sprintf(memalloc, "%.5f", elapsedTime);
     file << space << memalloc << endl;
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-}
-
-void Provenance::storeCatalystCost(double elapsedTime) {
-    if (processor_id != 0) return;
-    ofstream file;
-    file.open("prov/paraview/catalyst_" + to_string(taskID) + "_" + to_string(subTaskID) + ".prov", ios_base::app);
-    file << "Paraview:Catalyst:Pipeline" << endl;
-    char buffer[256];
-    sprintf(buffer, "%.5f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
-
-    sprintf(buffer, "Catalyst Cost: %.5f", elapsedTime);
-    cout << buffer << endl;
-}
-
-void Provenance::storeRDIComponentCost(double elapsedTime) {
-    if (processor_id != 0) return;
-    ofstream file;
-    file.open("prov/rdi/indexing_" + to_string(taskID) + "_" + to_string(subTaskID) + ".prov", ios_base::app);
-    file << "RDIComponent:DataExtraction:Process" << endl;
-    char buffer[jsonArraySize];
-    sprintf(buffer, "%.5f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
-    file.close();
-}
-
-void Provenance::storeSolverCost(double elapsedTime) {
-    if (processor_id != 0) return;
-    ofstream file;
-    file.open("prov/solver/time.prov", ios_base::app);
-    file << "Solver:Time:Process" << endl;
-    char buffer[jsonArraySize];
-    sprintf(buffer, "%.5f", elapsedTime);
-    file << space << "elapsed-time: " << buffer << " seconds." << endl;
     file.close();
 }
 
