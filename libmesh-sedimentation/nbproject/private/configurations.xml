@@ -10,7 +10,6 @@
           <in>extractor.h</in>
           <in>file.h</in>
           <in>indexer.h</in>
-          <in>performance.h</in>
           <in>performance_metric.C</in>
           <in>performance_metric.h</in>
           <in>provenance_object.C</in>

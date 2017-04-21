@@ -77,9 +77,6 @@ void Provenance::inputInputMesh() {
 #ifdef VERBOSE
     cout << "Input Input Mesh" << endl;
 #endif    
-    Performance perf;
-    perf.begin();
-
     string transformation = "inputmesh";
     PerformanceMetric p;
     p.SetDescription("libMeshSedimentation::" + transformation);
@@ -106,17 +103,6 @@ void Provenance::inputInputMesh() {
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl) {
@@ -124,10 +110,6 @@ void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl)
 #ifdef VERBOSE
     cout << "Output Input Mesh" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
-
     string transformation = "inputmesh";
     Task t(simulationID);
     t.setDataflow(dataflow);
@@ -136,7 +118,7 @@ void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl)
     t.setStatus("FINISHED");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d;%d;%s/%s;%s", 
+    sprintf(memalloc, "%d;%d;%s/%s;%s",
             simulationID, dim, GetCurrentWorkingDir().c_str(), mesh_file.c_str(), restartControl ? "true" : "false");
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
@@ -156,20 +138,7 @@ void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl)
     t.writeJSON(memalloc);
 #endif
 
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-
     //    AMR Config
-    perf.begin();
-
     transformation = "amrconfig";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -194,16 +163,6 @@ void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl)
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels, bool first_step_refinement,
@@ -212,10 +171,7 @@ void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double ma
 #ifdef VERBOSE
     cout << "Output AMR Config" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
-
+    
     string transformation = "amrconfig";
     Task t(simulationID);
     t.setDataflow(dataflow);
@@ -251,20 +207,7 @@ void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double ma
     t.writeJSON(memalloc);
 #endif
 
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-
     //    Create Equation Systems
-    perf.begin();
-
     transformation = "createequationsystems";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -289,16 +232,6 @@ void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double ma
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
@@ -309,10 +242,7 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
     cout << "Output Create Equation Systems" << endl;
 #endif
 
-    Performance perf;
     //        Create Equation Systems
-    perf.begin();
-
     char memalloc[jsonArraySize];
     string transformation = "createequationsystems";
     Task t(simulationID);
@@ -345,20 +275,7 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
     t.writeJSON(memalloc);
 #endif
 
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-
     //    Time Step Control Config
-    perf.begin();
-
     transformation = "timestepcontrolconfig";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -383,16 +300,6 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_min, double dt_max, double tol_u, double tol_s,
@@ -403,10 +310,7 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
 #ifdef VERBOSE
     cout << "Output Time Step Control Config" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
-
+    
     char memalloc[jsonArraySize];
     string transformation = "timestepcontrolconfig";
     Task t(simulationID);
@@ -443,20 +347,7 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
     t.writeJSON(memalloc);
 #endif
 
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-
     //    IO Config
-    perf.begin();
-
     transformation = "ioconfig";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -481,16 +372,6 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_interval, unsigned int catalyst_interval, bool write_restart) {
@@ -498,9 +379,6 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
 #ifdef VERBOSE
     cout << "Output IO Config" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     char memalloc[jsonArraySize];
     string transformation = "ioconfig";
@@ -535,20 +413,7 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
     t.writeJSON(memalloc);
 #endif
 
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-
     //    Get Maximum Iterations
-    perf.begin();
-
     transformation = "getmaximumiterationstoflow";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -573,16 +438,6 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputGetMaximumIterationsToFlow(Real dt, Real tmax,
@@ -592,9 +447,6 @@ void Provenance::outputGetMaximumIterationsToFlow(Real dt, Real tmax,
 #ifdef VERBOSE
     cout << "Output Get Maximum Iterations to Flow" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     char memalloc[1000];
     string transformation = "getmaximumiterationstoflow";
@@ -632,20 +484,7 @@ void Provenance::outputGetMaximumIterationsToFlow(Real dt, Real tmax,
     t.writeJSON(memalloc);
 #endif
 
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-
     //    Get Maximum Iterations to Transport
-    perf.begin();
-
     transformation = "getmaximumiterationstotransport";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
@@ -670,16 +509,6 @@ void Provenance::outputGetMaximumIterationsToFlow(Real dt, Real tmax,
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t2.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputGetMaximumIterationsToTransport(Real dt, Real tmax,
@@ -689,9 +518,6 @@ void Provenance::outputGetMaximumIterationsToTransport(Real dt, Real tmax,
 #ifdef VERBOSE
     cout << "Output Get Maximum Iterations to Transport" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     char memalloc[1000];
     string transformation = "getmaximumiterationstotransport";
@@ -728,17 +554,6 @@ void Provenance::outputGetMaximumIterationsToTransport(Real dt, Real tmax,
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::inputInitDataExtraction(int lineID) {
@@ -753,9 +568,6 @@ void Provenance::inputInitDataExtraction(int lineID) {
     } else {
         sprintf(transformation, "iline%dextraction", lineID);
     }
-
-    Performance perf;
-    perf.begin();
 
     PerformanceMetric p;
     char memalloc[jsonArraySize];
@@ -783,17 +595,6 @@ void Provenance::inputInitDataExtraction(int lineID) {
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation, simulationID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" << transformation << ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension) {
@@ -819,9 +620,6 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
         sprintf(rawDataFile, "ext_line_%d_0.csv", lineID);
     }
 
-    Performance perf;
-    perf.begin();
-
     Task t(simulationID);
     t.setDataflow(dataflow);
     t.setTransformation(transformationTag);
@@ -832,17 +630,6 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
     char memalloc[4096];
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformationTag) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformationTag) + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 
     string extension = "data";
     if (rawDataAccess.compare("INDEXING") == 0) {
@@ -871,8 +658,6 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
 
         idx.index(directory, rawDataFile, indexerID);
     }
-
-    perf.begin();
 
     char extractedFileName[jsonArraySize];
     if (rawDataAccess.compare("INDEXING") == 0) {
@@ -913,16 +698,6 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformationTag, simulationID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + string(transformationTag) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformationTag) + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::inputInitVisualization(int lineID) {
@@ -933,10 +708,7 @@ void Provenance::inputInitVisualization(int lineID) {
 
     char transformation[arraySize];
     sprintf(transformation, "ivisualization");
-
-    Performance perf;
-    perf.begin();
-
+    
     PerformanceMetric p;
     char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation, simulationID);
@@ -963,17 +735,6 @@ void Provenance::inputInitVisualization(int lineID) {
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation, simulationID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformation) + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputInitVisualization(int lineID, int timeStep) {
@@ -988,9 +749,6 @@ void Provenance::outputInitVisualization(int lineID, int timeStep) {
     sprintf(transformation, "ivisualization");
     sprintf(dataSet, "oivisualization");
     sprintf(png, "image_%d.png", timeStep);
-
-    Performance perf;
-    perf.begin();
 
     Task t(simulationID);
     t.setDataflow(dataflow);
@@ -1020,17 +778,6 @@ void Provenance::outputInitVisualization(int lineID, int timeStep) {
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation, simulationID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformation) + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::inputVisualization(int lineID) {
@@ -1041,9 +788,6 @@ void Provenance::inputVisualization(int lineID) {
 
     char transformation[arraySize];
     sprintf(transformation, "visualization");
-
-    Performance perf;
-    perf.begin();
 
     PerformanceMetric p;
     char memalloc[jsonArraySize];
@@ -1071,17 +815,6 @@ void Provenance::inputVisualization(int lineID) {
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation, taskID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformation) + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputVisualization(int lineID, int timeStep) {
@@ -1096,9 +829,6 @@ void Provenance::outputVisualization(int lineID, int timeStep) {
     sprintf(transformation, "visualization");
     sprintf(dataSet, "ovisualization");
     sprintf(png, "image_%d.png", timeStep);
-
-    Performance perf;
-    perf.begin();
 
     Task t(taskID);
     t.setDataflow(dataflow);
@@ -1127,18 +857,7 @@ void Provenance::outputVisualization(int lineID, int timeStep) {
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation, taskID);
     t.writeJSON(memalloc);
-#endif        
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformation) + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
+#endif
 }
 
 void Provenance::inputSolverSimulationFlow() {
@@ -1146,9 +865,6 @@ void Provenance::inputSolverSimulationFlow() {
 #ifdef VERBOSE
     cout << "Input Solver Simulation Flow" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     string transformation = "solversimulationflow";
     PerformanceMetric p;
@@ -1179,17 +895,6 @@ void Provenance::inputSolverSimulationFlow() {
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputSolverSimulationFlow(int time_step, Real time,
@@ -1199,9 +904,6 @@ void Provenance::outputSolverSimulationFlow(int time_step, Real time,
 #ifdef VERBOSE
     cout << "Output Solver Simulation Flow" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     string transformation = "solversimulationflow";
     Task t(taskID);
@@ -1239,17 +941,6 @@ void Provenance::outputSolverSimulationFlow(int time_step, Real time,
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::inputSolverSimulationTransport() {
@@ -1257,9 +948,7 @@ void Provenance::inputSolverSimulationTransport() {
 #ifdef VERBOSE
     cout << "Input Solver Simulation Transport" << endl;
 #endif
-    Performance perf;
-    perf.begin();
-
+    
     string transformation = "solversimulationtransport";
     PerformanceMetric p;
     char memalloc[jsonArraySize];
@@ -1289,17 +978,6 @@ void Provenance::inputSolverSimulationTransport() {
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsTransport);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputSolverSimulationTransport(int time_step,
@@ -1309,9 +987,6 @@ void Provenance::outputSolverSimulationTransport(int time_step,
 #ifdef VERBOSE
     cout << "Output Solver Simulation Transport" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     string transformation = "solversimulationtransport";
     Task t(taskID);
@@ -1349,17 +1024,6 @@ void Provenance::outputSolverSimulationTransport(int time_step,
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsTransport);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputMeshRefinement(bool first_step_refinement,
@@ -1368,8 +1032,6 @@ void Provenance::outputMeshRefinement(bool first_step_refinement,
 #ifdef VERBOSE
     cout << "Output Mesh Refinement" << endl;
 #endif
-    Performance perf;
-    perf.begin();
 
     string transformation = "meshrefinement";
     PerformanceMetric p;
@@ -1408,17 +1070,6 @@ void Provenance::outputMeshRefinement(bool first_step_refinement,
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsMeshRefinements);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::inputMeshWriter() {
@@ -1426,9 +1077,6 @@ void Provenance::inputMeshWriter() {
 #ifdef VERBOSE
     cout << "Input Mesh Writer" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     string transformation = "meshwriter";
     PerformanceMetric p;
@@ -1459,17 +1107,6 @@ void Provenance::inputMeshWriter() {
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputMeshWriter(int time_step, string xdmf) {
@@ -1477,9 +1114,6 @@ void Provenance::outputMeshWriter(int time_step, string xdmf) {
 #ifdef VERBOSE
     cout << "Output Mesh Writer" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     string transformation = "meshwriter";
     Task t(taskID);
@@ -1520,17 +1154,6 @@ void Provenance::outputMeshWriter(int time_step, string xdmf) {
     t.writeJSON(memalloc);
 #endif
 
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
-
     addMeshDependencyToList();
 }
 
@@ -1546,9 +1169,6 @@ void Provenance::inputDataExtraction(int lineID) {
     } else {
         sprintf(transformation, "line%dextraction", lineID);
     }
-
-    Performance perf;
-    perf.begin();
 
     PerformanceMetric p;
     char memalloc[jsonArraySize];
@@ -1578,17 +1198,6 @@ void Provenance::inputDataExtraction(int lineID) {
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation, simulationID, subTaskID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformation) + ":Input" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::outputDataExtraction(int lineID, int timeStep,
@@ -1614,9 +1223,6 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
         sprintf(rawDataFile, "ext_line_%d_%d.csv", lineID, timeStep);
     }
 
-    Performance perf;
-    perf.begin();
-
     Task t(taskID);
     t.setSubID(subTaskID);
     t.setDataflow(dataflow);
@@ -1628,17 +1234,6 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
     char memalloc[4096];
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformation) + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 
     string extension = "data";
     if (rawDataAccess.compare("INDEXING") == 0) {
@@ -1665,8 +1260,6 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
         }
         idx.index(directory, rawDataFile, indexerID);
     }
-
-    perf.begin();
 
     char extractedFileName[jsonArraySize];
     if (rawDataAccess.compare("INDEXING") == 0) {
@@ -1708,16 +1301,6 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation, simulationID, subTaskID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    elapsedTime = perf.getElapsedTime();
-
-    file.open("prov/log/" + string(transformation) + ".prov", ios_base::app);
-    file << "PROV:" + string(transformation) + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::meshAggregator(string xdmf, int n_processors) {
@@ -1725,9 +1308,6 @@ void Provenance::meshAggregator(string xdmf, int n_processors) {
 #ifdef VERBOSE
     cout << "Output Mesh Writer" << endl;
 #endif
-
-    Performance perf;
-    perf.begin();
 
     PerformanceMetric ptemp;
     ptemp.IdentifyStartTime();
@@ -1777,17 +1357,6 @@ void Provenance::meshAggregator(string xdmf, int n_processors) {
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
 #endif
-
-    perf.end();
-    double elapsedTime = perf.getElapsedTime();
-
-    ofstream file;
-    file.open("prov/log/" + transformation + ".prov", ios_base::app);
-    file << "PROV:" + transformation + ":Output" << endl;
-    sprintf(memalloc, "%.5f", elapsedTime);
-    file << space << memalloc << endl;
-    file << space << "elapsed-time: " << memalloc << " seconds." << endl;
-    file.close();
 }
 
 void Provenance::finishDataIngestor() {
