@@ -26,7 +26,7 @@ namespace FEAdaptor
 
   void Finalize();
 
-  void CoProcess(int numScripts, string extractionScript, string visualizationScript, EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep, bool using_amr);
+  void CoProcess(EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep, bool using_amr);
   
 }
 

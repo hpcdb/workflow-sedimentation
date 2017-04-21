@@ -279,12 +279,12 @@ namespace FEAdaptor
         Processor->RemoveAllPipelines();
       }
 
-      if(numScripts > 0){
+      if(numScripts > 0 && !extractionScript.empty()){
         extraction->Initialize(extractionScript.c_str());
         Processor->AddPipeline(extraction.GetPointer());
       }
 
-      if(numScripts > 1){
+      if(numScripts > 0 && !visualizationScript.empty()){
         visualization->Initialize(visualizationScript.c_str());
         Processor->AddPipeline(visualization.GetPointer());
       }
@@ -305,15 +305,8 @@ namespace FEAdaptor
       }
   }
 
-  void CoProcess(int numScripts, string extractionScript, string visualizationScript, EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep = false, bool using_amr = false)
+  void CoProcess(EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep = false, bool using_amr = false)
   {
-    //std::cout << "COPROCESSING BEGIN" << std::endl;
-    // if(numScripts > 0){ 
-    //   Processor->RemovePipeline(extraction.GetPointer());
-    //   extraction->Initialize(extractionScript.c_str());
-    //   Processor->AddPipeline(extraction.GetPointer());
-    // }
-
     vtkNew<vtkCPDataDescription> dataDescription;
     dataDescription->AddInput("input");
     dataDescription->SetTimeData(time, timeStep);
