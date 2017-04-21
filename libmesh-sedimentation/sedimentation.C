@@ -115,6 +115,9 @@ int main(int argc, char** argv) {
     // Initialize libMesh.
     LibMeshInit init(argc, argv);
 
+    //    Restart
+    bool restartControl = is_file_exist("restart.run");
+
     PerfLog perf_log("Sedimentation Solver");
 
     // This example requires Adaptive Mesh Refinement support - although
@@ -183,7 +186,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("InputMesh", "Provenance");
-    provenance.outputInputMesh(dim, mesh_file);
+    provenance.outputInputMesh(dim, mesh_file, restartControl);
     perf_log.stop_event("InputMesh", "Provenance");
 #endif
 
@@ -368,7 +371,7 @@ int main(int argc, char** argv) {
     xdmf_writer.set_file_name(rname);
     xdmf_writer.set_dir_path(dpath);
 
-    if (!is_file_exist("restart.run")) {
+    if (!restartControl) {
 
         // Starting simulation from the begining...
         std::cout << "Opening file: " << mesh_file << std::endl;
@@ -564,8 +567,8 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("GetMaximumIterations", "Provenance");
-    provenance.outputGetMaximumIterationsToFluid(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, current_files[1]);
-    provenance.outputGetMaximumIterationsToSediments(dt, tmax, n_time_steps, n_transport_nonlinear_iterations_total, transport_nonlinear_tolerance, n_transport_linear_iterations_total, current_files[1]);
+    provenance.outputGetMaximumIterationsToFlow(dt, tmax, n_time_steps, n_flow_nonlinear_iterations_total, flow_nonlinear_tolerance, n_flow_linear_iterations_total, current_files[1]);
+    provenance.outputGetMaximumIterationsToTransport(dt, tmax, n_time_steps, n_transport_nonlinear_iterations_total, transport_nonlinear_tolerance, n_transport_linear_iterations_total, current_files[1]);
 
     perf_log.stop_event("GetMaximumIterations", "Provenance");
     // prov.outputFlowSolverConfig();
@@ -653,8 +656,8 @@ int main(int argc, char** argv) {
 #ifdef PROVENANCE
     provenance.resetTaskID();
     provenance.resetSubTaskID();
-    provenance.resetIterationsFluid();
-    provenance.resetIterationsSediments();
+    provenance.resetIterationsFlow();
+    provenance.resetIterationsTransport();
     provenance.resetIterationsMeshRefinement();
     provenance.resetMeshDependencies();
 #endif
@@ -793,15 +796,15 @@ int main(int argc, char** argv) {
             UniquePtr<NumericVector<Number> >
                     flow_last_nonlinear_soln(flow_system.solution->clone());
 
-            // Fluid
+            // Flow
             // FLOW NONLINEAR LOOP
             for (flow_nli_counter = 0; flow_nli_counter < flow_n_nonlinear_steps; ++flow_nli_counter) {
 
 #ifdef PROVENANCE
-                provenance.incrementIterationsFluid();
-                perf_log.start_event("SolverSimulationFluid", "Provenance");
-                provenance.inputSolverSimulationFluid();
-                perf_log.stop_event("SolverSimulationFluid", "Provenance");
+                provenance.incrementIterationsFlow();
+                perf_log.start_event("SolverSimulationFlow", "Provenance");
+                provenance.inputSolverSimulationFlow();
+                perf_log.stop_event("SolverSimulationFlow", "Provenance");
 #endif
                 // Update the nonlinear solution.
                 flow_last_nonlinear_soln->zero();
@@ -891,9 +894,9 @@ int main(int argc, char** argv) {
                     diverged = true;
 
 #ifdef PROVENANCE
-                perf_log.start_event("SolverSimulationFluid", "Provenance");
-                provenance.outputSolverSimulationFluid(t_step, time, r, flow_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
-                perf_log.stop_event("SolverSimulationFluid", "Provenance");
+                perf_log.start_event("SolverSimulationFlow", "Provenance");
+                provenance.outputSolverSimulationFlow(t_step, time, r, flow_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+                perf_log.stop_event("SolverSimulationFlow", "Provenance");
 #endif  
 
                 // Otherwise, decrease the linear system tolerance.  For the inexact Newton
@@ -944,15 +947,15 @@ int main(int argc, char** argv) {
             // determine if we can exit the nonlinear loop.
             //UniquePtr<NumericVector<Number> > sed_last_nonlinear_soln(transport_system.solution->clone());
 
-            // Sediments
+            // Transport
             // FLOW NON-LINEAR LOOP
             for (transport_nli_counter = 0; transport_nli_counter < transport_n_nonlinear_steps; ++transport_nli_counter) {
 
 #ifdef PROVENANCE
-                provenance.incrementIterationsSediments();
-                perf_log.start_event("SolverSimulationSediments", "Provenance");
-                provenance.inputSolverSimulationSediments();
-                perf_log.stop_event("SolverSimulationSediments", "Provenance");
+                provenance.incrementIterationsTransport();
+                perf_log.start_event("SolverSimulationTransport", "Provenance");
+                provenance.inputSolverSimulationTransport();
+                perf_log.stop_event("SolverSimulationTransport", "Provenance");
 #endif
                 // Update the nonlinear solution.
                 transport_last_nonlinear_soln->zero();
@@ -1042,9 +1045,9 @@ int main(int argc, char** argv) {
                     diverged = true;
 
 #ifdef PROVENANCE
-                perf_log.start_event("SolverSimulationSediments", "Provenance");
-                provenance.outputSolverSimulationSediments(t_step, time, r, transport_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
-                perf_log.stop_event("SolverSimulationSediments", "Provenance");
+                perf_log.start_event("SolverSimulationTransport", "Provenance");
+                provenance.outputSolverSimulationTransport(t_step, time, r, transport_nli_counter, n_linear_iterations, final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+                perf_log.stop_event("SolverSimulationTransport", "Provenance");
 #endif
 
                 // Otherwise, decrease the linear system tolerance.  For the inexact Newton

@@ -31,7 +31,7 @@ public:
     Provenance(int processorID);
 
     void inputInputMesh();
-    void outputInputMesh(int dim, string mesh_file);
+    void outputInputMesh(int dim, string mesh_file, bool restarControl);
     
     void outputAMRConfig(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels, bool first_step_refinement,
             bool amrc_flow_transp, int ref_interval, int max_r_steps);
@@ -45,9 +45,9 @@ public:
     
     void outputIOConfig(string dpath, string rname, unsigned int write_interval, unsigned int catalyst_interval, bool write_restart);
 
-    void outputGetMaximumIterationsToFluid(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, string xdmf);
+    void outputGetMaximumIterationsToFlow(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, string xdmf);
     
-    void outputGetMaximumIterationsToSediments(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, string xdmf);
+    void outputGetMaximumIterationsToTransport(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, string xdmf);
 
     void inputInitDataExtraction(int lineID);
     void outputInitDataExtraction(int lineID, string xdmf, int dimension);
@@ -55,11 +55,11 @@ public:
     void inputInitVisualization(int lineID);
     void outputInitVisualization(int lineID, int timeStep);
 
-    void inputSolverSimulationFluid();
-    void outputSolverSimulationFluid(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void inputSolverSimulationFlow();
+    void outputSolverSimulationFlow(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
 
-    void inputSolverSimulationSediments();
-    void outputSolverSimulationSediments(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void inputSolverSimulationTransport();
+    void outputSolverSimulationTransport(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
 
     void outputMeshRefinement(bool first_step_refinement, int time_step, int before_n_active_elem, int after_n_active_elem);
 
@@ -92,14 +92,14 @@ public:
         subTaskID++;
     }
 
-    void incrementIterationsFluid() {
+    void incrementIterationsFlow() {
         if (processor_id != 0) return;
-        numberIterationsFluid++;
+        numberIterationsFlow++;
     }
 
-    void incrementIterationsSediments() {
+    void incrementIterationsTransport() {
         if (processor_id != 0) return;
-        numberIterationsSediments++;
+        numberIterationsTransport++;
     }
 
     void incrementIterationsMeshRefinements() {
@@ -117,14 +117,14 @@ public:
         this->subTaskID = id;
     }
 
-    void setNumberIterationsFluid(int value) {
+    void setNumberIterationsFlow(int value) {
         if (processor_id != 0) return;
-        this->numberIterationsFluid = value;
+        this->numberIterationsFlow = value;
     }
 
-    void setNumberIterationsSediments(int value) {
+    void setNumberIterationsTransport(int value) {
         if (processor_id != 0) return;
-        this->numberIterationsSediments = value;
+        this->numberIterationsTransport = value;
     }
 
     void setNumberIterationsMeshRefinements(int value) {
@@ -147,14 +147,14 @@ public:
         subTaskID = 0;
     }
 
-    void resetIterationsFluid() {
+    void resetIterationsFlow() {
         if (processor_id != 0) return;
-        numberIterationsFluid = 0;
+        numberIterationsFlow = 0;
     }
 
-    void resetIterationsSediments() {
+    void resetIterationsTransport() {
         if (processor_id != 0) return;
-        numberIterationsSediments = 0;
+        numberIterationsTransport = 0;
     }
 
     void resetIterationsMeshRefinement() {
@@ -194,8 +194,8 @@ private:
     int indexerID = 0;
     int taskID = 0;
     int subTaskID = 0;
-    int numberIterationsFluid = 0;
-    int numberIterationsSediments = 0;
+    int numberIterationsFlow = 0;
+    int numberIterationsTransport = 0;
     int numberIterationsMeshRefinements = 0;
     vector<int> meshDependencies;
 

@@ -119,7 +119,7 @@ void Provenance::inputInputMesh() {
     file.close();
 }
 
-void Provenance::outputInputMesh(int dim, string mesh_file) {
+void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Input Mesh" << endl;
@@ -136,7 +136,8 @@ void Provenance::outputInputMesh(int dim, string mesh_file) {
     t.setStatus("FINISHED");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d;%d;%s/%s", simulationID, dim, GetCurrentWorkingDir().c_str(), mesh_file.c_str());
+    sprintf(memalloc, "%d;%d;%s/%s;%s", 
+            simulationID, dim, GetCurrentWorkingDir().c_str(), mesh_file.c_str(), restartControl ? "true" : "false");
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
 
@@ -548,7 +549,7 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
     //    Get Maximum Iterations
     perf.begin();
 
-    transformation = "getmaximumiterationstofluid";
+    transformation = "getmaximumiterationstoflow";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
@@ -584,19 +585,19 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
     file.close();
 }
 
-void Provenance::outputGetMaximumIterationsToFluid(Real dt, Real tmax,
+void Provenance::outputGetMaximumIterationsToFlow(Real dt, Real tmax,
         unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance,
         int max_linear_iters, string xdmf) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Output Get Maximum Iterations to Fluid" << endl;
+    cout << "Output Get Maximum Iterations to Flow" << endl;
 #endif
 
     Performance perf;
     perf.begin();
 
     char memalloc[1000];
-    string transformation = "getmaximumiterationstofluid";
+    string transformation = "getmaximumiterationstoflow";
     Task t(simulationID);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
@@ -642,10 +643,10 @@ void Provenance::outputGetMaximumIterationsToFluid(Real dt, Real tmax,
     file << space << "elapsed-time: " << memalloc << " seconds." << endl;
     file.close();
 
-    //    Get Maximum Iterations to Sediments
+    //    Get Maximum Iterations to Transport
     perf.begin();
 
-    transformation = "getmaximumiterationstosediments";
+    transformation = "getmaximumiterationstotransport";
     p.SetDescription("libMeshSedimentation::" + transformation);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
@@ -656,7 +657,7 @@ void Provenance::outputGetMaximumIterationsToFluid(Real dt, Real tmax,
     t2.setTransformation(transformation);
     t2.setWorkspace(directory);
     t2.setStatus("RUNNING");
-    t2.addDtDependency("getmaximumiterationstofluid");
+    t2.addDtDependency("getmaximumiterationstoflow");
 
     sprintf(memalloc, "%d", simulationID);
     t2.addIdDependency(memalloc);
@@ -681,25 +682,25 @@ void Provenance::outputGetMaximumIterationsToFluid(Real dt, Real tmax,
     file.close();
 }
 
-void Provenance::outputGetMaximumIterationsToSediments(Real dt, Real tmax,
+void Provenance::outputGetMaximumIterationsToTransport(Real dt, Real tmax,
         unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance,
         int max_linear_iters, string xdmf) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Output Get Maximum Iterations to Sediments" << endl;
+    cout << "Output Get Maximum Iterations to Transport" << endl;
 #endif
 
     Performance perf;
     perf.begin();
 
     char memalloc[1000];
-    string transformation = "getmaximumiterationstosediments";
+    string transformation = "getmaximumiterationstotransport";
     Task t(simulationID);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("getmaximumiterationstofluid");
+    t.addDtDependency("getmaximumiterationstoflow");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
@@ -769,7 +770,7 @@ void Provenance::inputInitDataExtraction(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("getmaximumiterationstosediments");
+    t.addDtDependency("getmaximumiterationstotransport");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
@@ -826,7 +827,7 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
     t.setTransformation(transformationTag);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("getmaximumiterationstosediments");
+    t.addDtDependency("getmaximumiterationstotransport");
 
     char memalloc[4096];
     sprintf(memalloc, "%d", simulationID);
@@ -955,7 +956,7 @@ void Provenance::inputInitVisualization(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("getmaximumiterationstosediments");
+    t.addDtDependency("getmaximumiterationstotransport");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
@@ -1002,7 +1003,7 @@ void Provenance::outputInitVisualization(int lineID, int timeStep) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("getmaximumiterationstosediments");
+    t.addDtDependency("getmaximumiterationstotransport");
 
     char memalloc[4096];
     sprintf(memalloc, "%d", simulationID);
@@ -1063,7 +1064,7 @@ void Provenance::inputVisualization(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("solversimulationsediments");
+    t.addDtDependency("solversimulationtransport");
 
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
@@ -1110,7 +1111,7 @@ void Provenance::outputVisualization(int lineID, int timeStep) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("solversimulationsediments");
+    t.addDtDependency("solversimulationtransport");
 
     char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", taskID);
@@ -1146,42 +1147,42 @@ void Provenance::outputVisualization(int lineID, int timeStep) {
     file.close();
 }
 
-void Provenance::inputSolverSimulationFluid() {
+void Provenance::inputSolverSimulationFlow() {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Input Solver Simulation Fluid" << endl;
+    cout << "Input Solver Simulation Flow" << endl;
 #endif
 
     Performance perf;
     perf.begin();
 
-    string transformation = "solversimulationfluid";
+    string transformation = "solversimulationflow";
     PerformanceMetric p;
     char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, numberIterationsFluid);
+            transformation.c_str(), simulationID, numberIterationsFlow);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
 
     Task t(taskID);
     t.addPerformanceMetric(p);
-    t.setSubID(numberIterationsFluid);
+    t.setSubID(numberIterationsFlow);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("getmaximumiterationstosediments");
+    t.addDtDependency("getmaximumiterationstotransport");
 
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
     t.writeJSON(memalloc);
 #endif
 
@@ -1197,25 +1198,25 @@ void Provenance::inputSolverSimulationFluid() {
     file.close();
 }
 
-void Provenance::outputSolverSimulationFluid(int time_step, Real time,
+void Provenance::outputSolverSimulationFlow(int time_step, Real time,
         int linear_step, int n_linear_step, unsigned int n_linear_iterations,
         Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Output Solver Simulation Fluid" << endl;
+    cout << "Output Solver Simulation Flow" << endl;
 #endif
 
     Performance perf;
     perf.begin();
 
-    string transformation = "solversimulationfluid";
+    string transformation = "solversimulationflow";
     Task t(taskID);
-    t.setSubID(numberIterationsFluid);
+    t.setSubID(numberIterationsFlow);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("getmaximumiterationstosediments");
+    t.addDtDependency("getmaximumiterationstotransport");
 
     char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", simulationID);
@@ -1230,18 +1231,18 @@ void Provenance::outputSolverSimulationFluid(int time_step, Real time,
 
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, numberIterationsFluid);
+            transformation.c_str(), simulationID, numberIterationsFlow);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyEndTime();
     t.addPerformanceMetric(p);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFluid);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
     t.writeJSON(memalloc);
 #endif
 
@@ -1257,41 +1258,41 @@ void Provenance::outputSolverSimulationFluid(int time_step, Real time,
     file.close();
 }
 
-void Provenance::inputSolverSimulationSediments() {
+void Provenance::inputSolverSimulationTransport() {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Input Solver Simulation Sediments" << endl;
+    cout << "Input Solver Simulation Transport" << endl;
 #endif
     Performance perf;
     perf.begin();
 
-    string transformation = "solversimulationsediments";
+    string transformation = "solversimulationtransport";
     PerformanceMetric p;
     char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, numberIterationsSediments);
+            transformation.c_str(), simulationID, numberIterationsTransport);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
 
     Task t(taskID);
     t.addPerformanceMetric(p);
-    t.setSubID(numberIterationsSediments);
+    t.setSubID(numberIterationsTransport);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("solversimulationfluid");
+    t.addDtDependency("solversimulationflow");
 
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsTransport);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
+    sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsTransport);
     t.writeJSON(memalloc);
 #endif
 
@@ -1307,25 +1308,25 @@ void Provenance::inputSolverSimulationSediments() {
     file.close();
 }
 
-void Provenance::outputSolverSimulationSediments(int time_step,
+void Provenance::outputSolverSimulationTransport(int time_step,
         Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations,
         Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
-    cout << "Output Solver Simulation Sediments" << endl;
+    cout << "Output Solver Simulation Transport" << endl;
 #endif
 
     Performance perf;
     perf.begin();
 
-    string transformation = "solversimulationsediments";
+    string transformation = "solversimulationtransport";
     Task t(taskID);
-    t.setSubID(numberIterationsSediments);
+    t.setSubID(numberIterationsTransport);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("solversimulationfluid");
+    t.addDtDependency("solversimulationflow");
 
     char memalloc[jsonArraySize];
     sprintf(memalloc, "%d", taskID);
@@ -1340,18 +1341,18 @@ void Provenance::outputSolverSimulationSediments(int time_step,
 
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
-            transformation.c_str(), simulationID, numberIterationsSediments);
+            transformation.c_str(), simulationID, numberIterationsTransport);
     p.SetDescription(memalloc);
     p.SetMethod("COMPUTATION");
     p.IdentifyEndTime();
     t.addPerformanceMetric(p);
 
 #ifdef DATABASE
-    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsTransport);
     t.writeJSON(memalloc);
 #endif
 #ifdef BACKUP
-    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsSediments);
+    sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsTransport);
     t.writeJSON(memalloc);
 #endif
 
@@ -1391,7 +1392,7 @@ void Provenance::outputMeshRefinement(bool first_step_refinement,
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("solversimulationsediments");
+    t.addDtDependency("solversimulationtransport");
 
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
@@ -1451,7 +1452,7 @@ void Provenance::inputMeshWriter() {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("solversimulationsediments");
+    t.addDtDependency("solversimulationtransport");
 
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
@@ -1493,7 +1494,7 @@ void Provenance::outputMeshWriter(int time_step, string xdmf) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("solversimulationsediments");
+    t.addDtDependency("solversimulationtransport");
 
     char memalloc[4096];
     sprintf(memalloc, "%d", taskID);
@@ -1570,7 +1571,7 @@ void Provenance::inputDataExtraction(int lineID) {
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("RUNNING");
-    t.addDtDependency("solversimulationsediments");
+    t.addDtDependency("solversimulationtransport");
 
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
@@ -1628,7 +1629,7 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
     t.setTransformation(transformation);
     t.setWorkspace(directory);
     t.setStatus("FINISHED");
-    t.addDtDependency("solversimulationsediments");
+    t.addDtDependency("solversimulationtransport");
 
     char memalloc[4096];
     sprintf(memalloc, "%d", taskID);
