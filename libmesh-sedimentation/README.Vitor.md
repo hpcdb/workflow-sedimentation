@@ -78,39 +78,44 @@ make install
 # Virtual Box - Mint
 
 # SZIP
-./configure --prefix=/home/vitor/programs/szip
+./configure --prefix=/home/vitor/program/szip
 make
 make install
 
 # ZLIB
-./configure --prefix=/home/vitor/programs/zlib
+./configure --prefix=/home/vitor/program/zlib
 make
 make install
 
 # HDF5
-./configure --prefix=/home/vitor/programs/hdf5 --enable-fortran --enable-cxx --with-szlib=/home/vitor/programs/szip
+./configure --prefix=/home/vitor/program/hdf5 --enable-fortran --enable-cxx --with-szlib=/home/vitor/program/szip
 make
 make install
 
 # PETSc
-./configure --prefix=/home/vitor/programs/petsc --download-fblaslapack 
-make PETSC_DIR=/home/vitor/programs/petsc all
-make PETSC_DIR=/home/vitor/programs/petsc install
-export PETSC_DIR=/home/vitor/programs/petsc
+./configure --prefix=/home/vitor/program/petsc --download-fblaslapack 
+make PETSC_DIR=/home/vitor/program/petsc all
+make PETSC_DIR=/home/vitor/program/petsc install
+export PETSC_DIR=/home/vitor/program/petsc
 
 # libMesh
-./configure --enable-parmesh --prefix=/home/vitor/programs/libmesh-install --with-hdf5=/home/vitor/programs/hdf5 PETSC_DIR=/home/vitor/programs/petsc
+./configure --enable-parmesh --prefix=/home/vitor/program/libmesh --with-hdf5=/home/vitor/program/hdf5 PETSC_DIR=/home/vitor/program/petsc
 make -j 2
 make install
 
 # MesaOS
- ./configure     CXXFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     CFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     --disable-xvmc     --disable-glx     --disable-dri     --with-dri-drivers=""     --with-gallium-drivers="swrast"     --enable-texture-float --enable-gles2     --disable-egl     --with-egl-platforms=""     --enable-gallium-osmesa     --enable-gallium-llvm=yes   --prefix=/opt/libs/mesa
+#./configure     CXXFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     CFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     --disable-xvmc     --disable-glx     --disable-dri     --with-dri-drivers=""     --with-gallium-drivers="swrast"     --enable-texture-float --enable-gles2     --disable-egl     --with-egl-platforms=""     --enable-gallium-osmesa     --enable-gallium-llvm=yes   --prefix=/home/vitor/program/mesaos
+
+./configure CXXFLAGS='-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31' CFLAGS='-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31' --disable-xvmc --disable-glx --disable-dri --with-dri-drivers= --with-gallium-drivers=swrast --enable-texture-float --enable-gles2 --disable-egl --with-egl-platforms= --enable-gallium-osmesa --enable-gallium-llvm=yes --prefix=/home/vitor/program/mesaos
+
 make
 make install
 
 # ParaView
-apt-get install libphonon-dev libphonon4 qt4-dev-tools libqt4-core libqt4-gui qt4-qmake libxt-dev g++ gcc cmake-curses-gui libqt4-opengl-dev mesa-common-dev openmpi-common openmpi-bin libopenmpi-dev python-dev openmpi-common openmpi-bin libopenmpi-dev
-cmake /programs/ParaView-v5.3.0-RC2 -DBUILD_SHARED_LIBS=1 -DPARAVIEW_ENABLE_PYTHON=1 -DPARAVIEW_USE_MPI=1 -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_ENABLE_CATALYST=1 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=1 -DPARAVIEW_BUILD_QT_GUI=0 -DVTK_OPENGL_HAS_OSMESA=1 -DVTK_USE_X=0 -DOSMESA_INCLUDE_DIR=/programs/mesa-build/include -DOSMESA_LIBRARY=/programs/mesa-build/lib/libOSMesa.so -DVTK_USE_OFFSCREEN=1 -DCMAKE_INSTALL_PREFIX=/programs/paraview-5.3.0 -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi -DOPENGL_INCLUDE_DIR= -DOPENGL_gl_LIBRARY= -DOPENGL_glu_LIBRARY= -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi
+sudo apt-get install libphonon-dev libphonon4 qt4-dev-tools qt4-qmake libxt-dev g++ gcc cmake-curses-gui libqt4-opengl-dev mesa-common-dev openmpi-common openmpi-bin libopenmpi-dev python-dev openmpi-common openmpi-bin libopenmpi-dev
+
+cmake /home/vitor/Downloads/ParaView-v5.3.0 -DBUILD_SHARED_LIBS=1 -DPARAVIEW_ENABLE_PYTHON=1 -DPARAVIEW_USE_MPI=1 -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_ENABLE_CATALYST=1 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=1 -DPARAVIEW_BUILD_QT_GUI=0 -DVTK_OPENGL_HAS_OSMESA=1 -DVTK_USE_X=0 -DOSMESA_INCLUDE_DIR=/home/vitor/program/mesaos/include -DOSMESA_LIBRARY=/home/vitor/program/mesaos/lib/libOSMesa.so -DVTK_USE_OFFSCREEN=1 -DCMAKE_INSTALL_PREFIX=/home/vitor/program/paraview-5.3.0 -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi -DOPENGL_INCLUDE_DIR= -DOPENGL_gl_LIBRARY= -DOPENGL_glu_LIBRARY= -DMPI_C_LIBRARIES=/usr/lib/libmpi.so -DMPI_C_INCLUDE_PATH=/usr/include/mpi
+
 make
 make install
 
@@ -120,3 +125,8 @@ SETUP PYTHON ENVIRONMENT - LoboC
 export PYTHONPATH=/home/user2/sources/ParaView-v5.1.0/build/lib:/home/user2/sources/ParaView-v5.1.0/build/lib/site-packages
 export LD_LIBRARY_PATH=/home/user2/sources/ParaView-v5.1.0/build/lib:$LD_LIBRARY_PATH
 export PATH=$PATH:/home/user2/sources/ParaView-v5.1.0/build/bin
+
+
+
+CPPFLAGS=-I/home/vitor/program/hdf5/include LDFLAGS=-L/home/vitor/program/hdf5/lib ./configure --enable-netcdf-4 --enable-shared --enable-dap --prefix=/home/vitor/program/netcdf4
+
