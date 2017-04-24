@@ -1,8 +1,0 @@
-directory = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation/
-pgFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/PG-1.0.jar
-rdeFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDE-1.0.jar
-rdiFilePath = /Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/dfa/RDI-1.0.jar
-access=EXTRACTION
-cartridge=csv
-bin=/home/vitor/Documents/program/fastbit/bin
-extraArguments=[b:precision=2]

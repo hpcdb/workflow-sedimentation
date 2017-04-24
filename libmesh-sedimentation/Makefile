@@ -11,7 +11,10 @@ PROVENANCE?=1
 #LIBMESH_DIR?=/home/vitor/program/libmesh
 
 # Ubuntu - VMWare
-LIBMESH_DIR?=/home/vitor/programs/libmesh
+#LIBMESH_DIR?=/home/vitor/programs/libmesh
+
+# Ubuntu - NACAD
+LIBMESH_DIR?=/home/vitor/program/libmesh
 
 # LoboC
 # LIBMESH_DIR?=/sw/apps/suse/shared/libmesh/release-no-pmesh-opt/intel
@@ -47,8 +50,12 @@ ifeq (${CATALYST}, 1)
 #PARAVIEW_DIR?=/home/vitor/program/paraview-5.3.0
 
 # Ubuntu - VMWare
+#PARAVIEW_VERSION?=5.3
+#PARAVIEW_DIR?=/home/vitor/programs/paraview-5.3.0
+
+# Ubuntu - NACAD
 PARAVIEW_VERSION?=5.3
-PARAVIEW_DIR?=/home/vitor/programs/paraview-5.3.0
+PARAVIEW_DIR?=/home/vitor/program/paraview-5.3.0
 
 # LoboC
 # PARAVIEW_VERSION?=5.2
