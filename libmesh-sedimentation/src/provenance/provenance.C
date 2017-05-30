@@ -31,7 +31,7 @@
 #include "provenance.h"
 #include "performance.h"
 
-#define LINUX
+//#define LINUX
 #define DATABASE
 #define BACKUP
 
@@ -554,6 +554,10 @@ void Provenance::outputGetMaximumIterationsToTransport(Real dt, Real tmax,
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
     t.writeJSON(memalloc);
 #endif
+    
+//    to control the loop on the fluid and the sediments
+    incrementTaskID();
+    previousTaskID = taskID;
 }
 
 void Provenance::inputInitDataExtraction(int lineID) {
@@ -875,7 +879,7 @@ void Provenance::inputSolverSimulationFlow() {
     p.SetMethod("COMPUTATION");
     p.IdentifyStartTime();
 
-    Task t(taskID);
+    Task t(previousTaskID);
     t.addPerformanceMetric(p);
     t.setSubID(numberIterationsFlow);
     t.setDataflow(dataflow);
@@ -884,7 +888,7 @@ void Provenance::inputSolverSimulationFlow() {
     t.setStatus("RUNNING");
     t.addDtDependency("getmaximumiterationstotransport");
 
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", previousTaskID);
     t.addIdDependency(memalloc);
 
 #ifdef DATABASE
@@ -906,7 +910,7 @@ void Provenance::outputSolverSimulationFlow(int time_step, Real time,
 #endif
 
     string transformation = "solversimulationflow";
-    Task t(taskID);
+    Task t(previousTaskID);
     t.setSubID(numberIterationsFlow);
     t.setDataflow(dataflow);
     t.setTransformation(transformation);
@@ -915,7 +919,7 @@ void Provenance::outputSolverSimulationFlow(int time_step, Real time,
     t.addDtDependency("getmaximumiterationstotransport");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d", simulationID);
+    sprintf(memalloc, "%d", previousTaskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
@@ -967,7 +971,7 @@ void Provenance::inputSolverSimulationTransport() {
     t.setStatus("RUNNING");
     t.addDtDependency("solversimulationflow");
 
-    sprintf(memalloc, "%d", taskID);
+    sprintf(memalloc, "%d", previousTaskID);
     t.addIdDependency(memalloc);
 
 #ifdef DATABASE
@@ -998,7 +1002,7 @@ void Provenance::outputSolverSimulationTransport(int time_step,
     t.addDtDependency("solversimulationflow");
 
     char memalloc[jsonArraySize];
-    sprintf(memalloc, "%d", taskID);
+    sprintf(memalloc, "%d", previousTaskID);
     t.addIdDependency(memalloc);
 
     sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",

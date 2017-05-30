@@ -85,8 +85,8 @@ def CreateCoProcessor():
       # trace defaults for the display properties.
       slice1Display.ColorArrayName = ['POINTS', 's']
       slice1Display.LookupTable = sLUT
-      slice1Display.OSPRayScaleArray = 'u'
-      slice1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+      # slice1Display.OSPRayScaleArray = 'u'
+      # slice1Display.OSPRayScaleFunction = 'PiecewiseFunction'
       slice1Display.SelectOrientationVectors = 'None'
       slice1Display.ScaleFactor = 1.8
       slice1Display.SelectScaleArray = 'u'

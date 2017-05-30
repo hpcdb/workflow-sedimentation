@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-monetdb-start-all
+# monetdb-start-all
 
 # Restart MonetDB
 cd ../dfa

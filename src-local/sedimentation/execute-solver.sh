@@ -18,8 +18,8 @@
 # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
 
 # Ubuntu - NACAD
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
+# export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
+# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 
 # Mint - NACAD
 # export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
@@ -29,7 +29,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/p
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/work/03664/silva/programs/paraview/lib/paraview-5.0
 
 #docker
-# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/programs/paraview/lib/paraview-5.0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/programs/paraview-install/lib/paraview-5.0
 
 rm output-solver.log
 rm output-statistics.log
@@ -40,5 +40,5 @@ rm output-statistics.log
 # without catalyst
 # time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/ | tee -a "output-solver.log"
 # with catalyst
-time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"
+../../libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -e extraction.py -v visualization.py -o output -d /shared/experiment/sedimentation/output | tee -a "output-solver.log"
 

@@ -941,7 +941,6 @@ int main(int argc, char** argv) {
             // Transport
             // FLOW NON-LINEAR LOOP
             for (transport_nli_counter = 0; transport_nli_counter < transport_n_nonlinear_steps; ++transport_nli_counter) {
-
 #ifdef PROVENANCE
                 provenance.incrementIterationsTransport();
                 perf_log.start_event("SolverSimulationTransport", "Provenance");

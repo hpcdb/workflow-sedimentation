@@ -4,17 +4,83 @@
 ./configure --prefix=/Users/vitor/Documents/Program_Installations/petsc-3.6.4/build --download-fblaslapack
 make PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4 PETSC_ARCH=arch-darwin-c-debug all
 make PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4 PETSC_ARCH=arch-darwin-c-debug install
-export PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4
+export PETSC_DIR=/Users/vitor/Documents/Program_Installations/sedimentation/petsc-3.7.6
 
 # libMesh - Installation
-./configure --enable-parmesh --prefix=/Users/vitor/Documents/Program_Installations/libmesh/build --with-hdf5=/Users/vitor/Documents/Program_Installations/hdf5-1.8.9/hdf5 PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4
+./configure --enable-parmesh --prefix=/Users/vitor/Documents/Program_Installations/sedimentation/libmesh --with-hdf5=/Users/vitor/Documents/Program_Installations/hdf5-1.8.9/hdf5 PETSC_DIR=/Users/vitor/Documents/Program_Installations/petsc-3.6.4
 make -j 2
 make install
 
+# LLVM
+
+cmake                                           \
+  -DCMAKE_BUILD_TYPE=Release                    \
+  -DCMAKE_INSTALL_PREFIX=/Users/vitor/Documents/Program_Installations/sedimentation/llvm-4.0.0  \
+  -DLLVM_BUILD_LLVM_DYLIB=ON                    \
+  -DLLVM_ENABLE_RTTI=ON                         \
+  -DLLVM_INSTALL_UTILS=ON                       \
+  -DLLVM_TARGETS_TO_BUILD:STRING=X86            \
+  ..
+
+# Mesa
+
+./configure                                         \
+  --prefix=/Users/vitor/Documents/Program_Installations/sedimentation/mesa                    \
+  --enable-opengl --disable-gles1 --disable-gles2   \
+  --disable-va --disable-xvmc --disable-vdpau       \
+  --enable-shared-glapi                             \
+  --disable-texture-float                           \
+  --enable-gallium-llvm --enable-llvm-shared-libs   \
+  --with-gallium-drivers=swrast,swr                 \
+  --disable-dri --with-dri-drivers=                 \
+  --disable-egl --with-egl-platforms= --disable-gbm \
+  --disable-glx                                     \
+  --with-llvm-prefix=/usr/local/Cellar/llvm/4.0.0_1 --disable-osmesa --enable-gallium-osmesa			
+  
+
+
+
+
 # OSMesa Gallium llvmpipe state-tracker
  ./configure     CXXFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     CFLAGS="-O2 -g -DDEFAULT_SOFTWARE_DEPTH_BITS=31"     --disable-xvmc     --disable-glx     --disable-dri     --with-dri-drivers=""     --with-gallium-drivers="swrast"     --enable-texture-float --enable-gles2     --disable-egl     --with-egl-platforms=""     --enable-gallium-osmesa     --enable-gallium-llvm=yes   --prefix=/opt/libs/mesa
+
+./configure                                         \
+  --prefix=/Users/vitor/Documents/Program_Installations/sedimentation/mesaos-13.0.3                    \
+  --enable-opengl --disable-gles1 --disable-gles2   \
+  --disable-va --disable-xvmc --disable-vdpau       \
+  --enable-shared-glapi                             \
+  --disable-texture-float                           \
+  --enable-gallium-llvm --enable-llvm-shared-libs   \
+  --with-gallium-drivers=swrast,swr                 \
+  --disable-dri --with-dri-drivers=                 \
+  --disable-egl --with-egl-platforms= --disable-gbm \
+  --disable-glx                                     \
+  --disable-osmesa --enable-gallium-osmesa
+
 make 
 make install
+
+
+cmake /Users/vitor/Downloads/ParaView-v5.3.0 -DBUILD_SHARED_LIBS=1 \
+-DPARAVIEW_ENABLE_PYTHON=1 \
+-DPARAVIEW_USE_MPI=1 \
+-DCMAKE_BUILD_TYPE=Release \
+-DPARAVIEW_ENABLE_CATALYST=1 \
+-DPARAVIEW_INSTALL_DEVELOPMENT_FILES=1 \
+-DPARAVIEW_BUILD_QT_GUI=0 \
+-DVTK_OPENGL_HAS_OSMESA=1 \-DVTK_USE_X=0 \
+-DOSMESA_INCLUDE_DIR=/usr/local/Cellar/mesalib-glw/7.2/include \
+-DOSMESA_LIBRARY=/usr/local/Cellar/mesalib-glw/7.2/lib/libGLw.dylib \
+-DVTK_USE_OFFSCREEN=1 \
+-DCMAKE_INSTALL_PREFIX=/Users/vitor/Documents/Program_Installations/sedimentation/paraview-5.3.0 \
+-DMPI_C_INCLUDE_PATH=/usr/local/lib \
+-DOPENGL_INCLUDE_DIR= \
+-DOPENGL_gl_LIBRARY= \
+-DOPENGL_glu_LIBRARY= 
+
+
+
+cmake /Users/vitor/Downloads/ParaView-v5.3.0 -DBUILD_SHARED_LIBS=1 -DPARAVIEW_ENABLE_PYTHON=1 -DPARAVIEW_USE_MPI=1 -DCMAKE_BUILD_TYPE=Release -DPARAVIEW_ENABLE_CATALYST=1 -DPARAVIEW_INSTALL_DEVELOPMENT_FILES=1 -DPARAVIEW_BUILD_QT_GUI=0 -DVTK_OPENGL_HAS_OSMESA=1 -DVTK_USE_X=0 -DVTK_USE_OFFSCREEN=1 -DCMAKE_INSTALL_PREFIX=/Users/vitor/Documents/Program_Installations/sedimentation/paraview-5.3.0 -DOPENGL_INCLUDE_DIR= -DOPENGL_gl_LIBRARY= -DOPENGL_glu_LIBRARY= -DOSMESA_INCLUDE_DIR=/usr/local/Cellar/mesalib-glw/7.2/include -DOSMESA_LIBRARY=/usr/local/Cellar/mesalib-glw/7.2/lib/libOSMesa.so
 
 # Paraview
 BUILD_SHARED_LIBS: ON
