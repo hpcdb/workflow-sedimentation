@@ -9,6 +9,9 @@ cd ../dfa
 # delete files from the previous execution
 cd ../sedimentation
 ./delete.sh
+# rm -rf prov/di/*
+# cp -rf prov/pg/* prov/di/
+# cp ../dfa/finish.token prov/di
 
 # Start daemon process to Data Ingestor
 cd ../sedimentation

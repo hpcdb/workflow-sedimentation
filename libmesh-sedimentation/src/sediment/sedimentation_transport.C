@@ -97,14 +97,14 @@ void SedimentationTransport::init() {
 }
 
 void SedimentationTransport::setup(GetPot &infile) {
-    
+
     const MeshBase& mesh = es.get_mesh();
 
     // The dimension that we are running
     this->dim = mesh.mesh_dimension();
 
     TransientLinearImplicitSystem & transport_system = this->es.get_system<TransientLinearImplicitSystem> ("transport");
-    
+
     unsigned int s_var = transport_system.variable_number("s");
 
     transport_system.attach_assemble_object(*this);
@@ -130,16 +130,16 @@ void SedimentationTransport::setup(GetPot &infile) {
     }
 
 
-    this->noflux_bc_id  = infile("transport/neumann/noflux", -1);
+    this->noflux_bc_id = infile("transport/neumann/noflux", -1);
     this->erosion_bc_id = infile("transport/neumann/erosion", -1);
     this->deposition_id = infile("transport/deposition", -1);
-    if(this->deposition_id != -1)
-        cout<<" Deposition wall is "<<this->deposition_id<<endl;
+    if (this->deposition_id != -1)
+        cout << " Deposition wall is " << this->deposition_id << endl;
     this->apply_bottom_flow = infile("transport/neumann/apply_bottom_flux", true);
-    if(this->apply_bottom_flow)
-        cout<<" Considering mass outflow across deposition wall"<<endl<<endl;
+    if (this->apply_bottom_flow)
+        cout << " Considering mass outflow across deposition wall" << endl << endl;
 
-    bool init           = infile("sediment/init_condition", true);
+    bool init = infile("sediment/init_condition", true);
     if (init) transport_system.attach_init_function(init_sedimentation);
 
 }
@@ -299,7 +299,7 @@ void SedimentationTransport::assemble2D() {
 
 
         // Compute SUPG stabilization parameters: 
-        
+
         // loop over quadrature points
         for (unsigned int qp = 0; qp < qrule.n_points(); qp++) {
             // Values to hold the old solution & its gradient.
@@ -336,7 +336,7 @@ void SedimentationTransport::assemble2D() {
 
 
             Point f = e*s;
-            
+
             RealVectorValue U(u, v);
 
             Real tau_vms = compute_tau_M(g, G, U, k, dt, dt_stab);
@@ -345,7 +345,7 @@ void SedimentationTransport::assemble2D() {
             Real rint_x = (u - u_old) / dt + (U * grad_u) + grad_p(0) - f(0);
             Real rint_y = (v - v_old) / dt + (U * grad_v) + grad_p(1) - f(1);
 
-            RealVectorValue velocity(u - tau_vms*rint_x +e(0)*Us, v - tau_vms * rint_y + e(1)*Us);
+            RealVectorValue velocity(u - tau_vms * rint_x + e(0) * Us, v - tau_vms * rint_y + e(1) * Us);
             Real tau = compute_tau_M(g, G, velocity, k, dt, dt_stab);
 
             /*
@@ -371,7 +371,7 @@ void SedimentationTransport::assemble2D() {
             Real alpha_c = std::min(0.25 * Pe_p, 0.70);
             Real delta_sco = 0.5 * h_caract * alpha_c * residuo * ogcnorm * fopc;
              * */
-             
+
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i = 0; i < phi.size(); i++) {
                 // The RHS contribution
@@ -424,50 +424,50 @@ void SedimentationTransport::assemble2D() {
                     fe_face->reinit(elem, s);
 
                     // Applying flux advective boundary condition
-                    if(this->apply_bottom_flow)
-                    if (mesh.boundary_info->boundary_id(elem, s) == this->deposition_id) {
+                    if (this->apply_bottom_flow)
+                        if (mesh.boundary_info->boundary_id(elem, s) == this->deposition_id) {
 
-                        for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
-                            Number s = 0.0, s_old = 0.0;
-                            Gradient grad_u, grad_v;
+                            for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
+                                Number s = 0.0, s_old = 0.0;
+                                Gradient grad_u, grad_v;
 
-                            //Gradient grad_s;
+                                //Gradient grad_s;
 
-                            for (unsigned int i = 0; i < phi_face.size(); i++) {
-                                s_old += phi_face[i][qp] * system.old_solution(dof_indices[i]);
-                                grad_u.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_u[i]));
-                                grad_v.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_v[i]));
+                                for (unsigned int i = 0; i < phi_face.size(); i++) {
+                                    s_old += phi_face[i][qp] * system.old_solution(dof_indices[i]);
+                                    grad_u.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_u[i]));
+                                    grad_v.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_v[i]));
+                                }
+
+                                /*
+                                RealTensor G;
+                                G(0, 0) = k * (2.0 * grad_u(0));
+                                G(0, 1) = G(1, 0) = k * (grad_u(1) + grad_v(0));
+                                G(1, 1) = k * 2.0 * grad_v(1);
+                                RealVectorValue taub;
+                                taub(0) = normals[qp](0) * G(0, 0) + normals[qp](1) * G(1, 0);
+                                taub(1) = normals[qp](0) * G(0, 1) + normals[qp](1) * G(1, 1);
+
+                                Number taub_norm = taub.norm();
+                                const Real A = 1.3E-07;
+                                const Real Z = std::sqrt(taub_norm) * std::pow(Rp, 0.6) / Us;
+                                const Real Z5 = std::pow(Z, 5.0);
+
+                                Number E = (A * Z5) / (1.0 + A * Z5 / 0.3);
+                                 */
+
+                                Number tmp = (k / Us);
+                                // RHS contribution
+                                for (unsigned int i = 0; i < phi_face.size(); i++) {
+                                    Fe(i) += JxW_face[qp] * tmp * s_old * phi_face[i][qp];
+                                    for (unsigned int j = 0; j < phi_face.size(); j++)
+                                        Ke(i, j) += JxW_face[qp] * tmp * phi_face[i][qp] * phi_face[j][qp];
+
+                                }
+
+
                             }
-
-                            /*
-                            RealTensor G;
-                            G(0, 0) = k * (2.0 * grad_u(0));
-                            G(0, 1) = G(1, 0) = k * (grad_u(1) + grad_v(0));
-                            G(1, 1) = k * 2.0 * grad_v(1);
-                            RealVectorValue taub;
-                            taub(0) = normals[qp](0) * G(0, 0) + normals[qp](1) * G(1, 0);
-                            taub(1) = normals[qp](0) * G(0, 1) + normals[qp](1) * G(1, 1);
-
-                            Number taub_norm = taub.norm();
-                            const Real A = 1.3E-07;
-                            const Real Z = std::sqrt(taub_norm) * std::pow(Rp, 0.6) / Us;
-                            const Real Z5 = std::pow(Z, 5.0);
-
-                            Number E = (A * Z5) / (1.0 + A * Z5 / 0.3);
-                            */
-
-                            Number tmp = (k/Us);
-                            // RHS contribution
-                            for (unsigned int i = 0; i < phi_face.size(); i++) {
-                                Fe(i) += JxW_face[qp]*tmp*s_old*phi_face[i][qp];
-                                for (unsigned int j = 0; j < phi_face.size(); j++)
-                                    Ke(i, j) += JxW_face[qp]*tmp*phi_face[i][qp] * phi_face[j][qp];
-
-                            }
-
-
                         }
-                    }
 
                     if (mesh.boundary_info->boundary_id(elem, s) == this->noflux_bc_id) {
                         for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
@@ -546,7 +546,7 @@ void SedimentationTransport::assemble3D() {
     perf_log->start_event("Assembly", "Transport");
 
 
-    
+
     // Get a constant reference to the mesh object.
     const MeshBase& mesh = es.get_mesh();
 
@@ -601,16 +601,16 @@ void SedimentationTransport::assemble3D() {
     // Here we define some references to cell-specific data that
     // will be used to assemble the linear system.  We will start
     // with the element Jacobian * quadrature weight at each integration point.
-    const std::vector<Real>& JxW      = fe->get_JxW();
+    const std::vector<Real>& JxW = fe->get_JxW();
     const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
     // The element shape functions evaluated at the quadrature points.
-    const std::vector<std::vector<Real> >& phi      = fe->get_phi();
+    const std::vector<std::vector<Real> >& phi = fe->get_phi();
     const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
 
     // The element shape function gradients evaluated at the quadrature
     // points.
-    const std::vector<std::vector<RealGradient> >& dphi      = fe->get_dphi();
+    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
     const std::vector<std::vector<RealGradient> >& dphi_face = fe_face->get_dphi();
     const std::vector<Point> & normals = fe_face->get_normals();
 
@@ -621,7 +621,7 @@ void SedimentationTransport::assemble3D() {
     // object handles the index translation from node and element numbers
     // to degree of freedom numbers.  We will talk more about the \p DofMap
     // in future examples.
-    const DofMap& dof_map      = system.get_dof_map();
+    const DofMap& dof_map = system.get_dof_map();
     const DofMap& dof_map_flow = flow_system.get_dof_map();
 
     DenseMatrix<Number> Ke;
@@ -647,15 +647,15 @@ void SedimentationTransport::assemble3D() {
     const Real ez = es.parameters.get<Real> ("ez");
     const Real Rp = es.parameters.get<Real> ("erosion/Rp");
     const Real dt_stab = es.parameters.get<Real> ("dt_stab");
-    
+
     RealVectorValue e(ex, ey, ez);
-                  
+
     // Now we will loop over all the elements in the mesh that
     // live on the local processor. We will compute the element
     // matrix and right-hand-side contribution.  Since the mesh
     // will be refined we want to only consider the ACTIVE elements,
     // hence we use a variant of the \p active_elem_iterator.
-    MeshBase::const_element_iterator el          = mesh.active_local_elements_begin();
+    MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
     for (; el != end_el; ++el) {
@@ -732,7 +732,7 @@ void SedimentationTransport::assemble3D() {
             }
 
 
-            
+
             RealGradient g = compute_g(fe.get(), dim, qp);
             RealTensor G = compute_G(fe.get(), dim, qp);
 
@@ -743,40 +743,40 @@ void SedimentationTransport::assemble3D() {
 
             // Now compute the element matrix and RHS contributions.
 
-            
+
 
             Real rint_x = (u - u_old) / dt + (U * grad_u) + grad_p(0) - f(0);
             Real rint_y = (v - v_old) / dt + (U * grad_v) + grad_p(1) - f(1);
             Real rint_z = (w - w_old) / dt + (U * grad_w) + grad_p(1) - f(2);
 
-            RealVectorValue velocity(u - tau_vms*rint_x + e(0)*Us, v - tau_vms * rint_y + e(1)*Us, w - tau_vms * rint_z + e(2)*Us);
+            RealVectorValue velocity(u - tau_vms * rint_x + e(0) * Us, v - tau_vms * rint_y + e(1) * Us, w - tau_vms * rint_z + e(2) * Us);
 
             Real tau = compute_tau_M(g, G, velocity, k, dt, dt_stab);
 
-/*
-            const Real res = (s - s_old) / dt + velocity*grad_s;
-            const Real unorm = velocity.norm();
-            const Real aux2 = pow(2.0 * unorm / h_caract, 2.0) + aux1;
-            const Real tau = pow(aux2, -0.5);
+            /*
+                        const Real res = (s - s_old) / dt + velocity*grad_s;
+                        const Real unorm = velocity.norm();
+                        const Real aux2 = pow(2.0 * unorm / h_caract, 2.0) + aux1;
+                        const Real tau = pow(aux2, -0.5);
 
 
-            // CAU stabilization parameter
-            Real res_mass = (s - s_old) / dt;
-            Real res_adv = (velocity * grad_s);
-            Real residuo = res_mass + res_adv;
-            Real gcnorm = grad_s.norm();
-            gcnorm = std::max(1.0E-10, gcnorm);
-            Real ogcnorm = 1.0 / gcnorm;
-            Real aux3 = res_adv / (ogcnorm * ogcnorm);
-            RealVectorValue b(grad_s(0) * aux3, grad_s(1) * aux3, grad_s(2) * aux3);
-            Real bnorm = b.norm();
-            bnorm = std::max(bnorm, 1.0E-10);
-            Real bdb = k * bnorm*bnorm;
-            bdb = std::max(bdb, 1.0E-10);
-            Real Pe_p = 0.5 * h_caract * (bnorm * bnorm * bnorm) / bdb;
-            Real alpha_c = std::min(0.25 * Pe_p, 0.70);
-            Real delta_sco = 0.5 * h_caract * alpha_c * residuo * ogcnorm * fopc;
-*/
+                        // CAU stabilization parameter
+                        Real res_mass = (s - s_old) / dt;
+                        Real res_adv = (velocity * grad_s);
+                        Real residuo = res_mass + res_adv;
+                        Real gcnorm = grad_s.norm();
+                        gcnorm = std::max(1.0E-10, gcnorm);
+                        Real ogcnorm = 1.0 / gcnorm;
+                        Real aux3 = res_adv / (ogcnorm * ogcnorm);
+                        RealVectorValue b(grad_s(0) * aux3, grad_s(1) * aux3, grad_s(2) * aux3);
+                        Real bnorm = b.norm();
+                        bnorm = std::max(bnorm, 1.0E-10);
+                        Real bdb = k * bnorm*bnorm;
+                        bdb = std::max(bdb, 1.0E-10);
+                        Real Pe_p = 0.5 * h_caract * (bnorm * bnorm * bnorm) / bdb;
+                        Real alpha_c = std::min(0.25 * Pe_p, 0.70);
+                        Real delta_sco = 0.5 * h_caract * alpha_c * residuo * ogcnorm * fopc;
+             */
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i = 0; i < phi.size(); i++) {
@@ -827,56 +827,56 @@ void SedimentationTransport::assemble3D() {
                     fe_face->reinit(elem, s);
 
                     // Applying flux advective boundary condition
-                    if(this->apply_bottom_flow)
-                    if (mesh.boundary_info->boundary_id(elem, s) == this->deposition_id) {
+                    if (this->apply_bottom_flow)
+                        if (mesh.boundary_info->boundary_id(elem, s) == this->deposition_id) {
 
-                        for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
-                            Number s_old = 0.0;
-                            Gradient grad_u, grad_v, grad_w;
+                            for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
+                                Number s_old = 0.0;
+                                Gradient grad_u, grad_v, grad_w;
 
-                            Gradient grad_s;
+                                Gradient grad_s;
 
-                            for (unsigned int i = 0; i < phi_face.size(); i++) {
-                                s_old += phi_face[i][qp] * system.old_solution(dof_indices[i]);
-                                grad_u.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_u[i]));
-                                grad_v.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_v[i]));
-                                grad_w.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_w[i]));
+                                for (unsigned int i = 0; i < phi_face.size(); i++) {
+                                    s_old += phi_face[i][qp] * system.old_solution(dof_indices[i]);
+                                    grad_u.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_u[i]));
+                                    grad_v.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_v[i]));
+                                    grad_w.add_scaled(dphi_face[i][qp], flow_system.current_solution(dof_indices_w[i]));
+                                }
+
+                                /*
+                                DenseMatrix<Number> G;
+
+                                G(0, 0) = k * 2.0 * grad_u(0);
+                                G(0, 1) = G(1, 0) = k * (grad_u(1) + grad_v(0));
+                                G(0, 2) = G(2, 0) = k * (grad_u(2) + grad_w(0));
+                                G(1, 1) = k * 2.0 * grad_v(1);
+                                G(1, 2) = G(2, 1) = k * (grad_v(2) + grad_w(1));
+                                G(2, 2) = k * 2.0 * grad_w(2);
+
+                                RealVectorValue taub;
+                                taub(0) = normals[qp](0) * G(0, 0) + normals[qp](1) * G(1, 0) + normals[qp](2) * G(2, 0);
+                                taub(1) = normals[qp](0) * G(0, 1) + normals[qp](1) * G(1, 1) + normals[qp](2) * G(2, 1);
+                                taub(2) = normals[qp](0) * G(0, 2) + normals[qp](1) * G(1, 2) + normals[qp](2) * G(2, 2);
+
+                                Number taub_norm = taub.norm();
+                                const Real A = 1.3E-07;
+                                const Real Z = std::sqrt(taub_norm) * std::pow(Rp, 0.6) / Us;
+                                const Real Z5 = std::pow(Z, 5.0);
+
+                                Number E = (A * Z5) / (1.0 + A * Z5 / 0.3);
+                                 */
+
+                                Number tmp = (k / Us);
+                                // RHS contribution
+                                for (unsigned int i = 0; i < phi_face.size(); i++) {
+                                    Fe(i) += JxW_face[qp] * tmp * s_old * phi_face[i][qp];
+                                    for (unsigned int j = 0; j < phi_face.size(); j++)
+                                        Ke(i, j) += JxW_face[qp] * tmp * phi_face[i][qp] * phi_face[j][qp];
+
+                                }
+
                             }
-
-                            /*
-                            DenseMatrix<Number> G;
-
-                            G(0, 0) = k * 2.0 * grad_u(0);
-                            G(0, 1) = G(1, 0) = k * (grad_u(1) + grad_v(0));
-                            G(0, 2) = G(2, 0) = k * (grad_u(2) + grad_w(0));
-                            G(1, 1) = k * 2.0 * grad_v(1);
-                            G(1, 2) = G(2, 1) = k * (grad_v(2) + grad_w(1));
-                            G(2, 2) = k * 2.0 * grad_w(2);
-
-                            RealVectorValue taub;
-                            taub(0) = normals[qp](0) * G(0, 0) + normals[qp](1) * G(1, 0) + normals[qp](2) * G(2, 0);
-                            taub(1) = normals[qp](0) * G(0, 1) + normals[qp](1) * G(1, 1) + normals[qp](2) * G(2, 1);
-                            taub(2) = normals[qp](0) * G(0, 2) + normals[qp](1) * G(1, 2) + normals[qp](2) * G(2, 2);
-
-                            Number taub_norm = taub.norm();
-                            const Real A = 1.3E-07;
-                            const Real Z = std::sqrt(taub_norm) * std::pow(Rp, 0.6) / Us;
-                            const Real Z5 = std::pow(Z, 5.0);
-
-                            Number E = (A * Z5) / (1.0 + A * Z5 / 0.3);
-                            */
-                            
-                            Number tmp = (k/Us);
-                            // RHS contribution
-                            for (unsigned int i = 0; i < phi_face.size(); i++) {
-                                Fe(i) += JxW_face[qp]*tmp*s_old*phi_face[i][qp];
-                                for (unsigned int j = 0; j < phi_face.size(); j++)
-                                    Ke(i, j) += JxW_face[qp]*tmp*phi_face[i][qp] * phi_face[j][qp];
-
-                            }
-
                         }
-                    }
 
                     if (mesh.boundary_info->boundary_id(elem, s) == this->noflux_bc_id) {
                         for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
@@ -916,171 +916,165 @@ void SedimentationTransport::assemble3D() {
         system.rhs->add_vector(Fe, dof_indices);
     }
     // That concludes the system matrix assembly routine.
-    
+
 
     perf_log->stop_event("Assembly", "Transport");
     perf_log->restart_event("Solver", "Transport");
 
 }
 
+void SedimentationTransport::solve(int t_step, Real time, int r_step, bool& diverged) {
 
-void SedimentationTransport::solve(int t_step, Real time, int r_step, bool& diverged) 
-{
-        
     PerfLog* perf_log = es.parameters.get<PerfLog*>("PerfLog");
-    
+
     this->_linear_iteractions = 0;
     this->_nonlinear_iteractions = 0;
-   
+
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & transport_system = es.get_system<TransientLinearImplicitSystem> ("transport");
-    
+
     UniquePtr<NumericVector<Number> > nonlinear_soln(transport_system.solution->clone());
 
-    std::cout << "\n Solving Transport equation..." <<std::endl;
+    std::cout << "\n Solving Transport equation..." << std::endl;
     {
-                std::ostringstream out;
+        std::ostringstream out;
 
-              // We write the file in the ExodusII format.
-                out << std::setw(55)
-                 << std::setfill('-')
-                 << "\n"
-                 << std::setfill(' ')
-                 << std::setw(5)
-                 << std::left
-                 << "STEP"
-                 << std::setw(5)
-                 << "LI "
-                 << std::setw(15)
-                 << "|b-AX|"
-                 << std::setw(15)
-                 << "|du|"
-                 << std::setw(15)
-                 << "|du|/|u|"
-                 << "\n"
-                 <<std::right
-                 << std::setw(55)
-                 << std::setfill('-')
-                 << "\n";
-                 std::cout << out.str() << std::flush;
-              }
-    
-            // before to start solving the non-linear problem we reset linear solver tolerance to the initial value defined by user
-            es.parameters.set<Real> ("linear solver tolerance") = this->_initial_linear_tolerance;
-        
-            // Transport
-            // FLOW NON-LINEAR LOOP
-            for (int transport_nli_counter = 0; transport_nli_counter < _max_nonlinear_iteractions; ++transport_nli_counter) 
-            {
+        // We write the file in the ExodusII format.
+        out << std::setw(55)
+                << std::setfill('-')
+                << "\n"
+                << std::setfill(' ')
+                << std::setw(5)
+                << std::left
+                << "STEP"
+                << std::setw(5)
+                << "LI "
+                << std::setw(15)
+                << "|b-AX|"
+                << std::setw(15)
+                << "|du|"
+                << std::setw(15)
+                << "|du|/|u|"
+                << "\n"
+                << std::right
+                << std::setw(55)
+                << std::setfill('-')
+                << "\n";
+        std::cout << out.str() << std::flush;
+    }
 
-#ifdef PROVENANCE
-                prov->incrementIterationsTransport();
-                perf_log->start_event("SolverSimulationTransport", "Provenance");
-                prov->inputSolverSimulationTransport();
-                perf_log->stop_event("SolverSimulationTransport", "Provenance");
-#endif
-                // Update the nonlinear solution.
-                nonlinear_soln->zero();
-                nonlinear_soln->add(*transport_system.solution); // last system solution
-                
+    // before to start solving the non-linear problem we reset linear solver tolerance to the initial value defined by user
+    es.parameters.set<Real> ("linear solver tolerance") = this->_initial_linear_tolerance;
 
-                // Assemble & solve the linear system.
-                perf_log->start_event("Solver", "Transport");
-                transport_system.solve();
-                perf_log->stop_event("Solver", "Transport");
-
-                // Compute the difference between this solution and the last
-                // nonlinear iterate.
-                nonlinear_soln->add(-1., *transport_system.solution);
-
-                // Close the vector before computing its norm
-                nonlinear_soln->close();
-
-                // Compute the l2 norm of the difference
-                const Real norm_delta = nonlinear_soln->l2_norm();
-                const Real u_norm = transport_system.solution->l2_norm();
-
-                // How many iterations were required to solve the linear system?
-                this->_current_n_linear_iteractions = transport_system.n_linear_iterations();
-                
-                //Total number of linear iterations (so far)
-                //n_transport_linear_iterations_total += n_linear_iterations;
-                
-                this->_linear_iteractions+=this->_current_n_linear_iteractions;
-
-                // What was the final residual of the linear system?
-                //const Real final_linear_residual = transport_system.final_linear_residual();
-               this->_current_final_linear_residual =  transport_system.final_linear_residual();
-                // Number of linear iterations for the current time-step is stored
-                // to compute number of non-effective linear iterations in case of non acceptance of current time-step
-                //n_rejected_transport_linear_iterations_per_ts += n_linear_iterations;
-
-                {
-                    std::ostringstream out;
-
-                    // We write the file in the ExodusII format.
-                    out << std::setw(5)
-                            << std::left
-                            << transport_nli_counter + 1
-                            << std::setw(5)
-                            << this->_current_n_linear_iteractions
-                            << std::setw(15)
-                            << this->_current_final_linear_residual
-                            << std::setw(15)
-                            << norm_delta
-                            << std::setw(15)
-                            << norm_delta / u_norm
-                            << "\n";
-
-                    std::cout << out.str() << std::flush;
-                }
-
-                this->_nonlinear_iteractions++;
-                //Total number of non-linear iterations (so far)
-                //n_transport_nonlinear_iterations_total++;
-                //n_transport_nonlinear_iterations_reject_per_ts++;
-
-
-                // Terminate the solution iteration if the difference between
-                // this nonlinear iterate and the last is sufficiently small, AND
-                // if the most recent linear system was solved to a sufficient tolerance.
-                if ((norm_delta < this->_nonlinear_tolerance))
-                {
-                    std::ostringstream out;
-                    // We write the file in the ExodusII format.
-                    out << std::setw(55)
-                            << std::setfill('-')
-                            << "\n";
-                    std::cout << out.str()
-                            << " Nonlinear solver converged at step "
-                            << transport_nli_counter + 1
-                            << std::endl;
-                    break;
-                } else if (transport_nli_counter == this->_max_nonlinear_iteractions - 1)
-                    std::cout << " Nonlinear solver did not converge after " << this->_max_nonlinear_iteractions << " iterations." << endl;
-
-                // check for aborting simulation due divergence in transport solution
-                if (norm_delta > 1.0e3) {
-                    diverged = true;
-                    break;
-                }
+    // Transport
+    // FLOW NON-LINEAR LOOP
+    for (int transport_nli_counter = 0; transport_nli_counter < _max_nonlinear_iteractions; ++transport_nli_counter) {
 
 #ifdef PROVENANCE
-                perf_log->start_event("SolverSimulationTransport", "Provenance");
-                prov->outputSolverSimulationTransport(t_step, time, r_step, transport_nli_counter, _current_n_linear_iteractions, _current_final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
-                perf_log->stop_event("SolverSimulationTransport", "Provenance");
+        prov->incrementIterationsTransport();
+        perf_log->start_event("SolverSimulationTransport", "Provenance");
+        prov->inputSolverSimulationTransport();
+        perf_log->stop_event("SolverSimulationTransport", "Provenance");
+#endif
+        // Update the nonlinear solution.
+        nonlinear_soln->zero();
+        nonlinear_soln->add(*transport_system.solution); // last system solution
+
+
+        // Assemble & solve the linear system.
+        perf_log->start_event("Solver", "Transport");
+        transport_system.solve();
+        perf_log->stop_event("Solver", "Transport");
+
+        // Compute the difference between this solution and the last
+        // nonlinear iterate.
+        nonlinear_soln->add(-1., *transport_system.solution);
+
+        // Close the vector before computing its norm
+        nonlinear_soln->close();
+
+        // Compute the l2 norm of the difference
+        const Real norm_delta = nonlinear_soln->l2_norm();
+        const Real u_norm = transport_system.solution->l2_norm();
+
+        // How many iterations were required to solve the linear system?
+        this->_current_n_linear_iteractions = transport_system.n_linear_iterations();
+
+        //Total number of linear iterations (so far)
+        //n_transport_linear_iterations_total += n_linear_iterations;
+
+        this->_linear_iteractions += this->_current_n_linear_iteractions;
+
+        // What was the final residual of the linear system?
+        //const Real final_linear_residual = transport_system.final_linear_residual();
+        this->_current_final_linear_residual = transport_system.final_linear_residual();
+        // Number of linear iterations for the current time-step is stored
+        // to compute number of non-effective linear iterations in case of non acceptance of current time-step
+        //n_rejected_transport_linear_iterations_per_ts += n_linear_iterations;
+
+        {
+            std::ostringstream out;
+
+            // We write the file in the ExodusII format.
+            out << std::setw(5)
+                    << std::left
+                    << transport_nli_counter + 1
+                    << std::setw(5)
+                    << this->_current_n_linear_iteractions
+                    << std::setw(15)
+                    << this->_current_final_linear_residual
+                    << std::setw(15)
+                    << norm_delta
+                    << std::setw(15)
+                    << norm_delta / u_norm
+                    << "\n";
+
+            std::cout << out.str() << std::flush;
+        }
+
+        this->_nonlinear_iteractions++;
+        //Total number of non-linear iterations (so far)
+        //n_transport_nonlinear_iterations_total++;
+        //n_transport_nonlinear_iterations_reject_per_ts++;
+
+#ifdef PROVENANCE
+        perf_log->start_event("SolverSimulationTransport", "Provenance");
+        prov->outputSolverSimulationTransport(t_step, time, r_step, transport_nli_counter, _current_n_linear_iteractions, _current_final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+        perf_log->stop_event("SolverSimulationTransport", "Provenance");
 #endif
 
-                double min_lsolver_tol = es.parameters.get<double> ("minimum_linear_solver_tolerance");
-                es.parameters.set<Real> ("linear solver tolerance") =
-                        std::max(std::min(std::pow(this->_current_final_linear_residual,this->_linear_tolerance_power), this->_initial_linear_tolerance), min_lsolver_tol);
+        // Terminate the solution iteration if the difference between
+        // this nonlinear iterate and the last is sufficiently small, AND
+        // if the most recent linear system was solved to a sufficient tolerance.
+        if ((norm_delta < this->_nonlinear_tolerance)) {
+            std::ostringstream out;
+            // We write the file in the ExodusII format.
+            out << std::setw(55)
+                    << std::setfill('-')
+                    << "\n";
+            std::cout << out.str()
+                    << " Nonlinear solver converged at step "
+                    << transport_nli_counter + 1
+                    << std::endl;
+            break;
+        } else if (transport_nli_counter == this->_max_nonlinear_iteractions - 1)
+            std::cout << " Nonlinear solver did not converge after " << this->_max_nonlinear_iteractions << " iterations." << endl;
 
-            } // end nonlinear loop
-    
+        // check for aborting simulation due divergence in transport solution
+        if (norm_delta > 1.0e3) {
+            diverged = true;
+            break;
+        }
+
+        double min_lsolver_tol = es.parameters.get<double> ("minimum_linear_solver_tolerance");
+        es.parameters.set<Real> ("linear solver tolerance") =
+                std::max(std::min(std::pow(this->_current_final_linear_residual, this->_linear_tolerance_power), this->_initial_linear_tolerance), min_lsolver_tol);
+
+    } // end nonlinear loop
+
 }
 
-void SedimentationTransport::assembleSUPG2D()
-{
+void SedimentationTransport::assembleSUPG2D() {
     // It is a good idea to make sure we are assembling the proper system.
     libmesh_assert_equal_to(system_name, "transport");
 
@@ -1187,8 +1181,9 @@ void SedimentationTransport::assembleSUPG2D()
 
     RealVectorValue e(ex, ey), vel_sed;
     vel_sed = Us*e;
-    Real Res, mod_v_ip, aux4, aux5, aux7, aux8, delta, tau, beta = 1.0, inv_pi = libMesh::pi, inv_s = 1.0/s_ref_bar;;
-    Real aux9 = beta*0.5 -1.0;
+    Real Res, mod_v_ip, aux4, aux5, aux7, aux8, delta, tau, beta = 1.0, inv_pi = libMesh::pi, inv_s = 1.0 / s_ref_bar;
+    ;
+    Real aux9 = beta * 0.5 - 1.0;
 
     // Now we will loop over all the elements in the mesh that
     // live on the local processor. We will compute the element
@@ -1205,12 +1200,12 @@ void SedimentationTransport::assembleSUPG2D()
 
         // The characteristic height of the element
         const Real vol = elem->volume();
-        const Real h_caract = 2.0*pow(vol*inv_pi,0.5);
+        const Real h_caract = 2.0 * pow(vol*inv_pi, 0.5);
 
         // for Tau SUPG and Delta YZBetha parameters
         // using for energy equation the diffusivity for the diffusive limit with dimension less formulation
-        aux4 = 9.0*pow(4.0*k/(h_caract*h_caract),2.0)+ dt_stab*4.0/(dt*dt);
-        aux7 = pow(h_caract*0.5, beta);
+        aux4 = 9.0 * pow(4.0 * k / (h_caract * h_caract), 2.0) + dt_stab * 4.0 / (dt * dt);
+        aux7 = pow(h_caract * 0.5, beta);
 
         // Get the degree of freedom indices for the
         // current element.  These define where in the global
@@ -1266,34 +1261,34 @@ void SedimentationTransport::assembleSUPG2D()
             RealVectorValue velocity(u + vel_sed(0), v + vel_sed(1));
 
             // Compute SUPG stabilization parameters: Tau SUPG & delta YZBeta
-            mod_v_ip = pow( velocity*velocity ,0.5 );
-            aux5 = pow(2.0*mod_v_ip/h_caract,2.0) + aux4;
-            tau = pow(aux5,-0.5);
+            mod_v_ip = pow(velocity*velocity, 0.5);
+            aux5 = pow(2.0 * mod_v_ip / h_caract, 2.0) + aux4;
+            tau = pow(aux5, -0.5);
 
             // Advection-Diffusion Residual
-            Res = delta_factor*(s-s_old)/dt + velocity*grad_s;
-            aux8 = inv_s * inv_s * (grad_s*grad_s);
+            Res = delta_factor * (s - s_old) / dt + velocity*grad_s;
+            aux8 = inv_s * inv_s * (grad_s * grad_s);
 
-            if(aux8>0.0)
-               delta = fabs(inv_s*Res) * pow(aux8,aux9) * aux7;
+            if (aux8 > 0.0)
+                delta = fabs(inv_s * Res) * pow(aux8, aux9) * aux7;
             else
-               delta = 0.0;
+                delta = 0.0;
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i = 0; i < phi.size(); i++) {
                 // The RHS contribution
-                Fe(i) += JxW[qp]* ( phi[i][qp]  +                              // Galerkin mass-vector
-                                    tau * (velocity * dphi[i][qp]) ) * s_old ; // SUPG mass-vector
+                Fe(i) += JxW[qp]* (phi[i][qp] + // Galerkin mass-vector
+                        tau * (velocity * dphi[i][qp])) * s_old; // SUPG mass-vector
 
                 for (unsigned int j = 0; j < phi.size(); j++) {
                     // The Galerkin contribution
                     Ke(i, j) += JxW[qp]*(
-                            phi[i][qp] * phi[j][qp] +                       // Mass-matrix
-                            dt * ( -(dphi[i][qp]*velocity) * phi[j][qp] +   // Advection matrix
-                            k  *  dphi[i][qp] * dphi[j][qp] ) );            // Diffusion matrix
+                            phi[i][qp] * phi[j][qp] + // Mass-matrix
+                            dt * (-(dphi[i][qp] * velocity) * phi[j][qp] + // Advection matrix
+                            k * dphi[i][qp] * dphi[j][qp])); // Diffusion matrix
                     // The SUPG contribution
-                    Ke(i, j) += JxW[qp] * tau * ( (velocity * dphi[i][qp]) * phi[j][qp] +                  // Mass-matrix
-                                           dt * ( (velocity * dphi[i][qp]) * (velocity * dphi[j][qp]) ) ); // Advective-matrix
+                    Ke(i, j) += JxW[qp] * tau * ((velocity * dphi[i][qp]) * phi[j][qp] + // Mass-matrix
+                            dt * ((velocity * dphi[i][qp]) * (velocity * dphi[j][qp]))); // Advective-matrix
                     // YZBetha
                     Ke(i, j) += JxW[qp] * delta * dt * (dphi[i][qp] * dphi[j][qp]);
                 }
@@ -1315,30 +1310,27 @@ void SedimentationTransport::assembleSUPG2D()
                 fe_face->reinit(elem, s);
 
                 // Applying sedimentation flux boundary condition
-                if(this->apply_bottom_flow)
-                    if(mesh.boundary_info->boundary_id(elem,s) == this->deposition_id)
-                    {
+                if (this->apply_bottom_flow)
+                    if (mesh.boundary_info->boundary_id(elem, s) == this->deposition_id) {
                         // normal to the element face
                         const std::vector<Point> normal = fe_face->get_normals();
 
                         // loop over face integration points
-                        for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                        {
-                            RealVectorValue vel_sed_bottom (0.0,0.0);
+                        for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
+                            RealVectorValue vel_sed_bottom(0.0, 0.0);
                             Number s_old = 0.0;
-                            for (unsigned int l=0; l<phi_face.size(); l++)
-                            {
-                                s_old += phi_face[l][qp]*system.old_solution(dof_indices[l]);
-                                vel_sed_bottom(0) += phi_face[l][qp]*vel_sed(0);
-                                vel_sed_bottom(1) += phi_face[l][qp]*vel_sed(1);
+                            for (unsigned int l = 0; l < phi_face.size(); l++) {
+                                s_old += phi_face[l][qp] * system.old_solution(dof_indices[l]);
+                                vel_sed_bottom(0) += phi_face[l][qp] * vel_sed(0);
+                                vel_sed_bottom(1) += phi_face[l][qp] * vel_sed(1);
                             }
 
                             // Linear system contribution
-                            for (unsigned int i=0; i<phi_face.size(); i++) {
-                                Fe(i) -= JxW_face[qp] * dt * (1.0 - theta) * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * s_old);
+                            for (unsigned int i = 0; i < phi_face.size(); i++) {
+                                Fe(i) -= JxW_face[qp] * dt * (1.0 - theta) * (phi_face[i][qp] * (vel_sed_bottom * normal[qp]) * s_old);
                                 // Matrix contribution
-                                for (unsigned int j=0; j<phi_face.size(); j++)
-                                    Ke(i,j) += JxW_face[qp] * dt * theta * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * phi_face[j][qp]); // At LHS, advective flux has a positive sign
+                                for (unsigned int j = 0; j < phi_face.size(); j++)
+                                    Ke(i, j) += JxW_face[qp] * dt * theta * (phi_face[i][qp] * (vel_sed_bottom * normal[qp]) * phi_face[j][qp]); // At LHS, advective flux has a positive sign
                             }
                         }
                     } // end sedimentation flux_bc
@@ -1362,8 +1354,7 @@ void SedimentationTransport::assembleSUPG2D()
 
 }
 
-void SedimentationTransport::assembleSUPG3D()
-{
+void SedimentationTransport::assembleSUPG3D() {
     // It is a good idea to make sure we are assembling the proper system.
     libmesh_assert_equal_to(system_name, "transport");
 
@@ -1473,8 +1464,9 @@ void SedimentationTransport::assembleSUPG3D()
 
     RealVectorValue e(ex, ey, ez), vel_sed;
     vel_sed = Us*e;
-    Real Res, mod_v_ip, aux4, aux5, aux7, aux8, delta, tau, beta = 1.0, inv_pi = libMesh::pi, inv_s = 1.0/s_ref_bar;;
-    Real aux9 = beta*0.5 -1.0;
+    Real Res, mod_v_ip, aux4, aux5, aux7, aux8, delta, tau, beta = 1.0, inv_pi = libMesh::pi, inv_s = 1.0 / s_ref_bar;
+    ;
+    Real aux9 = beta * 0.5 - 1.0;
 
     // Now we will loop over all the elements in the mesh that
     // live on the local processor. We will compute the element
@@ -1491,12 +1483,12 @@ void SedimentationTransport::assembleSUPG3D()
 
         // The characteristic height of the element
         const Real vol = elem->volume();
-        const Real h_caract = pow(6.0*vol*inv_pi,1.0/3.0);
+        const Real h_caract = pow(6.0 * vol*inv_pi, 1.0 / 3.0);
 
         // for Tau SUPG and Delta YZBetha parameters
         // using for energy equation the diffusivity for the diffusive limit with dimension less formulation
-        aux4 = 9.0*pow(4.0*k/(h_caract*h_caract),2.0)+ dt_stab*4.0/(dt*dt);
-        aux7 = pow(h_caract*0.5, beta);
+        aux4 = 9.0 * pow(4.0 * k / (h_caract * h_caract), 2.0) + dt_stab * 4.0 / (dt * dt);
+        aux7 = pow(h_caract * 0.5, beta);
 
         // Get the degree of freedom indices for the
         // current element.  These define where in the global
@@ -1555,34 +1547,34 @@ void SedimentationTransport::assembleSUPG3D()
             RealVectorValue velocity(u + vel_sed(0), v + vel_sed(1), w + vel_sed(2));
 
             // Compute SUPG stabilization parameters: Tau SUPG & delta YZBeta
-            mod_v_ip = pow( velocity*velocity ,0.5 );
-            aux5 = pow(2.0*mod_v_ip/h_caract,2.0) + aux4;
-            tau = pow(aux5,-0.5);
+            mod_v_ip = pow(velocity*velocity, 0.5);
+            aux5 = pow(2.0 * mod_v_ip / h_caract, 2.0) + aux4;
+            tau = pow(aux5, -0.5);
 
             // Advection-Diffusion Residual
-            Res = delta_factor*(s-s_old)/dt + velocity*grad_s;
-            aux8 = inv_s * inv_s * (grad_s*grad_s);
+            Res = delta_factor * (s - s_old) / dt + velocity*grad_s;
+            aux8 = inv_s * inv_s * (grad_s * grad_s);
 
-            if(aux8>0.0)
-               delta = fabs(inv_s*Res) * pow(aux8,aux9) * aux7;
+            if (aux8 > 0.0)
+                delta = fabs(inv_s * Res) * pow(aux8, aux9) * aux7;
             else
-               delta = 0.0;
+                delta = 0.0;
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i = 0; i < phi.size(); i++) {
                 // The RHS contribution
-                Fe(i) += JxW[qp]* ( phi[i][qp]  +                              // Galerkin mass-vector
-                                    tau * (velocity * dphi[i][qp]) ) * s_old ; // SUPG mass-vector
+                Fe(i) += JxW[qp]* (phi[i][qp] + // Galerkin mass-vector
+                        tau * (velocity * dphi[i][qp])) * s_old; // SUPG mass-vector
 
                 for (unsigned int j = 0; j < phi.size(); j++) {
                     // The Galerkin contribution
                     Ke(i, j) += JxW[qp]*(
-                            phi[i][qp] * phi[j][qp] +                       // Mass-matrix
-                            dt * ( -(dphi[i][qp]*velocity) * phi[j][qp] +   // Advection matrix
-                            k  *  dphi[i][qp] * dphi[j][qp] ) );            // Diffusion matrix
+                            phi[i][qp] * phi[j][qp] + // Mass-matrix
+                            dt * (-(dphi[i][qp] * velocity) * phi[j][qp] + // Advection matrix
+                            k * dphi[i][qp] * dphi[j][qp])); // Diffusion matrix
                     // The SUPG contribution
-                    Ke(i, j) += JxW[qp] * tau * ( (velocity * dphi[i][qp]) * phi[j][qp] +                  // Mass-matrix
-                                           dt * ( (velocity * dphi[i][qp]) * (velocity * dphi[j][qp]) ) ); // Advective-matrix
+                    Ke(i, j) += JxW[qp] * tau * ((velocity * dphi[i][qp]) * phi[j][qp] + // Mass-matrix
+                            dt * ((velocity * dphi[i][qp]) * (velocity * dphi[j][qp]))); // Advective-matrix
                     // YZBetha
                     Ke(i, j) += JxW[qp] * delta * dt * (dphi[i][qp] * dphi[j][qp]);
                 }
@@ -1604,31 +1596,28 @@ void SedimentationTransport::assembleSUPG3D()
                 fe_face->reinit(elem, s);
 
                 // Applying sedimentation flux boundary condition
-                if(this->apply_bottom_flow)
-                    if(mesh.boundary_info->boundary_id(elem,s) == this->deposition_id)
-                    {
+                if (this->apply_bottom_flow)
+                    if (mesh.boundary_info->boundary_id(elem, s) == this->deposition_id) {
                         // normal to the element face
                         const std::vector<Point> normal = fe_face->get_normals();
 
                         // loop over face integration points
-                        for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                        {
-                            RealVectorValue vel_sed_bottom (0.0,0.0,0.0);
+                        for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
+                            RealVectorValue vel_sed_bottom(0.0, 0.0, 0.0);
                             Number s_old = 0.0;
-                            for (unsigned int l=0; l<phi_face.size(); l++)
-                            {
-                                s_old += phi_face[l][qp]*system.old_solution(dof_indices[l]);
-                                vel_sed_bottom(0) += phi_face[l][qp]*vel_sed(0);
-                                vel_sed_bottom(1) += phi_face[l][qp]*vel_sed(1);
-                                vel_sed_bottom(2) += phi_face[l][qp]*vel_sed(2);
+                            for (unsigned int l = 0; l < phi_face.size(); l++) {
+                                s_old += phi_face[l][qp] * system.old_solution(dof_indices[l]);
+                                vel_sed_bottom(0) += phi_face[l][qp] * vel_sed(0);
+                                vel_sed_bottom(1) += phi_face[l][qp] * vel_sed(1);
+                                vel_sed_bottom(2) += phi_face[l][qp] * vel_sed(2);
                             }
 
                             // Linear system contribution
-                            for (unsigned int i=0; i<phi_face.size(); i++) {
-                                Fe(i) -= JxW_face[qp] * dt * (1.0 - theta) * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * s_old);
+                            for (unsigned int i = 0; i < phi_face.size(); i++) {
+                                Fe(i) -= JxW_face[qp] * dt * (1.0 - theta) * (phi_face[i][qp] * (vel_sed_bottom * normal[qp]) * s_old);
                                 // Matrix contribution
-                                for (unsigned int j=0; j<phi_face.size(); j++)
-                                    Ke(i,j) += JxW_face[qp] * dt * theta * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * phi_face[j][qp]); // At LHS, advective flux has a positive sign
+                                for (unsigned int j = 0; j < phi_face.size(); j++)
+                                    Ke(i, j) += JxW_face[qp] * dt * theta * (phi_face[i][qp] * (vel_sed_bottom * normal[qp]) * phi_face[j][qp]); // At LHS, advective flux has a positive sign
                             }
                         }
                     } // end sedimentation flux_bc
