@@ -1,0 +1,119 @@
+# Input file for transport simulation
+
+version = 2.0
+
+#######################################################
+# Mesh Parameters
+#------------------------------------------------------
+
+# The coarse mesh from which to start adaptivity
+mesh/file = 'necker2d.msh'
+
+xlock = 0.75
+hlock = 2.0
+
+# Mesh Refinement Parameters
+amr/initial_unif_ref_mesh     = 4
+amr/max_r_steps = 2
+amr/r_fraction  = 0.9
+amr/c_fraction  = 0.001
+amr/max_h_level = 4
+amr/r_interval  = 20
+amr/amrc_flow_transp = true
+amr/first_step_refinement = true
+
+## 2D
+# Boundary Condition
+# necker2d.msh 
+# Physical parameters:
+# Left wall  : 1
+# Right wall : 2
+# Bottom wall: 3
+# top wall   : 4
+ 
+# Flow Boundary Condition
+#flow/dirichlet/slipx         = '1 2'
+flow/dirichlet/slipy         = '4'
+flow/dirichlet/noslip        = '1 2 3'
+#flow/dirichlet/pressure/zero = '4'
+
+#sediment transport boundary condition
+transport/deposition = '3'
+transport/neumann/erosion = '3'
+transport/neumann/apply_bottom_flux = true
+
+
+#Mesh Moviment
+mesh/dirichlet/nodisplacement  = '4'
+
+#Time Step Control
+ts_control/model_name = PC11
+ts_control/dt_min = 0.00001
+ts_control/dt_max = 0.001
+ts_control/tol_u = 0.005
+ts_control/tol_s = 0.001
+ts_control/nsa_max = 10
+ts_control/kp = 0.075
+ts_control/ki = 0.175
+ts_control/kd = 0.01
+ts_control/mult_factor_max = 2.0
+ts_control/mult_factor_min = 0.7
+ts_control/reduct_factor = 0.5
+ts_control/nsa_target_flow = 4
+ts_control/nsa_target_transport = 2
+ts_control/nsa_limit_flow = 5
+ts_control/nsa_limit_transport = 2
+ts_control/pc11_theta = 0.95
+ts_control/alpha = 0.8
+ts_control/k_exp = 2.0
+ts_control/s_mim = 0.05
+ts_control/s_max = 1.05
+ts_control/complete_flow_norm = false
+
+
+#----------------------------------------------------
+# TIME INTEGRATION PARAMETERS
+time/nssteady     = 30
+time/deltat       = 0.00001
+time/init_time    = 0.0
+time/tmax         = 20.0
+time/n_time_steps = 1000000
+time/theta        = 1.0
+
+#----------------------------------------------------
+# Linear and Non-Linear parameters
+
+flow_n_nonlinear_steps        = 11
+flow_nonlinear_tolerance      = 1.0e-4
+transport_n_nonlinear_steps   = 11
+transport_nonlinear_tolerance = 1.0E-4
+max_linear_iterations         = 300
+flow_initial_linear_solver_tolerance       = 1.0E-5
+transport_initial_linear_solver_tolerance  = 1.0E-6
+minimum_linear_solver_tolerance       = 1.0E-8
+linear_tolerance_power = 1.5
+
+#------------------------------------------------------
+# Stabilization Parameters
+stabilization/dt_stab = 1.0
+stabilization/s_ref_bar_yzBeta = 1.0
+stabilization/delta_transient_factor = 0.1
+stabilization/rbvms = false
+
+
+#------------------------------------------------------
+# EQUATION PARAMETERS
+Reynolds    =  0.0
+Grashof     =  2.5E07
+Schmidt     =  1.0
+Richardson  =  1.0
+Us          =  0.02
+ex          =  0.0
+ey          = -1.0
+c_factor    =  1.0
+Cs          =  0.0
+
+
+# Write out every nth timestep to file.
+write_interval    = 200
+catalyst_interval = 1
