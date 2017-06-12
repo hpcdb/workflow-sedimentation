@@ -332,12 +332,12 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation s
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name t_step -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name time -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name r -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name l -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name n_linear_iterations -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name final_linear_residual -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name norm_delta -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name norm_delta_u -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name converged -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name flow_l -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name flow_n_linear_iterations -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name flow_final_linear_residual -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name flow_norm_delta -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name flow_norm_delta_u -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name flow_converged -type text
 
 echo "Solver Simulation to the Transport"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag solverSimulationTransport
@@ -350,12 +350,42 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation s
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name t_step -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name time -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name r -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name l -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name n_linear_iterations -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name final_linear_residual -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name norm_delta -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name norm_delta_u -type numeric
-java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name converged -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name transport_l -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name transport_n_linear_iterations -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name transport_final_linear_residual -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name transport_norm_delta -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name transport_norm_delta_u -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name transport_converged -type text
+
+echo "Compute Solution Change"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag computeSolutionChange
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation computeSolutionChange -name libmesh-sedimentation-opt::EvaluateTimeStepControl -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation computeSolutionChange -tag osolversimulationtransport -type input -dependency solverSimulationTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation computeSolutionChange -tag ocomputeSolutionChange -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name t_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name time -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name dt -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name n_flow_linear_iterations_total -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name n_flow_nonlinear_iterations_total -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name n_transport_linear_iterations_total -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name n_transport_nonlinear_iterations_total -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name solution_converged -type text
+
+echo "Compute Time Step"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag computeTimeStep
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation computeTimeStep -name libmesh-sedimentation-opt::EvaluateTimeStepControl -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation computeTimeStep -tag ocomputeSolutionChange -type input -dependency computeSolutionChange
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation computeTimeStep -tag ocomputeTimeStep -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeTimeStep -set ocomputeTimeStep -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeTimeStep -set ocomputeTimeStep -name t_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeTimeStep -set ocomputeTimeStep -name time -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeTimeStep -set ocomputeTimeStep -name dt -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeTimeStep -set ocomputeTimeStep -name ts_converged -type text
 
 echo "Mesh Refinement"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshRefinement

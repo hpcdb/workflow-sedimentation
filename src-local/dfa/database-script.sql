@@ -99,7 +99,7 @@ CREATE TABLE attribute(
 	id INTEGER DEFAULT NEXT VALUE FOR "att_id_seq" NOT NULL,
 	ds_id INTEGER NOT NULL,
 	extractor_id INTEGER,
-	name VARCHAR(30),
+	name VARCHAR(50),
 	type VARCHAR(15),
 	PRIMARY KEY ("id"),
 	FOREIGN KEY ("ds_id") REFERENCES data_set("id") ON DELETE CASCADE ON UPDATE CASCADE,
@@ -240,7 +240,7 @@ BEGIN
 END;
 
 -- DROP FUNCTION insertAttribute;
-CREATE FUNCTION insertAttribute (dds_id INTEGER, vextractor_id INTEGER, vname VARCHAR(30), vtype VARCHAR(15))
+CREATE FUNCTION insertAttribute (dds_id INTEGER, vextractor_id INTEGER, vname VARCHAR(50), vtype VARCHAR(15))
 RETURNS INTEGER
 BEGIN
 	DECLARE vid INTEGER;

@@ -1,5 +1,3 @@
-
-
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
@@ -57,7 +55,6 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-
 // Define a wrapper for exact_solution that will be needed below
 
 Number init_value(const Point& p,
@@ -72,12 +69,10 @@ Number init_value(const Point& p,
 }
 
 void init_sedimentation(EquationSystems& es, const std::string& system_name) {
-
     libmesh_assert_equal_to(system_name, "transport");
 
     TransientLinearImplicitSystem & system =
             es.get_system<TransientLinearImplicitSystem>("transport");
-
     es.parameters.set<Real> ("time") = system.time = 0;
 
     system.project_solution(init_value, NULL, es.parameters);
@@ -90,14 +85,10 @@ void SedimentationTransport::init() {
     this->dim = mesh.mesh_dimension();
 
     TransientLinearImplicitSystem & transport_system = this->es.add_system<TransientLinearImplicitSystem> ("transport");
-
     unsigned int s_var = transport_system.add_variable("s");
-
-
 }
 
 void SedimentationTransport::setup(GetPot &infile) {
-
     const MeshBase& mesh = es.get_mesh();
 
     // The dimension that we are running
@@ -129,7 +120,6 @@ void SedimentationTransport::setup(GetPot &infile) {
         transport_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(cprescribed, sed_vars, &pbc));
     }
 
-
     this->noflux_bc_id = infile("transport/neumann/noflux", -1);
     this->erosion_bc_id = infile("transport/neumann/erosion", -1);
     this->deposition_id = infile("transport/deposition", -1);
@@ -145,7 +135,6 @@ void SedimentationTransport::setup(GetPot &infile) {
 }
 
 void SedimentationTransport::assemble2D() {
-
     // It is a good idea to make sure we are assembling
     // the proper system.
 

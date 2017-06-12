@@ -61,7 +61,17 @@ public:
 
     void inputSolverSimulationTransport();
     void outputSolverSimulationTransport(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    
+    void inputComputeSolutionChange();
+    void outputComputeSolutionChange(int time_step, Real time, Real dt, 
+            unsigned int n_flow_linear_iterations_total, unsigned int n_flow_nonlinear_iterations_total, 
+            unsigned int n_transport_linear_iterations_total, unsigned int n_transport_nonlinear_iterations_total,
+            bool timeStepAccepted);
+    
+    void inputComputeTimeStep();
+    void outputComputeTimeStep(int time_step, Real time, Real dt, bool timeStepAccepted);
 
+    void inputMeshRefinement();
     void outputMeshRefinement(bool first_step_refinement, int time_step, int before_n_active_elem, int after_n_active_elem);
 
     void inputMeshWriter();
@@ -103,6 +113,16 @@ public:
         if (processor_id != 0) return;
         numberIterationsMeshRefinements++;
     }
+    
+    void incrementIterationsComputeSolutionChange() {
+        if (processor_id != 0) return;
+        numberIterationsComputeSolutionChange++;
+    }
+    
+    void incrementIterationsComputeTimeStep() {
+        if (processor_id != 0) return;
+        numberIterationsComputeTimeStep++;
+    }
 
     void setTaskID(int taskID) {
         if (processor_id != 0) return;
@@ -127,6 +147,16 @@ public:
     void setNumberIterationsMeshRefinements(int value) {
         if (processor_id != 0) return;
         this->numberIterationsMeshRefinements = value;
+    }
+    
+    void setNumberIterationsComputeSolutionChange(int value) {
+        if (processor_id != 0) return;
+        this->numberIterationsComputeSolutionChange = value;
+    }
+    
+    void setNumberIterationsComputeTimeStep(int value) {
+        if (processor_id != 0) return;
+        this->numberIterationsComputeTimeStep = value;
     }
 
     void addMeshDependencyToList() {
@@ -157,6 +187,16 @@ public:
     void resetIterationsMeshRefinement() {
         if (processor_id != 0) return;
         numberIterationsMeshRefinements = 0;
+    }
+    
+    void resetIterationsComputeSolutionChange() {
+        if (processor_id != 0) return;
+        numberIterationsComputeSolutionChange = 0;
+    }
+    
+    void resetIterationsComputeTimeStep() {
+        if (processor_id != 0) return;
+        numberIterationsComputeTimeStep = 0;
     }
 
     void incrementIndexerID() {
@@ -198,6 +238,8 @@ private:
     int numberIterationsFlow = 0;
     int numberIterationsTransport = 0;
     int numberIterationsMeshRefinements = 0;
+    int numberIterationsComputeSolutionChange = 0;
+    int numberIterationsComputeTimeStep = 0;
     vector<int> meshDependencies;
     
 //    to control the loop on the flow and the sediments
