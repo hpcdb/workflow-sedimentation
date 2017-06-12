@@ -182,6 +182,10 @@ public:
     int getIndexerID() {
         return indexerID;
     }
+    
+    int getTaskID(){
+        return taskID;
+    }
 
 
 private:
@@ -195,6 +199,9 @@ private:
     int numberIterationsTransport = 0;
     int numberIterationsMeshRefinements = 0;
     vector<int> meshDependencies;
+    
+//    to control the loop on the flow and the sediments
+    int previousTaskID;
 
     const int jsonArraySize = 4096;
     const int arraySize = 256;
