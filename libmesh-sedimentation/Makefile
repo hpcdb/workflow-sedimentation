@@ -5,15 +5,11 @@
 CATALYST?=1
 PROVENANCE?=1
 
-LIBMESH_DIR=/home/vitor/programs/libmesh
-
-# include the library options determined by configure
-include $(LIBMESH_DIR)/Make.common
-
 include config/config.vitor.ubuntu
 #include config/config.loboc
 
-
+# include the library options determined by configure
+include $(LIBMESH_DIR)/Make.common
 
 TARGET_SUFFIX := $(METHOD)
 

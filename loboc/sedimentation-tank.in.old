@@ -1,0 +1,87 @@
+# Input file for transport simulation
+version = 2.0
+
+#######################################################
+# Mesh Parameters
+#------------------------------------------------------
+
+# The coarse mesh from which to start adaptivity
+mesh/file = 'necker3d.msh'
+
+xlock = 1.0
+hlock = 1.999
+
+#------------------------------------------------------------
+# 3D
+# Boundary Condition
+# necker3d.msh
+# Physical parameters:
+# Left wall  : 1
+# Right wall : 2
+# Bottom wall: 3
+# top wall   : 4
+# front wall : 5
+# back wall  : 6
+
+dim = 3
+flow/dirichlet/inlet   = '3'
+flow/dirichlet/inlet/constant/u = '0.5'
+flow/dirichlet/inlet/constant/v = '0.0'
+flow/dirichlet/inlet/constant/w = '0.0'
+
+flow/dirichlet/deposition = '2'
+flow/dirichlet/slipz      = '1'
+flow/dirichlet/noslip     = '4'
+flow/dirichlet/pnull      = '1'
+flow/dirichlet/fixedwall  = '1'
+flow/dirichlet/czero      = '1'
+flow/dirichlet/sediment/prescribed = '3'
+
+sediment/init_condition = false
+
+
+#------------------------------------------------------
+# refinement parameters
+
+amr/hlevels     = 0
+amr/max_r_steps = 1
+amr/r_fraction  = 0.08
+amr/c_fraction  = 0.01
+amr/max_h_level = 1
+amr/r_interval  = 100
+amr/first_step_refinement = false
+
+
+#----------------------------------------------------
+# TIME INTEGRATION PARAMETERS
+
+time/deltat = 0.005
+time/n_time_steps          = 1000000
+time/max_linear_iterations = 100
+time/tmax    = 100.0 
+
+#----------------------------------------------------
+# Linear and Non-Linear parameters
+
+flow_n_nonlinear_steps        = 10
+flow_nonlinear_tolerance      = 1.0E-3
+transport_n_nonlinear_steps   = 10
+transport_nonlinear_tolerance = 1.0E-3
+max_linear_iterations         = 100
+linear_solver_tolerance       = 1.0E-6
+
+#------------------------------------------------------
+# EQUATION PARAMETERS
+
+Reynolds    =  2000.0
+Grashof     =  0.0
+Sc          =  1.0
+Us          =  5.6651e-03
+ex          =  0.0
+ey          =  0.0
+ez          = -1.0
+
+# Write out every nth timestep to file.
+write_interval    = 100
+catalyst_interval = 100
+
