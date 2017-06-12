@@ -1,86 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="f2cblaslapack-3.4.2.q1"
-                   displayName="f2cblaslapack-3.4.2.q1"
-                   projectFiles="true"
-                   root="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1">
-      <logicalFolder name="blas" displayName="blas" projectFiles="true">
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dcopy.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dgemm.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dgemv.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dger.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dnrm2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/drot.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dscal.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dswap.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dtrmm.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dtrmv.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dtrsm.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/f2c.h</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/idamax.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/lsame.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/pow_di.c</itemPath>
-      </logicalFolder>
-      <logicalFolder name="lapack" displayName="lapack" projectFiles="true">
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dbdsqr.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgebd2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgebrd.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgelq2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgelqf.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgelss.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgeqr2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgeqrf.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgesvd.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgetf2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgetrf.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgetrs.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/disnan.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlabad.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlabrd.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlacpy.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlaisnan.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlange.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlapy2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarf.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarfb.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarfg.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarft.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlartg.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlas2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlascl.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlaset.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq1.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq3.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq4.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq5.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq6.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasr.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasrt.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlassq.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasv2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlaswp.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorg2r.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorgbr.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorgl2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorglq.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorgqr.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorm2r.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dormbr.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorml2.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dormlq.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dormqr.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/drscl.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/f2c.h</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/ieeeck.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/iladlc.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/iladlr.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/ilaenv.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/iparmq.c</itemPath>
-        <itemPath>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/xerbla.c</itemPath>
-      </logicalFolder>
-    </logicalFolder>
     <df root="." name="0">
       <df name="contrib">
         <df name="dfanalyzer">
@@ -144,9 +64,7 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <flagsDictionary>
-        <element flagsID="0"
-                 commonFlags="-mtune=generic -march=x86-64 -g -O -fPIC -fstack-protector-strong"/>
-        <element flagsID="1" commonFlags="-std=gnu++11 -O2 -fopenmp"/>
+        <element flagsID="0" commonFlags="-std=gnu++11 -O2 -fopenmp"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -155,7 +73,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>sediment-opt</executablePath>
           <ccTool>
             <incDir>
               <pElem>include/common</pElem>
@@ -167,11 +85,11 @@
               <pElem>contrib</pElem>
               <pElem>contrib/dfanalyzer/*.h</pElem>
               <pElem>include/provenance</pElem>
-              <pElem>../../../../program/paraview-5.3.0/include/paraview-5.3</pElem>
+              <pElem>../../../../programs/paraview-5.3.0/include/paraview-5.3</pElem>
               <pElem>include/catalyst</pElem>
-              <pElem>../../../../program/libmesh/include</pElem>
-              <pElem>../../../../program/hdf5/include</pElem>
-              <pElem>../../../../program/petsc/include</pElem>
+              <pElem>../../../../programs/libmesh/include</pElem>
+              <pElem>../../../../programs/hdf5/include</pElem>
+              <pElem>../../../../programs/petsc/include</pElem>
               <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent</pElem>
               <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include</pElem>
               <pElem>/usr/lib/openmpi/include</pElem>
@@ -184,506 +102,27 @@
             </preprocessorList>
           </ccTool>
         </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
       </makefileType>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dcopy.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dgemm.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dgemv.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dger.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dnrm2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/drot.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dscal.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dswap.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dtrmm.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dtrmv.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/dtrsm.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/idamax.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/lsame.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas/pow_di.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dbdsqr.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgebd2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgebrd.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgelq2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgelqf.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgelss.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgeqr2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgeqrf.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgesvd.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgetf2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgetrf.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dgetrs.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/disnan.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlabad.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlabrd.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlacpy.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlaisnan.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlange.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlapy2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarf.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarfb.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarfg.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlarft.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlartg.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlas2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlascl.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlaset.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq1.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq3.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq4.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq5.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasq6.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasr.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasrt.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlassq.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlasv2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dlaswp.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorg2r.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorgbr.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorgl2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorglq.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorgqr.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorm2r.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dormbr.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dorml2.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dormlq.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/dormqr.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/drscl.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/ieeeck.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/iladlc.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/iladlr.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/ilaenv.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/iparmq.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
-      <item path="../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack/xerbla.c"
-            ex="false"
-            tool="0"
-            flavor2="3">
-        <cTool flags="0">
-        </cTool>
-      </item>
       <item path="contrib/dfanalyzer/performance_metric.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="contrib/dfanalyzer/provenance_object.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="contrib/dfanalyzer/task.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <folder path="0/contrib">
@@ -700,99 +139,85 @@
           </incDir>
         </ccTool>
       </folder>
-      <folder path="f2cblaslapack-3.4.2.q1/blas">
-        <cTool>
-          <incDir>
-            <pElem>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/blas</pElem>
-          </incDir>
-        </cTool>
-      </folder>
-      <folder path="f2cblaslapack-3.4.2.q1/lapack">
-        <cTool>
-          <incDir>
-            <pElem>../../../source/petsc-3.7.2/arch-linux2-c-opt/externalpackages/f2cblaslapack-3.4.2.q1/lapack</pElem>
-          </incDir>
-        </cTool>
-      </folder>
       <item path="sedimentation.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/catalyst/FEAdaptor.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/common/stab_helper.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/flow/sedimentation_flow.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/flow/viscosity_flow.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/io/xdmf.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/mesh_mov/mesh_moviment.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/provenance/provenance.C" ex="false" tool="1" flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/sediment/sediment_mass_energy.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/sediment/sedimentation_deposition.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/sediment/sedimentation_transport.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlBase.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlPC11.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlPID.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlResidual.C"
             ex="false"
             tool="1"
             flavor2="8">
-        <ccTool flags="1">
+        <ccTool flags="0">
         </ccTool>
       </item>
     </conf>
