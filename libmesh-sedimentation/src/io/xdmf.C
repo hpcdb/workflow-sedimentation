@@ -398,9 +398,38 @@ void XDMFWriter::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &
     //if(!this->is_mesh_changed) return;
     
     g2l.clear();
+    coords.clear();
+    conn.clear();
+ 
+    // NEW 
+    /*
+    dof_id_type local_node_counter = 0;
+    MeshBase::const_node_iterator n_it        = mesh.local_nodes_begin();
+    const MeshBase::const_node_iterator n_end = mesh.local_nodes_end();
+
+    for (; n_it != n_end; ++n_it)
+    {
+        const Node* node = *n_it;
+        dof_id_type gid = node->id();
+        g2l.insert(std::pair<int, int>(gid,local_node_counter));
+        //g2l[gid] = local_node_counter;
+        double x = (*node)(0);
+        double y = (*node)(1);
+        double z = (*node)(2);
+        coords.push_back(x);
+        coords.push_back(y);
+        coords.push_back(z);
+        local_node_counter++;
+       
+    }
+    */
    
+   
+  
+   //OLD  
     MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+   
     
     unsigned int local_node_counter = 0;
     for (; it != end; ++it)
@@ -430,6 +459,7 @@ void XDMFWriter::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &
         
     }
     
+
     libmesh_assert(local_node_counter == mesh.n_local_nodes());
     
     unsigned int local_elem_counter = 0;
@@ -441,6 +471,8 @@ void XDMFWriter::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &
         if(local_elem_counter == 0) this->elemtype = elem->type();
         for (unsigned int i=0; i<elem->n_nodes(); ++i)
         {
+            
+            libmesh_assert(g2l.find(elem->node(i)) != g2l.end());
             int local_node = g2l[elem->node(i)];
             libmesh_assert(local_node < local_node_counter);
             conn.push_back(local_node);
@@ -449,6 +481,7 @@ void XDMFWriter::libMesh_to_xdmf(std::vector<double>& coords, std::vector<int> &
         
     }
      
+    libmesh_assert(local_elem_counter == mesh.n_active_local_elem());
     
     this->n_local_elem  = local_elem_counter;
     this->n_local_nodes = local_node_counter;
@@ -470,6 +503,22 @@ void XDMFWriter::get_variable_solution(EquationSystems& es, int sys, int ivar, s
     const FEType & fe_type    = system.variable_type(ivar);
     
     NumericVector<Number> & sys_soln(*system.current_local_solution);
+    //std::cout << "Solution size: " << sys_soln.size() << std::endl;
+    //std::cout << "# local Nodes: " << mesh.n_local_nodes() << std::endl;
+    
+    /*
+    MeshBase::const_node_iterator it        = mesh.local_nodes_begin();
+    const MeshBase::const_node_iterator end = mesh.local_nodes_end();
+    for (; it != end; ++it)
+    {
+        const Node* node = *it;
+        
+        dof_id_type local_id       = g2l[node->id()];
+        dof_id_type dof_id         = node->dof_number(sys,ivar,0);
+        solution[local_id] = sys_soln(dof_id);
+        
+    } **/
+   
     
     MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_local_elements_end();

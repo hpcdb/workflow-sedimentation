@@ -34,7 +34,7 @@ timeStepControlPC11::timeStepControlPC11( double dt_init, double dt_min, double 
                                         s_max(s_max),
                                         complet_flow_norn(complete)
 {
-    cout<<"PC11 time-step control will be adopted"<<((complet_flow_norn)?" with complete solution vector norm.\n\n":" with only velocity solution vector norm.\n\n"); 
+    cout<<"PC11 time-step control will be adopted"<<((complet_flow_norn)?" with complete solution vector norm.\n":" with only velocity solution vector norm.\n"); 
 }
 
 timeStepControlPC11::timeStepControlPC11(const timeStepControlPC11& orig):
@@ -101,7 +101,7 @@ void  timeStepControlPC11::computeSolutionChangeInTime(EquationSystems & es) {
         double global_norm, global_dif_norm, local_sqr_norm = 0.0;
         double local_sqr_dif_norm = 0.0;
         int ndata = 2;
-        double rms[ndata], rms_sum[ndata];
+        double rms[2], rms_sum[2];
 
         for (int i=0; i<ndata; i++) {
            rms[i]= 0.0;
@@ -109,9 +109,11 @@ void  timeStepControlPC11::computeSolutionChangeInTime(EquationSystems & es) {
         }
 
         // counting on only velocity components to compute L2 norm  
-        for (numeric_index_type i = flow_system_reference.solution->first_local_index(); i<flow_system_reference.solution->last_local_index()-dim; i+=dim+1) {     
-            local_sqr_norm += (flow_system_reference.solution->el(i)*flow_system_reference.solution->el(i) + flow_system_reference.solution->el(i+1)*flow_system_reference.solution->el(i+1));
-            local_sqr_dif_norm += (current_flow_soln->el(i)*current_flow_soln->el(i) + current_flow_soln->el(i+1)*current_flow_soln->el(i+1));
+        for (numeric_index_type i = flow_system_reference.solution->first_local_index(); i<flow_system_reference.solution->last_local_index()-dim; i+=dim+1) {
+            for ( numeric_index_type k = i; k < i+dim; k++ ) {
+                local_sqr_norm += ( flow_system_reference.solution->el(k)*flow_system_reference.solution->el(k) );
+                local_sqr_dif_norm += (current_flow_soln->el(k)*current_flow_soln->el(k) );
+            }
         }
 
         rms[0] = local_sqr_norm;
@@ -173,11 +175,90 @@ void  timeStepControlPC11::computeSolutionChangeInTime(EquationSystems & es) {
     // compute the maximum measure of the change in time for the systems
     this->rn = std::max(r_flow, r_transport);
 
-    std::cout << " \nMeasure of the solution change in time = " << this->rn << " and last = "<<this->rn_1<<std::endl;
+    std::cout << "\nMeasure of the solution change in current  time = " << this->rn << std::endl;
+    std::cout << "Measure of the solution change in previous time = " <<this->rn_1<<std::endl;
+}
+
+void timeStepControlPC11::checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted)
+{
+    accepted = true;
+    if ( (this->rn>1.0  || flow_nonlinear_iteractions > this->nsa_max || transport_nonlinear_iteractions > this->nsa_max ) && dt > this->dt_min)
+        accepted = false;
+    
+    // check whether the current time-step was accepted because it was already the minimum 
+    if (accepted) { 
+        this->ckeckKeepMinTimeStep(dt, flow_nonlinear_iteractions, transport_nonlinear_iteractions);
+    }      
+    
+}
+
+void timeStepControlPC11::computeTimeStep(bool accepted, Real time, Real tmax, Real& dt)
+{
+    
+    if(!accepted)
+    {
+        this->dt_avg -= dt;
+       
+        // For while next time-step will be reduced by an alpha factor [0,1]
+        dt = this->alpha * dt;  
+        
+        std::cout << " New calculated time step = " << dt << std::endl;
+        
+        // For while next time-step will be reduced by an alpha factor [0,1] but not smaller than dt_min!
+        dt = max(dt, this->dt_min);        
+            
+        // updating number of rejected time-steps
+        this->dt_avg += dt;
+        this->n_rejected_time_step++;
+        
+    }else
+    {   
+        std::cout << "\nCurrent solution was accepted";
+                
+        if(this->keep_dt_min) {
+            std::cout <<" because time-step is minimum!" << std::endl;
+            // since current time-step value was accepted only because it is equal the minimum, it's value will be repeated
+
+            //storing last accepted time-step
+            this->dt_last = dt;
+
+        } else {
+            std::cout <<"!" << std::endl;
+            double exp = 1.0/(this->k_exp+1.0);
+            double dt_star = this->theta * pow( this->rn_1/(this->rn*this->rn ),exp) * dt*dt/this->dt_last;
+            
+            //storing last accepted time-step
+            this->dt_last = dt;
+
+            dt = std::min(this->s_max*dt, std::max(this->s_min*dt, dt_star) );
+
+            std::cout << " New calculated time step = " << dt <<std::endl;
+
+            // check time step range
+            dt = max(dt,this->dt_min);
+            dt = min(dt,this->dt_max);
+        }
+
+        // updating number of accepted time-steps
+        // to compute average time-step
+        this->dt_avg+=dt;
+        this->n_accepted_time_step++;
+        // storing error measure
+        this->storeSolutionChangeinTime();     
+            
+    }
+
+    // check whether simulation has reached the end to avoid exceed maximum simulation time
+    if (time+dt>tmax || tmax-(time+dt) < this->dt_min)
+        dt = tmax - time;
+
+    std::cout << " Next adopted time step = " << dt <<". Var = "<<(dt-this->dt_last)/this->dt_last*100 <<"%"<< std::endl;
 }
 
 
-void timeStepControlPC11::checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted) {
+
+/*
+void timeStepControlPC11::checkTimeStepAcceptance(EquationSystems & es, double& dt, bool& accepted) {
     
     
     unsigned int flow_nli_counter      = es.parameters.get<unsigned int>("n_non_linear_iter_flow");
@@ -301,6 +382,7 @@ void timeStepControlPC11::checkTimeStepAcceptance(EquationSystems & es, double& 
                     
 //    std::cout << " New adopted time step = " << dt << std::endl;       
 } 
+ */
 
 /*
 void timeStepControlPC11::checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted) {
@@ -410,5 +492,13 @@ void timeStepControlPC11::printSelf (ostream& os, const char* indent) const {
         << "\n\n Effective time-step size average: "
         << this->dt_avg/this->n_accepted_time_step            
 		<< std::endl;    
+}
+
+void timeStepControlPC11::ckeckKeepMinTimeStep( Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions) 
+{
+    if ( (this->rn > 1.0 || flow_nonlinear_iteractions > (this->nsa_max) || transport_nonlinear_iteractions > (this->nsa_max) ) && abs(dt - this->dt_min) < 1.0e-10 )
+        this->keep_dt_min = true;
+    else
+        this->keep_dt_min = false;       
 }
     

@@ -5,6 +5,9 @@
  * Created on May 18, 2016, 09:42 AM
  */
 
+#ifndef PERFORMANCE_H
+#define PERFORMANCE_H
+
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
@@ -43,6 +46,7 @@ class Performance
       timespec endTime;
 };
 
+#endif
 
 
 

@@ -59,9 +59,13 @@ public:
     
     virtual void computeSolutionChangeInTime(EquationSystems & es) = 0;
     
-    virtual void checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted) = 0;
+    virtual void checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted) = 0;
+    
+    virtual void computeTimeStep(bool accepted, Real time, Real tmax, Real &dt) = 0;
     
     virtual void storeSolutionChangeinTime() = 0;
+    
+    virtual void ckeckKeepMinTimeStep( Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions) = 0;
     
     virtual void printSelf (ostream& os, const char* indent) const = 0;
     
@@ -104,6 +108,8 @@ protected:
     unsigned int start_control;
     // maximum number of non linear iterations (successive approximation)
     unsigned int nsa_max;
+    // flag to check whether a time-step solution was accepted only because minimum time-step value is already reached
+    bool keep_dt_min;
 };
 
 #endif /* TIMESTEPCONTROLBASE_H */

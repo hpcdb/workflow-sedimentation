@@ -16,6 +16,8 @@
 #include <ostream>
 #include <fstream>
 
+#include "libmesh/system_norm.h" 
+
 #include "timeStepControlPID.h"
 
 using namespace libMesh;
@@ -32,7 +34,7 @@ timeStepControlPID::timeStepControlPID( double dt_init, double dt_min, double dt
                                         en_2(1.0),
                                         dt_prev(dt_init)
 {
-    cout<<"PID time-step control will be adopted\n\n"; 
+    cout<<"PID time-step control will be adopted\n"; 
 }
 
 timeStepControlPID::timeStepControlPID(const timeStepControlPID& orig):
@@ -59,6 +61,8 @@ void  timeStepControlPID::computeSolutionChangeInTime(EquationSystems & es) {
     TransientLinearImplicitSystem & flow_system_reference =
     es.get_system<TransientLinearImplicitSystem> ("flow");
     
+    
+    const unsigned int dim = es.get_mesh().mesh_dimension();
     // Compute the l2 norm of the flow solution (includes pressure)
     //flow_norm = flow_system_reference.solution->l2_norm();
     
@@ -73,25 +77,6 @@ void  timeStepControlPID::computeSolutionChangeInTime(EquationSystems & es) {
     // Close the vector before computing its norm
     current_flow_soln->close();
 
-    // Compute the l2 norm of the difference between two successive solutions
-    //flow_diff_norm = current_flow_soln->l2_norm();
-    
-    //cout<<"norma LM = "<<flow_norm<<" norm_delta = "<<flow_diff_norm<<endl;
-    
-    // compute the measure of the change in time for flow
-    //if (flow_diff_norm>1.0e-10) { // avoid 'e_flow' become zero!
-    //    e_flow = flow_diff_norm / flow_norm;
-    //    e_flow /= this->tol_U;
-    //}
-    
-   // cout<<" eflow_before = "<< e_flow<<endl;
-    
-    // Get a conSTant reference to the mesh object.
-    const MeshBase& mesh = es.get_mesh();
-
-    // The dimension that we are running
-    const unsigned int dim = mesh.mesh_dimension();
-
     MPI_Comm comm = MPI_COMM_WORLD;
 
     double global_norm, global_dif_norm, local_sqr_norm = 0.0;
@@ -105,9 +90,11 @@ void  timeStepControlPID::computeSolutionChangeInTime(EquationSystems & es) {
     }
   
     // counting on only velocity components to compute L2 norm  
-    for (numeric_index_type i = flow_system_reference.solution->first_local_index(); i<flow_system_reference.solution->last_local_index()-dim; i+=dim+1) {     
-        local_sqr_norm += (flow_system_reference.solution->el(i)*flow_system_reference.solution->el(i) + flow_system_reference.solution->el(i+1)*flow_system_reference.solution->el(i+1));
-        local_sqr_dif_norm += (current_flow_soln->el(i)*current_flow_soln->el(i) + current_flow_soln->el(i+1)*current_flow_soln->el(i+1));
+    for (numeric_index_type i = flow_system_reference.solution->first_local_index(); i<flow_system_reference.solution->last_local_index()-dim; i+=dim+1) {
+        for ( numeric_index_type k = i; k < i+dim; k++ ) {
+            local_sqr_norm += ( flow_system_reference.solution->el(k)*flow_system_reference.solution->el(k) );
+            local_sqr_dif_norm += (current_flow_soln->el(k)*current_flow_soln->el(k) );
+        }
     }
 
     rms[0] = local_sqr_norm;
@@ -115,10 +102,8 @@ void  timeStepControlPID::computeSolutionChangeInTime(EquationSystems & es) {
 
     MPI_Allreduce(rms, rms_sum, ndata, MPI_DOUBLE, MPI_SUM, comm);
      
-    global_norm = std::pow(rms_sum[0],0.5);
+    global_norm     = std::pow(rms_sum[0],0.5);
     global_dif_norm = std::pow(rms_sum[1],0.5);
-     
-    //cout<<" minha norma = "<<global_norm<<" norm_delta = "<<global_dif_norm<<endl;
      
 
     // compute the measure of the change in time for flow
@@ -169,27 +154,30 @@ void  timeStepControlPID::computeSolutionChangeInTime(EquationSystems & es) {
     // compute the maximum measure of the change in time for the systems
     this->en = std::max(e_flow, e_transport);
 
-    std::cout << " \nMeasure of the solution change in time = " << this->en << std::endl;
+    std::cout << "\nMeasure of the solution change in current  time = " << this->en << std::endl;
+    std::cout << "Measure of the solution change in previous time = " << this->en_1 << std::endl;
+    std::cout << "Measure of the solution change in older    time = " << this->en_2 << std::endl;
 }
 
+/*
 void timeStepControlPID::checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted) {
     
     unsigned int flow_nli_counter = es.parameters.get<unsigned int>("n_non_linear_iter_flow");
     unsigned int transport_nli_counter = es.parameters.get<unsigned int>("n_non_linear_iter_transport");
     
-    if ( (this->en>1.0 || flow_nli_counter>(this->nsa_max) || transport_nli_counter>(this->nsa_max) ) && dt > this->dt_min)     { // current time-step is refused  
+    if ( (this->en>1.0 || flow_nli_counter > (this->nsa_max) || transport_nli_counter>(this->nsa_max) ) && dt > this->dt_min)     { // current time-step is refused  
         
         std::cout << " Current solution was refused!\n Reverting time data" << std::endl;
         
         // Get a reference to the Flow and Transport systems object and restore the solution vectors from the previous time step
-        TransientLinearImplicitSystem & flow_system_reference = es.get_system<TransientLinearImplicitSystem> ("flow");
-        *flow_system_reference.current_local_solution = *flow_system_reference.old_local_solution;    
-        if ( es.has_system("Transport") ) {        
-            TransientLinearImplicitSystem & transport_system_reference =  es.get_system<TransientLinearImplicitSystem> ("transport");
-            *transport_system_reference.current_local_solution = *transport_system_reference.old_local_solution;
-        }
+        //TransientLinearImplicitSystem & flow_system_reference = es.get_system<TransientLinearImplicitSystem> ("flow");
+        //*flow_system_reference.current_local_solution = *flow_system_reference.old_local_solution;    
+        //if ( es.has_system("Transport") ) {        
+        //    TransientLinearImplicitSystem & transport_system_reference =  es.get_system<TransientLinearImplicitSystem> ("transport");
+        //    *transport_system_reference.current_local_solution = *transport_system_reference.old_local_solution;
+        //}
 
-        es.parameters.set<Real> ("time") -= dt;
+        //es.parameters.set<Real> ("time") -= dt;
         this->dt_avg -= dt;
         t_step--;
 
@@ -254,6 +242,79 @@ void timeStepControlPID::checkTimeStepAcceptance(EquationSystems & es, double& d
             this->n_accepted_time_step++;   
         }  // end "else" time-step accepted
     }
+ * */
+
+void timeStepControlPID::checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted)
+{
+    accepted = true;
+    if ( (this->en > 1.0 || flow_nonlinear_iteractions > this->nsa_max || transport_nonlinear_iteractions > this->nsa_max ) && dt > this->dt_min)
+        accepted = false;
+    
+    // check whether the current time-step was accepted because it was already the minimum 
+    if (accepted) { 
+        this->ckeckKeepMinTimeStep(dt, flow_nonlinear_iteractions, transport_nonlinear_iteractions);
+    }     
+  
+}
+
+void timeStepControlPID::computeTimeStep(bool accepted, Real time, Real tmax, Real &dt)
+{
+    if(!accepted) 
+    { 
+        this->dt_avg -= dt;
+        Real factor = 1.0/this->en;
+
+        if (factor > 0.8)
+            factor = 0.8;
+        
+        dt = factor*dt;
+        std::cout << " New calculated time step = "<< dt<<endl;
+                
+        // check time-step range
+        dt = max(dt,this->dt_min);
+        
+        // updating parameters
+        this->dt_avg += dt;
+        this->dt_prev = dt*dt/this->dt_prev;
+        this->n_rejected_time_step++;
+            
+    } else 
+    { 
+        //current time-step is accepted
+        //storing last accepted time-step
+        this->dt_last = dt;
+
+        std::cout << "\nCurrent solution was accepted";
+                
+        if(this->keep_dt_min) {
+            std::cout <<" because time-step is minimum!" << std::endl;
+            // since current time-step value was accepted only because it is equal the minimum, it's value will be repeated
+        } else {
+            std::cout <<"!" << std::endl;
+            dt = pow(this->en_1/this->en,this->kp)*pow(1.0/this->en,this->ki)*pow(this->en_1*this->en_1/(this->en*this->en_2),this->kd) * this->dt_prev;
+
+            std::cout << " New calculated time step = " << dt << std::endl;
+
+            // check time step range
+            dt = max(dt,this->dt_min);
+            dt = min(dt,this->dt_max);
+        }
+           
+            // updating parameters
+            this->dt_avg += dt;
+            this->dt_prev = dt;
+            this->n_accepted_time_step++;
+            // storing error measure
+            this->storeSolutionChangeinTime();
+    }
+
+    // check whether simulation has reached the end to avoid exceed maximum simulation time
+    if (time+dt>tmax || tmax-(time+dt) < this->dt_min)
+        dt = tmax - time;
+
+    std::cout << " Next adopted time step = " << dt <<". Var = "<<(dt-this->dt_last)/this->dt_last*100<<"%"<< std::endl;
+    
+}
 
 void timeStepControlPID::storeSolutionChangeinTime() {
     this->en_2 = this->en_1;
@@ -278,4 +339,10 @@ void timeStepControlPID::printSelf (ostream& os, const char* indent) const {
         << this->dt_avg/this->n_accepted_time_step            
 		<< std::endl;    
 }
-    
+
+void timeStepControlPID::ckeckKeepMinTimeStep( Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions) {
+    if ( (this->en > 1.0 || flow_nonlinear_iteractions > (this->nsa_max) || transport_nonlinear_iteractions> (this->nsa_max) ) && abs(dt - this->dt_min) < 1.0e-10 )
+        this->keep_dt_min = true;
+    else
+        this->keep_dt_min = false;       
+}   

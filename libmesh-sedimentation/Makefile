@@ -1,26 +1,18 @@
 ######################################################################
 #
 # Template libMesh application Makefile
-#LIBMESH_DIR=/home/camata/Libraries/libmesh-trunk
-#PARAVIEW_DIR=/opt/app/paraview/5.0.1
-#PARAVIEW_VERSION?=5.0
+
 CATALYST?=1
 PROVENANCE?=1
-#LIBMESH_DIR?=/opt/libs/libmesh/
-#LIBMESH_DIR?=/home/vitor/Documents/program/libmesh
-#LIBMESH_DIR?=/home/vitor/program/libmesh
 
-# Ubuntu - VMWare
-#LIBMESH_DIR?=/home/vitor/programs/libmesh
-
-# Ubuntu - NACAD
-LIBMESH_DIR?=/home/vitor/program/libmesh
-
-# LoboC
-# LIBMESH_DIR?=/sw/apps/suse/shared/libmesh/release-no-pmesh-opt/intel
+LIBMESH_DIR=/home/vitor/programs/libmesh
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
+
+include config/config.vitor.ubuntu
+#include config/config.loboc
+
 
 
 TARGET_SUFFIX := $(METHOD)
@@ -34,37 +26,19 @@ srcfiles 	:= $(wildcard *.C) $(wildcard src/common/*.C) $(wildcard src/flow/*.C)
 
 libmesh_CXXFLAGS += -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib 
 
+srcfiles +=  $(wildcard src/provenance/*.C) $(wildcard contrib/dfanalyzer/*.C) $(wildcard contrib/rapidjson/*.C)
+libmesh_CXXFLAGS +=  -I./contrib/dfanalyzer/*.h -I./include/provenance
 
 ifeq (${PROVENANCE}, 1) 
-srcfiles +=  $(wildcard src/provenance/*.C) $(wildcard contrib/dfanalyzer/*.C) $(wildcard contrib/rapidjson/*.C)
-libmesh_CXXFLAGS +=  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE
+libmesh_CXXFLAGS += -DPROVENANCE
 endif
 
-
 ifeq (${CATALYST}, 1) 
-#PARAVIEW_VERSION?=5.2
-#PARAVIEW_DIR?=/opt/paraview/5.2
-#PARAVIEW_VERSION?=5.1
-#PARAVIEW_DIR?=/home/vitor/Documents/program/paraview
-#PARAVIEW_VERSION?=5.3
-#PARAVIEW_DIR?=/home/vitor/program/paraview-5.3.0
-
-# Ubuntu - VMWare
-#PARAVIEW_VERSION?=5.3
-#PARAVIEW_DIR?=/home/vitor/programs/paraview-5.3.0
-
-# Ubuntu - NACAD
-PARAVIEW_VERSION?=5.3
-PARAVIEW_DIR?=/home/vitor/program/paraview-5.3.0
-
-# LoboC
-# PARAVIEW_VERSION?=5.2
-# PARAVIEW_DIR?=/home/users/vitorss/local/all/paraview-5.2.0
-
-PARAVIEW_LIB_DIR=$(PARAVIEW_DIR)/lib/paraview-$(PARAVIEW_VERSION)
-PARAVIEW_LIBS =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerApplication-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerCore-pv$(PARAVIEW_VERSION) -lvtkPVServerImplementationCore-pv$(PARAVIEW_VERSION) -lvtkPVClientServerCoreCore-pv$(PARAVIEW_VERSION) -lvtkFiltersParallel-pv$(PARAVIEW_VERSION) -lvtkFiltersModeling-pv$(PARAVIEW_VERSION) -lvtkRenderingCore-pv$(PARAVIEW_VERSION) -lvtkFiltersExtraction-pv$(PARAVIEW_VERSION) -lvtkFiltersStatistics-pv$(PARAVIEW_VERSION) -lvtkImagingFourier-pv$(PARAVIEW_VERSION) -lvtkImagingCore-pv$(PARAVIEW_VERSION) -lvtkalglib-pv$(PARAVIEW_VERSION) -lvtkFiltersGeometry-pv$(PARAVIEW_VERSION) -lvtkFiltersSources-pv$(PARAVIEW_VERSION) -lvtkFiltersGeneral-pv$(PARAVIEW_VERSION) -lvtkCommonComputationalGeometry-pv$(PARAVIEW_VERSION) -lvtkCommonColor-pv$(PARAVIEW_VERSION) -lvtkFiltersProgrammable-pv$(PARAVIEW_VERSION) -lvtkPVVTKExtensionsCore-pv$(PARAVIEW_VERSION) -lvtkPVCommon-pv$(PARAVIEW_VERSION) -lvtkClientServer-pv$(PARAVIEW_VERSION) -lvtkIOXMLParser-pv$(PARAVIEW_VERSION) -lvtkFiltersCore-pv$(PARAVIEW_VERSION) -lvtkParallelMPI-pv$(PARAVIEW_VERSION) -lvtkParallelCore-pv$(PARAVIEW_VERSION) -lvtkIOLegacy-pv$(PARAVIEW_VERSION) -lvtkCommonExecutionModel-pv$(PARAVIEW_VERSION) -lvtkCommonDataModel-pv$(PARAVIEW_VERSION) -lvtkCommonSystem-pv$(PARAVIEW_VERSION) -lvtkCommonTransforms-pv$(PARAVIEW_VERSION) -lvtkCommonMisc-pv$(PARAVIEW_VERSION) -lvtkCommonMath-pv$(PARAVIEW_VERSION) -lprotobuf -lpthread  -lvtkPythonInterpreter-pv$(PARAVIEW_VERSION) -lvtkWrappingPython27Core-pv$(PARAVIEW_VERSION) -lvtkCommonCore-pv$(PARAVIEW_VERSION) -lpython2.7 -lvtksys-pv$(PARAVIEW_VERSION) -Wl,-rpath,$(PARAVIEW_LIB_DIR) -Wl,-rpath-link,$(PARAVIEW_LIB_DIR)
-PARAVIEW_INCLUDE=-I$(PARAVIEW_DIR)/include/paraview-$(PARAVIEW_VERSION)
-libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) -I./include/catalyst -DUSE_CATALYST
+PARAVIEW_LIB_DIR  =$(PARAVIEW_DIR)/lib/paraview-$(PARAVIEW_VERSION)
+PARAVIEW_LIBS     =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerApplication-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerCore-pv$(PARAVIEW_VERSION) -lvtkPVServerImplementationCore-pv$(PARAVIEW_VERSION) -lvtkPVClientServerCoreCore-pv$(PARAVIEW_VERSION) -lvtkFiltersParallel-pv$(PARAVIEW_VERSION) -lvtkFiltersModeling-pv$(PARAVIEW_VERSION) -lvtkRenderingCore-pv$(PARAVIEW_VERSION) -lvtkFiltersExtraction-pv$(PARAVIEW_VERSION) -lvtkFiltersStatistics-pv$(PARAVIEW_VERSION) -lvtkImagingFourier-pv$(PARAVIEW_VERSION) -lvtkImagingCore-pv$(PARAVIEW_VERSION) -lvtkalglib-pv$(PARAVIEW_VERSION) -lvtkFiltersGeometry-pv$(PARAVIEW_VERSION) -lvtkFiltersSources-pv$(PARAVIEW_VERSION) -lvtkFiltersGeneral-pv$(PARAVIEW_VERSION) -lvtkCommonComputationalGeometry-pv$(PARAVIEW_VERSION) -lvtkCommonColor-pv$(PARAVIEW_VERSION) -lvtkFiltersProgrammable-pv$(PARAVIEW_VERSION) -lvtkPVVTKExtensionsCore-pv$(PARAVIEW_VERSION) -lvtkPVCommon-pv$(PARAVIEW_VERSION) -lvtkClientServer-pv$(PARAVIEW_VERSION) -lvtkIOXMLParser-pv$(PARAVIEW_VERSION) -lvtkFiltersCore-pv$(PARAVIEW_VERSION) -lvtkParallelMPI-pv$(PARAVIEW_VERSION) -lvtkParallelCore-pv$(PARAVIEW_VERSION) -lvtkIOLegacy-pv$(PARAVIEW_VERSION) -lvtkCommonExecutionModel-pv$(PARAVIEW_VERSION) -lvtkCommonDataModel-pv$(PARAVIEW_VERSION) -lvtkCommonSystem-pv$(PARAVIEW_VERSION) -lvtkCommonTransforms-pv$(PARAVIEW_VERSION) -lvtkCommonMisc-pv$(PARAVIEW_VERSION) -lvtkCommonMath-pv$(PARAVIEW_VERSION) -lprotobuf -lpthread  -lvtkPythonInterpreter-pv$(PARAVIEW_VERSION) -lvtkWrappingPython27Core-pv$(PARAVIEW_VERSION) -lvtkCommonCore-pv$(PARAVIEW_VERSION) -lpython2.7 -lvtksys-pv$(PARAVIEW_VERSION) -Wl,-rpath,$(PARAVIEW_LIB_DIR) -Wl,-rpath-link,$(PARAVIEW_LIB_DIR)
+PARAVIEW_INCLUDE  =-I$(PARAVIEW_DIR)/include/paraview-$(PARAVIEW_VERSION)
+libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) 
+libmesh_CXXFLAGS +=-I./include/catalyst -DUSE_CATALYST
 libmesh_LDFLAGS +=$(PARAVIEW_LIBS)
 srcfiles +=  $(wildcard src/catalyst/*.C)
 endif

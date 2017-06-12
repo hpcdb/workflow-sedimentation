@@ -21,6 +21,7 @@
 #include <vtkMultiBlockDataSet.h>
 #include <vtkMultiPieceDataSet.h>
 #include <vtkMultiProcessController.h>
+#include "vtkCPPythonAdaptorAPI.h"
 
 #include "libmesh/libmesh.h"
 
@@ -45,286 +46,297 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
 
-namespace
+std::pair<int,int> CellTypeLibMeshToVTK(ElemType etype)
 {
-
-  vtkCPProcessor* Processor    = NULL;
-  vtkUnstructuredGrid* VTKGrid = NULL;
-  bool rebuild_grid            = false;
-  
-  void BuildVTKGrid(EquationSystems &eq, std::map<int, int> &g2l)
-  {
-    
-    //std::vector<double> coords;
-    g2l.clear();
-    
-    //std::cout << "BuildVTKGrid BEGIN" << std::endl;
-    const MeshBase &mesh = eq.get_mesh();
-    
-    int numberOfCells  = mesh.n_local_elem();
-    int numberOfPoints = mesh.n_local_nodes(); 
-    
-    vtkNew<vtkDoubleArray> pointArray;
-   
-    pointArray->SetNumberOfComponents(3);
-    pointArray->Allocate(static_cast<vtkIdType>(numberOfPoints*3));
-
-    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-    ElemType etype = (*el)->type();
-    int counter = 0;
-    for ( ; el != end_el; ++el)
-    {
-      const Elem* elem = *el;
-
-
-      for(int ino = 0; ino <  elem->n_nodes(); ++ino)
-      {
-          int g_id = elem->node(ino);
-          
-          if(g2l.find(g_id) == g2l.end() )
-          {
-              double p[3];
-              g2l[g_id] = counter;
-              p[0] = elem->point(ino)(0);
-              p[1] = elem->point(ino)(1);
-              p[2] = elem->point(ino)(2);
-              pointArray->InsertNextTuple(p);
-              counter++;
-          }
-      }
+    switch(etype) {
+        case TRI3:
+            return std::pair<int, int> (VTK_TRIANGLE,3);
+        case QUAD4:
+            return std::pair<int, int> (VTK_QUAD,4);
+        case TET4:
+            return std::pair<int, int> (VTK_TETRA,4);
+        case HEX8:
+            return std::pair<int, int> (VTK_HEXAHEDRON,8);
+    default:
+        std::cout << "Element type not supported" << endl;
+        return std::pair<int,int>(-1,-1);
     }
-  
-    vtkNew<vtkPoints> points;
-    points->SetData(pointArray.GetPointer());
-    VTKGrid->SetPoints(points.GetPointer());
-    
-    //std::cout << "VTK INSERT NODES" << std::endl;
-    
-    libmesh_assert(g2l.size() == numberOfPoints);
-  
-   
-    // create the cells
-     int np = 0;
-     int vtk_type;
-    if(etype == HEX8) {
-       VTKGrid->Allocate(static_cast<vtkIdType>(numberOfCells*9));
-       np = 8;
-       vtk_type = VTK_HEXAHEDRON;
-
-     }
-     else if (etype == TET4) {
-       VTKGrid->Allocate(static_cast<vtkIdType>(numberOfCells*5));
-        np =4;
-        vtk_type = VTK_TETRA;
-     }
-    
-    el     = mesh.active_local_elements_begin();
-    for ( ; el != end_el; ++el)
-    {
-        vtkIdType tmp[8];
-        const Elem* elem = *el;
-        for(int ino = 0; ino < elem->n_nodes(); ++ino)
-        {
-            tmp[ino] = g2l[elem->node(ino)];
-        }
-
-         VTKGrid->InsertNextCell(vtk_type,np,  tmp);
-               
-    }
-    
-    //std::cout << "VTK INSERT ELEM" << std::endl;
-    
-   
-  }
-  
-  void get_variable_solution(EquationSystems& es, int sys, int ivar, std::vector<double> &solution, std::map<int, int> &g2l)
-{
-    const MeshBase &mesh = es.get_mesh();
-    const unsigned int dim = mesh.mesh_dimension();
-    const System & system  = es.get_system(sys);
-    const DofMap & dof_map = system.get_dof_map();
- 
-    std::vector<dof_id_type> dof_indices;
-    std::vector<double>       nodal_soln;
-    std::vector<double>       elem_soln;
-    
-    const FEType & fe_type    = system.variable_type(ivar);
-    
-    NumericVector<Number> & sys_soln(*system.current_local_solution);
-    
-    MeshBase::const_element_iterator       it  = mesh.active_local_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
-    
-    for (; it != end; ++it)
-    {
-        const Elem *elem = *it;
-        
-        dof_map.dof_indices (elem, dof_indices, ivar);
-        elem_soln.resize(dof_indices.size());
-        for(int i = 0; i < dof_indices.size(); ++i)
-            elem_soln[i] = sys_soln(dof_indices[i]);
-        
-        
-        FEInterface::nodal_soln (dim,fe_type, elem, elem_soln,nodal_soln);
-        
-        libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
-        for (unsigned int n=0; n<elem->n_nodes(); n++) {
-            int local_id = g2l[elem->node(n)];
-            solution[local_id] = nodal_soln[n];
-        }
-    }
-    
-  
+                
 }
-  
-  void UpdateVTKAttributes(EquationSystems &es, std::map<int, int> &g2l )
-  {
-     //std::cout << "UpdateVTKAttributes BEGIN" << std::endl;
-     std::vector<double> solution;
-     solution.resize(g2l.size());
-     
 
-     if(VTKGrid->GetPointData()->GetNumberOfArrays() == 0)
-      {
-         for(int ns=0; ns < es.n_systems(); ++ns) {
-            for(int nv=0; nv < es.get_system(ns).n_vars(); ++nv ) 
-            {
-                 
-                get_variable_solution(es,ns,nv,solution,g2l);
-                vtkNew<vtkDoubleArray> data;
-                data->SetName(es.get_system(ns).variable_name(nv).c_str());
-                data->SetNumberOfComponents(1);
-                data->SetNumberOfTuples(static_cast<vtkIdType>(VTKGrid->GetNumberOfPoints()));
-                for(int i = 0; i < VTKGrid->GetNumberOfPoints(); i++)
-                     data->SetTuple(i,&solution[i]);
-                 VTKGrid->GetPointData()->AddArray(data.GetPointer());
-            }
-         }
-     } 
-     else
-     {
-       for(int ns=0; ns < es.n_systems(); ++ns) {
-        for(int nv=0; nv < es.get_system(ns).n_vars(); ++nv )
-        {
-            get_variable_solution(es,ns,nv,solution,g2l);
-            std::string var_name = es.get_system(ns).variable_name(nv);
-            vtkDoubleArray* data = vtkDoubleArray::SafeDownCast(VTKGrid->GetPointData()->GetArray(var_name.c_str()));
-            for(int i = 0; i < VTKGrid->GetNumberOfPoints(); i++)
-                     data->SetTuple(i,&solution[i]);
-       
-        }
-      }
-    }
-     
-  }
-  
-  void BuildVTKDataStructures(EquationSystems &eq, std::map<int, int> &g2l, bool using_amr)
-  {
-      
+
+namespace {
+
+    vtkCPProcessor *Processor = NULL;
+    vtkUnstructuredGrid *VTKGrid = NULL;
+    int rebuild_grid = false;
+
     
-    //std::cout << "BuildVTKDataStructures BEGIN" << std::endl;
-    if(VTKGrid == NULL)
-    {
+    void CreateVTKGrid(EquationSystems &eq, std::map<unsigned int, unsigned int> &g2l) {
+
         // The grid structure isn't changing so we only build it
         // the first time it's needed. If we needed the memory
         // we could delete it and rebuild as necessary.
-        VTKGrid = vtkUnstructuredGrid::New();
-        BuildVTKGrid(eq, g2l);
-    }
-    
-    if(VTKGrid != NULL && rebuild_grid)
-    {
-        g2l.clear();
-        VTKGrid->Delete();
-        VTKGrid = vtkUnstructuredGrid::New();
-        BuildVTKGrid(eq, g2l);
-        rebuild_grid = false;
+   
         
+        const MeshBase &mesh = eq.get_mesh();
+        g2l.clear();
+
+        std::cout << "  Creating Grid..." << std::endl;
+       
+        int unsigned ncells = mesh.n_local_elem();
+        int unsigned npoints = mesh.n_local_nodes();
+
+        // create the points information
+        vtkNew<vtkDoubleArray> pointArray;
+        pointArray->SetNumberOfComponents(3);
+        //pointArray->Allocate(static_cast<vtkIdType> (npoints * 3));
+
+
+        MeshBase::const_element_iterator e_iter = mesh.active_local_elements_begin();
+        MeshBase::const_element_iterator e_end = mesh.active_local_elements_end();
+        ElemType etype = (*e_iter)->type();
+        int node_counter = 0;
+        for (; e_iter != e_end; e_iter++) {
+            const Elem* elem = *e_iter;
+            for (int n = 0; n < elem->n_nodes(); n++) {
+                int g_id = elem->node(n);
+                if (g2l.find(g_id) == g2l.end()) {
+                    g2l[g_id] = node_counter;
+
+                    pointArray->InsertNextTuple3(elem->point(n)(0),
+                                                 elem->point(n)(1),
+                                                 elem->point(n)(2));
+                    node_counter++;
+                }
+            }
+        }
+
+        vtkNew<vtkPoints> points;
+        points->SetData(pointArray.GetPointer());
+        VTKGrid->SetPoints(points.GetPointer());
+
+        libmesh_assert(g2l.size() == npoints);
+        
+        
+        e_iter = mesh.active_local_elements_begin();
+        for (; e_iter != e_end; ++e_iter) {
+            vtkIdType tmp[8];
+            const Elem* elem = *e_iter;
+            std::pair<int, int> elemmap = CellTypeLibMeshToVTK(elem->type());
+            for (int ino = 0; ino < elem->n_nodes(); ++ino) {
+                tmp[ino] = g2l[elem->node(ino)];
+            }
+
+            if (elemmap.first == VTK_TETRA) {
+                int t = tmp[0];
+                tmp[0] = tmp[1];
+                tmp[1] = t;
+            }
+
+            VTKGrid->InsertNextCell(elemmap.first, elemmap.second, tmp);
+
+        }
+
     }
-    
-    UpdateVTKAttributes(eq, g2l);
-    
-  }
+
+    void get_variable_solution(const System& system, int var_number, std::vector<double> &solution, std::map<unsigned int, unsigned int> &g2l) {
+
+        const MeshBase &mesh   = system.get_mesh();
+        const unsigned int dim = mesh.mesh_dimension();
+        const DofMap & dof_map = system.get_dof_map();
+
+        std::vector<dof_id_type> dof_indices;
+        std::vector<double> nodal_soln;
+        std::vector<double> elem_soln;
+
+        const FEType & fe_type = system.variable_type(var_number);
+
+        NumericVector<Number> & sys_soln(*system.current_local_solution);
+
+        MeshBase::const_element_iterator it = mesh.active_local_elements_begin();
+        const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
+
+        for (; it != end; ++it) {
+            
+            const Elem *elem = *it;
+
+            dof_map.dof_indices(elem, dof_indices, var_number);
+            
+            elem_soln.resize(dof_indices.size());
+            for (int i = 0; i < dof_indices.size(); ++i)
+                elem_soln[i] = sys_soln(dof_indices[i]);
+
+            FEInterface::nodal_soln(dim, fe_type, elem, elem_soln, nodal_soln);
+
+            libmesh_assert_equal_to(nodal_soln.size(), elem->n_nodes());
+
+            for (unsigned int n = 0; n < elem->n_nodes(); n++) {
+                int local_id = g2l[elem->node(n)];
+                solution[local_id] = nodal_soln[n];
+            }
+        }
+
+    }
+
+    void UpdateFields(EquationSystems &eq, 
+                      std::map<unsigned int, unsigned int> & libmesh_global_to_local_map, 
+                      vtkCPDataDescription* dataDescription) 
+    {
+
+
+        vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("input");
+
+        if (VTKGrid == NULL) {
+            VTKGrid = vtkUnstructuredGrid::New();
+            CreateVTKGrid(eq, libmesh_global_to_local_map);
+        }
+
+        // If AMR is used, wee need rebuild the VTKGrid.
+        if (VTKGrid != NULL && rebuild_grid) {
+            libmesh_global_to_local_map.clear();
+            VTKGrid->Delete();
+            VTKGrid = vtkUnstructuredGrid::New();
+            CreateVTKGrid(eq, libmesh_global_to_local_map);
+            rebuild_grid = false;
+
+        }
+        
+        std::cout << "  Updating Fields Data..." << std::endl;
+
+        const MeshBase & mesh = eq.get_mesh();
+
+        vtkIdType NumberOfNodes  = static_cast<vtkIdType> (VTKGrid->GetNumberOfPoints());
+
+      
+        unsigned int n_systems = eq.n_systems();
+
+        // now add numerical fields data
+        if (VTKGrid->GetPointData()->GetNumberOfArrays() == 0) 
+        {
+           
+            for (int s = 0; s < n_systems; s++) 
+            {
+                // Getting the system
+                const System & sys = eq.get_system(s);
+
+                for (int v = 0; v < sys.n_vars(); v++) 
+                {
+                    const std::string var_name = sys.variable_name(v);
+                       
+                    if (idd->IsFieldNeeded(var_name.c_str())) 
+                    {
+                        
+                        vtkDoubleArray* pointData = vtkDoubleArray::New();
+                        pointData->SetName(var_name.c_str());
+                        pointData->SetNumberOfComponents(1);
+                        pointData->SetNumberOfTuples(NumberOfNodes);
+                        VTKGrid->GetPointData()->AddArray(pointData);
+                        pointData->Delete();
+                        
+                    }
+                }
+
+            }
+
+        }
+        
+        {
+            std::vector<double> solution;
+            solution.resize(libmesh_global_to_local_map.size());
+
+            
+            for (int s = 0; s < n_systems; s++) {
+                const System & system = eq.get_system(s);
+
+                for (int v = 0; v < system.n_vars(); v++) 
+                {
+                    const std::string var_name = system.variable_name(v);
+                    if (idd->IsFieldNeeded(var_name.c_str())) 
+                    {
+
+                        get_variable_solution(system, v, solution, libmesh_global_to_local_map);
+                        vtkDoubleArray* data = vtkDoubleArray::SafeDownCast(VTKGrid->GetPointData()->GetArray(var_name.c_str()));
+                        for (int i = 0; i < VTKGrid->GetNumberOfPoints(); i++)
+                            data->SetTuple(i, &solution[i]);
+
+                    }
+                }
+
+            }
+        }
+    }
 
 }
 
-namespace FEAdaptor
+namespace FEAdaptor 
 {
 
-  void mark_to_rebuild_grid() {
-      rebuild_grid = true;
-  }
-
-  std::map<int, int>                   g2l;
-  int numScripts;
-  vtkNew<vtkCPPythonScriptPipeline> extraction;
-  vtkNew<vtkCPPythonScriptPipeline> visualization;
-
-  
-  void Initialize(int numScripts, string extractionScript, string visualizationScript)
-  {
-      
-    //std::cout << "COPROCESSING INIT BEGIN" << std::endl;
-    if(Processor == NULL)
-      {
-        Processor = vtkCPProcessor::New();
-        Processor->Initialize();
-      }
-    else
-      {
-        Processor->RemoveAllPipelines();
-      }
-
-      if(numScripts > 0 && !extractionScript.empty()){
-        extraction->Initialize(extractionScript.c_str());
-        Processor->AddPipeline(extraction.GetPointer());
-      }
-
-      if(numScripts > 0 && !visualizationScript.empty()){
-        visualization->Initialize(visualizationScript.c_str());
-        Processor->AddPipeline(visualization.GetPointer());
-      }
-     //std::cout << "COPROCESSING INIT END" << std::endl;
-  }
-
-  void Finalize()
-  {
-    if(Processor)
-      {
-        Processor->Delete();
-        Processor = NULL;
-      }
-    if(VTKGrid)
-      {
-         VTKGrid->Delete();
-         VTKGrid = NULL;
-      }
-  }
-
-  void CoProcess(EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep = false, bool using_amr = false)
-  {
-    vtkNew<vtkCPDataDescription> dataDescription;
-    dataDescription->AddInput("input");
-    dataDescription->SetTimeData(time, timeStep);
-    if(lastTimeStep == true)
-    {
-      // assume that we want to all the pipelines to execute if it
-      // is the last time step.
-      dataDescription->ForceOutputOn();
+    void mark_to_rebuild_grid() {
+        rebuild_grid = true;
     }
-    if(Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
+
+    std::map<unsigned int, unsigned int> libmesh_global_to_local_map;
+    int numScripts;
+    vtkNew<vtkCPPythonScriptPipeline> extraction;
+    vtkNew<vtkCPPythonScriptPipeline> visualization;
+
+    void Initialize(int numScripts, string extractionScript, string visualizationScript) 
     {
-      BuildVTKDataStructures(eq, g2l, using_amr);
-      dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
-      dataDescription->ForceOutputOn();
-      Processor->CoProcess(dataDescription.GetPointer());
+
+        if (Processor == NULL) {
+            Processor = vtkCPProcessor::New();
+            Processor->Initialize();
+        } else {
+            Processor->RemoveAllPipelines();
+        }
+
+        if (numScripts > 0 && (extractionScript != "not defined")) 
+        {
+            extraction->Initialize(extractionScript.c_str());
+            Processor->AddPipeline(extraction.GetPointer());
+        }
+
+        if (numScripts > 0 && (visualizationScript != "not defined")) {
+            visualization->Initialize(visualizationScript.c_str());
+            Processor->AddPipeline(visualization.GetPointer());
+        }
+       
     }
-  }
-  
+
+    void Finalize() 
+    {
+        if (Processor) {
+            Processor->Delete();
+            Processor = NULL;
+        }
+        if (VTKGrid) {
+            VTKGrid->Delete();
+            VTKGrid = NULL;
+        }
+    }
+
+    void CoProcess(EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep = false, bool using_amr = false) 
+    {
+
+        vtkNew<vtkCPDataDescription> dataDescription;
+        dataDescription->AddInput("input");
+        dataDescription->SetTimeData(time, timeStep);
+        
+        if (lastTimeStep == true) {
+            // assume that we want to all the pipelines to execute if it
+            // is the last time step.
+            dataDescription->ForceOutputOn();
+        }
+        if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0) {
+            UpdateFields(eq, libmesh_global_to_local_map,  dataDescription.GetPointer());
+            dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
+            dataDescription->ForceOutputOn();
+            Processor->CoProcess(dataDescription.GetPointer());
+        }
+    }
+
 } // end of Catalyst namespace
 
 #endif

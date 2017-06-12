@@ -62,7 +62,7 @@
 using namespace libMesh;
 using namespace std;
 
-void SedimentationTransport::PrintMass(const char *fname) {
+void SedimentationTransport::PrintMass(std::ofstream& fmass, unsigned int t_step ) {
 
     double local[2] = {0.0, 0.0};
     double global[2] = {0.0, 0.0};
@@ -182,21 +182,18 @@ void SedimentationTransport::PrintMass(const char *fname) {
 
         if (system.time == 0) {
             this->mass_dep = 0.0;
-            this->init_mass = global[0] + global[1];
-            fout1.open(fname);
-            if (system.time == 0) fout1 << "#time        M_susp       M_dep        M_tot        M_tot/M_init" << endl;
-        } else
-            fout1.open(fname, ios_base::app);
+            this->total_mass = this->init_mass = global[0];
+            fmass << "#time        M_susp       M_dep        M_tot        M_tot/M_init" << endl;
+        }
 
-        fout1 << std::left << std::scientific <<
+        if ((t_step) % es.parameters.get<unsigned int>("write_interval") == 0 || abs( system.time - es.parameters.get<Real>("tmax") )<1.0e-8 ) {
+            fmass << std::left << std::scientific <<
                 std::setw(8) << system.time << " " <<
                 std::setw(8) << global[0] << " " <<
                 std::setw(8) << global[1] << " " <<
                 std::setw(8) << this->total_mass << " " <<
                 std::setw(8) << this->total_mass / this->init_mass << endl;
-        
-        fout1.close();
-
+        }
     }
 
     return;

@@ -11,6 +11,8 @@
  * Created on 29 de Junho de 2016, 16:31
  */
 
+#if 0 
+
 #include <iostream>
 #include <sstream>
 #include <ostream>
@@ -203,4 +205,5 @@ void timeStepControlResidual::printSelf (ostream& os, const char* indent) const 
         << this->dt_avg/this->n_accepted_time_step            
 		<< std::endl;    
 }
-    
+  
+#endif

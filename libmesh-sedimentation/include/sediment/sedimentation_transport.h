@@ -5,6 +5,9 @@
  * Created on September 16, 2015, 10:45 AM
  */
 
+#ifndef SEDIMENTATION_TRANSPORT_H
+#define SEDIMENTATION_TRANSPORT_H
+
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
@@ -56,49 +59,109 @@
 
 #include "timeStepControlBase.h"
 
+#ifndef PROVENANCE_H
+#define PROVENANCE_H
+#include "../provenance/provenance.h"
+#endif
+
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
-#ifndef SEDIMENTATION_TRANSPORT_H
-#define	SEDIMENTATION_TRANSPORT_H
 
-class SedimentationTransport : public System::Assembly
-{
+class SedimentationTransport : public System::Assembly {
 public:
-    
-  SedimentationTransport (EquationSystems &es_in) : es (es_in), Reynolds(1.0)
-  {};
 
-  void init();
-  void assemble ();
-  void setup(GetPot &infile);
-  //void attach_time_stepping(timeStepControlBase *ts) {this->tsControl = ts;}
-  void PrintMass(const char* fname);
-  
-  double   mass_dep;
-  double init_mass ;
-  double total_mass;
-  
-  
+    SedimentationTransport(EquationSystems &es_in) : es(es_in), Reynolds(1.0) {
+    };
+
+    void init();
+    void assemble();
+    void setup(GetPot &infile);
+    void solve(int t_step, Real time, int r_step, bool& diverged);
+    //void attach_time_stepping(timeStepControlBase *ts) {this->tsControl = ts;}
+    void PrintMass(std::ofstream& fmass, unsigned int t_step);
+
+    Real& nonlinear_tolerance() {
+        return _nonlinear_tolerance;
+    };
+
+    Real& linear_tolerance() {
+        return _linear_tolerance;
+    };
+
+    Real& initial_linear_tolerance() {
+        return _initial_linear_tolerance;
+    };
+
+    Real current_final_linear_residual() {
+        return _current_final_linear_residual;
+    };
+
+    Real& linear_tolerance_power() {
+        return _linear_tolerance_power;
+    };
+
+    unsigned int& max_nonlinear_iteractions() {
+        return _max_nonlinear_iteractions;
+    };
+
+    unsigned int linear_iteractions() {
+        return _linear_iteractions;
+    };
+
+    unsigned int nonlinear_iteractions() {
+        return _nonlinear_iteractions;
+    };
+
+#ifdef PROVENANCE
+    void attach_provenance(Provenance *provenance) {
+        this->prov = provenance;
+    }
+#endif
+
+    double mass_dep;
+    double init_mass;
+    double total_mass;
+
+
 private:
-  EquationSystems &es;
-  timeStepControlBase *tsControl;
-  
-  Real Reynolds;
-  Real Grashof;
-  int dim;
-  void assemble3D();
-  void assemble2D();
-  int erosion_bc_id;
-  int noflux_bc_id;
-  int deposition_id;
-  
-  //unsigned int n_transport_nonlinear_iterations_total;
-  //unsigned int n_transport_linear_iterations_total;
-  //unsigned int n_rejected_transport_linear_iterations_total;
-  
-  //unsigned int old_n_non_linear_iter_transport;
-  
+    EquationSystems &es;
+    timeStepControlBase *tsControl;
+
+#ifdef PROVENANCE
+    Provenance *prov;
+#endif
+
+    Real Reynolds;
+    Real Grashof;
+    int dim;
+    void assemble3D();
+    void assemble2D();
+    void assembleSUPG2D();
+    void assembleSUPG3D();
+    int erosion_bc_id;
+    int noflux_bc_id;
+    int deposition_id;
+    bool apply_bottom_flow;
+
+    Real _nonlinear_tolerance;
+    Real _linear_tolerance;
+    unsigned int _max_nonlinear_iteractions;
+    unsigned int _linear_iteractions;
+    unsigned int _nonlinear_iteractions;
+    unsigned int _current_n_linear_iteractions;
+    Real _current_final_linear_residual;
+    Real _solution_norm;
+    Real _nonlinear_step_norm;
+    Real _initial_linear_tolerance;
+    Real _linear_tolerance_power;
+
+    //unsigned int n_transport_nonlinear_iterations_total;
+    //unsigned int n_transport_linear_iterations_total;
+    //unsigned int n_rejected_transport_linear_iterations_total;
+
+    //unsigned int old_n_non_linear_iter_transport;
+
 };
 
 
-#endif	/* SEDIMENTATION_TRANSPORT_H */
+#endif /* SEDIMENTATION_TRANSPORT_H */

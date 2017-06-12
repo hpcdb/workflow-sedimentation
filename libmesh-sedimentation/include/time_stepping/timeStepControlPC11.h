@@ -38,9 +38,15 @@ public:
     
     void computeSolutionChangeInTime(EquationSystems & es);
     
-    void checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted);
+    //void checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted);
     
     void storeSolutionChangeinTime();
+    
+    void checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted);
+    
+    void computeTimeStep(bool accepted, Real time, Real tmax, Real &dt);
+    
+    void ckeckKeepMinTimeStep( Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions);
     
     void printSelf (ostream& os, const char* indent) const;
     

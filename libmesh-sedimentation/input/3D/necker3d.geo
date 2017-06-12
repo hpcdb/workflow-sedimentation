@@ -16,162 +16,177 @@ Point(3) = {xlock, ymin, zmax, lc};
 Point(4) = {xmin , ymin, zmax, lc};
 Point(5) = {xmax,  ymin, zmin, lc};
 Point(6) = {xmax , ymin, zmax, lc};
-Point(7) = {xmin,  ymin, hlock, lc};
-Point(8) = {xlock, ymin, hlock, lc};
-Point(9) = {xmax , ymin, hlock, lc};
+Point(7) = {xmin,  ymax, zmin, lc};
+Point(8) = {xlock, ymax, zmin, lc};
+Point(9) = {xlock, ymax, zmax, lc};
+Point(10) = {xmin , ymax, zmax, lc};
+Point(11) = {xmax,  ymax, zmin, lc};
+Point(12) = {xmax , ymax, zmax, lc};
 
 
-Point(10) = {xmin,  ymax, zmin, lc};
-Point(11) = {xlock, ymax, zmin, lc};
-Point(12) = {xlock, ymax, zmax, lc};
-Point(13) = {xmin , ymax, zmax, lc};
-Point(14) = {xmax,  ymax, zmin, lc};
-Point(15) = {xmax , ymax, zmax, lc};
-Point(16) = {xmin,  ymax, hlock, lc};
-Point(17) = {xlock, ymax, hlock, lc};
-Point(18) = {xmax , ymax, hlock, lc};
+
+//Transfinite Volume {44};
+//Transfinite Volume {46};
+
+//Physical Surface("LEFT", 1)  = {38};
+//Physical Surface("RIGHT", 2) = {42};
+//Physical Surface("BOTTOM", 3) = {22,24};
+//Physical Surface("TOP", 4) = {26,28};
+//Physical Surface("BACK", 5) = {30,32};
+//Physical Surface("FRONT", 6) = {34,36};
+//Physical Volume("WATER", 7) = {44};
+//Physical Volume("SEDIMENT", 8) = {46};
 
 
-Line(1) = {1, 2};
-Line(2) = {2, 5};
-Line(3) = {5, 14};
-Line(4) = {14, 11};
-Line(5) = {11, 10};
-Line(6) = {10, 1};
-Line(7) = {11, 2};
-Line(8) = {4, 3};
-Line(9) = {3, 6};
-Line(10) = {6, 15};
-Line(11) = {15, 12};
-Line(12) = {12, 13};
-Line(13) = {13, 4};
-Line(14) = {12, 3};
-Line(15) = {7, 8};
-Line(16) = {8, 9};
-Line(17) = {9, 18};
-Line(18) = {18, 17};
-Line(19) = {17, 16};
-Line(20) = {16, 7};
-Line(21) = {17, 8};
-Line(22) = {3, 8};
-Line(23) = {4, 7};
-Line(24) = {7, 1};
-Line(25) = {8, 2};
-Line(26) = {12, 17};
-Line(27) = {17, 11};
-Line(28) = {13, 16};
-Line(29) = {16, 10};
-Line(30) = {6, 9};
-Line(31) = {9, 5};
-Line(32) = {15, 18};
-Line(33) = {18, 14};
+// LEFT
+//+
+Line(1) = {1, 4};
+//+
+Line(2) = {4, 10};
+//+
+Line(3) = {10, 7};
+//+
+Line(4) = {7, 1};
 
-Line Loop(34) = {1, -7, 5, 6};
-Plane Surface(35) = {34};
-Line Loop(36) = {7, 2, 3, 4};
-Plane Surface(37) = {36};
-Line Loop(38) = {24, 1, -25, -15};
-Plane Surface(39) = {38};
-Line Loop(40) = {24, -6, -29, 20};
-Plane Surface(41) = {40};
-Line Loop(42) = {5, -29, -19, 27};
-Plane Surface(43) = {42};
-Line Loop(44) = {20, 15, -21, 19};
-Plane Surface(45) = {44};
-Line Loop(46) = {25, -7, -27, 21};
-Plane Surface(47) = {46};
-Line Loop(48) = {25, 2, -31, -16};
-Plane Surface(49) = {48};
-Line Loop(50) = {21, 16, 17, 18};
-Plane Surface(51) = {50};
-Line Loop(52) = {22, 16, -30, -9};
-Plane Surface(53) = {52};
-Line Loop(54) = {15, -22, -8, 23};
-Plane Surface(55) = {54};
-Line Loop(56) = {20, -23, -13, 28};
-Plane Surface(57) = {56};
-Line Loop(58) = {19, -28, -12, 26};
-Plane Surface(59) = {58};
-Line Loop(60) = {21, -22, -14, 26};
-Plane Surface(61) = {60};
-Line Loop(62) = {18, -26, -11, 32};
-Plane Surface(63) = {62};
-Line Loop(64) = {17, -32, -10, 30};
-Plane Surface(65) = {64};
-Line Loop(66) = {14, 9, 10, 11};
-Plane Surface(67) = {66};
-Line Loop(68) = {3, -33, -17, 31};
-Plane Surface(69) = {68};
-Line Loop(70) = {4, -27, -18, 33};
-Plane Surface(71) = {70};
-Line Loop(72) = {13, 8, -14, 12};
-Plane Surface(73) = {72};
+// Lock
+//+
+Line(5) = {2, 3};
+//+
+Line(6) = {3, 9};
+//+
+Line(7) = {9, 8};
+//+
+Line(8) = {8, 2};
 
-Transfinite Surface {35};
-Transfinite Surface {37};
-Transfinite Surface {39};
-Transfinite Surface {41};
-Transfinite Surface {43};
-Transfinite Surface {45};
-Transfinite Surface {47};
-Transfinite Surface {49};
-Transfinite Surface {51};
-Transfinite Surface {53};
-Transfinite Surface {55};
-Transfinite Surface {57};
-Transfinite Surface {59};
-Transfinite Surface {61};
-Transfinite Surface {63};
-Transfinite Surface {65};
-Transfinite Surface {67};
-Transfinite Surface {69};
-Transfinite Surface {71};
-Transfinite Surface {73};
+// RIGHT
+//+
+Line(9) = {11, 5};
+//+
+Line(10) = {5, 6};
+//+
+Line(11) = {6, 12};
+//+
+Line(12) = {12, 11};
 
+// BOTTOM
+//+
+Line(13) = {1, 2};
+//+
+Line(14) = {8, 7};
+//+
+Line(15) = {2, 5};
+//+
+Line(16) = {11, 8};
 
-Surface Loop(74) = {49, 37, 69, 71, 51, 47};
-Volume(75) = {74};
-Surface Loop(76) = {67, 53, 65, 63, 51, 61};
-Volume(77) = {76};
-Surface Loop(78) = {41, 39, 35, 43, 47, 45};
-Volume(79) = {78};
-Surface Loop(80) = {59, 57, 55, 73, 61, 45};
-Volume(81) = {80};
+// TOP
+//+
+Line(17) = {4, 3};
+//+
+Line(18) = {9, 10};
+//+
+Line(19) = {3, 6};
+//+
+Line(20) = {12, 9};
 
-Transfinite Volume {75};
-Transfinite Volume {77};
-Transfinite Volume {79};
-Transfinite Volume {81};
+//SURFACES
+// LEFT
+//+
+Line Loop(1) = {4, 1, 2, 3};
+//+
+Plane Surface(1) = {1};
 
+// LOCK
+//+
+Line Loop(2) = {8, 5, 6, 7};
+//+
+Plane Surface(2) = {2};
 
-//Physical Surface("deposition", 1) = {35, 37};
-//Physical Surface("slipx", 2)      = {41, 57};
-//Physical Surface("slipz", 3)      = {73, 67};
-//Physical Surface("noslip", 4)     = {65,69};
-//Physical Surface("slipy", 5)      = {43, 59, 63, 71, 39, 55, 49, 53};
-//Physical Surface("pnull", 6)      = {73, 67};
-//Physical Volume("sediment", 7)    = {79};
-//Physical Volume("water", 8)       = {75, 77, 81};
+// RIGHT
+//+
+Line Loop(3) = {12, 9, 10, 11};
+//+
+Plane Surface(3) = {3};
 
+// BOTTOM
 
+//+
+Line Loop(4) = {4, 13, -8, 14};
+//+
+Plane Surface(4) = {4};
+//+
+Line Loop(5) = {8, 15, -9, 16};
+//+
+Plane Surface(5) = {5};
+
+// TOP
+
+//+
+Line Loop(6) = {2, -18, -6, -17};
+//+
+Plane Surface(6) = {6};
+//+
+Line Loop(7) = {6, -20, -11, -19};
+//+
+Plane Surface(7) = {7};
+
+// BACK
+
+//+
+Line Loop(8) = {13, 5, -17, -1};
+//+
+Plane Surface(8) = {8};
+//+
+Line Loop(9) = {5, 19, -10, -15};
+//+
+Plane Surface(9) = {9};
+
+// FRONT
+
+//+
+Line Loop(10) = {3, -14, -7, 18};
+//+
+Plane Surface(10) = {10};
+//+
+Line Loop(11) = {7, -16, -12, 20};
+//+
+Plane Surface(11) = {11};
+
+// VOLUME
+// SEDIMENT
+
+//+
+Surface Loop(1) = {1, 4, 8, 6, 10, 2};
+//+
+Volume(1) = {1};
+
+// WATER
+//+
+Surface Loop(2) = {9, 7, 11, 5, 3, 2};
+//+
+Volume(2) = {2};
 
 //+
 
-Physical Surface("LEFT", 1) = {41, 57};
-//+
-Physical Surface("RIGHT", 2) = {69, 65};
-//+
-Physical Surface("BOTTOM", 3) = {35, 37};
-//+
-Physical Surface("TOP", 4) = {73, 67};
-//+
-Physical Surface("FRONT", 5) = {49, 39, 53, 55};
-//+
-Physical Surface("BACK", 6) = {71, 63, 43, 59};
-//+
-Physical Volume("WATER", 7) = {75, 77, 81};
-//+
-Physical Volume("SEDIMENT", 8) = {79};
+Transfinite Surface {1};
+Transfinite Surface {2};
+Transfinite Surface {3};
+Transfinite Surface {4};
+Transfinite Surface {5};
+Transfinite Surface {6};
+Transfinite Surface {7};
+Transfinite Surface {8};
+Transfinite Surface {9};
+Transfinite Surface {10};
+Transfinite Surface {11};
+Transfinite Volume {1};
+Transfinite Volume {2};
 
-Mesh.RecombineAll = 1;
-Mesh.Algorithm3D  = 6;
+Physical Surface("LEFT", 1)    = {1};
+Physical Surface("RIGHT", 2)   = {3};
+Physical Surface("BOTTOM", 3)  = {4,5};
+Physical Surface("TOP", 4)     = {6,7};
+Physical Surface("BACK", 5)    = {8,9};
+Physical Surface("FRONT", 6)   = {10,11};
+Physical Volume("WATER", 7)    = {2};
+Physical Volume("SEDIMENT", 8) = {1};
+

@@ -19,6 +19,8 @@
 #include <ostream>
 #include <fstream>
 
+#if 0
+
 #include "libmesh/libmesh.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
@@ -39,7 +41,11 @@ public:
     
     void computeSolutionChangeInTime(EquationSystems & es);
     
-    void checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted);
+    void checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted);
+    
+    void computeTimeStep(bool accepted, Real time, Real tmax, Real &dt);
+    
+    //void checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted);
     
     void storeSolutionChangeinTime (){ };
     
@@ -67,6 +73,9 @@ private:
     double dt_factor_red;
     // time-step multiplication factor
     double mult_factor;
+    
 };
+
+#endif
 
 #endif /* TIMESTEPCONTROLRESIDUAL_H */

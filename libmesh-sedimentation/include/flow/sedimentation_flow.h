@@ -6,7 +6,7 @@
  */
 
 #ifndef SEDIMENTATION_FLOW_H
-#define	SEDIMENTATION_FLOW_H
+#define SEDIMENTATION_FLOW_H
 
 // C++ include files that we need
 #include <iostream>
@@ -57,58 +57,137 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/getpot.h"
 
-#include "define.h"
-
 #include "timeStepControlBase.h"
 
-
+#ifndef PROVENANCE_H
+#define PROVENANCE_H
+#include "../provenance/provenance.h"
+#endif
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-class SedimentationFlow : public System::Assembly
-{
-  public:
-    
-  SedimentationFlow (EquationSystems &es_in) : es (es_in), Reynolds(1.0)
-  {};
-  
-  void assemble ();
-  void init();
-  void setup(GetPot &infile);
-  void solve();
-  void restart(GetPot &restart);
-  void attach_time_stepping(timeStepControlBase *ts) {this->tsControl = ts;}
+class SedimentationFlow : public System::Assembly {
+public:
+
+    SedimentationFlow(EquationSystems &es_in) : es(es_in), Reynolds(1.0) {
+    };
+
+    void assemble();
+    void init();
+    void setup(GetPot &infile);
+    void solve(int t_step, Real time, int r_step, bool& diverged);
+    void restart(GetPot &restart);
+    //void attach_time_stepping(timeStepControlBase *ts) {this->tsControl = ts;}
+
+    Real& non_linear_tolerance() {
+        return _non_linear_tolerance;
+    };
+
+    Real& linear_tolerance() {
+        return _linear_tolerance;
+    };
+
+    Real& initial_linear_tolerance() {
+        return _initial_linear_tolerance;
+    };
+
+    Real current_final_linear_residual() {
+        return _current_final_linear_residual;
+    };
+
+    Real& linear_tolerance_power() {
+        return _linear_tolerance_power;
+    };
+
+    unsigned int& max_nonlinear_iteractions() {
+        return _max_nonlinear_iteractions;
+    };
+
+    unsigned int linear_iteractions() {
+        return _linear_iteractions;
+    };
+
+    unsigned int nonlinear_iteractions() {
+        return _nonlinear_iteractions;
+    };
+
+    Number strainRateTensorNorm2D(const RealGradient& GradU, const RealGradient& GradV) {
+        // GradU = (dphi_x*U, dphi_y*U)
+        // GradV = (dphi_x*V, dphi_y*V)
+        // eij = 1/2 * ( dphi_j * v_i + dphi_i * v_j))
+        Number exx = GradU(0);
+        Number exy = 0.5 * (GradU(1) + GradV(0)); // = eyx (symmetric tensor)
+        Number eyy = GradV(1);
+
+        // 2 * (e_ij * e_ij)
+        Number t_norm = 2.0 * (exx * exx + 2.0 * exy * exy + eyy * eyy);
+
+        return pow(t_norm, 0.5);
+    }
+
+    Number strainRateTensorNorm3D(const RealGradient& GradU, const RealGradient& GradV, const RealGradient& GradW) {
+        // GradU = (dphi_x*U, dphi_y*U, dphi_z*U)
+        // GradV = (dphi_x*V, dphi_y*V, dphi_z*V)
+        // GradV = (dphi_x*W, dphi_y*W, dphi_z*W)      
+        // eij = 1/2 * ( dphi_j * v_i + dphi_i * v_j))
+        Number exx = GradU(0);
+        Number exy = 0.5 * (GradU(1) + GradV(0)); // = eyx (symmetric tensor)
+        Number exz = 0.5 * (GradU(2) + GradW(0)); // = ezx (symmetric tensor)
+        Number eyy = GradV(1);
+        Number eyz = 0.5 * (GradV(2) + GradW(1)); // = ezy (symmetric tensor)
+        Number ezz = GradW(2);
+
+        // 2 * (e_ij * e_ij)
+        Number t_norm = 2.0 * (exx * exx + 2.0 * exy * exy + 2.0 * exz * exz + eyy * eyy + 2.0 * eyz * eyz + ezz * ezz);
+
+        return pow(t_norm, 0.5);
+    }
+
+#ifdef PROVENANCE
+    void attach_provenance(Provenance *provenance) {
+        this->prov = provenance;
+    }
+#endif
 
 private:
-  void assemble2D();
-  void assemble3D();
-  
-  Real Reynolds;
-  Point normal;
-  Real gravity;
-  Real rho;
-  Real viscosity;
-  
-  int outbflow_id;
-  
-  Real         non_linear_tolerance;
-  Real         linear_tolerance;
+    void assemble2D();
+    void assemble3D();
+    void assembleSUPG2D();
+    void assembleSUPG3D();
 
- 
-  //unsigned int n_flow_nonlinear_iterations_total;
-  //unsigned int n_flow_linear_iterations_total;
-  //unsigned int n_rejected_flow_nonlinear_iterations_total;
-  
-  //unsigned int old_n_non_linear_iter_flow;
-  
-  int dim;
-  EquationSystems &es;
-  timeStepControlBase *tsControl;
-  
-  //TODO:
-  // Add pointer to TsControl and Provenance Objects.
-  
+#ifdef PROVENANCE
+    Provenance *prov;
+#endif
+
+    Real Reynolds;
+    Point normal;
+    Real gravity;
+    Real rho;
+    Real viscosity;
+
+    int outbflow_id;
+
+    Real _non_linear_tolerance;
+    Real _linear_tolerance;
+    unsigned int _max_nonlinear_iteractions;
+    unsigned int _nonlinear_iteractions;
+    unsigned int _current_n_linear_iteractions;
+    unsigned int _linear_iteractions;
+    Real _current_final_linear_residual;
+    Real _solution_norm;
+    Real _nonlinear_step_norm;
+    Real _initial_linear_tolerance;
+    Real _linear_tolerance_power;
+
+    //unsigned int n_flow_nonlinear_iterations_total;
+    //unsigned int n_flow_linear_iterations_total;
+    //unsigned int n_rejected_flow_nonlinear_iterations_total;
+
+    //unsigned int old_n_non_linear_iter_flow;
+
+    int dim;
+    EquationSystems &es;
 };
 
 #endif

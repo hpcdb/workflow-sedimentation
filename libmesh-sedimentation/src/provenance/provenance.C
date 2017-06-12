@@ -41,6 +41,9 @@ using namespace libMesh;
 Provenance::Provenance(int processorID) {
     processor_id = processorID;
     simulationID = 1;
+}
+
+void Provenance::SetUp() {
 
     GetPot infile("provenance.in");
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
@@ -171,7 +174,7 @@ void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double ma
 #ifdef VERBOSE
     cout << "Output AMR Config" << endl;
 #endif
-    
+
     string transformation = "amrconfig";
     Task t(simulationID);
     t.setDataflow(dataflow);
@@ -310,7 +313,7 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
 #ifdef VERBOSE
     cout << "Output Time Step Control Config" << endl;
 #endif
-    
+
     char memalloc[jsonArraySize];
     string transformation = "timestepcontrolconfig";
     Task t(simulationID);
@@ -708,7 +711,7 @@ void Provenance::inputInitVisualization(int lineID) {
 
     char transformation[arraySize];
     sprintf(transformation, "ivisualization");
-    
+
     PerformanceMetric p;
     char memalloc[jsonArraySize];
     sprintf(memalloc, "libMeshSedimentation::%s-%d", transformation, simulationID);
@@ -948,7 +951,7 @@ void Provenance::inputSolverSimulationTransport() {
 #ifdef VERBOSE
     cout << "Input Solver Simulation Transport" << endl;
 #endif
-    
+
     string transformation = "solversimulationtransport";
     PerformanceMetric p;
     char memalloc[jsonArraySize];

@@ -95,6 +95,9 @@ void SedimentationDeposition::ComputeDeposition() {
     NumericVector<Number> & sys_soln(*sediment_system.current_local_solution);
     std::vector<Number> elem_soln;
     std::vector<Number> nodal_soln;
+    
+    
+
     for (; el != end_el; ++el) {
         // Store a pointer to the element we are currently
         // working on.  This allows for nicer syntax later.
@@ -121,11 +124,11 @@ void SedimentationDeposition::ComputeDeposition() {
                     for (int i = 0; i < side->n_nodes(); i++) {
                         const Node *node = side->get_node(i);
                         unsigned int source_dof = node->dof_number(sediment_system.number(), s_var, 0);
-                        unsigned int dep_dof = node->dof_number(deposition_system.number(), d_var, 0);
+                        //unsigned int dep_dof = node->dof_number(deposition_system.number(), d_var, 0);
                         unsigned int r_dof = node->dof_number(deposition_rate.number(), r_var, 0);
                         Number value = nodal_soln[i] * Us * dt*c_factor;
-                        deposition_rate.solution->set(dep_dof, value);
-                        deposition_system.solution->add(r_dof, value);
+                        deposition_rate.solution->set(r_dof, value);
+                        //deposition_system.solution->add(dep_dof, value);
 
 
                     }
@@ -135,8 +138,10 @@ void SedimentationDeposition::ComputeDeposition() {
     }
 
 
-
     deposition_rate.solution->close();
+    
+    deposition_system.solution->add(*deposition_rate.solution);
+    
     deposition_system.solution->close();
 
     deposition_rate.update();
