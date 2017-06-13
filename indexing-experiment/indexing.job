@@ -1,0 +1,43 @@
+#PBS -l select=1:ncpus=1:mpiprocs=1
+#PBS -l walltime=999:00:00
+#PBS -j oe  
+#PBS -N indexing-sedimentation
+#PBS -V 
+#PBS -m bae
+#PBS -M vitor.silva.sousa@gmail.com
+
+echo "Starting job..."
+
+export CPATH=/scratch/10061a/vitorss/indexing/sedimentation/tank3d
+cd $CPATH
+echo "Current path..."
+echo `pwd`
+
+echo "Starting experiment..."
+cd positional-idx
+	echo "Positional Indexing..." >> $CPATH/output.log
+	./submit.sh >> $CPATH/output.log 2>> $CPATH/error.log
+cd ..
+cd postgres-raw-idx
+	echo "PostgresRaw Indexing..." >> $CPATH/output.log	
+	./start-postgres-raw.sh
+	sleep 10
+	./submit.sh >> $CPATH/output.log 2>> $CPATH/error.log
+	./shutdown-postgres-raw.sh
+cd ..
+cd fastbit-idx
+	echo "FastBit Indexing..." >> $CPATH/output.log
+	./submit.sh >> $CPATH/output.log 2>> $CPATH/error.log
+cd ..
+cd optimized-fastbit-idx
+	echo "Optimized FastBit Indexing..." >> $CPATH/output.log
+	./submit.sh >> $CPATH/output.log 2>> $CPATH/error.log
+cd ..
+
+echo "Finishing job..."
+
+
+
+
+
+
