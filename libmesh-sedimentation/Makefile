@@ -5,7 +5,7 @@
 CATALYST?=1
 PROVENANCE?=1
 
-include config/config.vitor.ubuntu
+include config/config.vitor.linux.ubuntu
 #include config/config.loboc
 
 # include the library options determined by configure
