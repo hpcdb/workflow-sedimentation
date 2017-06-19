@@ -13,11 +13,11 @@ xlock = 0.75
 hlock = 2.0
 
 # Mesh Refinement Parameters
-amr/initial_unif_ref_mesh     = 4
+amr/initial_unif_ref_mesh     = 3
 amr/max_r_steps = 2
 amr/r_fraction  = 0.9
 amr/c_fraction  = 0.001
-amr/max_h_level = 4
+amr/max_h_level = 3
 amr/r_interval  = 20
 amr/amrc_flow_transp = true
 amr/first_step_refinement = true
@@ -88,7 +88,7 @@ flow_nonlinear_tolerance      = 1.0e-4
 transport_n_nonlinear_steps   = 11
 transport_nonlinear_tolerance = 1.0E-4
 max_linear_iterations         = 300
-flow_initial_linear_solver_tolerance       = 1.0E-5
+flow_initial_linear_solver_tolerance       = 1.0E-6
 transport_initial_linear_solver_tolerance  = 1.0E-6
 minimum_linear_solver_tolerance       = 1.0E-8
 linear_tolerance_power = 1.5
@@ -98,8 +98,8 @@ linear_tolerance_power = 1.5
 stabilization/dt_stab = 1.0
 stabilization/s_ref_bar_yzBeta = 1.0
 stabilization/delta_transient_factor = 0.1
-stabilization/rbvms = false
-
+stabilization/fem_model = RBVMS
+#stabilization/rbvms = false
 
 #------------------------------------------------------
 # EQUATION PARAMETERS
@@ -115,5 +115,5 @@ Cs          =  0.0
 
 
 # Write out every nth timestep to file.
-write_interval    = 200
+write_interval    = 500
 catalyst_interval = 1

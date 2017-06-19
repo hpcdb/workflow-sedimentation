@@ -1,42 +1,42 @@
 Compiling C++ (in optimized mode) sedimentation.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c sedimentation.C -o sedimentation.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c sedimentation.C -o sedimentation.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/common/stab_helper.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/common/stab_helper.C -o src/common/stab_helper.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/common/stab_helper.C -o src/common/stab_helper.x86_64-unknown-linux-gnu.opt.o
 src/common/stab_helper.C:71:33: warning: unused parameter ‘g’ [-Wunused-parameter]
  Real compute_tau_M(RealGradient g, RealTensor G, Gradient U, Real k, Real dt, Real dt_stab)
                                  ^
 Compiling C++ (in optimized mode) src/flow/viscosity_flow.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/flow/viscosity_flow.C -o src/flow/viscosity_flow.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/flow/viscosity_flow.C -o src/flow/viscosity_flow.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/flow/sedimentation_flow.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/flow/sedimentation_flow.C -o src/flow/sedimentation_flow.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/flow/sedimentation_flow.C -o src/flow/sedimentation_flow.x86_64-unknown-linux-gnu.opt.o
 src/flow/sedimentation_flow.C:42:69: warning: unused parameter ‘t’ [-Wunused-parameter]
- inline DenseVector<Number> initPressure(const Point & p, const Real t, const Parameters& parameters)
+ inline DenseVector<Number> initPressure(const Point & p, const Real t, const Parameters& parameters) {
                                                                      ^
-src/flow/sedimentation_flow.C:73:56: warning: unused parameter ‘system_name’ [-Wunused-parameter]
+src/flow/sedimentation_flow.C:72:56: warning: unused parameter ‘system_name’ [-Wunused-parameter]
  void init_flow(EquationSystems& es, const std::string& system_name) {
                                                         ^
 Compiling C++ (in optimized mode) src/io/xdmf.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/io/xdmf.C -o src/io/xdmf.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/io/xdmf.C -o src/io/xdmf.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/mesh_mov/mesh_moviment.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/mesh_mov/mesh_moviment.C -o src/mesh_mov/mesh_moviment.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/mesh_mov/mesh_moviment.C -o src/mesh_mov/mesh_moviment.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/sediment/sedimentation_transport.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/sediment/sedimentation_transport.C -o src/sediment/sedimentation_transport.x86_64-unknown-linux-gnu.opt.o
-src/sediment/sedimentation_transport.C:74:65: warning: unused parameter ‘system_name’ [-Wunused-parameter]
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/sediment/sedimentation_transport.C -o src/sediment/sedimentation_transport.x86_64-unknown-linux-gnu.opt.o
+src/sediment/sedimentation_transport.C:71:65: warning: unused parameter ‘system_name’ [-Wunused-parameter]
  void init_sedimentation(EquationSystems& es, const std::string& system_name) {
                                                                  ^
 Compiling C++ (in optimized mode) src/sediment/sedimentation_deposition.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/sediment/sedimentation_deposition.C -o src/sediment/sedimentation_deposition.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/sediment/sedimentation_deposition.C -o src/sediment/sedimentation_deposition.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/sediment/sediment_mass_energy.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/sediment/sediment_mass_energy.C -o src/sediment/sediment_mass_energy.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/sediment/sediment_mass_energy.C -o src/sediment/sediment_mass_energy.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/time_stepping/timeStepControlBase.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/time_stepping/timeStepControlBase.C -o src/time_stepping/timeStepControlBase.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/time_stepping/timeStepControlBase.C -o src/time_stepping/timeStepControlBase.x86_64-unknown-linux-gnu.opt.o
 src/time_stepping/timeStepControlBase.C:40:69: warning: unused parameter ‘orig’ [-Wunused-parameter]
  timeStepControlBase::timeStepControlBase(const timeStepControlBase& orig) {
                                                                      ^
 Compiling C++ (in optimized mode) src/time_stepping/timeStepControlResidual.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/time_stepping/timeStepControlResidual.C -o src/time_stepping/timeStepControlResidual.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/time_stepping/timeStepControlResidual.C -o src/time_stepping/timeStepControlResidual.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/time_stepping/timeStepControlPID.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/time_stepping/timeStepControlPID.C -o src/time_stepping/timeStepControlPID.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/time_stepping/timeStepControlPID.C -o src/time_stepping/timeStepControlPID.x86_64-unknown-linux-gnu.opt.o
 src/time_stepping/timeStepControlPID.C:40:66: warning: unused parameter ‘orig’ [-Wunused-parameter]
  timeStepControlPID::timeStepControlPID(const timeStepControlPID& orig):
                                                                   ^
@@ -48,12 +48,12 @@ src/time_stepping/timeStepControlPID.C:85:37: warning: ISO C++ forbids variable 
      double rms[ndata], rms_sum[ndata];
                                      ^
 Compiling C++ (in optimized mode) src/time_stepping/timeStepControlPC11.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/time_stepping/timeStepControlPC11.C -o src/time_stepping/timeStepControlPC11.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/time_stepping/timeStepControlPC11.C -o src/time_stepping/timeStepControlPC11.x86_64-unknown-linux-gnu.opt.o
 src/time_stepping/timeStepControlPC11.C:40:69: warning: unused parameter ‘orig’ [-Wunused-parameter]
  timeStepControlPC11::timeStepControlPC11(const timeStepControlPC11& orig):
                                                                      ^
 Compiling C++ (in optimized mode) src/provenance/provenance.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/provenance/provenance.C -o src/provenance/provenance.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/provenance/provenance.C -o src/provenance/provenance.x86_64-unknown-linux-gnu.opt.o
 src/provenance/provenance.C: In member function ‘void Provenance::inputInputMesh()’:
 src/provenance/provenance.C:96:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
      char memalloc[jsonArraySize];
@@ -154,35 +154,55 @@ src/provenance/provenance.C: In member function ‘void Provenance::outputSolver
 src/provenance/provenance.C:1003:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
      char memalloc[jsonArraySize];
                                 ^
-src/provenance/provenance.C: In member function ‘void Provenance::outputMeshRefinement(bool, int, int, int)’:
+src/provenance/provenance.C: In member function ‘void Provenance::inputComputeSolutionChange()’:
 src/provenance/provenance.C:1041:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
      char memalloc[jsonArraySize];
                                 ^
+src/provenance/provenance.C: In member function ‘void Provenance::outputComputeSolutionChange(int, libMesh::Real, libMesh::Real, unsigned int, unsigned int, unsigned int, unsigned int, bool)’:
+src/provenance/provenance.C:1088:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
+     char memalloc[jsonArraySize];
+                                ^
+src/provenance/provenance.C: In member function ‘void Provenance::inputComputeTimeStep()’:
+src/provenance/provenance.C:1128:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
+     char memalloc[jsonArraySize];
+                                ^
+src/provenance/provenance.C: In member function ‘void Provenance::outputComputeTimeStep(int, libMesh::Real, libMesh::Real, bool)’:
+src/provenance/provenance.C:1172:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
+     char memalloc[jsonArraySize];
+                                ^
+src/provenance/provenance.C: In member function ‘void Provenance::inputMeshRefinement()’:
+src/provenance/provenance.C:1211:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
+     char memalloc[jsonArraySize];
+                                ^
+src/provenance/provenance.C: In member function ‘void Provenance::outputMeshRefinement(bool, int, int, int)’:
+src/provenance/provenance.C:1251:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
+     char memalloc[jsonArraySize];
+                                ^
 src/provenance/provenance.C: In member function ‘void Provenance::inputMeshWriter()’:
-src/provenance/provenance.C:1086:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
+src/provenance/provenance.C:1296:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
      char memalloc[jsonArraySize];
                                 ^
 src/provenance/provenance.C: In member function ‘void Provenance::inputDataExtraction(int)’:
-src/provenance/provenance.C:1169:34: warning: ISO C++ forbids variable length array ‘transformation’ [-Wvla]
+src/provenance/provenance.C:1379:34: warning: ISO C++ forbids variable length array ‘transformation’ [-Wvla]
      char transformation[arraySize];
                                   ^
-src/provenance/provenance.C:1177:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
+src/provenance/provenance.C:1387:32: warning: ISO C++ forbids variable length array ‘memalloc’ [-Wvla]
      char memalloc[jsonArraySize];
                                 ^
 src/provenance/provenance.C: In member function ‘void Provenance::outputDataExtraction(int, int, std::__cxx11::string, int)’:
-src/provenance/provenance.C:1213:34: warning: ISO C++ forbids variable length array ‘transformation’ [-Wvla]
+src/provenance/provenance.C:1423:34: warning: ISO C++ forbids variable length array ‘transformation’ [-Wvla]
      char transformation[arraySize];
                                   ^
-src/provenance/provenance.C:1214:27: warning: ISO C++ forbids variable length array ‘dataSet’ [-Wvla]
+src/provenance/provenance.C:1424:27: warning: ISO C++ forbids variable length array ‘dataSet’ [-Wvla]
      char dataSet[arraySize];
                            ^
-src/provenance/provenance.C:1215:31: warning: ISO C++ forbids variable length array ‘indexerName’ [-Wvla]
+src/provenance/provenance.C:1425:31: warning: ISO C++ forbids variable length array ‘indexerName’ [-Wvla]
      char indexerName[arraySize];
                                ^
-src/provenance/provenance.C:1216:31: warning: ISO C++ forbids variable length array ‘rawDataFile’ [-Wvla]
+src/provenance/provenance.C:1426:31: warning: ISO C++ forbids variable length array ‘rawDataFile’ [-Wvla]
      char rawDataFile[arraySize];
                                ^
-src/provenance/provenance.C:1267:41: warning: ISO C++ forbids variable length array ‘extractedFileName’ [-Wvla]
+src/provenance/provenance.C:1477:41: warning: ISO C++ forbids variable length array ‘extractedFileName’ [-Wvla]
      char extractedFileName[jsonArraySize];
                                          ^
 src/provenance/provenance.C: In function ‘std::__cxx11::string GetCurrentWorkingDir()’:
@@ -195,154 +215,154 @@ In file included from src/provenance/provenance.C:26:0:
          system(buffer);
                        ^
 Compiling C++ (in optimized mode) contrib/dfanalyzer/provenance_object.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c contrib/dfanalyzer/provenance_object.C -o contrib/dfanalyzer/provenance_object.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c contrib/dfanalyzer/provenance_object.C -o contrib/dfanalyzer/provenance_object.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) contrib/dfanalyzer/performance_metric.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c contrib/dfanalyzer/performance_metric.C -o contrib/dfanalyzer/performance_metric.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c contrib/dfanalyzer/performance_metric.C -o contrib/dfanalyzer/performance_metric.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) contrib/dfanalyzer/task.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c contrib/dfanalyzer/task.C -o contrib/dfanalyzer/task.x86_64-unknown-linux-gnu.opt.o
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c contrib/dfanalyzer/task.C -o contrib/dfanalyzer/task.x86_64-unknown-linux-gnu.opt.o
 Compiling C++ (in optimized mode) src/catalyst/FEAdaptor.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/programs/libmesh/include -I/home/vitor/programs/hdf5/include -I/home/vitor/programs/petsc/include -I/home/vitor/programs/petsc//include -c src/catalyst/FEAdaptor.C -o src/catalyst/FEAdaptor.x86_64-unknown-linux-gnu.opt.o
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkFieldData.h:47:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:48,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30,
+mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3  -I./include/catalyst -DUSE_CATALYST -I/home/vitor/program/libmesh/include -I/home/vitor/program/hdf5/include -I/home/vitor/program/petsc/include -I/home/vitor/program/petsc//include -c src/catalyst/FEAdaptor.C -o src/catalyst/FEAdaptor.x86_64-unknown-linux-gnu.opt.o
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkFieldData.h:47:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:48,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30,
                  from src/catalyst/FEAdaptor.C:7:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkObject.h:56:44: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkObject.h:56:44: warning: extra ‘;’ [-Wpedantic]
    vtkBaseTypeMacro(vtkObject,vtkObjectBase);
                                             ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkFieldData.h:49:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:48,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkFieldData.h:49:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:48,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30,
                  from src/catalyst/FEAdaptor.C:7:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkAbstractArray.h:78:43: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkAbstractArray.h:78:43: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkAbstractArray,vtkObject);
                                            ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:48:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:48:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30,
                  from src/catalyst/FEAdaptor.C:7:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkFieldData.h:58:39: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkFieldData.h:58:39: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkFieldData,vtkObject);
                                        ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30:0,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:30:0,
                  from src/catalyst/FEAdaptor.C:7:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:60:50: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataSetAttributes.h:60:50: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkDataSetAttributes,vtkFieldData);
                                                   ^
 In file included from src/catalyst/FEAdaptor.C:7:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:37:49: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCellData.h:37:49: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCellData,vtkDataSetAttributes);
                                                  ^
 In file included from src/catalyst/FEAdaptor.C:9:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPAdaptorAPI.h:30:43: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPAdaptorAPI.h:30:43: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCPAdaptorAPI, vtkObject);
                                            ^
 In file included from src/catalyst/FEAdaptor.C:10:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPDataDescription.h:31:48: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPDataDescription.h:31:48: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCPDataDescription, vtkObject);
                                                 ^
 In file included from src/catalyst/FEAdaptor.C:11:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPInputDataDescription.h:32:53: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPInputDataDescription.h:32:53: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCPInputDataDescription, vtkObject);
                                                      ^
 In file included from src/catalyst/FEAdaptor.C:12:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPProcessor.h:61:42: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPProcessor.h:61:42: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCPProcessor, vtkObject);
                                           ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPPythonScriptPipeline.h:18:0,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPPythonScriptPipeline.h:18:0,
                  from src/catalyst/FEAdaptor.C:13:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPPipeline.h:32:41: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPPipeline.h:32:41: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCPPipeline, vtkObject);
                                          ^
 In file included from src/catalyst/FEAdaptor.C:13:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPPythonScriptPipeline.h:33:57: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPPythonScriptPipeline.h:33:57: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCPPythonScriptPipeline, vtkCPPipeline);
                                                          ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:28:0,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:28:0,
                  from src/catalyst/FEAdaptor.C:14:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataArray.h:51:46: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataArray.h:51:46: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkDataArray,vtkAbstractArray);
                                               ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArrayLookupHelper.h:26:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArray.h:72,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkAOSDataArrayTemplate.h:35,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:29,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArrayLookupHelper.h:26:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArray.h:72,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkAOSDataArrayTemplate.h:35,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:29,
                  from src/catalyst/FEAdaptor.C:14:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkIdList.h:44:36: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkIdList.h:44:36: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkIdList,vtkObject);
                                     ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArray.txx:21:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArray.h:346,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkAOSDataArrayTemplate.h:35,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:29,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArray.txx:21:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkGenericDataArray.h:346,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkAOSDataArrayTemplate.h:35,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:29,
                  from src/catalyst/FEAdaptor.C:14:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkMath.h:88:34: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkMath.h:88:34: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkMath,vtkObject);
                                   ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkBuffer.h:29:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkAOSDataArrayTemplate.h:36,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:29,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkBuffer.h:29:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkAOSDataArrayTemplate.h:36,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDoubleArray.h:29,
                  from src/catalyst/FEAdaptor.C:14:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkObjectFactory.h:137:43: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkObjectFactory.h:137:43: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkObjectFactory,vtkObject);
                                            ^
 In file included from src/catalyst/FEAdaptor.C:17:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkPoints.h:41:36: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkPoints.h:41:36: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkPoints,vtkObject);
                                     ^
 In file included from src/catalyst/FEAdaptor.C:18:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkPointData.h:36:50: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkPointData.h:36:50: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkPointData,vtkDataSetAttributes);
                                                   ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataSet.h:44:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkPointSet.h:33,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGridBase.h:32,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGrid.h:31,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataSet.h:44:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkPointSet.h:33,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGridBase.h:32,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGrid.h:31,
                  from src/catalyst/FEAdaptor.C:20:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataObject.h:63:40: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataObject.h:63:40: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkDataObject,vtkObject);
                                         ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkPointSet.h:33:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGridBase.h:32,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGrid.h:31,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkPointSet.h:33:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGridBase.h:32,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGrid.h:31,
                  from src/catalyst/FEAdaptor.C:20:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataSet.h:59:41: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataSet.h:59:41: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkDataSet,vtkDataObject);
                                          ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGridBase.h:32:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGrid.h:31,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGridBase.h:32:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkUnstructuredGrid.h:31,
                  from src/catalyst/FEAdaptor.C:20:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkPointSet.h:42:39: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkPointSet.h:42:39: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkPointSet,vtkDataSet);
                                        ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataObjectTree.h:37:0,
-                 from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkMultiBlockDataSet.h:43,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataObjectTree.h:37:0,
+                 from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkMultiBlockDataSet.h:43,
                  from src/catalyst/FEAdaptor.C:21:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCompositeDataSet.h:48:51: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCompositeDataSet.h:48:51: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCompositeDataSet, vtkDataObject);
                                                    ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkMultiBlockDataSet.h:43:0,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkMultiBlockDataSet.h:43:0,
                  from src/catalyst/FEAdaptor.C:21:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkDataObjectTree.h:49:55: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkDataObjectTree.h:49:55: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkDataObjectTree, vtkCompositeDataSet);
                                                        ^
 In file included from src/catalyst/FEAdaptor.C:21:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkMultiBlockDataSet.h:49:56: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkMultiBlockDataSet.h:49:56: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkMultiBlockDataSet, vtkDataObjectTree);
                                                         ^
 In file included from src/catalyst/FEAdaptor.C:22:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkMultiPieceDataSet.h:44:56: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkMultiPieceDataSet.h:44:56: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkMultiPieceDataSet, vtkDataObjectTree);
                                                         ^
-In file included from /home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkMultiProcessController.h:55:0,
+In file included from /home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkMultiProcessController.h:55:0,
                  from src/catalyst/FEAdaptor.C:23:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCommunicator.h:55:43: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCommunicator.h:55:43: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCommunicator, vtkObject);
                                            ^
 In file included from src/catalyst/FEAdaptor.C:23:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkMultiProcessController.h:79:52: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkMultiProcessController.h:79:52: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkMultiProcessController,vtkObject);
                                                     ^
 In file included from src/catalyst/FEAdaptor.C:24:0:
-/home/vitor/programs/paraview-5.3.0/include/paraview-5.3/vtkCPPythonAdaptorAPI.h:27:55: warning: extra ‘;’ [-Wpedantic]
+/home/vitor/program/paraview-5.3.0/include/paraview-5.3/vtkCPPythonAdaptorAPI.h:27:55: warning: extra ‘;’ [-Wpedantic]
    vtkTypeMacro(vtkCPPythonAdaptorAPI, vtkCPAdaptorAPI);
                                                        ^
 src/catalyst/FEAdaptor.C:320:90: warning: unused parameter ‘analysisInterval’ [-Wunused-parameter]
@@ -352,4 +372,4 @@ src/catalyst/FEAdaptor.C:320:152: warning: unused parameter ‘using_amr’ [-Wu
      void CoProcess(EquationSystems &eq, double time, unsigned int timeStep, unsigned int analysisInterval, bool lastTimeStep = false, bool using_amr = false) 
                                                                                                                                                         ^
 Linking sediment-opt...
-libtool: link: mpicxx -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib "-I./contrib/dfanalyzer/*.h" -I./include/provenance -DPROVENANCE -I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3 -I./include/catalyst -DUSE_CATALYST sedimentation.x86_64-unknown-linux-gnu.opt.o src/common/stab_helper.x86_64-unknown-linux-gnu.opt.o src/flow/viscosity_flow.x86_64-unknown-linux-gnu.opt.o src/flow/sedimentation_flow.x86_64-unknown-linux-gnu.opt.o src/io/xdmf.x86_64-unknown-linux-gnu.opt.o src/mesh_mov/mesh_moviment.x86_64-unknown-linux-gnu.opt.o src/sediment/sedimentation_transport.x86_64-unknown-linux-gnu.opt.o src/sediment/sedimentation_deposition.x86_64-unknown-linux-gnu.opt.o src/sediment/sediment_mass_energy.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlBase.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlResidual.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlPID.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlPC11.x86_64-unknown-linux-gnu.opt.o src/provenance/provenance.x86_64-unknown-linux-gnu.opt.o contrib/dfanalyzer/provenance_object.x86_64-unknown-linux-gnu.opt.o contrib/dfanalyzer/performance_metric.x86_64-unknown-linux-gnu.opt.o contrib/dfanalyzer/task.x86_64-unknown-linux-gnu.opt.o src/catalyst/FEAdaptor.x86_64-unknown-linux-gnu.opt.o -o sediment-opt -Wl,-rpath -Wl,/home/vitor/programs/hdf5/lib -Wl,-rpath -Wl,/home/vitor/programs/petsc/lib -Wl,-rpath -Wl,/usr/lib/gcc/x86_64-linux-gnu/5 -Wl,-rpath -Wl,/lib/x86_64-linux-gnu -Wl,-rpath -Wl,/usr/lib/x86_64-linux-gnu -Wl,-rpath -Wl,/usr/lib/openmpi/lib -Wl,-rpath -Wl,/home/vitor/programs/libmesh/lib -Wl,-rpath -Wl,/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3 -Wl,-rpath-link -Wl,/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3  -L/home/vitor/programs/hdf5/lib -L/home/vitor/programs/szip/lib -L/home/vitor/programs/petsc/lib -lmpi_cxx -lstdc++ -lmpi -lgcc_s -L/usr/lib/openmpi/lib -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -L/home/vitor/programs/libmesh/lib /home/vitor/programs/libmesh/lib/libmesh_opt.so /home/vitor/programs/hdf5/lib/libhdf5_cpp.so /home/vitor/programs/hdf5/lib/libhdf5.so /home/vitor/programs/szip/lib/libsz.so -lm -lz -lpetsc -lflapack -lfblas -lhwloc -lX11 -lmpi_usempif08 -lmpi_usempi_ignore_tkr -lmpi_mpifh -lgfortran -lquadmath -ldl -L/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3 -lvtkPVPythonCatalyst-pv5.3 -lvtkPVCatalyst-pv5.3 -lvtkPVServerManagerApplication-pv5.3 -lvtkPVServerManagerCore-pv5.3 -lvtkPVServerImplementationCore-pv5.3 -lvtkPVClientServerCoreCore-pv5.3 -lvtkFiltersParallel-pv5.3 -lvtkFiltersModeling-pv5.3 -lvtkRenderingCore-pv5.3 -lvtkFiltersExtraction-pv5.3 -lvtkFiltersStatistics-pv5.3 -lvtkImagingFourier-pv5.3 -lvtkImagingCore-pv5.3 -lvtkalglib-pv5.3 -lvtkFiltersGeometry-pv5.3 -lvtkFiltersSources-pv5.3 -lvtkFiltersGeneral-pv5.3 -lvtkCommonComputationalGeometry-pv5.3 -lvtkCommonColor-pv5.3 -lvtkFiltersProgrammable-pv5.3 -lvtkPVVTKExtensionsCore-pv5.3 -lvtkPVCommon-pv5.3 -lvtkClientServer-pv5.3 -lvtkIOXMLParser-pv5.3 -lvtkFiltersCore-pv5.3 -lvtkParallelMPI-pv5.3 -lvtkParallelCore-pv5.3 -lvtkIOLegacy-pv5.3 -lvtkCommonExecutionModel-pv5.3 -lvtkCommonDataModel-pv5.3 -lvtkCommonSystem-pv5.3 -lvtkCommonTransforms-pv5.3 -lvtkCommonMisc-pv5.3 -lvtkCommonMath-pv5.3 -lprotobuf -lpthread -lvtkPythonInterpreter-pv5.3 -lvtkWrappingPython27Core-pv5.3 -lvtkCommonCore-pv5.3 -lpython2.7 -lvtksys-pv5.3 -fopenmp -Wl,-rpath -Wl,/home/vitor/programs/libmesh/lib -Wl,-rpath -Wl,/home/vitor/programs/hdf5/lib -Wl,-rpath -Wl,/home/vitor/programs/szip/lib -Wl,-rpath -Wl,/home/vitor/programs/libmesh/lib -Wl,-rpath -Wl,/home/vitor/programs/hdf5/lib -Wl,-rpath -Wl,/home/vitor/programs/szip/lib
+libtool: link: mpicxx -std=gnu++11 -O2 -felide-constructors -funroll-loops -fstrict-aliasing -Wdisabled-optimization -Wno-variadic-macros -fopenmp -I./include/common -I./include/flow -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib "-I./contrib/dfanalyzer/*.h" -I./include/provenance -DPROVENANCE -I/home/vitor/program/paraview-5.3.0/include/paraview-5.3 -I./include/catalyst -DUSE_CATALYST sedimentation.x86_64-unknown-linux-gnu.opt.o src/common/stab_helper.x86_64-unknown-linux-gnu.opt.o src/flow/viscosity_flow.x86_64-unknown-linux-gnu.opt.o src/flow/sedimentation_flow.x86_64-unknown-linux-gnu.opt.o src/io/xdmf.x86_64-unknown-linux-gnu.opt.o src/mesh_mov/mesh_moviment.x86_64-unknown-linux-gnu.opt.o src/sediment/sedimentation_transport.x86_64-unknown-linux-gnu.opt.o src/sediment/sedimentation_deposition.x86_64-unknown-linux-gnu.opt.o src/sediment/sediment_mass_energy.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlBase.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlResidual.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlPID.x86_64-unknown-linux-gnu.opt.o src/time_stepping/timeStepControlPC11.x86_64-unknown-linux-gnu.opt.o src/provenance/provenance.x86_64-unknown-linux-gnu.opt.o contrib/dfanalyzer/provenance_object.x86_64-unknown-linux-gnu.opt.o contrib/dfanalyzer/performance_metric.x86_64-unknown-linux-gnu.opt.o contrib/dfanalyzer/task.x86_64-unknown-linux-gnu.opt.o src/catalyst/FEAdaptor.x86_64-unknown-linux-gnu.opt.o -o sediment-opt -Wl,-rpath -Wl,/home/vitor/program/hdf5/lib -Wl,-rpath -Wl,/home/vitor/program/petsc/lib -Wl,-rpath -Wl,/usr/lib/gcc/x86_64-linux-gnu/5 -Wl,-rpath -Wl,/lib/x86_64-linux-gnu -Wl,-rpath -Wl,/usr/lib/x86_64-linux-gnu -Wl,-rpath -Wl,/usr/lib/openmpi/lib -Wl,-rpath -Wl,/home/vitor/program/libmesh/lib -Wl,-rpath -Wl,/home/vitor/program/paraview-5.3.0/lib/paraview-5.3 -Wl,-rpath-link -Wl,/home/vitor/program/paraview-5.3.0/lib/paraview-5.3  -L/home/vitor/program/hdf5/lib -L/home/vitor/program/szip/lib -L/home/vitor/program/petsc/lib -lmpi_cxx -lstdc++ -lmpi -lgcc_s -L/usr/lib/openmpi/lib -L/usr/lib/gcc/x86_64-linux-gnu/5 -L/usr/lib/x86_64-linux-gnu -L/lib/x86_64-linux-gnu -L/home/vitor/program/libmesh/lib /home/vitor/program/libmesh/lib/libmesh_opt.so /home/vitor/program/libmesh/lib/libnetcdf.so /home/vitor/program/hdf5/lib/libhdf5_hl.so /usr/lib/x86_64-linux-gnu/libcurl.so /home/vitor/program/hdf5/lib/libhdf5_cpp.so /home/vitor/program/hdf5/lib/libhdf5.so /home/vitor/program/szip/lib/libsz.so -lm -lz -lpetsc -lflapack -lfblas -lhwloc -lmpi_usempif08 -lmpi_usempi_ignore_tkr -lmpi_mpifh -lgfortran -lquadmath -ldl -L/home/vitor/program/paraview-5.3.0/lib/paraview-5.3 -lvtkPVPythonCatalyst-pv5.3 -lvtkPVCatalyst-pv5.3 -lvtkPVServerManagerApplication-pv5.3 -lvtkPVServerManagerCore-pv5.3 -lvtkPVServerImplementationCore-pv5.3 -lvtkPVClientServerCoreCore-pv5.3 -lvtkFiltersParallel-pv5.3 -lvtkFiltersModeling-pv5.3 -lvtkRenderingCore-pv5.3 -lvtkFiltersExtraction-pv5.3 -lvtkFiltersStatistics-pv5.3 -lvtkImagingFourier-pv5.3 -lvtkImagingCore-pv5.3 -lvtkalglib-pv5.3 -lvtkFiltersGeometry-pv5.3 -lvtkFiltersSources-pv5.3 -lvtkFiltersGeneral-pv5.3 -lvtkCommonComputationalGeometry-pv5.3 -lvtkCommonColor-pv5.3 -lvtkFiltersProgrammable-pv5.3 -lvtkPVVTKExtensionsCore-pv5.3 -lvtkPVCommon-pv5.3 -lvtkClientServer-pv5.3 -lvtkIOXMLParser-pv5.3 -lvtkFiltersCore-pv5.3 -lvtkParallelMPI-pv5.3 -lvtkParallelCore-pv5.3 -lvtkIOLegacy-pv5.3 -lvtkCommonExecutionModel-pv5.3 -lvtkCommonDataModel-pv5.3 -lvtkCommonSystem-pv5.3 -lvtkCommonTransforms-pv5.3 -lvtkCommonMisc-pv5.3 -lvtkCommonMath-pv5.3 -lprotobuf -lpthread -lvtkPythonInterpreter-pv5.3 -lvtkWrappingPython27Core-pv5.3 -lvtkCommonCore-pv5.3 -lpython2.7 -lvtksys-pv5.3 -pthread -fopenmp -Wl,-rpath -Wl,/home/vitor/program/libmesh/lib -Wl,-rpath -Wl,/home/vitor/program/hdf5/lib -Wl,-rpath -Wl,/home/vitor/program/szip/lib -Wl,-rpath -Wl,/home/vitor/program/libmesh/lib -Wl,-rpath -Wl,/home/vitor/program/hdf5/lib -Wl,-rpath -Wl,/home/vitor/program/szip/lib

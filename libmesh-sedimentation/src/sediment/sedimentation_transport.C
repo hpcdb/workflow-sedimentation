@@ -508,17 +508,21 @@ void SedimentationTransport::assemble2D() {
 }
 
 void SedimentationTransport::assemble() {
-    bool rbvms = es.parameters.get<bool> ("rbvms");
+    std::string fem_model = es.parameters.get<std::string> ("fem_model");
     switch (this->dim) {
         case 2:
-            if (!rbvms)
+            if (fem_model=="SUPG/PSPG")
                 this->assembleSUPG2D();
+            else if (fem_model=="RBVMS")
+                this->assembleRBVMS2D();
             else
                 this->assemble2D();
             break;
         default:
-            if (!rbvms)
+            if (fem_model=="SUPG/PSPG" )
                 this->assembleSUPG3D();
+            else if (fem_model=="RBVMS")
+                this->assembleRBVMS3D();
             else
                 this->assemble3D();
             break;
@@ -1085,20 +1089,17 @@ void SedimentationTransport::assembleSUPG2D() {
     TransientLinearImplicitSystem & flow_system =
             es.get_system<TransientLinearImplicitSystem> ("flow");
 
-    // Numeric ids corresponding to each variable in the system
+    // Numeric ids corresponding to each variable in the systems
     const unsigned int s_var = system.variable_number("s");
-
-    // Numeric ids corresponding to each variable in the system
     const unsigned int u_var = flow_system.variable_number("u");
     const unsigned int v_var = flow_system.variable_number("v");
-    const unsigned int p_var = flow_system.variable_number("p");
-
+    
+    // This vector will hold the degree of freedom indices for
+    // the element.  These define where in the global system
+    // the element degrees of freedom get mapped.
+    std::vector<dof_id_type> dof_indices_s;    
     std::vector<dof_id_type> dof_indices_u;
     std::vector<dof_id_type> dof_indices_v;
-    std::vector<dof_id_type> dof_indices_p;
-
-    std::vector<dof_id_type> face_dof_indices;
-
 
     // Get a constant reference to the Finite Element type
     // for the first (and only) variable in the system.
@@ -1129,7 +1130,6 @@ void SedimentationTransport::assembleSUPG2D() {
     // The element shape functions evaluated at the quadrature points.
     const std::vector<std::vector<Real> >& phi = fe->get_phi();
     const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
-    const std::vector<Point> & normals = fe_face->get_normals();
 
     // The element shape function gradients evaluated at the quadrature
     // points.
@@ -1149,25 +1149,20 @@ void SedimentationTransport::assembleSUPG2D() {
     DenseMatrix<Number> Ke;
     DenseVector<Number> Fe;
 
-    // This vector will hold the degree of freedom indices for
-    // the element.  These define where in the global system
-    // the element degrees of freedom get mapped.
-    std::vector<dof_id_type> dof_indices;
-    std::vector<dof_id_type> dof_indices_face;
-
     // Here we extract the parameters that we put in the EquationSystems object.
     const Real dt = es.parameters.get<Real> ("dt");
-    const Real fopc = es.parameters.get<Real> ("fopc");
     const Real theta = es.parameters.get<Real> ("theta");
     const Real k = es.parameters.get<Real> ("Diffusivity");
     const Real Us = es.parameters.get<Real> ("Us");
     const Real ex = es.parameters.get<Real> ("ex");
     const Real ey = es.parameters.get<Real> ("ey");
-    const Real Rp = es.parameters.get<Real> ("erosion/Rp");
     const Real dt_stab = es.parameters.get<Real> ("dt_stab");
     const Real s_ref_bar = es.parameters.get<Real> ("s_ref_bar_yzBeta");
     const Real delta_factor = es.parameters.get<Real> ("delta_transient_factor");
+    const bool yzBeta = es.parameters.get<bool> ("yzBeta");
+    const Real tau_dt_contrib = dt_stab*4.0/(dt*dt);    
 
+    // gravity direction and sedimentation vectors
     RealVectorValue e(ex, ey), vel_sed;
     vel_sed = Us*e;
     Real Res, mod_v_ip, aux4, aux5, aux7, aux8, delta, tau, beta = 1.0, inv_pi = libMesh::pi, inv_s = 1.0 / s_ref_bar;
@@ -1193,20 +1188,18 @@ void SedimentationTransport::assembleSUPG2D() {
 
         // for Tau SUPG and Delta YZBetha parameters
         // using for energy equation the diffusivity for the diffusive limit with dimension less formulation
-        aux4 = 9.0 * pow(4.0 * k / (h_caract * h_caract), 2.0) + dt_stab * 4.0 / (dt * dt);
+        aux4 = 9.0 * pow(4.0 * k / (h_caract * h_caract),2.0) + tau_dt_contrib;
         aux7 = pow(h_caract * 0.5, beta);
 
         // Get the degree of freedom indices for the
         // current element.  These define where in the global
         // matrix and right-hand-side this element will
         // contribute to.
-        dof_map.dof_indices(elem, dof_indices);
-
-        int n_dofs = dof_indices.size();
+        dof_map.dof_indices(elem, dof_indices_s);
+        int n_dofs = dof_indices_s.size();
 
         dof_map_flow.dof_indices(elem, dof_indices_u, u_var);
         dof_map_flow.dof_indices(elem, dof_indices_v, v_var);
-        dof_map_flow.dof_indices(elem, dof_indices_p, p_var);
 
         // Compute the element-specific data for the current
         // element.  This involves computing the location of the
@@ -1220,76 +1213,70 @@ void SedimentationTransport::assembleSUPG2D() {
         // the last element.  Note that this will be the case if the
         // element type is different (i.e. the last element was a
         // triangle, now we are on a quadrilateral).
-        Ke.resize(dof_indices.size(),
-                dof_indices.size());
-
-        Fe.resize(dof_indices.size());
+        Ke.resize(n_dofs, n_dofs);
+        Fe.resize(n_dofs);
 
         // loop over quadrature points
         for (unsigned int qp = 0; qp < qrule.n_points(); qp++) {
             // Values to hold the old solution & its gradient.
             Number s_old = 0.0, s = 0.0;
-            Gradient grad_s, grad_u, grad_v;
+            Gradient grad_s;
             Number u = 0.0, v = 0.0;
 
             // Compute the old solution & its gradient.
             for (unsigned int l = 0; l < phi.size(); l++) {
 
-                s_old += phi[l][qp] * system.old_solution(dof_indices[l]);
+                s_old += phi[l][qp] * system.old_solution(dof_indices_s[l]);
 
-                s += phi[l][qp] * system.current_solution(dof_indices[l]);
-                grad_s.add_scaled(dphi[l][qp], system.current_solution(dof_indices[l]));
+                s += phi[l][qp] * system.current_solution(dof_indices_s[l]);
+                grad_s.add_scaled(dphi[l][qp], system.current_solution(dof_indices_s[l]));
 
                 u += phi[l][qp]*(flow_system.current_solution(dof_indices_u[l]));
                 v += phi[l][qp]*(flow_system.current_solution(dof_indices_v[l]));
-
-                grad_u.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_u[l]));
-                grad_v.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_v[l]));
             }
 
-            RealVectorValue velocity(u + vel_sed(0), v + vel_sed(1));
+            RealVectorValue U(u + vel_sed(0), v + vel_sed(1));
 
             // Compute SUPG stabilization parameters: Tau SUPG & delta YZBeta
-            mod_v_ip = pow(velocity*velocity, 0.5);
-            aux5 = pow(2.0 * mod_v_ip / h_caract, 2.0) + aux4;
-            tau = pow(aux5, -0.5);
+            mod_v_ip = U.size();
+            aux5 = pow(2.0*mod_v_ip/h_caract,2.0) + aux4;
+            tau = pow(aux5,-0.5);
 
             // Advection-Diffusion Residual
-            Res = delta_factor * (s - s_old) / dt + velocity*grad_s;
-            aux8 = inv_s * inv_s * (grad_s * grad_s);
+            if (yzBeta) {
+                Res = delta_factor*(s-s_old)/dt + U*grad_s;
+                aux8 = inv_s * inv_s * (grad_s*grad_s);
 
-            if (aux8 > 0.0)
-                delta = fabs(inv_s * Res) * pow(aux8, aux9) * aux7;
-            else
-                delta = 0.0;
+                if(aux8>0.0)
+                   delta = fabs(inv_s*Res) * pow(aux8,aux9) * aux7;
+                else
+                   delta = 0.0;
+            }
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i = 0; i < phi.size(); i++) {
+                
+                const Number Udphi_i = U * dphi[i][qp];
+                
                 // The RHS contribution
-                Fe(i) += JxW[qp]* (phi[i][qp] + // Galerkin mass-vector
-                        tau * (velocity * dphi[i][qp])) * s_old; // SUPG mass-vector
+                Fe(i) += JxW[qp]* ( phi[i][qp]  +                               // Galerkin mass-vector
+                                    tau * Udphi_i ) * s_old ;                   // SUPG mass-vector
 
                 for (unsigned int j = 0; j < phi.size(); j++) {
                     // The Galerkin contribution
-                    Ke(i, j) += JxW[qp]*(
-                            phi[i][qp] * phi[j][qp] + // Mass-matrix
-                            dt * (-(dphi[i][qp] * velocity) * phi[j][qp] + // Advection matrix
-                            k * dphi[i][qp] * dphi[j][qp])); // Diffusion matrix
+                    Ke(i, j) += JxW[qp] * ( phi[i][qp] * phi[j][qp] +           // Mass-matrix
+                                     dt * (-Udphi_i * phi[j][qp] +              // Advection matrix
+                                      k * (dphi[i][qp] * dphi[j][qp]) ) );      // Diffusion matrix
                     // The SUPG contribution
-                    Ke(i, j) += JxW[qp] * tau * ((velocity * dphi[i][qp]) * phi[j][qp] + // Mass-matrix
-                            dt * ((velocity * dphi[i][qp]) * (velocity * dphi[j][qp]))); // Advective-matrix
+                    Ke(i, j) += JxW[qp] * tau * ( Udphi_i * phi[j][qp] +         // Mass-matrix
+                                           dt * ( Udphi_i * (U * dphi[j][qp]) ) ); // Advective-matrix
                     // YZBetha
-                    Ke(i, j) += JxW[qp] * delta * dt * (dphi[i][qp] * dphi[j][qp]);
+                    if (yzBeta)
+                        Ke(i, j) += JxW[qp] * dt * delta * (dphi[i][qp] * dphi[j][qp]);
                 }
             }
         }
 
-        // At this point the interior element integration has
-        // been completed.  However, we have not yet addressed
-        // boundary conditions.  For this example we will only
-        // consider simple Dirichlet boundary conditions imposed
-        // via the penalty method.
-        //
         // The following loops over the sides of the element.
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
@@ -1308,10 +1295,12 @@ void SedimentationTransport::assembleSUPG2D() {
                         for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
                             RealVectorValue vel_sed_bottom(0.0, 0.0);
                             Number s_old = 0.0;
+
                             for (unsigned int l = 0; l < phi_face.size(); l++) {
-                                s_old += phi_face[l][qp] * system.old_solution(dof_indices[l]);
+                                s_old += phi_face[l][qp] * system.old_solution(dof_indices_s[l]);
                                 vel_sed_bottom(0) += phi_face[l][qp] * vel_sed(0);
                                 vel_sed_bottom(1) += phi_face[l][qp] * vel_sed(1);
+
                             }
 
                             // Linear system contribution
@@ -1327,14 +1316,14 @@ void SedimentationTransport::assembleSUPG2D() {
 
         // If this assembly program were to be used on an adaptive mesh,
         // we would have to apply any hanging node constraint equations
-        dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
+        dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices_s);
 
         // The element matrix and right-hand-side are now built
         // for this element.  Add them to the global matrix and
         // right-hand-side vector.  The \p SparseMatrix::add_matrix()
         // and \p NumericVector::add_vector() members do this for us.
-        system.matrix->add_matrix(Ke, dof_indices);
-        system.rhs->add_vector(Fe, dof_indices);
+        system.matrix->add_matrix(Ke, dof_indices_s);
+        system.rhs->add_vector(Fe, dof_indices_s);
     }
 
     // That concludes the system matrix assembly routine.
@@ -1365,22 +1354,19 @@ void SedimentationTransport::assembleSUPG3D() {
     TransientLinearImplicitSystem & flow_system =
             es.get_system<TransientLinearImplicitSystem> ("flow");
 
-    // Numeric ids corresponding to each variable in the system
+    // Numeric ids corresponding to each variable in the systems
     const unsigned int s_var = system.variable_number("s");
-
-    // Numeric ids corresponding to each variable in the system
     const unsigned int u_var = flow_system.variable_number("u");
     const unsigned int v_var = flow_system.variable_number("v");
     const unsigned int w_var = flow_system.variable_number("w");
-    const unsigned int p_var = flow_system.variable_number("p");
 
+    // This vector will hold the degree of freedom indices for
+    // the element.  These define where in the global system
+    // the element degrees of freedom get mapped.
+    std::vector<dof_id_type> dof_indices_s;    
     std::vector<dof_id_type> dof_indices_u;
     std::vector<dof_id_type> dof_indices_v;
     std::vector<dof_id_type> dof_indices_w;
-    std::vector<dof_id_type> dof_indices_p;
-
-    std::vector<dof_id_type> face_dof_indices;
-
 
     // Get a constant reference to the Finite Element type
     // for the first (and only) variable in the system.
@@ -1411,7 +1397,6 @@ void SedimentationTransport::assembleSUPG3D() {
     // The element shape functions evaluated at the quadrature points.
     const std::vector<std::vector<Real> >& phi = fe->get_phi();
     const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
-    const std::vector<Point> & normals = fe_face->get_normals();
 
     // The element shape function gradients evaluated at the quadrature
     // points.
@@ -1431,31 +1416,26 @@ void SedimentationTransport::assembleSUPG3D() {
     DenseMatrix<Number> Ke;
     DenseVector<Number> Fe;
 
-    // This vector will hold the degree of freedom indices for
-    // the element.  These define where in the global system
-    // the element degrees of freedom get mapped.
-    std::vector<dof_id_type> dof_indices;
-    std::vector<dof_id_type> dof_indices_face;
-
     // Here we extract the parameters that we put in the EquationSystems object.
     const Real dt = es.parameters.get<Real> ("dt");
-    const Real fopc = es.parameters.get<Real> ("fopc");
     const Real theta = es.parameters.get<Real> ("theta");
     const Real k = es.parameters.get<Real> ("Diffusivity");
     const Real Us = es.parameters.get<Real> ("Us");
     const Real ex = es.parameters.get<Real> ("ex");
     const Real ey = es.parameters.get<Real> ("ey");
     const Real ez = es.parameters.get<Real> ("ez");
-    const Real Rp = es.parameters.get<Real> ("erosion/Rp");
     const Real dt_stab = es.parameters.get<Real> ("dt_stab");
     const Real s_ref_bar = es.parameters.get<Real> ("s_ref_bar_yzBeta");
     const Real delta_factor = es.parameters.get<Real> ("delta_transient_factor");
+    const bool yzBeta = es.parameters.get<bool> ("yzBeta");
+    const Real tau_dt_contrib = dt_stab*4.0/(dt*dt);
 
+    // gravity direction and sedimentation vectors
     RealVectorValue e(ex, ey, ez), vel_sed;
     vel_sed = Us*e;
     Real Res, mod_v_ip, aux4, aux5, aux7, aux8, delta, tau, beta = 1.0, inv_pi = libMesh::pi, inv_s = 1.0 / s_ref_bar;
-    ;
-    Real aux9 = beta * 0.5 - 1.0;
+    Real aux9 = beta * 0.5 -1.0;
+    Real um_terco = 1.0/3.0;
 
     // Now we will loop over all the elements in the mesh that
     // live on the local processor. We will compute the element
@@ -1472,25 +1452,23 @@ void SedimentationTransport::assembleSUPG3D() {
 
         // The characteristic height of the element
         const Real vol = elem->volume();
-        const Real h_caract = pow(6.0 * vol*inv_pi, 1.0 / 3.0);
+        const Real h_caract = pow(6.0*vol*inv_pi,um_terco);
 
         // for Tau SUPG and Delta YZBetha parameters
         // using for energy equation the diffusivity for the diffusive limit with dimension less formulation
-        aux4 = 9.0 * pow(4.0 * k / (h_caract * h_caract), 2.0) + dt_stab * 4.0 / (dt * dt);
+        aux4 = 9.0 * pow(4.0 * k / (h_caract * h_caract),2.0) + tau_dt_contrib;
         aux7 = pow(h_caract * 0.5, beta);
 
         // Get the degree of freedom indices for the
         // current element.  These define where in the global
         // matrix and right-hand-side this element will
         // contribute to.
-        dof_map.dof_indices(elem, dof_indices);
-
-        int n_dofs = dof_indices.size();
+        dof_map.dof_indices(elem, dof_indices_s);
+        int n_dofs = dof_indices_s.size();
 
         dof_map_flow.dof_indices(elem, dof_indices_u, u_var);
         dof_map_flow.dof_indices(elem, dof_indices_v, v_var);
         dof_map_flow.dof_indices(elem, dof_indices_w, w_var);
-        dof_map_flow.dof_indices(elem, dof_indices_p, p_var);
 
         // Compute the element-specific data for the current
         // element.  This involves computing the location of the
@@ -1504,71 +1482,71 @@ void SedimentationTransport::assembleSUPG3D() {
         // the last element.  Note that this will be the case if the
         // element type is different (i.e. the last element was a
         // triangle, now we are on a quadrilateral).
-        Ke.resize(dof_indices.size(),
-                dof_indices.size());
-
-        Fe.resize(dof_indices.size());
+        Ke.resize(n_dofs, n_dofs);
+        Fe.resize(n_dofs);
 
         // loop over quadrature points
         for (unsigned int qp = 0; qp < qrule.n_points(); qp++) {
             // Values to hold the old solution & its gradient.
             Number s_old = 0.0, s = 0.0;
-            Gradient grad_s, grad_u, grad_v, grad_w;
+            Gradient grad_s;
             Number u = 0.0, v = 0.0, w = 0.0;
 
             // Compute the old solution & its gradient.
             for (unsigned int l = 0; l < phi.size(); l++) {
 
-                s_old += phi[l][qp] * system.old_solution(dof_indices[l]);
+                s_old += phi[l][qp] * system.old_solution(dof_indices_s[l]);
 
-                s += phi[l][qp] * system.current_solution(dof_indices[l]);
-                grad_s.add_scaled(dphi[l][qp], system.current_solution(dof_indices[l]));
+                s += phi[l][qp] * system.current_solution(dof_indices_s[l]);
+                grad_s.add_scaled(dphi[l][qp], system.current_solution(dof_indices_s[l]));
 
                 u += phi[l][qp]*(flow_system.current_solution(dof_indices_u[l]));
                 v += phi[l][qp]*(flow_system.current_solution(dof_indices_v[l]));
                 w += phi[l][qp]*(flow_system.current_solution(dof_indices_w[l]));
-
-                grad_u.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_u[l]));
-                grad_v.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_v[l]));
-                grad_w.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_w[l]));
             }
 
-            RealVectorValue velocity(u + vel_sed(0), v + vel_sed(1), w + vel_sed(2));
+            RealVectorValue U(u + vel_sed(0), v + vel_sed(1), w + vel_sed(2));
 
             // Compute SUPG stabilization parameters: Tau SUPG & delta YZBeta
-            mod_v_ip = pow(velocity*velocity, 0.5);
-            aux5 = pow(2.0 * mod_v_ip / h_caract, 2.0) + aux4;
-            tau = pow(aux5, -0.5);
+            mod_v_ip = U.size();
+            aux5 = pow(2.0*mod_v_ip/h_caract,2.0) + aux4;
+            tau = pow(aux5,-0.5);
 
             // Advection-Diffusion Residual
-            Res = delta_factor * (s - s_old) / dt + velocity*grad_s;
-            aux8 = inv_s * inv_s * (grad_s * grad_s);
+            if (yzBeta) {
+                Res = delta_factor*(s-s_old)/dt + U*grad_s;
+                aux8 = inv_s * inv_s * (grad_s*grad_s);
 
-            if (aux8 > 0.0)
-                delta = fabs(inv_s * Res) * pow(aux8, aux9) * aux7;
-            else
-                delta = 0.0;
+                if(aux8>0.0)
+                   delta = fabs(inv_s*Res) * pow(aux8,aux9) * aux7;
+                else
+                   delta = 0.0;
+            }
 
             // Now compute the element matrix and RHS contributions.
             for (unsigned int i = 0; i < phi.size(); i++) {
-                // The RHS contribution
-                Fe(i) += JxW[qp]* (phi[i][qp] + // Galerkin mass-vector
-                        tau * (velocity * dphi[i][qp])) * s_old; // SUPG mass-vector
+                
+                const Number Udphi_i = U * dphi[i][qp];
+                
+                // The RHS contribution                
+                Fe(i) += JxW[qp]* ( phi[i][qp]  +                               // Galerkin mass-vector
+                                    tau * Udphi_i ) * s_old ;                   // SUPG mass-vector
 
                 for (unsigned int j = 0; j < phi.size(); j++) {
+                
                     // The Galerkin contribution
-                    Ke(i, j) += JxW[qp]*(
-                            phi[i][qp] * phi[j][qp] + // Mass-matrix
-                            dt * (-(dphi[i][qp] * velocity) * phi[j][qp] + // Advection matrix
-                            k * dphi[i][qp] * dphi[j][qp])); // Diffusion matrix
+                    Ke(i, j) += JxW[qp] * ( phi[i][qp] * phi[j][qp] +           // Mass-matrix
+                                     dt * (-Udphi_i * phi[j][qp] +              // Advection matrix
+                                     k  * (dphi[i][qp] * dphi[j][qp]) ) );      // Diffusion matrix
                     // The SUPG contribution
-                    Ke(i, j) += JxW[qp] * tau * ((velocity * dphi[i][qp]) * phi[j][qp] + // Mass-matrix
-                            dt * ((velocity * dphi[i][qp]) * (velocity * dphi[j][qp]))); // Advective-matrix
+                    Ke(i, j) += JxW[qp] * tau * ( Udphi_i * phi[j][qp] +        // Mass-matrix
+                                           dt *   Udphi_i * (U * dphi[j][qp]) );// Advective-matrix
                     // YZBetha
-                    Ke(i, j) += JxW[qp] * delta * dt * (dphi[i][qp] * dphi[j][qp]);
+                    if (yzBeta)
+                        Ke(i, j) += JxW[qp] * dt * delta * (dphi[i][qp] * dphi[j][qp]);
                 }
             }
-        }
+        } // loop over quadrature points
 
         // At this point the interior element integration has
         // been completed.  However, we have not yet addressed
@@ -1594,8 +1572,9 @@ void SedimentationTransport::assembleSUPG3D() {
                         for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
                             RealVectorValue vel_sed_bottom(0.0, 0.0, 0.0);
                             Number s_old = 0.0;
+
                             for (unsigned int l = 0; l < phi_face.size(); l++) {
-                                s_old += phi_face[l][qp] * system.old_solution(dof_indices[l]);
+                                s_old += phi_face[l][qp] * system.old_solution(dof_indices_s[l]);
                                 vel_sed_bottom(0) += phi_face[l][qp] * vel_sed(0);
                                 vel_sed_bottom(1) += phi_face[l][qp] * vel_sed(1);
                                 vel_sed_bottom(2) += phi_face[l][qp] * vel_sed(2);
@@ -1614,17 +1593,560 @@ void SedimentationTransport::assembleSUPG3D() {
 
         // If this assembly program were to be used on an adaptive mesh,
         // we would have to apply any hanging node constraint equations
-        dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
+        dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices_s);
 
         // The element matrix and right-hand-side are now built
         // for this element.  Add them to the global matrix and
         // right-hand-side vector.  The \p SparseMatrix::add_matrix()
         // and \p NumericVector::add_vector() members do this for us.
-        system.matrix->add_matrix(Ke, dof_indices);
-        system.rhs->add_vector(Fe, dof_indices);
+        system.matrix->add_matrix(Ke, dof_indices_s);
+        system.rhs->add_vector(Fe, dof_indices_s);
     }
 
     // That concludes the system matrix assembly routine.
+    perf_log->stop_event("Assembly", "Transport");
+    perf_log->restart_event("Solver", "Transport");
+
+}
+
+void SedimentationTransport::assembleRBVMS2D() {
+
+    // It is a good idea to make sure we are assembling the proper system.
+    PerfLog* perf_log = es.parameters.get<PerfLog*>("PerfLog");
+    perf_log->pause_event("Solver", "Transport");
+    perf_log->start_event("Assembly", "Transport");
+
+    // Get a constant reference to the mesh object.
+    const MeshBase& mesh = es.get_mesh();
+
+    // The dimension that we are running
+    const unsigned int dim = mesh.mesh_dimension();
+
+    // Get a reference to the Convection-Diffusion system object.
+    TransientLinearImplicitSystem & system =
+            es.get_system<TransientLinearImplicitSystem> ("transport");
+
+    // Get a reference to the Convection-Diffusion system object.
+    TransientLinearImplicitSystem & flow_system =
+            es.get_system<TransientLinearImplicitSystem> ("flow");
+
+    // Numeric ids corresponding to each variable in the systems
+    const unsigned int s_var = system.variable_number("s");
+    const unsigned int u_var = flow_system.variable_number("u");
+    const unsigned int v_var = flow_system.variable_number("v");
+    
+    // This vector will hold the degree of freedom indices for
+    // the element.  These define where in the global system
+    // the element degrees of freedom get mapped.
+    std::vector<dof_id_type> dof_indices_s;
+    std::vector<dof_id_type> dof_indices_u;
+    std::vector<dof_id_type> dof_indices_v;
+
+    // Get a constant reference to the Finite Element type
+    // for the first (and only) variable in the system.
+    FEType fe_type = system.variable_type(s_var);
+
+    // Build a Finite Element object of the specified type.  Since the
+    // \p FEBase::build() member dynamically creates memory we will
+    // store the object as an \p UniquePtr<FEBase>.  This can be thought
+    // of as a pointer that will clean up after itself.
+    UniquePtr<FEBase> fe(FEBase::build(dim, fe_type));
+    UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_type));
+
+    // A Gauss quadrature rule for numerical integration.
+    // Let the \p FEType object decide what order rule is appropriate.
+    QGauss qrule(dim, fe_type.default_quadrature_order());
+    QGauss qface(dim - 1, fe_type.default_quadrature_order());
+
+    // Tell the finite element object to use our quadrature rule.
+    fe->attach_quadrature_rule(&qrule);
+    fe_face->attach_quadrature_rule(&qface);
+
+    // Here we define some references to cell-specific data that
+    // will be used to assemble the linear system.  We will start
+    // with the element Jacobian * quadrature weight at each integration point.
+    const std::vector<Real>& JxW = fe->get_JxW();
+    const std::vector<Real>& JxW_face = fe_face->get_JxW();
+
+    // The element shape functions evaluated at the quadrature points.
+    const std::vector<std::vector<Real> >& phi = fe->get_phi();
+    const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
+
+    // The element shape function gradients evaluated at the quadrature
+    // points.
+    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+    const std::vector<std::vector<RealGradient> >& dphi_face = fe_face->get_dphi();
+
+    // The XY locations of the quadrature points used for face integration
+    const std::vector<Point>& qface_points = fe_face->get_xyz();
+
+    // A reference to the \p DofMap object for this system.  The \p DofMap
+    // object handles the index translation from node and element numbers
+    // to degree of freedom numbers.  We will talk more about the \p DofMap
+    // in future examples.
+    const DofMap& dof_map = system.get_dof_map();
+    const DofMap& dof_map_flow = flow_system.get_dof_map();
+
+    DenseMatrix<Number> Ke;
+    DenseVector<Number> Fe;
+
+    // Here we extract the velocity & parameters that we put in the
+    // EquationSystems object.
+    const Real dt = es.parameters.get<Real> ("dt");
+    const Real dt_stab = es.parameters.get<Real> ("dt_stab");
+    const Real theta = es.parameters.get<Real> ("theta");
+    const Real k = es.parameters.get<Real> ("Diffusivity");
+    const Real Us = es.parameters.get<Real> ("Us");
+    const Real ex = es.parameters.get<Real> ("ex");
+    const Real ey = es.parameters.get<Real> ("ey");
+    const Real s_ref_bar = es.parameters.get<Real> ("s_ref_bar_yzBeta");
+    const Real delta_factor = es.parameters.get<Real> ("delta_transient_factor");
+    const bool yzBeta = es.parameters.get<bool> ("yzBeta");
+
+    // gravity direction and sedimentation vectors    
+    RealVectorValue e(ex, ey), vel_sed;
+    vel_sed = Us*e;
+    Real delta, inv_s = 1.0/s_ref_bar, inv_pi = libMesh::pi;
+    Real beta = 1.0;
+    Real aux1 = beta*0.5 -1.0;
+
+    // Now we will loop over all the elements in the mesh that
+    // live on the local processor. We will compute the element
+    // matrix and right-hand-side contribution.  Since the mesh
+    // will be refined we want to only consider the ACTIVE elements,
+    // hence we use a variant of the \p active_elem_iterator.
+    MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+    for (; el != end_el; ++el) {
+        // Store a pointer to the element we are currently
+        // working on.  This allows for nicer syntax later.
+        const Elem* elem = *el;
+
+        // The characteristic height of the element
+        const Real vol = elem->volume();
+        const Real h_caract = 2.0*pow(vol*inv_pi,0.5);
+
+        // for Delta YZBetha parameter
+        Real aux2 = pow(h_caract*0.5, beta);
+
+        // Get the degree of freedom indices for the
+        // current element.  These define where in the global
+        // matrix and right-hand-side this element will
+        // contribute to.
+        dof_map.dof_indices(elem, dof_indices_s);
+        int n_dofs = dof_indices_s.size();
+
+        dof_map_flow.dof_indices(elem, dof_indices_u, u_var);
+        dof_map_flow.dof_indices(elem, dof_indices_v, v_var);
+
+        // Compute the element-specific data for the current
+        // element.  This involves computing the location of the
+        // quadrature points (q_point) and the shape functions
+        // (phi, dphi) for the current element.
+        fe->reinit(elem);
+
+        // Zero the element matrix and right-hand side before
+        // summing them.  We use the resize member here because
+        // the number of degrees of freedom might have changed from
+        // the last element.  Note that this will be the case if the
+        // element type is different (i.e. the last element was a
+        // triangle, now we are on a quadrilateral).
+        Ke.resize(n_dofs, n_dofs);
+        Fe.resize(n_dofs);
+        
+        // loop over quadrature points
+        for (unsigned int qp = 0; qp < qrule.n_points(); qp++) {
+            // Values to hold the current and old solution at each integration point
+            Number s = 0.0, s_old = 0.0;
+            Number u = 0.0, v = 0.0;
+            Gradient grad_s;
+
+            // Compute the concentration old solution current velocity components.
+            for (unsigned int l = 0; l < phi.size(); l++) {
+                
+                s_old += phi[l][qp] * system.old_solution(dof_indices_s[l]);
+                s += phi[l][qp] * system.current_solution(dof_indices_s[l]);
+                u += phi[l][qp]*(flow_system.current_solution(dof_indices_u[l]));
+                v += phi[l][qp]*(flow_system.current_solution(dof_indices_v[l]));
+                grad_s.add_scaled(dphi[l][qp], system.current_solution(dof_indices_s[l]));
+            }
+
+            RealGradient g = compute_g(fe.get(), dim, qp);
+            RealTensor G = compute_G(fe.get(), dim, qp);
+
+            RealVectorValue U(u+vel_sed(0), v+vel_sed(1));
+
+            // RbMVS parameter
+            const Real tau_m = compute_tau_M(g, G, U, k, dt, dt_stab);
+            //const Real tau_c = compute_tau_C(g, tau_m);
+
+            // Advection-Diffusion Residual
+            if (yzBeta) {
+                const Real Res = delta_factor*(s-s_old)/dt + U*grad_s;
+                const Real aux3 = inv_s * inv_s * (grad_s*grad_s);
+
+                if(aux3>0.0)
+                    delta = fabs(inv_s*Res) * pow(aux3,aux1) * aux2;
+                else
+                delta = 0.0;
+            }
+             
+            // Now compute the element matrix and RHS contributions.
+            for (unsigned int i = 0; i < phi.size(); i++) {
+
+                const Number Udphi_i = U * dphi[i][qp];
+
+                // The RHS contribution
+                Fe(i) += JxW[qp]*( phi[i][qp] +                                 // Galerkin mass term
+                          tau_m * Udphi_i ) * s_old;                            // RbVms mass term
+                
+                // Matrix contribution
+                for (unsigned int j = 0; j < phi.size(); j++) {
+
+                    // The Galerkin contribution
+                    Ke(i, j) += JxW[qp]*( phi[i][qp] * phi[j][qp] +             // Mass-matrix
+                                    dt * (-Udphi_i * phi[j][qp] +               // Convection
+                                     k * dphi[i][qp] * dphi[j][qp] ) );         // Diffusion
+                    
+                    // The RbVMS contribution
+                    Ke(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] +       // Mass-matrix
+                                             dt * Udphi_i * (U * dphi[j][qp]) );// Convection
+
+                    // YZBetha
+                    if (yzBeta)
+                        Ke(i, j) += JxW[qp] * dt * delta * (dphi[i][qp] * dphi[j][qp]);
+                }
+            }
+        }
+
+        // The following loops over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int s = 0; s < elem->n_sides(); s++)
+            if (elem->neighbor(s) == NULL) {
+
+                fe_face->reinit(elem, s);
+
+                // Applying sedimentation flux boundary condition
+                if(this->apply_bottom_flow)
+                    if(mesh.boundary_info->boundary_id(elem,s) == this->deposition_id)
+                    {
+                        // normal to the element face
+                        const std::vector<Point> normal = fe_face->get_normals();
+
+                        // loop over face integration points
+                        for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                        {
+                            RealVectorValue vel_sed_bottom (0.0,0.0);
+                            Number s_old = 0.0;
+                            for (unsigned int l=0; l<phi_face.size(); l++)
+                            {
+                                s_old += phi_face[l][qp]*system.old_solution(dof_indices_s[l]);
+                                vel_sed_bottom(0) += phi_face[l][qp]*vel_sed(0);
+                                vel_sed_bottom(1) += phi_face[l][qp]*vel_sed(1);
+                            }
+
+                            // Linear system contribution
+                            for (unsigned int i=0; i<phi_face.size(); i++) {
+                                Fe(i) -= JxW_face[qp] * dt * (1.0 - theta) * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * s_old);
+                                // Matrix contribution
+                                for (unsigned int j=0; j<phi_face.size(); j++)
+                                    Ke(i,j) += JxW_face[qp] * dt * theta * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * phi_face[j][qp]); // At LHS, advective flux has a positive sign
+                            }
+                        }
+                    } // end sedimentation flux_bc
+            }
+
+        // If this assembly program were to be used on an adaptive mesh,
+        // we would have to apply any hanging node constraint equations
+        dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices_s);
+
+        // The element matrix and right-hand-side are now built
+        // for this element.  Add them to the global matrix and
+        // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+        // and \p NumericVector::add_vector() members do this for us.
+        system.matrix->add_matrix(Ke, dof_indices_s);
+        system.rhs->add_vector(Fe, dof_indices_s);
+    }
+    // That concludes the system matrix assembly routine.
+
+    perf_log->stop_event("Assembly", "Transport");
+    perf_log->restart_event("Solver", "Transport");
+
+}
+
+
+void SedimentationTransport::assembleRBVMS3D() {
+
+    // It is a good idea to make sure we are assembling the proper system.
+    PerfLog* perf_log = es.parameters.get<PerfLog*>("PerfLog");
+    perf_log->pause_event("Solver", "Transport");
+    perf_log->start_event("Assembly", "Transport");
+
+    // Get a constant reference to the mesh object.
+    const MeshBase& mesh = es.get_mesh();
+
+    // The dimension that we are running
+    const unsigned int dim = mesh.mesh_dimension();
+
+    // Get a reference to the Convection-Diffusion system object.
+    TransientLinearImplicitSystem & system =
+            es.get_system<TransientLinearImplicitSystem> ("transport");
+
+    // Get a reference to the Convection-Diffusion system object.
+    TransientLinearImplicitSystem & flow_system =
+            es.get_system<TransientLinearImplicitSystem> ("flow");
+
+    // Numeric ids corresponding to each variable in the system
+    const unsigned int s_var = system.variable_number("s");
+
+    // Numeric ids corresponding to each variable in the system
+    const unsigned int u_var = flow_system.variable_number("u");
+    const unsigned int v_var = flow_system.variable_number("v");
+    const unsigned int w_var = flow_system.variable_number("w");
+    
+    // This vector will hold the degree of freedom indices for
+    // the element.  These define where in the global system
+    // the element degrees of freedom get mapped.
+    std::vector<dof_id_type> dof_indices_s;    
+    std::vector<dof_id_type> dof_indices_u;
+    std::vector<dof_id_type> dof_indices_v;
+    std::vector<dof_id_type> dof_indices_w;
+
+    // Get a constant reference to the Finite Element type
+    // for the first (and only) variable in the system.
+    FEType fe_type = system.variable_type(s_var);
+
+    // Build a Finite Element object of the specified type.  Since the
+    // \p FEBase::build() member dynamically creates memory we will
+    // store the object as an \p UniquePtr<FEBase>.  This can be thought
+    // of as a pointer that will clean up after itself.
+    UniquePtr<FEBase> fe(FEBase::build(dim, fe_type));
+    UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_type));
+
+    // A Gauss quadrature rule for numerical integration.
+    // Let the \p FEType object decide what order rule is appropriate.
+    QGauss qrule(dim, fe_type.default_quadrature_order());
+    QGauss qface(dim - 1, fe_type.default_quadrature_order());
+
+    // Tell the finite element object to use our quadrature rule.
+    fe->attach_quadrature_rule(&qrule);
+    fe_face->attach_quadrature_rule(&qface);
+
+    // Here we define some references to cell-specific data that
+    // will be used to assemble the linear system.  We will start
+    // with the element Jacobian * quadrature weight at each integration point.
+    const std::vector<Real>& JxW = fe->get_JxW();
+    const std::vector<Real>& JxW_face = fe_face->get_JxW();
+
+    // The element shape functions evaluated at the quadrature points.
+    const std::vector<std::vector<Real> >& phi = fe->get_phi();
+    const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
+
+    // The element shape function gradients evaluated at the quadrature
+    // points.
+    const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+    const std::vector<std::vector<RealGradient> >& dphi_face = fe_face->get_dphi();
+
+    // The XY locations of the quadrature points used for face integration
+    const std::vector<Point>& qface_points = fe_face->get_xyz();
+
+    // A reference to the \p DofMap object for this system.  The \p DofMap
+    // object handles the index translation from node and element numbers
+    // to degree of freedom numbers.  We will talk more about the \p DofMap
+    // in future examples.
+    const DofMap& dof_map = system.get_dof_map();
+    const DofMap& dof_map_flow = flow_system.get_dof_map();
+
+    DenseMatrix<Number> Ke;
+    DenseVector<Number> Fe;
+
+    // Here we extract the velocity & parameters that we put in the
+    // EquationSystems object.
+    const Real dt = es.parameters.get<Real> ("dt");
+    const Real dt_stab = es.parameters.get<Real> ("dt_stab");
+    const Real theta = es.parameters.get<Real> ("theta");
+    const Real k = es.parameters.get<Real> ("Diffusivity");
+    const Real Us = es.parameters.get<Real> ("Us");
+    const Real ex = es.parameters.get<Real> ("ex");
+    const Real ey = es.parameters.get<Real> ("ey");
+    const Real ez = es.parameters.get<Real> ("ez");
+    const Real s_ref_bar = es.parameters.get<Real> ("s_ref_bar_yzBeta");
+    const Real delta_factor = es.parameters.get<Real> ("delta_transient_factor");
+    const bool yzBeta = es.parameters.get<bool> ("yzBeta");
+    
+    // gravity direction and sedimentation vectors
+    RealVectorValue e(ex, ey, ez), vel_sed;
+    vel_sed = Us*e;
+    Real delta, inv_s = 1.0/s_ref_bar, inv_pi = libMesh::pi;
+    Real beta = 1.0;
+    Real aux1 = beta*0.5 -1.0;
+    Real um_terco = 1.0/3.0;
+
+    // Now we will loop over all the elements in the mesh that
+    // live on the local processor. We will compute the element
+    // matrix and right-hand-side contribution.  Since the mesh
+    // will be refined we want to only consider the ACTIVE elements,
+    // hence we use a variant of the \p active_elem_iterator.
+    MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+    for (; el != end_el; ++el) {
+        // Store a pointer to the element we are currently
+        // working on.  This allows for nicer syntax later.
+        const Elem* elem = *el;
+
+        // The characteristic height of the element
+        const Real vol = elem->volume();
+        const Real h_caract = pow(6.0*vol*inv_pi,um_terco);
+
+        // for Delta YZBetha parameter
+        Real aux2 = pow(h_caract*0.5, beta);
+
+        // Get the degree of freedom indices for the
+        // current element.  These define where in the global
+        // matrix and right-hand-side this element will
+        // contribute to.
+        dof_map.dof_indices(elem, dof_indices_s);
+        int n_dofs = dof_indices_s.size();
+
+        dof_map_flow.dof_indices(elem, dof_indices_u, u_var);
+        dof_map_flow.dof_indices(elem, dof_indices_v, v_var);
+        dof_map_flow.dof_indices(elem, dof_indices_w, w_var);
+
+        // Compute the element-specific data for the current
+        // element.  This involves computing the location of the
+        // quadrature points (q_point) and the shape functions
+        // (phi, dphi) for the current element.
+        fe->reinit(elem);
+
+        // Zero the element matrix and right-hand side before
+        // summing them.  We use the resize member here because
+        // the number of degrees of freedom might have changed from
+        // the last element.  Note that this will be the case if the
+        // element type is different (i.e. the last element was a
+        // triangle, now we are on a quadrilateral).
+        Ke.resize(n_dofs, n_dofs);
+        Fe.resize(n_dofs);
+
+        // loop over quadrature points
+        for (unsigned int qp = 0; qp < qrule.n_points(); qp++) {
+            // Values to hold the current and old solution at each integration point
+            Number s = 0.0, s_old = 0.0;
+            Number u = 0.0, v = 0.0, w = 0.0;
+            Gradient grad_s;
+
+            // Compute the concentration old solution current velocity components.
+            for (unsigned int l = 0; l < phi.size(); l++) {
+
+                s_old += phi[l][qp] * system.old_solution(dof_indices_s[l]);
+                s += phi[l][qp] * system.current_solution(dof_indices_s[l]);
+                u += phi[l][qp]*(flow_system.current_solution(dof_indices_u[l]));
+                v += phi[l][qp]*(flow_system.current_solution(dof_indices_v[l]));
+                w += phi[l][qp]*(flow_system.current_solution(dof_indices_w[l]));
+                grad_s.add_scaled(dphi[l][qp], system.current_solution(dof_indices_s[l]));
+            }
+
+            RealGradient g = compute_g(fe.get(), dim, qp);
+            RealTensor G = compute_G(fe.get(), dim, qp);
+
+            RealVectorValue U(u+vel_sed(0), v+vel_sed(1), w+vel_sed(2));
+
+            // RbMVS parameter
+            const Real tau_m = compute_tau_M(g, G, U, k, dt, dt_stab);
+
+            // Advection-Diffusion Residual
+            if (yzBeta) {
+                const Real Res = delta_factor*(s-s_old)/dt + U*grad_s;
+                const Real aux3 = inv_s * inv_s * (grad_s*grad_s);
+
+                if(aux3>0.0)
+                    delta = fabs(inv_s*Res) * pow(aux3,aux1) * aux2;
+                else
+                delta = 0.0;
+            }
+
+            // Now compute the element matrix and RHS contributions.
+            for (unsigned int i = 0; i < phi.size(); i++) {
+
+                const Number Udphi_i = U * dphi[i][qp];
+
+                // The RHS contribution
+                Fe(i) += JxW[qp]*( phi[i][qp] +                                 // Galerkin mass term
+                          tau_m * Udphi_i ) * s_old;                            // RbVms mass term
+
+                // Matrix contribution
+                for (unsigned int j = 0; j < phi.size(); j++) {
+
+                    // The Galerkin contribution
+                    Ke(i, j) += JxW[qp]*( phi[i][qp] * phi[j][qp] +             // Mass-matrix
+                                    dt * (-Udphi_i * phi[j][qp] +               // Convection
+                                     k * dphi[i][qp] * dphi[j][qp] ) );         // Diffusion
+
+                    // The RbVMS contribution
+                    Ke(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] +       // Mass-matrix
+                                             dt * Udphi_i * (U * dphi[j][qp]) );// Convection
+
+                    // YZBetha
+                    if (yzBeta)
+                        Ke(i, j) += JxW[qp] * dt * delta * (dphi[i][qp] * dphi[j][qp]);
+                }
+            }
+        }
+
+        // The following loops over the sides of the element.
+        // If the element has no neighbor on a side then that
+        // side MUST live on a boundary of the domain.
+        for (unsigned int s = 0; s < elem->n_sides(); s++)
+            if (elem->neighbor(s) == NULL) {
+
+                fe_face->reinit(elem, s);
+
+                // Applying sedimentation flux boundary condition
+                if(this->apply_bottom_flow)
+                    if(mesh.boundary_info->boundary_id(elem,s) == this->deposition_id)
+                    {
+                        // normal to the element face
+                        const std::vector<Point> normal = fe_face->get_normals();
+
+                        // loop over face integration points
+                        for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                        {
+                            RealVectorValue vel_sed_bottom (0.0,0.0,0.0);
+                            Number s_old = 0.0;
+                            for (unsigned int l=0; l<phi_face.size(); l++)
+                            {
+                                s_old += phi_face[l][qp]*system.old_solution(dof_indices_s[l]);
+                                vel_sed_bottom(0) += phi_face[l][qp]*vel_sed(0);
+                                vel_sed_bottom(1) += phi_face[l][qp]*vel_sed(1);
+                                vel_sed_bottom(2) += phi_face[l][qp]*vel_sed(2);
+                            }
+
+                            // Linear system contribution
+                            for (unsigned int i=0; i<phi_face.size(); i++) {
+                                Fe(i) -= JxW_face[qp] * dt * (1.0 - theta) * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * s_old);
+                                // Matrix contribution
+                                for (unsigned int j=0; j<phi_face.size(); j++)
+                                    Ke(i,j) += JxW_face[qp] * dt * theta * (phi_face[i][qp] * (vel_sed_bottom*normal[qp]) * phi_face[j][qp]); // At LHS, advective flux has a positive sign
+                            }
+                        }
+                    } // end sedimentation flux_bc
+            }
+
+        // If this assembly program were to be used on an adaptive mesh,
+        // we would have to apply any hanging node constraint equations
+        dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices_s);
+
+        // The element matrix and right-hand-side are now built
+        // for this element.  Add them to the global matrix and
+        // right-hand-side vector.  The \p SparseMatrix::add_matrix()
+        // and \p NumericVector::add_vector() members do this for us.
+        system.matrix->add_matrix(Ke, dof_indices_s);
+        system.rhs->add_vector(Fe, dof_indices_s);
+    }
+    // That concludes the system matrix assembly routine.
+
     perf_log->stop_event("Assembly", "Transport");
     perf_log->restart_event("Solver", "Transport");
 

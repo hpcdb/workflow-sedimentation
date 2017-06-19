@@ -113,9 +113,10 @@ public:
     };
 
     Number strainRateTensorNorm2D(const RealGradient& GradU, const RealGradient& GradV) {
-        // GradU = (dphi_x*U, dphi_y*U)
-        // GradV = (dphi_x*V, dphi_y*V)
-        // eij = 1/2 * ( dphi_j * v_i + dphi_i * v_j))
+        /* GradU = (dphi_x*U, dphi_y*U)
+         * GradV = (dphi_x*V, dphi_y*V)
+         * eij = 1/2 * ( dphi_j * v_i + dphi_i * v_j))
+         */
         Number exx = GradU(0);
         Number exy = 0.5 * (GradU(1) + GradV(0)); // = eyx (symmetric tensor)
         Number eyy = GradV(1);
@@ -127,10 +128,11 @@ public:
     }
 
     Number strainRateTensorNorm3D(const RealGradient& GradU, const RealGradient& GradV, const RealGradient& GradW) {
-        // GradU = (dphi_x*U, dphi_y*U, dphi_z*U)
-        // GradV = (dphi_x*V, dphi_y*V, dphi_z*V)
-        // GradV = (dphi_x*W, dphi_y*W, dphi_z*W)      
-        // eij = 1/2 * ( dphi_j * v_i + dphi_i * v_j))
+        /* GradU = (dphi_x*U, dphi_y*U, dphi_z*U)
+         * GradV = (dphi_x*V, dphi_y*V, dphi_z*V)
+         * GradV = (dphi_x*W, dphi_y*W, dphi_z*W)      
+         * eij = 1/2 * ( dphi_j * v_i + dphi_i * v_j))
+         */
         Number exx = GradU(0);
         Number exy = 0.5 * (GradU(1) + GradV(0)); // = eyx (symmetric tensor)
         Number exz = 0.5 * (GradU(2) + GradW(0)); // = ezx (symmetric tensor)
@@ -155,6 +157,8 @@ private:
     void assemble3D();
     void assembleSUPG2D();
     void assembleSUPG3D();
+    void assembleRBVMS2D();
+    void assembleRBVMS3D();    
 
 #ifdef PROVENANCE
     Provenance *prov;
@@ -165,9 +169,7 @@ private:
     Real gravity;
     Real rho;
     Real viscosity;
-
     int outbflow_id;
-
     Real _non_linear_tolerance;
     Real _linear_tolerance;
     unsigned int _max_nonlinear_iteractions;
@@ -179,13 +181,6 @@ private:
     Real _nonlinear_step_norm;
     Real _initial_linear_tolerance;
     Real _linear_tolerance_power;
-
-    //unsigned int n_flow_nonlinear_iterations_total;
-    //unsigned int n_flow_linear_iterations_total;
-    //unsigned int n_rejected_flow_nonlinear_iterations_total;
-
-    //unsigned int old_n_non_linear_iter_flow;
-
     int dim;
     EquationSystems &es;
 };

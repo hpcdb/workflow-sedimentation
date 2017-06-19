@@ -20,13 +20,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	sedimentation.C
 	-o
@@ -59,13 +59,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/common/stab_helper.C
 	-o
@@ -98,13 +98,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/flow/viscosity_flow.C
 	-o
@@ -137,13 +137,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/flow/sedimentation_flow.C
 	-o
@@ -176,13 +176,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/io/xdmf.C
 	-o
@@ -215,13 +215,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/mesh_mov/mesh_moviment.C
 	-o
@@ -254,13 +254,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/sediment/sedimentation_transport.C
 	-o
@@ -293,13 +293,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/sediment/sedimentation_deposition.C
 	-o
@@ -332,13 +332,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/sediment/sediment_mass_energy.C
 	-o
@@ -371,13 +371,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/time_stepping/timeStepControlBase.C
 	-o
@@ -410,13 +410,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/time_stepping/timeStepControlResidual.C
 	-o
@@ -449,13 +449,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/time_stepping/timeStepControlPID.C
 	-o
@@ -488,13 +488,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/time_stepping/timeStepControlPC11.C
 	-o
@@ -527,13 +527,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/provenance/provenance.C
 	-o
@@ -566,13 +566,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	contrib/dfanalyzer/provenance_object.C
 	-o
@@ -605,13 +605,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	contrib/dfanalyzer/performance_metric.C
 	-o
@@ -644,13 +644,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	contrib/dfanalyzer/task.C
 	-o
@@ -683,13 +683,13 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
-	-I/home/vitor/programs/libmesh/include
-	-I/home/vitor/programs/hdf5/include
-	-I/home/vitor/programs/petsc/include
-	-I/home/vitor/programs/petsc//include
+	-I/home/vitor/program/libmesh/include
+	-I/home/vitor/program/hdf5/include
+	-I/home/vitor/program/petsc/include
+	-I/home/vitor/program/petsc//include
 	-c
 	src/catalyst/FEAdaptor.C
 	-o
@@ -746,7 +746,7 @@ called: /usr/bin/g++
 	-I./contrib/dfanalyzer/*.h
 	-I./include/provenance
 	-DPROVENANCE
-	-I/home/vitor/programs/paraview-5.3.0/include/paraview-5.3
+	-I/home/vitor/program/paraview-5.3.0/include/paraview-5.3
 	-I./include/catalyst
 	-DUSE_CATALYST
 	sedimentation.x86_64-unknown-linux-gnu.opt.o
@@ -770,9 +770,9 @@ called: /usr/bin/g++
 	-o
 	sediment-opt
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/hdf5/lib
+	-Wl,/home/vitor/program/hdf5/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/petsc/lib
+	-Wl,/home/vitor/program/petsc/lib
 	-Wl,-rpath
 	-Wl,/usr/lib/gcc/x86_64-linux-gnu/5
 	-Wl,-rpath
@@ -782,14 +782,14 @@ called: /usr/bin/g++
 	-Wl,-rpath
 	-Wl,/usr/lib/openmpi/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/libmesh/lib
+	-Wl,/home/vitor/program/libmesh/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
+	-Wl,/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 	-Wl,-rpath-link
-	-Wl,/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
-	-L/home/vitor/programs/hdf5/lib
-	-L/home/vitor/programs/szip/lib
-	-L/home/vitor/programs/petsc/lib
+	-Wl,/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
+	-L/home/vitor/program/hdf5/lib
+	-L/home/vitor/program/szip/lib
+	-L/home/vitor/program/petsc/lib
 	-lmpi_cxx
 	-lstdc++
 	-lmpi
@@ -798,25 +798,27 @@ called: /usr/bin/g++
 	-L/usr/lib/gcc/x86_64-linux-gnu/5
 	-L/usr/lib/x86_64-linux-gnu
 	-L/lib/x86_64-linux-gnu
-	-L/home/vitor/programs/libmesh/lib
-	/home/vitor/programs/libmesh/lib/libmesh_opt.so
-	/home/vitor/programs/hdf5/lib/libhdf5_cpp.so
-	/home/vitor/programs/hdf5/lib/libhdf5.so
-	/home/vitor/programs/szip/lib/libsz.so
+	-L/home/vitor/program/libmesh/lib
+	/home/vitor/program/libmesh/lib/libmesh_opt.so
+	/home/vitor/program/libmesh/lib/libnetcdf.so
+	/home/vitor/program/hdf5/lib/libhdf5_hl.so
+	/usr/lib/x86_64-linux-gnu/libcurl.so
+	/home/vitor/program/hdf5/lib/libhdf5_cpp.so
+	/home/vitor/program/hdf5/lib/libhdf5.so
+	/home/vitor/program/szip/lib/libsz.so
 	-lm
 	-lz
 	-lpetsc
 	-lflapack
 	-lfblas
 	-lhwloc
-	-lX11
 	-lmpi_usempif08
 	-lmpi_usempi_ignore_tkr
 	-lmpi_mpifh
 	-lgfortran
 	-lquadmath
 	-ldl
-	-L/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
+	-L/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 	-lvtkPVPythonCatalyst-pv5.3
 	-lvtkPVCatalyst-pv5.3
 	-lvtkPVServerManagerApplication-pv5.3
@@ -858,19 +860,20 @@ called: /usr/bin/g++
 	-lvtkCommonCore-pv5.3
 	-lpython2.7
 	-lvtksys-pv5.3
+	-pthread
 	-fopenmp
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/libmesh/lib
+	-Wl,/home/vitor/program/libmesh/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/hdf5/lib
+	-Wl,/home/vitor/program/hdf5/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/szip/lib
+	-Wl,/home/vitor/program/szip/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/libmesh/lib
+	-Wl,/home/vitor/program/libmesh/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/hdf5/lib
+	-Wl,/home/vitor/program/hdf5/lib
 	-Wl,-rpath
-	-Wl,/home/vitor/programs/szip/lib
+	-Wl,/home/vitor/program/szip/lib
 	-I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent
 	-I/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include
 	-I/usr/lib/openmpi/include
@@ -889,7 +892,7 @@ called: /usr/bin/ld
 	-plugin
 	/usr/lib/gcc/x86_64-linux-gnu/5/liblto_plugin.so
 	-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/5/lto-wrapper
-	-plugin-opt=-fresolution=/tmp/ccRqrok2.res
+	-plugin-opt=-fresolution=/tmp/cckbzrko.res
 	-plugin-opt=-pass-through=-lgcc_s
 	-plugin-opt=-pass-through=-lgcc
 	-plugin-opt=-pass-through=-lpthread
@@ -912,15 +915,15 @@ called: /usr/bin/ld
 	/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crt1.o
 	/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu/crti.o
 	/usr/lib/gcc/x86_64-linux-gnu/5/crtbegin.o
-	-L/home/vitor/programs/hdf5/lib
-	-L/home/vitor/programs/szip/lib
-	-L/home/vitor/programs/petsc/lib
+	-L/home/vitor/program/hdf5/lib
+	-L/home/vitor/program/szip/lib
+	-L/home/vitor/program/petsc/lib
 	-L/usr/lib/openmpi/lib
 	-L/usr/lib/gcc/x86_64-linux-gnu/5
 	-L/usr/lib/x86_64-linux-gnu
 	-L/lib/x86_64-linux-gnu
-	-L/home/vitor/programs/libmesh/lib
-	-L/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
+	-L/home/vitor/program/libmesh/lib
+	-L/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 	-L/usr/lib/openmpi/lib
 	-L/usr/lib/gcc/x86_64-linux-gnu/5
 	-L/usr/lib/gcc/x86_64-linux-gnu/5/../../../x86_64-linux-gnu
@@ -949,9 +952,9 @@ called: /usr/bin/ld
 	contrib/dfanalyzer/task.x86_64-unknown-linux-gnu.opt.o
 	src/catalyst/FEAdaptor.x86_64-unknown-linux-gnu.opt.o
 	-rpath
-	/home/vitor/programs/hdf5/lib
+	/home/vitor/program/hdf5/lib
 	-rpath
-	/home/vitor/programs/petsc/lib
+	/home/vitor/program/petsc/lib
 	-rpath
 	/usr/lib/gcc/x86_64-linux-gnu/5
 	-rpath
@@ -961,25 +964,27 @@ called: /usr/bin/ld
 	-rpath
 	/usr/lib/openmpi/lib
 	-rpath
-	/home/vitor/programs/libmesh/lib
+	/home/vitor/program/libmesh/lib
 	-rpath
-	/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
+	/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 	-rpath-link
-	/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
+	/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 	-lmpi_cxx
 	-lstdc++
 	-lmpi
 	-lgcc_s
-	/home/vitor/programs/libmesh/lib/libmesh_opt.so
-	/home/vitor/programs/hdf5/lib/libhdf5_cpp.so
-	/home/vitor/programs/hdf5/lib/libhdf5.so
-	/home/vitor/programs/szip/lib/libsz.so
+	/home/vitor/program/libmesh/lib/libmesh_opt.so
+	/home/vitor/program/libmesh/lib/libnetcdf.so
+	/home/vitor/program/hdf5/lib/libhdf5_hl.so
+	/usr/lib/x86_64-linux-gnu/libcurl.so
+	/home/vitor/program/hdf5/lib/libhdf5_cpp.so
+	/home/vitor/program/hdf5/lib/libhdf5.so
+	/home/vitor/program/szip/lib/libsz.so
 	-lz
 	-lpetsc
 	-lflapack
 	-lfblas
 	-lhwloc
-	-lX11
 	-lmpi_usempif08
 	-lmpi_usempi_ignore_tkr
 	-lmpi_mpifh
@@ -1028,17 +1033,17 @@ called: /usr/bin/ld
 	-lpython2.7
 	-lvtksys-pv5.3
 	-rpath
-	/home/vitor/programs/libmesh/lib
+	/home/vitor/program/libmesh/lib
 	-rpath
-	/home/vitor/programs/hdf5/lib
+	/home/vitor/program/hdf5/lib
 	-rpath
-	/home/vitor/programs/szip/lib
+	/home/vitor/program/szip/lib
 	-rpath
-	/home/vitor/programs/libmesh/lib
+	/home/vitor/program/libmesh/lib
 	-rpath
-	/home/vitor/programs/hdf5/lib
+	/home/vitor/program/hdf5/lib
 	-rpath
-	/home/vitor/programs/szip/lib
+	/home/vitor/program/szip/lib
 	-rpath
 	/usr/lib/openmpi/lib
 	--enable-new-dtags

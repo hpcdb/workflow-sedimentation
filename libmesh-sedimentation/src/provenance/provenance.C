@@ -33,7 +33,7 @@
 
 #define LINUX
 #define DATABASE
-// #define BACKUP
+#define BACKUP
 
 using namespace std;
 using namespace libMesh;

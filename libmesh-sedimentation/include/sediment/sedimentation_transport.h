@@ -138,6 +138,8 @@ private:
     void assemble2D();
     void assembleSUPG2D();
     void assembleSUPG3D();
+    void assembleRBVMS2D();
+    void assembleRBVMS3D();    
     int erosion_bc_id;
     int noflux_bc_id;
     int deposition_id;
@@ -154,13 +156,6 @@ private:
     Real _nonlinear_step_norm;
     Real _initial_linear_tolerance;
     Real _linear_tolerance_power;
-
-    //unsigned int n_transport_nonlinear_iterations_total;
-    //unsigned int n_transport_linear_iterations_total;
-    //unsigned int n_rejected_transport_linear_iterations_total;
-
-    //unsigned int old_n_non_linear_iter_transport;
-
 };
 
 

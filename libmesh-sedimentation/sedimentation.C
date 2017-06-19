@@ -255,7 +255,6 @@ int main(int argc, char** argv) {
     Real ey = infile("ey", 0.0);
     Real ez = infile("ez", -1.0);
     Real c_factor = infile("c_factor", 1.0);
-
     Real fopc = infile("fopc", 0.2);
 
     if (Re == 0.0) {
@@ -336,8 +335,10 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("dt_stab") = infile("stabilization/dt_stab", 0.1);
     equation_systems.parameters.set<Real> ("s_ref_bar_yzBeta") = infile("stabilization/s_ref_bar_yzBeta", 1.0);
     equation_systems.parameters.set<Real> ("delta_transient_factor") = infile("stabilization/delta_transient_factor", 0.5);
-    bool rbvms = infile("stabilization/rbvms", true);
-    equation_systems.parameters.set<bool> ("rbvms") = rbvms;
+    std::string fem_model = infile("stabilization/fem_model", "");
+    equation_systems.parameters.set<std::string> ("fem_model") = fem_model;
+    bool yzBeta = infile("stabilization/yzBeta", true);
+    equation_systems.parameters.set<bool> ("yzBeta") = yzBeta;
 
 #ifdef PROVENANCE
     provenance.outputTSControlConfig(ts_control_model_name, dt_min, dt_max, tol_u, tol_s,
@@ -369,7 +370,6 @@ int main(int argc, char** argv) {
 
     unsigned int n_flow_sstate = infile("n_flow_sstate", 50);
     unsigned int n_transport_sstate = infile("n_transport_sstate", 50);
-
 
     // Output parameters
     unsigned int write_interval = infile("write_interval", 10);
@@ -419,7 +419,7 @@ int main(int argc, char** argv) {
 
     if (!restartControl) {
 
-        // Starting simulation from the begining...
+        // Starting simulation from the beginning...
         std::cout << "\nOpening mesh file: " << mesh_file << std::endl;
 
         mesh.read(mesh_file);
@@ -505,6 +505,9 @@ int main(int argc, char** argv) {
 
     // Print information about the mesh to the screen.
     mesh.print_info();
+    
+    if (initial_unif_ref_mesh)
+        cout<<"  Applying "<<initial_unif_ref_mesh<<" level(s) of initial refinement throughout the mesh\n\n";
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & transport_system =
@@ -644,7 +647,7 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<double>("minimum_linear_solver_tolerance") = minimum_linear_solver_tol;
     equation_systems.parameters.set<unsigned int>("write_interval") = write_interval;
 
-    cout << "\n Adopting " << ((rbvms) ? "RbVMS" : "SUPG/PSPG") << " to solve Flow and Transport problems" << endl;
+    cout<<"\nAdopting "<<((fem_model=="SUPG/PSPG")? "SUPG/PSPG": "RbVMS")<< " to solve Flow and Transport problems\n"<<endl;
 
     // Writing into a file the initial time-step value at the beginning of the simulation
     if (mesh.processor_id() == 0)
@@ -1083,7 +1086,7 @@ int main(int argc, char** argv) {
         // All done.
         cout << "\nAll done!" << endl;
     } else {
-        cout << " Simulation diverged. Aborting!\n";
+        cout << "\nSimulation diverged. Aborting!\n";
     }
 
     // Closing "data against time" files

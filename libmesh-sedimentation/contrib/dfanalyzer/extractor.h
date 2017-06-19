@@ -15,11 +15,11 @@ extern "C" {
     namespace extractor {
 
         void ReplaceStringInPlace(std::string& subject, const std::string& search,
-                          const std::string& replace) {
+                const std::string& replace) {
             size_t pos = 0;
             while ((pos = subject.find(search, pos)) != std::string::npos) {
-                 subject.replace(pos, search.length(), replace);
-                 pos += replace.length();
+                subject.replace(pos, search.length(), replace);
+                pos += replace.length();
             }
         }
 
@@ -29,7 +29,7 @@ extern "C" {
                 char finalFilename[256];
                 sprintf(firstFilename, "init_ext_line_%d.csv", timeStep);
                 sprintf(finalFilename, "ext_line_%d.csv", timeStep);
-                
+
                 // char commandLine[256];
                 // sprintf(commandLine, "python clean-csv.py %s %s;rm %s", firstFilename, finalFilename, firstFilename);
                 // cout << commandLine << endl;
@@ -43,12 +43,11 @@ extern "C" {
                 string line;
                 // size_t len = wordToReplace.length();
                 // size_t len2 = wordToReplace2.length();
-                while (getline(in, line))
-                {
-                    if(line.find("nan") == std::string::npos){
+                while (getline(in, line)) {
+                    if (line.find("nan") == std::string::npos) {
                         ReplaceStringInPlace(line, wordToReplace, "");
                         ReplaceStringInPlace(line, wordToReplace2, "");
-                        
+
                         // size_t pos = line.find(wordToReplace);
                         // if (pos != string::npos)
                         //     line.replace(pos, len, "");
@@ -83,9 +82,8 @@ extern "C" {
                 string line;
                 // size_t len = wordToReplace.length();
                 // size_t len2 = wordToReplace2.length();
-                while (getline(in, line))
-                {
-                    if(line.find("nan") == std::string::npos){
+                while (getline(in, line)) {
+                    if (line.find("nan") == std::string::npos) {
                         ReplaceStringInPlace(line, wordToReplace, "");
                         ReplaceStringInPlace(line, wordToReplace2, "");
 
@@ -100,6 +98,11 @@ extern "C" {
                         out << line << '\n';
                     }
                 }
+
+                char commandLine[256];
+                sprintf(commandLine, "rm %s;chmod -R 774 %s", firstFilename, finalFilename);
+                cout << commandLine << endl;
+                system(commandLine);
             }
         }
     }
