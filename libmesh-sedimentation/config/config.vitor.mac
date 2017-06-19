@@ -1,0 +1,3 @@
+export LIBMESH_DIR=/Users/vitor/Documents/program/libmesh
+export PARAVIEW_VERSION=5.4
+export PARAVIEW_DIR=/Users/vitor/Downloads/ParaView-v5.4.0/build/CMakeFiles/__macos_install
