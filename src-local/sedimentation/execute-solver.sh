@@ -17,9 +17,9 @@
 # export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
 # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
 
-# Ubuntu - NACAD
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
+# XPS - Ubuntu - NACAD
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 
 # Mint - NACAD
 # export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3

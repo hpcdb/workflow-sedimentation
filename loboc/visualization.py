@@ -2,8 +2,6 @@
 from paraview.simple import *
 from paraview import coprocessing
 
-import datetime as dt
-
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
 # ParaView 5.2.0 64 bits
@@ -14,8 +12,6 @@ import datetime as dt
 def CreateCoProcessor():
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
-      start=dt.datetime.now()
-
       timeStep = datadescription.GetTimeStep()
       time = datadescription.GetTime()
       print "[CATALYST] Visualization  - Time step: " + str(timeStep) + " ; Time: " + str(time)
@@ -89,8 +85,8 @@ def CreateCoProcessor():
       # trace defaults for the display properties.
       slice1Display.ColorArrayName = ['POINTS', 's']
       slice1Display.LookupTable = sLUT
-      slice1Display.OSPRayScaleArray = 'u'
-      slice1Display.OSPRayScaleFunction = 'PiecewiseFunction'
+      # slice1Display.OSPRayScaleArray = 'u'
+      # slice1Display.OSPRayScaleFunction = 'PiecewiseFunction'
       slice1Display.SelectOrientationVectors = 'None'
       slice1Display.ScaleFactor = 1.8
       slice1Display.SelectScaleArray = 'u'
@@ -113,15 +109,6 @@ def CreateCoProcessor():
       # finally, restore active source
       SetActiveSource(output_480_00091xmf)
       # ----------------------------------------------------------------
-
-      end=dt.datetime.now()
-      elapsedTime = (end.microsecond-start.microsecond)/1e6
-      if(elapsedTime < 0.00000):
-        elapsedTime = 0.00
-
-      text_file = open("prov/visualization/paraview-" + str(timeStep) + ".prov", "a+")
-      text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
-      text_file.close()
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):
@@ -130,7 +117,7 @@ def CreateCoProcessor():
 
   coprocessor = CoProcessor()
   # these are the frequencies at which the coprocessor updates.
-  freqs = {'input': [50]}
+  freqs = {'input': [1]}
   coprocessor.SetUpdateFrequencies(freqs)
   return coprocessor
 
@@ -169,8 +156,6 @@ def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
     global coprocessor
 
-    start=dt.datetime.now()
-
     timeStep = datadescription.GetTimeStep()
     time = datadescription.GetTime()
     print "[CATALYST - CoProcessing] Visualization  - Time step: " + str(timeStep) + " ; Time: " + str(time)
@@ -187,12 +172,3 @@ def DoCoProcessing(datadescription):
 
     # Live Visualization, if enabled.
     coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)
-
-    end=dt.datetime.now()
-    elapsedTime = (end.microsecond-start.microsecond)/1e6
-    if(elapsedTime < 0.00000):
-      elapsedTime = 0.00
-
-    text_file = open("prov/visualization/paraview-" + str(timeStep) + ".prov", "a+")
-    text_file.write("Visualization:ParaView:Run\n      elapsed-time: %.5f seconds.\n" % (elapsedTime))
-    text_file.close()
