@@ -330,6 +330,7 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverS
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name t_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name dt -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name time -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name r -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationFlow -set osolversimulationflow -name flow_l -type numeric
@@ -348,6 +349,7 @@ java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation solverS
 
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name simulationID -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name t_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name dt -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name time -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name r -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation solverSimulationTransport -set osolversimulationtransport -name transport_l -type numeric
@@ -373,6 +375,7 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation c
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name n_transport_linear_iterations_total -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name n_transport_nonlinear_iterations_total -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name solution_converged -type text
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeSolutionChange -set ocomputeSolutionChange -name error -type numeric
 
 echo "Compute Time Step"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag computeTimeStep

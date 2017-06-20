@@ -724,9 +724,9 @@ int main(int argc, char** argv) {
                     << std::setfill('=')
                     << "\n";
 
-            sediment_flow.solve(t_step, time, 0, diverged_flow);
+            sediment_flow.solve(t_step, dt, time, 0, diverged_flow);
 
-            sediment_transport.solve(t_step, time, 0, diverged_transport);
+            sediment_transport.solve(t_step, dt, time, 0, diverged_transport);
 
             n_flow_nonlinear_iterations_total += sediment_flow.nonlinear_iteractions();
             n_transport_nonlinear_iterations_total += sediment_transport.nonlinear_iteractions();
@@ -754,7 +754,7 @@ int main(int argc, char** argv) {
                 provenance.outputComputeSolutionChange(t_step, time, dt,
                         n_flow_linear_iterations_total, n_flow_nonlinear_iterations_total,
                         n_transport_linear_iterations_total, n_transport_nonlinear_iterations_total,
-                        TimeStepAccepted);
+                        TimeStepAccepted, ts_control->getError());
                 perf_log.stop_event("ComputeSolutionChange", "Provenance");
 #endif
             }
@@ -881,9 +881,9 @@ int main(int argc, char** argv) {
                 xdmf_writer.mesh_changed_on();
 
                 // Solve Flow and Transport to new mesh
-                sediment_flow.solve(t_step, time, 1, diverged_flow);
+                sediment_flow.solve(t_step, dt, time, 1, diverged_flow);
 
-                sediment_transport.solve(t_step, time, 1, diverged_transport);
+                sediment_transport.solve(t_step, dt, time, 1, diverged_transport);
 
             }
         }

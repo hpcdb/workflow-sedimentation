@@ -59,6 +59,8 @@ public:
     
     virtual void computeSolutionChangeInTime(EquationSystems & es) = 0;
     
+    virtual double getError() = 0;
+    
     virtual void checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted) = 0;
     
     virtual void computeTimeStep(bool accepted, Real time, Real tmax, Real &dt) = 0;

@@ -71,6 +71,10 @@ public:
     
     void ckeckKeepMinTimeStep( Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions);
     
+    double getError(){
+        return this->en;
+    };
+    
     void printSelf (ostream& os, const char* indent) const;
     
     friend ostream& operator<<(ostream& os, const timeStepControlPID& o) {

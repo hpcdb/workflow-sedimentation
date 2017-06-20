@@ -57,16 +57,16 @@ public:
     void outputInitVisualization(int lineID, int timeStep);
 
     void inputSolverSimulationFlow();
-    void outputSolverSimulationFlow(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void outputSolverSimulationFlow(int time_step, Real dt, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
 
     void inputSolverSimulationTransport();
-    void outputSolverSimulationTransport(int time_step, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void outputSolverSimulationTransport(int time_step, Real dt, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
     
     void inputComputeSolutionChange();
     void outputComputeSolutionChange(int time_step, Real time, Real dt, 
             unsigned int n_flow_linear_iterations_total, unsigned int n_flow_nonlinear_iterations_total, 
             unsigned int n_transport_linear_iterations_total, unsigned int n_transport_nonlinear_iterations_total,
-            bool timeStepAccepted);
+            bool timeStepAccepted, double error);
     
     void inputComputeTimeStep();
     void outputComputeTimeStep(int time_step, Real time, Real dt, bool timeStepAccepted);

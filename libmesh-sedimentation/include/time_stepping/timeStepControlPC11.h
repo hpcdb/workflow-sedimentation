@@ -38,6 +38,10 @@ public:
     
     void computeSolutionChangeInTime(EquationSystems & es);
     
+    double getError(){
+        return this->rn;
+    };
+    
     //void checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted);
     
     void storeSolutionChangeinTime();

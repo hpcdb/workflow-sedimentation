@@ -900,7 +900,7 @@ void Provenance::inputSolverSimulationFlow() {
 #endif
 }
 
-void Provenance::outputSolverSimulationFlow(int time_step, Real time,
+void Provenance::outputSolverSimulationFlow(int time_step, Real dt, Real time,
         int linear_step, int n_linear_step, unsigned int n_linear_iterations,
         Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
     if (processor_id != 0) return;
@@ -921,8 +921,8 @@ void Provenance::outputSolverSimulationFlow(int time_step, Real time,
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
-            simulationID, time_step, time, linear_step, n_linear_step,
+    sprintf(memalloc, "%d;%d;%.7f;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
+            simulationID, time_step, dt, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta,
             norm_delta_u, converged ? "true" : "false");
     vector<string> e = {memalloc};
@@ -983,7 +983,7 @@ void Provenance::inputSolverSimulationTransport() {
 #endif
 }
 
-void Provenance::outputSolverSimulationTransport(int time_step,
+void Provenance::outputSolverSimulationTransport(int time_step, Real dt,
         Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations,
         Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
     if (processor_id != 0) return;
@@ -1004,8 +1004,8 @@ void Provenance::outputSolverSimulationTransport(int time_step,
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%d;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
-            simulationID, time_step, time, linear_step, n_linear_step,
+    sprintf(memalloc, "%d;%d;%.7f;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
+            simulationID, time_step, dt, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta, norm_delta_u,
             converged ? "true" : "false");
     vector<string> e = {memalloc};
@@ -1070,7 +1070,7 @@ void Provenance::inputComputeSolutionChange() {
 void Provenance::outputComputeSolutionChange(int time_step, Real time, Real dt,
         unsigned int n_flow_linear_iterations_total, unsigned int n_flow_nonlinear_iterations_total,
         unsigned int n_transport_linear_iterations_total, unsigned int n_transport_nonlinear_iterations_total,
-        bool timeStepAccepted) {
+        bool timeStepAccepted, double error) {
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Output Compute Solution Change" << endl;
@@ -1089,11 +1089,12 @@ void Provenance::outputComputeSolutionChange(int time_step, Real time, Real dt,
     sprintf(memalloc, "%d", taskID);
     t.addIdDependency(memalloc);
 
-    sprintf(memalloc, "%d;%d;%.7f;%.7f;%d;%d;%d;%d;%s",
+    sprintf(memalloc, "%d;%d;%.7f;%.7f;%d;%d;%d;%d;%s;%.7f",
             simulationID, time_step, time, dt,
             n_flow_linear_iterations_total, n_flow_nonlinear_iterations_total,
             n_transport_linear_iterations_total, n_transport_nonlinear_iterations_total,
-            timeStepAccepted ? "true" : "false"
+            timeStepAccepted ? "true" : "false",
+            error
             );
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
@@ -1200,7 +1201,7 @@ void Provenance::outputComputeTimeStep(int time_step, Real time, Real dt, bool t
 
 void Provenance::inputMeshRefinement() {
     incrementIterationsMeshRefinements();
-    
+
     if (processor_id != 0) return;
 #ifdef VERBOSE
     cout << "Input Mesh Refinement" << endl;

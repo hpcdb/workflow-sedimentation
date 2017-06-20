@@ -916,7 +916,7 @@ void SedimentationTransport::assemble3D() {
 
 }
 
-void SedimentationTransport::solve(int t_step, Real time, int r_step, bool& diverged) {
+void SedimentationTransport::solve(int t_step, Real dt, Real time, int r_step, bool& diverged) {
 
     PerfLog* perf_log = es.parameters.get<PerfLog*>("PerfLog");
 
@@ -1032,7 +1032,7 @@ void SedimentationTransport::solve(int t_step, Real time, int r_step, bool& dive
 
 #ifdef PROVENANCE
         perf_log->start_event("SolverSimulationTransport", "Provenance");
-        prov->outputSolverSimulationTransport(t_step, time, r_step, transport_nli_counter, _current_n_linear_iteractions, _current_final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
+        prov->outputSolverSimulationTransport(t_step, dt, time, r_step, transport_nli_counter, _current_n_linear_iteractions, _current_final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
         perf_log->stop_event("SolverSimulationTransport", "Provenance");
 #endif
 
