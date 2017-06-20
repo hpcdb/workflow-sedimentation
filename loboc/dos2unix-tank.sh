@@ -11,3 +11,4 @@ cd ../tank-idx-fb
 dos2unix *
 cd ../tank-idx-ofb
 dos2unix *
+cd ..

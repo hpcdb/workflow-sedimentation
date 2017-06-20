@@ -11,3 +11,4 @@ cd ../exp-idx-fb
 dos2unix *
 cd ../exp-idx-ofb
 dos2unix *
+cd ..
