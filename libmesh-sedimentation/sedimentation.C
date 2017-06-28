@@ -174,7 +174,6 @@ int main(int argc, char** argv) {
     provenance.resetIndexerID();
 #endif
 
-
     //Define performance parameters
     unsigned int n_flow_nonlinear_iterations_total = 0;
     unsigned int n_flow_linear_iterations_total = 0;
@@ -228,7 +227,6 @@ int main(int argc, char** argv) {
             amrc_flow_transp, ref_interval, max_r_steps);
     perf_log.stop_event("AMRConfig", "Provenance");
 #endif
-
 
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
@@ -595,7 +593,6 @@ int main(int argc, char** argv) {
         }
     }
 
-
     // Steady-state control parameters
     unsigned int flow_sstate_count = 0;
     unsigned int transport_sstate_count = 0;
@@ -724,8 +721,9 @@ int main(int argc, char** argv) {
                     << std::setfill('=')
                     << "\n";
 
+            // SolverSimulationFluid
             sediment_flow.solve(t_step, dt, time, 0, diverged_flow);
-
+            // SolverSimulationTransport
             sediment_transport.solve(t_step, dt, time, 0, diverged_transport);
 
             n_flow_nonlinear_iterations_total += sediment_flow.nonlinear_iteractions();

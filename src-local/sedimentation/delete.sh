@@ -18,6 +18,10 @@ rm -rf index
 rm -rf image*
 rm -rf video*
 
+rm -rf monitoring*.log
+echo "time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear_iterations;flag" > monitoring-flow.log
+echo "time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear_iterations;flag" > monitoring-transport.log
+
 mkdir prov
 mkdir prov/di
 mkdir prov/pg

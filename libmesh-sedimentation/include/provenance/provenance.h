@@ -61,13 +61,13 @@ public:
 
     void inputSolverSimulationTransport();
     void outputSolverSimulationTransport(int time_step, Real dt, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
-    
+
     void inputComputeSolutionChange();
-    void outputComputeSolutionChange(int time_step, Real time, Real dt, 
-            unsigned int n_flow_linear_iterations_total, unsigned int n_flow_nonlinear_iterations_total, 
+    void outputComputeSolutionChange(int time_step, Real time, Real dt,
+            unsigned int n_flow_linear_iterations_total, unsigned int n_flow_nonlinear_iterations_total,
             unsigned int n_transport_linear_iterations_total, unsigned int n_transport_nonlinear_iterations_total,
             bool timeStepAccepted, double error);
-    
+
     void inputComputeTimeStep();
     void outputComputeTimeStep(int time_step, Real time, Real dt, bool timeStepAccepted);
 
@@ -84,6 +84,9 @@ public:
     void outputVisualization(int lineID, int time_step);
 
     void meshAggregator(string xdmf, int n_processors);
+
+    void writeMonitoringDataIntoFile(char* filename, int timeStep, int time, 
+        Real initial_norm_delta, Real final_norm_delta, int linear_iteractions);
 
     void finishDataIngestor();
 
@@ -113,12 +116,12 @@ public:
         if (processor_id != 0) return;
         numberIterationsMeshRefinements++;
     }
-    
+
     void incrementIterationsComputeSolutionChange() {
         if (processor_id != 0) return;
         numberIterationsComputeSolutionChange++;
     }
-    
+
     void incrementIterationsComputeTimeStep() {
         if (processor_id != 0) return;
         numberIterationsComputeTimeStep++;
@@ -148,12 +151,12 @@ public:
         if (processor_id != 0) return;
         this->numberIterationsMeshRefinements = value;
     }
-    
+
     void setNumberIterationsComputeSolutionChange(int value) {
         if (processor_id != 0) return;
         this->numberIterationsComputeSolutionChange = value;
     }
-    
+
     void setNumberIterationsComputeTimeStep(int value) {
         if (processor_id != 0) return;
         this->numberIterationsComputeTimeStep = value;
@@ -188,12 +191,12 @@ public:
         if (processor_id != 0) return;
         numberIterationsMeshRefinements = 0;
     }
-    
+
     void resetIterationsComputeSolutionChange() {
         if (processor_id != 0) return;
         numberIterationsComputeSolutionChange = 0;
     }
-    
+
     void resetIterationsComputeTimeStep() {
         if (processor_id != 0) return;
         numberIterationsComputeTimeStep = 0;
@@ -222,8 +225,8 @@ public:
     int getIndexerID() {
         return indexerID;
     }
-    
-    int getTaskID(){
+
+    int getTaskID() {
         return taskID;
     }
 
@@ -241,8 +244,8 @@ private:
     int numberIterationsComputeSolutionChange = 0;
     int numberIterationsComputeTimeStep = 0;
     vector<int> meshDependencies;
-    
-//    to control the loop on the flow and the sediments
+
+    //    to control the loop on the flow and the sediments
     int previousTaskID;
 
     const int jsonArraySize = 4096;

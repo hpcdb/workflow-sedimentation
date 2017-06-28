@@ -100,8 +100,8 @@ def CreateCoProcessor():
       # get color legend/bar for sLUT in view renderView1
       sLUTColorBar = GetScalarBar(sLUT, renderView1)
       sLUTColorBar.Position = [0.3118045830681095, 0.13406403940886716]
-      sLUTColorBar.Position2 = [0.4299999999999999, 0.11999999999999997]
-      sLUTColorBar.Orientation = 'Horizontal'
+      # sLUTColorBar.Position2 = [0.4299999999999999, 0.11999999999999997]
+      # sLUTColorBar.Orientation = 'Horizontal'
       sLUTColorBar.Title = 's'
       sLUTColorBar.ComponentTitle = ''
 

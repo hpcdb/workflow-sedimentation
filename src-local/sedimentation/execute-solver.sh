@@ -2,8 +2,8 @@
 # solver execution
 
 # mac
-# export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/Program_Installations/ParaView-v5.2.0/build/CMakeFiles/__macos_install/lib/paraview-5.2:/usr/local/opt/gcc/lib/gcc/6/
-# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/Users/vitor/Documents/Program_Installations/ParaView-v5.2.0/build/lib/paraview-5.2
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/lib/paraview-5.4:/usr/local/opt/gcc/lib/gcc/6/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/lib/paraview-5.4
 
 # virtual box - mint
 # export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/src/paraview/lib/paraview-5.1
@@ -18,8 +18,8 @@
 # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/programs/paraview-5.3.0/lib/paraview-5.3
 
 # XPS - Ubuntu - NACAD
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
+# export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
+# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
 
 # Mint - NACAD
 # export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/home/vitor/program/paraview-5.3.0/lib/paraview-5.3
@@ -40,5 +40,9 @@ rm output-statistics.log
 # without catalyst
 # time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i sedimentation.in -m necker3d.msh -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/ | tee -a "output-solver.log"
 # with catalyst
-time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i lock_necker3D_pc11.in -m lock_necker3D.msh -e extraction.py -v visualization.py -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"
+# time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i lock_necker3D_pc11.in -m lock_necker3D.msh -e extraction.py -v visualization.py -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"
+
+# MacOS
+time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i lock_necker3D_pc11.in -m lock_necker3D.msh -e extraction.py -v visualization.py -o output -d /Users/vitor/Documents/repository/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"
+
 

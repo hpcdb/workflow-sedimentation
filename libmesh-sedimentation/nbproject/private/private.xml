@@ -8,4 +8,13 @@
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/Users/vitor/Documents/repository/workflow-sedimentation/libmesh-sedimentation/include/provenance/provenance.h</file>
+            <file>file:/Users/vitor/Documents/repository/workflow-sedimentation/libmesh-sedimentation/sedimentation.C</file>
+            <file>file:/Users/vitor/Documents/repository/workflow-sedimentation/libmesh-sedimentation/src/flow/sedimentation_flow.C</file>
+            <file>file:/Users/vitor/Documents/repository/workflow-sedimentation/libmesh-sedimentation/src/provenance/provenance.C</file>
+            <file>file:/Users/vitor/Documents/repository/workflow-sedimentation/libmesh-sedimentation/src/sediment/sedimentation_transport.C</file>
+        </group>
+    </open-files>
 </project-private>

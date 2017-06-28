@@ -4,9 +4,9 @@
 
 CATALYST?=1
 PROVENANCE?=1
-MACOS?=0
+MACOS?=1
 
-# include config/config.vitor.xps.linux
+ include config/config.vitor.mac
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common

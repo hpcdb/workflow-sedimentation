@@ -44,17 +44,24 @@ transport/deposition = '3'
 transport/neumann/erosion = '3'
 transport/neumann/apply_bottom_flux = true
 
-
 #Mesh Moviment
 mesh/dirichlet/nodisplacement  = '4'
 
 #Time Step Control
 ts_control/model_name = PC11
-ts_control/dt_min = 0.00001
-ts_control/dt_max = 0.001
-ts_control/tol_u = 0.005
-ts_control/tol_s = 0.001
-ts_control/nsa_max = 11
+
+#ts_control/dt_min = 0.00001
+#ts_control/dt_max = 0.001
+#ts_control/tol_u = 0.005
+#ts_control/tol_s = 0.001
+
+ts_control/dt_min = 0.10
+ts_control/dt_max = 0.10
+ts_control/tol_u = 0.05
+ts_control/tol_s = 0.01
+
+#ts_control/nsa_max = 11
+ts_control/nsa_max = 10
 ts_control/kp = 0.075
 ts_control/ki = 0.175
 ts_control/kd = 0.01
@@ -76,20 +83,33 @@ ts_control/complete_flow_norm = false
 #----------------------------------------------------
 # TIME INTEGRATION PARAMETERS
 time/nssteady     = 30
-time/deltat       = 0.00001
 time/init_time    = 0.0
-time/tmax         = 0.00003
+
+#time/deltat       = 0.00001
+#time/tmax         = 0.00003
+
+time/deltat    = 0.010
+time/tmax       = 1.000
+
 time/n_time_steps = 1000000
 time/theta        = 1.0
 
 #----------------------------------------------------
 # Linear and Non-Linear parameters
 
-flow_n_nonlinear_steps        = 11
-flow_nonlinear_tolerance      = 1.0e-4
-transport_n_nonlinear_steps   = 11
-transport_nonlinear_tolerance = 1.0E-4
-max_linear_iterations         = 400
+#flow_n_nonlinear_steps        = 11
+#flow_nonlinear_tolerance      = 1.0e-4
+#transport_n_nonlinear_steps   = 11
+#transport_nonlinear_tolerance = 1.0E-4
+#max_linear_iterations         = 400
+
+flow_n_nonlinear_steps        =  10
+flow_nonlinear_tolerance      = 1.0E-3
+transport_n_nonlinear_steps   = 10
+transport_nonlinear_tolerance = 1.0E-3
+max_linear_iterations         = 100
+#linear_solver_tolerance       = 1.0E-6
+
 flow_initial_linear_solver_tolerance       = 1.0E-4
 transport_initial_linear_solver_tolerance       = 1.0E-6
 minimum_linear_solver_tolerance       = 1.0E-8

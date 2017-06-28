@@ -1588,3 +1588,26 @@ void Provenance::createIndexDirectory() {
     int exitStatus = system(cmd);
 }
 
+void Provenance::writeMonitoringDataIntoFile(char* filename, int timeStep, int time, 
+        Real initial_norm_delta, Real final_norm_delta, int linear_iteractions) {
+    if (processor_id != 0) return;
+
+    Real ratio = Real(final_norm_delta / initial_norm_delta);
+    string flag;
+    if (ratio == 1) {
+        flag.assign("stagnant");
+    } else if (ratio > 1) {
+        flag.assign("bad_convergence");
+    }else{
+        flag.assign("ok");
+    }
+
+    FILE * monitoringFilePath = fopen(filename, "a");
+    fprintf(monitoringFilePath, "%d;%d;%.7f;%.7f;%.7f;%d;%s\n",
+            timeStep, time,
+            initial_norm_delta, final_norm_delta,
+            ratio,
+            linear_iteractions,
+            flag.c_str());
+    fclose(monitoringFilePath);
+};
