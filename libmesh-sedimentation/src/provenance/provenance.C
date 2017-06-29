@@ -1588,7 +1588,7 @@ void Provenance::createIndexDirectory() {
     int exitStatus = system(cmd);
 }
 
-void Provenance::writeMonitoringDataIntoFile(char* filename, int timeStep, int time, 
+void Provenance::writeMonitoringDataIntoFile(char* filename, int timeStep, Real time, 
         Real initial_norm_delta, Real final_norm_delta, int linear_iteractions) {
     if (processor_id != 0) return;
 

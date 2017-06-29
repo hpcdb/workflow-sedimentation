@@ -85,7 +85,7 @@ public:
 
     void meshAggregator(string xdmf, int n_processors);
 
-    void writeMonitoringDataIntoFile(char* filename, int timeStep, int time, 
+    void writeMonitoringDataIntoFile(char* filename, int timeStep, Real time, 
         Real initial_norm_delta, Real final_norm_delta, int linear_iteractions);
 
     void finishDataIngestor();
