@@ -1603,7 +1603,7 @@ void Provenance::writeMonitoringDataIntoFile(char* filename, int timeStep, int t
     }
 
     FILE * monitoringFilePath = fopen(filename, "a");
-    fprintf(monitoringFilePath, "%d;%d;%.7f;%.7f;%.7f;%d;%s\n",
+    fprintf(monitoringFilePath, "%d;%.10f;%.10f;%.10f;%.10f;%d;%s\n",
             timeStep, time,
             initial_norm_delta, final_norm_delta,
             ratio,

@@ -55,7 +55,7 @@ ts_control/model_name = PC11
 #ts_control/tol_u = 0.005
 #ts_control/tol_s = 0.001
 
-ts_control/dt_min = 0.01
+ts_control/dt_min = 0.05
 ts_control/dt_max = 0.10
 ts_control/tol_u = 0.05
 ts_control/tol_s = 0.01
@@ -104,9 +104,9 @@ time/theta        = 1.0
 #max_linear_iterations         = 400
 
 flow_n_nonlinear_steps        =  10
-flow_nonlinear_tolerance      = 1.0E-2
+flow_nonlinear_tolerance      = 1.0E-3
 transport_n_nonlinear_steps   = 10
-transport_nonlinear_tolerance = 1.0E-2
+transport_nonlinear_tolerance = 1.0E-3
 max_linear_iterations         = 100
 #linear_solver_tolerance       = 1.0E-6
 
