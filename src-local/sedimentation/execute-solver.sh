@@ -50,4 +50,4 @@ rm output-statistics.log
 # time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i lock_necker3D_pc11.in -m lock_necker3D.msh -e extraction.py -v visualization.py -o output -d /Users/vitor/Documents/repository/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"
 
 # Ubuntu - Inspiron
-time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i lock_necker3D_pc11.in -m lock_necker3D.msh -e extraction.py -v visualization.py -o output -d /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"
+time mpirun -np 2 ../../libmesh-sedimentation/sediment-opt -i lock_necker3D_pc11.in -m lock_necker3D.msh -e extraction.py -v visualization.py -o output -d /media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation/output | tee -a "output-solver.log"

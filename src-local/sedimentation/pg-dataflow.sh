@@ -2,7 +2,7 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 
 # MacOS
-PGDIR=/Users/vitor/Documents/repository/workflow-sedimentation/src-local/sedimentation
+PGDIR=/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation
 # docker
 # PGDIR=/shared/experiment/libmesh-sedimentation
 # Virtual Box - mint
