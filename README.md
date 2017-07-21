@@ -1,14 +1,14 @@
 # User documentation for docker
 
 ## Clones
-docker pull vitorss/debian:sedimentation-vitor
-git clone git@bitbucket.org:vitorss/workflow-sedimentation.git
-LOCAL_DIR=/path/to/repository/in/local/machine
+- docker pull vitorss/debian:sedimentation-vitor
+- git clone git@bitbucket.org:vitorss/workflow-sedimentation.git
+- LOCAL_DIR=/path/to/repository/in/local/machine
 
 ## Run docker:
-
+```
 docker run -v $LOCAL_DIR:/shared -i -t vitorss/debian:sedimentation-vitor /bin/bash
-
+```
 Now, in docker:
 
 ## Adjust the Docker variables
@@ -54,20 +54,22 @@ extraArguments=[b:precision=2]
 ## Make the solver:
 
 Uncomment `include config/config.docker`
-
+```
 export LIBMESH_DIR=/programs/libmesh/build
 cd /shared/libmesh-sedimentation
 rm -rf .depend
 rm -rf .libs
 make clean
 make
-
+```
 
 ## Run:
 
+```
+monetdb-start-all
 cd /shared/workflow-sedimentation/src-local/sedimentation
 ./pg-dataflow.sh --> gera dataflow "conceitual"
 ./delete.sh --> apagar dados de uma execução passada
-monetdb-start-all
 ./start-data-ingestor.sh --> limpa a base e inicializa o MonetDB
 ./execute-solver.sh --> rodar em um terminal separado para rodar junto com a instância do MonetDB. Roda o solver de sedimentação.
+```
