@@ -14,3 +14,9 @@
 /program/ProvenanceAnalysis/nbproject/private/
 /program/ProvenanceAnalysis/dist/
 /program/ProvenanceAnalysis/build/
+src-local/sedimentation/*csv
+src-local/sedimentation/*png
+libmesh-sedimentation/.depend
+src-local/sedimentation/output*
+src-local/sedimentation/*log
+.DS_Store

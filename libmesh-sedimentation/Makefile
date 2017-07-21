@@ -7,6 +7,7 @@ PROVENANCE?=1
 MACOS?=0
 
 #include config/config.vitor.mac
+#include config/config.docker
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
