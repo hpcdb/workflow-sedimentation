@@ -1,0 +1,25 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "inputmesh",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::inputmesh",
+            "method": "COMPUTATION",
+            "endTime": "01.08.2017-09:31:50"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "oinputmesh",
+            "elements": [
+                "1;3;/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/lock_necker3D.msh;false"
+            ]
+        }
+    ],
+    "dependency": {},
+    "files": []
+}

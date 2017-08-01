@@ -1,0 +1,29 @@
+{
+    "id": "2",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "visualization",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::visualization-1",
+            "method": "COMPUTATION",
+            "startTime": "01.08.2017-09:32:10"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationtransport"
+            }
+        ],
+        "ids": [
+            {
+                "id": "2"
+            }
+        ]
+    },
+    "files": []
+}

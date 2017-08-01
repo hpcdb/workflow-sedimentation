@@ -1,0 +1,42 @@
+{
+    "id": "1",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "meshaggregator",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::meshaggregator-1",
+            "method": "COMPUTATION",
+            "startTime": "01.08.2017-09:32:10",
+            "endTime": "01.08.2017-09:32:10"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "omeshaggregator",
+            "elements": [
+                "1;/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/prov/pg/sedimentation/output_1.xmf;1"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "meshwriter"
+            }
+        ],
+        "ids": [
+            {
+                "id": "2"
+            }
+        ]
+    },
+    "files": [
+        {
+            "name": "output_1.xmf",
+            "path": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "id": "2",
+    "subid": "1",
+    "dataflow": "sedimentation",
+    "transformation": "line2extraction",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::line2extraction-1-1",
+            "method": "COMPUTATION",
+            "endTime": "01.08.2017-09:32:10"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "oline2extraction",
+            "elements": [
+                "1;1;/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/output_1_00001.xmf;/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/ext_line_2_1.csv"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationtransport"
+            }
+        ],
+        "ids": [
+            {
+                "id": "2"
+            }
+        ]
+    },
+    "files": [
+        {
+            "name": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/output/output_1_00001.xmf",
+            "path": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+        }
+    ]
+}

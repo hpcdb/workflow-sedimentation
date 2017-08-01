@@ -503,9 +503,9 @@ int main(int argc, char** argv) {
 
     // Print information about the mesh to the screen.
     mesh.print_info();
-    
+
     if (initial_unif_ref_mesh)
-        cout<<"  Applying "<<initial_unif_ref_mesh<<" level(s) of initial refinement throughout the mesh\n\n";
+        cout << "  Applying " << initial_unif_ref_mesh << " level(s) of initial refinement throughout the mesh\n\n";
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & transport_system =
@@ -644,7 +644,7 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<double>("minimum_linear_solver_tolerance") = minimum_linear_solver_tol;
     equation_systems.parameters.set<unsigned int>("write_interval") = write_interval;
 
-    cout<<"\nAdopting "<<((fem_model=="SUPG/PSPG")? "SUPG/PSPG": "RbVMS")<< " to solve Flow and Transport problems\n"<<endl;
+    cout << "\nAdopting " << ((fem_model == "SUPG/PSPG") ? "SUPG/PSPG" : "RbVMS") << " to solve Flow and Transport problems\n" << endl;
 
     // Writing into a file the initial time-step value at the beginning of the simulation
     if (mesh.processor_id() == 0)
@@ -659,7 +659,9 @@ int main(int argc, char** argv) {
         provenance.incrementTaskID();
 #endif
 
-        if (is_file_exist("abort.run")) break;
+        if (is_file_exist("abort.run")) {
+            break;
+        }
 
         if (is_file_exist("reset.run")) {
             GetPot reset(input);
@@ -791,7 +793,7 @@ int main(int argc, char** argv) {
                 provenance.inputComputeTimeStep();
                 perf_log.stop_event("ComputeTimeStep", "Provenance");
 #endif
-                
+
                 perf_log.start_event("computeTimeStep", "Time-Step Control");
                 if (t_step >= ts_control->getStartTimeStepControl() - 1 && (abs(equation_systems.parameters.get<Real> ("time") - tmax) > 1.0e-08 || !TimeStepAccepted))
                     ts_control->computeTimeStep(TimeStepAccepted, time, tmax, dt);
@@ -1031,7 +1033,9 @@ int main(int argc, char** argv) {
         perf_log.start_event("MeshAggregator", "Provenance");
         provenance.meshAggregator(out_filename, libMesh::global_n_processors());
         perf_log.stop_event("MeshAggregator", "Provenance");
-        provenance.finishDataIngestor();
+        if (!is_file_exist("abort.run")) {
+            provenance.finishDataIngestor();
+        }
         solverPerformance.end();
 #endif
 

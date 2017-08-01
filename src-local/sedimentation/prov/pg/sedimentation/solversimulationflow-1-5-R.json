@@ -1,0 +1,29 @@
+{
+    "id": "1",
+    "subid": "5",
+    "dataflow": "sedimentation",
+    "transformation": "solversimulationflow",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "RUNNING",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::solversimulationflow-1-5",
+            "method": "COMPUTATION",
+            "startTime": "01.08.2017-09:32:08"
+        }
+    ],
+    "sets": [],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "getmaximumiterationstotransport"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

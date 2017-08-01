@@ -89,7 +89,7 @@ time/init_time    = 0.0
 #time/tmax         = 0.00003
 
 time/deltat    = 0.010
-time/tmax       = 1.000
+time/tmax       = 0.400
 
 time/n_time_steps = 1000000
 time/theta        = 1.0

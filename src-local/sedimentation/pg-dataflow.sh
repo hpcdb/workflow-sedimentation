@@ -1,14 +1,14 @@
 rm -rf prov/di/*
 rm -rf prov/pg/*
 
-# MacOS
-PGDIR=/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation
+# Ubuntu - Inspiron
+#PGDIR=/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation
 # docker
 # PGDIR=/shared/experiment/libmesh-sedimentation
 # Virtual Box - mint
 #PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Ubuntu
-# PGDIR=/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation
+PGDIR=/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
 # LoboC

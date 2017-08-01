@@ -1,0 +1,37 @@
+{
+    "id": "1",
+    "subid": "1",
+    "dataflow": "sedimentation",
+    "transformation": "meshrefinement",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::meshrefinement-1-1",
+            "method": "COMPUTATION",
+            "startTime": "01.08.2017-09:32:07",
+            "endTime": "01.08.2017-09:32:07"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "omeshrefinement",
+            "elements": [
+                "1;false;0;3328;2096"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationtransport"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}

@@ -4,92 +4,9 @@
     <df root="." name="0">
       <df name="contrib">
         <df name="dfanalyzer">
-          <in>attribute.h</in>
-          <in>extractor.h</in>
-          <in>file.h</in>
-          <in>indexer.h</in>
           <in>performance_metric.C</in>
-          <in>performance_metric.h</in>
           <in>provenance_object.C</in>
-          <in>provenance_object.h</in>
           <in>task.C</in>
-          <in>task.h</in>
-        </df>
-        <df name="rapidjson">
-          <df name="error">
-            <in>en.h</in>
-            <in>error.h</in>
-          </df>
-          <df name="internal">
-            <in>biginteger.h</in>
-            <in>diyfp.h</in>
-            <in>dtoa.h</in>
-            <in>ieee754.h</in>
-            <in>itoa.h</in>
-            <in>meta.h</in>
-            <in>pow10.h</in>
-            <in>regex.h</in>
-            <in>stack.h</in>
-            <in>strfunc.h</in>
-            <in>strtod.h</in>
-            <in>swap.h</in>
-          </df>
-          <df name="msinttypes">
-            <in>inttypes.h</in>
-            <in>stdint.h</in>
-          </df>
-          <in>allocators.h</in>
-          <in>document.h</in>
-          <in>encodedstream.h</in>
-          <in>encodings.h</in>
-          <in>filereadstream.h</in>
-          <in>filewritestream.h</in>
-          <in>fwd.h</in>
-          <in>istreamwrapper.h</in>
-          <in>memorybuffer.h</in>
-          <in>memorystream.h</in>
-          <in>ostreamwrapper.h</in>
-          <in>pointer.h</in>
-          <in>prettywriter.h</in>
-          <in>rapidjson.h</in>
-          <in>reader.h</in>
-          <in>schema.h</in>
-          <in>stream.h</in>
-          <in>stringbuffer.h</in>
-          <in>writer.h</in>
-        </df>
-      </df>
-      <df name="include">
-        <df name="catalyst">
-          <in>FEAdaptor.h</in>
-        </df>
-        <df name="common">
-          <in>define.h</in>
-          <in>performance.h</in>
-          <in>stab_helper.h</in>
-        </df>
-        <df name="flow">
-          <in>sedimentation_flow.h</in>
-          <in>viscosity_flow.h</in>
-        </df>
-        <df name="io">
-          <in>xdmf.h</in>
-        </df>
-        <df name="mesh_mov">
-          <in>mesh_moviment.h</in>
-        </df>
-        <df name="provenance">
-          <in>provenance.h</in>
-        </df>
-        <df name="sediment">
-          <in>sedimentation_deposition.h</in>
-          <in>sedimentation_transport.h</in>
-        </df>
-        <df name="time_stepping">
-          <in>timeStepControlBase.h</in>
-          <in>timeStepControlPC11.h</in>
-          <in>timeStepControlPID.h</in>
-          <in>timeStepControlResidual.h</in>
         </df>
       </df>
       <df name="src">
@@ -146,6 +63,9 @@
         <dependencyChecking>false</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
+      <flagsDictionary>
+        <element flagsID="0" commonFlags="-std=gnu++11 -O2 -fopenmp"/>
+      </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
       <makefileType>
@@ -154,233 +74,151 @@
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath></executablePath>
+          <ccTool>
+            <incDir>
+              <pElem>include/common</pElem>
+              <pElem>include/flow</pElem>
+              <pElem>include/io</pElem>
+              <pElem>include/mesh_mov</pElem>
+              <pElem>include/sediment</pElem>
+              <pElem>include/time_stepping</pElem>
+              <pElem>contrib</pElem>
+              <pElem>contrib/dfanalyzer/*.h</pElem>
+              <pElem>include/provenance</pElem>
+              <pElem>../../../../program/paraview-5.3.0/include/paraview-5.3</pElem>
+              <pElem>include/catalyst</pElem>
+              <pElem>../../../../program/libmesh/include</pElem>
+              <pElem>../../../../program/hdf5/include</pElem>
+              <pElem>../../../../program/petsc/include</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi/opal/mca/event/libevent2021/libevent/include</pElem>
+              <pElem>/usr/lib/openmpi/include</pElem>
+              <pElem>/usr/lib/openmpi/include/openmpi</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>NDEBUG</Elem>
+              <Elem>PROVENANCE</Elem>
+              <Elem>USE_CATALYST</Elem>
+            </preprocessorList>
+          </ccTool>
         </makeTool>
         <preBuild>
           <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
-      <item path="contrib/dfanalyzer/attribute.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/dfanalyzer/extractor.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/dfanalyzer/file.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/dfanalyzer/indexer.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="contrib/dfanalyzer/performance_metric.C"
             ex="false"
             tool="1"
-            flavor2="0">
-      </item>
-      <item path="contrib/dfanalyzer/performance_metric.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="contrib/dfanalyzer/provenance_object.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/dfanalyzer/provenance_object.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
+      <item path="contrib/dfanalyzer/task.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/dfanalyzer/task.C" ex="false" tool="1" flavor2="0">
+      <folder path="0/contrib">
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="0/src">
+        <ccTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <item path="sedimentation.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/dfanalyzer/task.h" ex="false" tool="3" flavor2="0">
+      <item path="src/catalyst/FEAdaptor.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/rapidjson/allocators.h" ex="false" tool="3" flavor2="0">
+      <item path="src/common/stab_helper.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/rapidjson/document.h" ex="false" tool="3" flavor2="0">
+      <item path="src/flow/sedimentation_flow.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/rapidjson/encodedstream.h" ex="false" tool="3" flavor2="0">
+      <item path="src/flow/viscosity_flow.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/rapidjson/encodings.h" ex="false" tool="3" flavor2="0">
+      <item path="src/io/xdmf.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/rapidjson/error/en.h" ex="false" tool="3" flavor2="0">
+      <item path="src/mesh_mov/mesh_moviment.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
-      <item path="contrib/rapidjson/error/error.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/filereadstream.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/filewritestream.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/fwd.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/biginteger.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/diyfp.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/dtoa.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/ieee754.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/itoa.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/meta.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/pow10.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/regex.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/stack.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/strfunc.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/strtod.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/internal/swap.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/istreamwrapper.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/memorybuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/memorystream.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/msinttypes/inttypes.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/msinttypes/stdint.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/ostreamwrapper.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/pointer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/prettywriter.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/rapidjson.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/reader.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/schema.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/stream.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/stringbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="contrib/rapidjson/writer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/catalyst/FEAdaptor.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/common/define.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/common/performance.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/common/stab_helper.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/flow/sedimentation_flow.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/flow/viscosity_flow.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/io/xdmf.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/mesh_mov/mesh_moviment.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/provenance/provenance.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/sediment/sedimentation_deposition.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/sediment/sedimentation_transport.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/time_stepping/timeStepControlBase.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/time_stepping/timeStepControlPC11.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/time_stepping/timeStepControlPID.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="include/time_stepping/timeStepControlResidual.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="sedimentation.C" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/catalyst/FEAdaptor.C" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/common/stab_helper.C" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/flow/sedimentation_flow.C" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/flow/viscosity_flow.C" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/io/xdmf.C" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/mesh_mov/mesh_moviment.C" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="src/provenance/provenance.C" ex="false" tool="1" flavor2="0">
+      <item path="src/provenance/provenance.C" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="src/sediment/sediment_mass_energy.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="src/sediment/sedimentation_deposition.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="src/sediment/sedimentation_transport.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlBase.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlPC11.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlPID.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
       <item path="src/time_stepping/timeStepControlResidual.C"
             ex="false"
             tool="1"
-            flavor2="0">
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
       </item>
     </conf>
   </confs>

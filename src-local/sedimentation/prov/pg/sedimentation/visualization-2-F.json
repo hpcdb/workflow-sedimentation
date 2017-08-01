@@ -1,0 +1,35 @@
+{
+    "id": "2",
+    "subid": null,
+    "dataflow": "sedimentation",
+    "transformation": "visualization",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [],
+    "sets": [
+        {
+            "tag": "ovisualization",
+            "elements": [
+                "1;1;/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/prov/pg/sedimentation/image_1.png"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationtransport"
+            }
+        ],
+        "ids": [
+            {
+                "id": "2"
+            }
+        ]
+    },
+    "files": [
+        {
+            "name": "image_1.png",
+            "path": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+        }
+    ]
+}

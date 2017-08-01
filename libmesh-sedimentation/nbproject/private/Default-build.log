@@ -1,4 +1,2 @@
-Compiling C++ (in optimized mode) sedimentation.C...
-mpicxx -DNDEBUG -std=gnu++11 -O2 -felide-constructors -Qunused-arguments -Wunused-parameter -Wunused -I./include/common -I./include/flow  -I./include/io -I./include/mesh_mov -I./include/sediment -I./include/time_stepping -I./contrib  -I./contrib/dfanalyzer/*.h -I./include/provenance -DPROVENANCE -I/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/include/paraview-5.4  -I./include/catalyst -DUSE_CATALYST -I/Users/vitor/Documents/program/libmesh/include -I/Users/vitor/Documents/program/hdf5-1.8.19/include -D_THREAD_SAFE -pthread -I/Users/vitor/Documents/program/petsc-3.7.6/include -I/Users/vitor/Documents/program/petsc-3.7.6//include -I/opt/X11/include -I/usr/local/opt/openssl/include -c sedimentation.C -o sedimentation.x86_64-apple-darwin16.6.0.opt.o
-/bin/sh: mpicxx: command not found
-make: *** [sedimentation.x86_64-apple-darwin16.6.0.opt.o] Error 127
+Makefile:13: /Make.common: No such file or directory
+make: *** No rule to make target '/Make.common'.  Stop.

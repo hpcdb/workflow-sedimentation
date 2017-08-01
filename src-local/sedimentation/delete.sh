@@ -8,15 +8,16 @@ rm -rf prov/pg/*
 rm -rf prov/di/*
 rm -rf log.*.out
 rm -rf log.*.err
-rm -rf *.conf
+# rm -rf *.conf
 rm -rf nodes.txt
-rm -rf *.dump
+# rm -rf *.dump
 rm -rf data
 rm -rf *.data
 rm -rf *.index
 rm -rf index
 rm -rf image*
 rm -rf video*
+rm abort.run
 
 rm -rf monitoring*.log
 echo "time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear_iterations;flag" > monitoring-flow.log

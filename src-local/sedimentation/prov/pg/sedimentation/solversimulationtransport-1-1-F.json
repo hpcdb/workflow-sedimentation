@@ -1,0 +1,36 @@
+{
+    "id": "1",
+    "subid": "1",
+    "dataflow": "sedimentation",
+    "transformation": "solversimulationtransport",
+    "workspace": "/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation",
+    "status": "FINISHED",
+    "performances": [
+        {
+            "description": "libMeshSedimentation::solversimulationtransport-1-1",
+            "method": "COMPUTATION",
+            "endTime": "01.08.2017-09:31:59"
+        }
+    ],
+    "sets": [
+        {
+            "tag": "osolversimulationtransport",
+            "elements": [
+                "1;0;0.0100000;0.0100000;0;0;6;0.000000000;0.001605146;0.000079762;true"
+            ]
+        }
+    ],
+    "dependency": {
+        "tags": [
+            {
+                "tag": "solversimulationflow"
+            }
+        ],
+        "ids": [
+            {
+                "id": "1"
+            }
+        ]
+    },
+    "files": []
+}
