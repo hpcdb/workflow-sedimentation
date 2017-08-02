@@ -1,14 +1,22 @@
 #!/bin/bash
 # solver execution
-SOLVER="3D/lock_container"
-SOLVER_MESH=$SOLVER".msh"
-SOLVER_IN=$SOLVER"_cte.in"
-SOLVER_EXTRACTION=$SOLVER"_extraction.py"
-SOLVER_VISUALIZATION=$SOLVER"_visualization_surface.py,"$SOLVER"_visualization_volume.py,"$SOLVER"_visualization_wireframe.py"
-# ENVIRONMENTs: xps-nacad,xps-home,inspiron-laptop
+CASE_STUDY="meiburg2D"
+if [ "$CASE_STUDY" == "necker3D" ]; then
+	SOLVER="necker3D/lock_container"
+	SOLVER_MESH=$SOLVER".msh"
+	SOLVER_IN=$SOLVER"_cte.in"
+	SOLVER_EXTRACTION=$SOLVER"_extraction.py"
+	SOLVER_VISUALIZATION=$SOLVER"_visualization_surface.py,"$SOLVER"_visualization_volume.py,"$SOLVER"_visualization_wireframe.py"
+elif [ "$CASE_STUDY" == "meiburg2D" ]; then
+	SOLVER="meiburg2D/lock_meiburg2D"
+	SOLVER_MESH=$SOLVER".msh"
+	SOLVER_IN=$SOLVER"_pc11.in"
+	SOLVER_EXTRACTION=$SOLVER"_extraction.py"
+	SOLVER_VISUALIZATION=$SOLVER"_visualization.py"
+fi
+# ENVIRONMENT: xps-nacad,xps-home,inspiron-laptop
 ENVIRONMENT="xps-home"
 EXPERIMENT_DIR=""
-
 if [ "$ENVIRONMENT" == "xps-nacad" ]; then
 	EXPERIMENT_DIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
 elif [ "$ENVIRONMENT" == "xps-home" ]; then

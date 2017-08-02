@@ -12,34 +12,9 @@ from paraview import coprocessing
 # ----------------------- CoProcessor definition -----------------------
 
 def CreateCoProcessor():
-  
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
       timeStep = datadescription.GetTimeStep()
-      time = datadescription.GetTime()
-      print "[CATALYST] Time step: " + str(timeStep) + " ; Time: " + str(time)
-      # 3D analysis
-      #### disable automatic camera reset on 'Show'
-      paraview.simple._DisableFirstRenderCameraReset()
-
-      # create a new 'Xdmf3ReaderS'
-      # create a producer from a simulation input
-      output_2_00000xmf = coprocessor.CreateProducer(datadescription, 'input')
-
-      # create a new 'Plot Over Line'
-      # plotOverLine1 = PlotOverLine(Input=output_2_00000xmf,
-      #     Source='High Resolution Line Source')
-      # plotOverLine1.Tolerance = 2.22044604925031e-16
-
-      # # init the 'High Resolution Line Source' selected for 'Source'
-      # plotOverLine1.Source.Point1 = [0.0, 1.0, 0.0]
-      # plotOverLine1.Source.Point2 = [18.0, 1.0, 0.0]
-
-      SaveData('init_ext_plane_' + str(timeStep) + ".csv", proxy=output_2_00000xmf, Precision=5,
-        UseScientificNotation=0,
-        WriteAllTimeSteps=0,
-        FieldAssociation='Points')
-
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):
@@ -86,6 +61,10 @@ def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
     global coprocessor
 
+    timeStep = datadescription.GetTimeStep()
+    time = datadescription.GetTime()
+    print "[CATALYST] Extraction - Time step: " + str(timeStep) + " ; Time: " + str(time)
+
     # Update the coprocessor by providing it the newly generated simulation data.
     # If the pipeline hasn't been setup yet, this will setup the pipeline.
     coprocessor.UpdateProducers(datadescription)
@@ -98,3 +77,62 @@ def DoCoProcessing(datadescription):
 
     # Live Visualization, if enabled.
     coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)
+    
+    # create a new 'Xdmf3ReaderS'
+    # create a producer from a simulation input
+    output_2_00003xmf = coprocessor.CreateProducer(datadescription, 'input')
+
+    # create a new 'Plot Over Line'
+    plotOverLine3 = PlotOverLine(Input=output_2_00003xmf,
+        Source='High Resolution Line Source')
+    plotOverLine3.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine3.Source.Point1 = [4.5, 0.0, 0.0]
+    plotOverLine3.Source.Point2 = [4.5, 2.0, 0.0]
+
+    # create a new 'Plot Over Line'
+    plotOverLine4 = PlotOverLine(Input=output_2_00003xmf,
+        Source='High Resolution Line Source')
+    plotOverLine4.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine4.Source.Point1 = [13.5, 0.0, 0.0]
+    plotOverLine4.Source.Point2 = [13.5, 2.0, 0.0]
+
+    # create a new 'Plot Over Line'
+    plotOverLine1 = PlotOverLine(Input=output_2_00003xmf,
+        Source='High Resolution Line Source')
+    plotOverLine1.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine1.Source.Point1 = [0.0, 1.0, 0.0]
+    plotOverLine1.Source.Point2 = [18.0, 1.0, 0.0]
+
+    # create a new 'Plot Over Line'
+    plotOverLine2 = PlotOverLine(Input=output_2_00003xmf,
+        Source='High Resolution Line Source')
+    plotOverLine2.Tolerance = 2.22044604925031e-16
+
+    # init the 'High Resolution Line Source' selected for 'Source'
+    plotOverLine2.Source.Point1 = [9.0, 0.0, 0.0]
+    plotOverLine2.Source.Point2 = [9.0, 2.0, 0.0]
+
+    # save data
+    SaveData('init_ext_line_0_' + str(timeStep) + ".csv", proxy=plotOverLine1, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+    SaveData('init_ext_line_1_' + str(timeStep) + ".csv", proxy=plotOverLine3, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+    SaveData('init_ext_line_2_' + str(timeStep) + ".csv", proxy=plotOverLine2, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+    SaveData('init_ext_line_3_' + str(timeStep) + ".csv", proxy=plotOverLine4, Precision=5,
+      UseScientificNotation=0,
+      WriteAllTimeSteps=0,
+      FieldAssociation='Points')
+

@@ -29,7 +29,7 @@ fi
 # PGDIR=/home/vitor/Documents/dev/workflow-sedimentation/src-local/libmesh-sedimentation
 
 # Sedimentation Solver
-dimension="3"
+dimension="2"
 access="extraction"
 cartridge="csv"
 
@@ -167,171 +167,143 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation g
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterationsToTransport -set ogetmaximumiterationstotransport -name max_linear_iters -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation getMaximumIterationsToTransport -set ogetmaximumiterationstotransport -name xdmf -type text
 
-if [ "$dimension" == "2" ]; then
-	# 2D Analysis
-	echo "Init Data Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag initDataExtraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation initDataExtraction -name libmesh-sedimentation-opt::InitDataExtraction -filepath $PGDIR
+# Analysis
+echo "Initial Horizontal Line Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine0Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine0Extraction -name libmesh-sedimentation-opt::iLine0Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation initDataExtraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation initDataExtraction -tag oinitdataextraction -type output
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine0Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine0Extraction -tag oline0iextraction -type output
 
-	if [ "$access" == "extraction" ]; then
-		# extraction
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -tag irde -algorithm EXTRACTION:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
-		# indexing - csv
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -tag irde -algorithm INDEXING:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
-		# indexing - fastbit
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -tag irde -algorithm INDEXING:FASTBIT
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "optimized_fastbit" ]; then
-		# indexing - fastbit
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -tag irde -algorithm INDEXING:OPTIMIZED_FASTBIT
-	fi
+echo "Initial Vertical Line 1 Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine1Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine1Extraction -name libmesh-sedimentation-opt::iLine1Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name u -type numeric -extractor irde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name v -type numeric -extractor irde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name p -type numeric -extractor irde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name s -type numeric -extractor irde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name d -type numeric -extractor irde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points0 -type numeric -extractor irde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points1 -type numeric -extractor irde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation initDataExtraction -set oinitdataextraction -name points2 -type numeric -extractor irde
-elif [ "$dimension" == "3" ]; then
-	# 3D Analysis
-	echo "Initial Horizontal Line Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine0Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine0Extraction -name libmesh-sedimentation-opt::iLine0Extraction -filepath $PGDIR
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine1Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine1Extraction -tag oline1iextraction -type output
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine0Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine0Extraction -tag oline0iextraction -type output
+echo "Initial Vertical Line 2 Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine2Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine2Extraction -name libmesh-sedimentation-opt::iLine2Extraction -filepath $PGDIR
 
-	echo "Initial Vertical Line 1 Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine1Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine1Extraction -name libmesh-sedimentation-opt::iLine1Extraction -filepath $PGDIR
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine2Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine2Extraction -tag oline2iextraction -type output
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine1Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine1Extraction -tag oline1iextraction -type output
+echo "Initial Vertical Line 3 Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine3Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine3Extraction -name libmesh-sedimentation-opt::iLine3Extraction -filepath $PGDIR
 
-	echo "Initial Vertical Line 2 Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine2Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine2Extraction -name libmesh-sedimentation-opt::iLine2Extraction -filepath $PGDIR
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine3Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine3Extraction -tag oline3iextraction -type output
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine2Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine2Extraction -tag oline2iextraction -type output
-
-	echo "Initial Vertical Line 3 Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iLine3Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iLine3Extraction -name libmesh-sedimentation-opt::iLine3Extraction -filepath $PGDIR
-
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine3Extraction -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iLine3Extraction -tag oline3iextraction -type output
-
-	if [ "$access" == "extraction" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm EXTRACTION:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm EXTRACTION:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm EXTRACTION:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm EXTRACTION:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm INDEXING:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm INDEXING:FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:FASTBIT
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "optimized_fastbit" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm INDEXING:OPTIMIZED_FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:OPTIMIZED_FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:OPTIMIZED_FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:OPTIMIZED_FASTBIT
-	fi
-
-	# line 0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name u -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name v -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name w -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name p -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name s -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name d -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name r -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name vtkvalidpointmask -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name arc_length -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name points0 -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name points1 -type numeric -extractor iline0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name points2 -type numeric -extractor iline0
-
-	# line 1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name u -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name v -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name w -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name p -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name s -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name d -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name r -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name vtkvalidpointmask -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name arc_length -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name points0 -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name points1 -type numeric -extractor iline1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name points2 -type numeric -extractor iline1
-
-	# line 2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name u -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name v -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name w -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name p -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name s -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name d -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name r -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name vtkvalidpointmask -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name arc_length -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name points0 -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name points1 -type numeric -extractor iline2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name points2 -type numeric -extractor iline2
-
-	# line 3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name u -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name v -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name w -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name p -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name s -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name d -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name r -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name vtkvalidpointmask -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name arc_length -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points0 -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points1 -type numeric -extractor iline3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points2 -type numeric -extractor iline3
-
-	echo "Initial Visualization"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iVisualization
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iVisualization -name libmesh-sedimentation-opt::iVisualization -filepath $PGDIR
-
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iVisualization -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iVisualization -tag oivisualization -type output
-
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name png -type file
+if [ "$access" == "extraction" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm EXTRACTION:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm EXTRACTION:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm EXTRACTION:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm EXTRACTION:CSV
+elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm INDEXING:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:CSV
+elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm INDEXING:FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:FASTBIT
+elif [ "$access" == "indexing" ] && [ "$cartridge" == "optimized_fastbit" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -tag iline0 -algorithm INDEXING:OPTIMIZED_FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -tag iline1 -algorithm INDEXING:OPTIMIZED_FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -tag iline2 -algorithm INDEXING:OPTIMIZED_FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -tag iline3 -algorithm INDEXING:OPTIMIZED_FASTBIT
 fi
+
+# line 0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name u -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name v -type numeric -extractor iline0
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name w -type numeric -extractor iline0
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name p -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name s -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name d -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name r -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name vtkvalidpointmask -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name arc_length -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name points0 -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name points1 -type numeric -extractor iline0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine0Extraction -set oline0iextraction -name points2 -type numeric -extractor iline0
+
+# line 1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name u -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name v -type numeric -extractor iline1
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name w -type numeric -extractor iline1
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name p -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name s -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name d -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name r -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name vtkvalidpointmask -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name arc_length -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name points0 -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name points1 -type numeric -extractor iline1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine1Extraction -set oline1iextraction -name points2 -type numeric -extractor iline1
+
+# line 2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name u -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name v -type numeric -extractor iline2
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name w -type numeric -extractor iline2
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name p -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name s -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name d -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name r -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name vtkvalidpointmask -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name arc_length -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name points0 -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name points1 -type numeric -extractor iline2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine2Extraction -set oline2iextraction -name points2 -type numeric -extractor iline2
+
+# line 3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name u -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name v -type numeric -extractor iline3
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name w -type numeric -extractor iline3
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name p -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name s -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name d -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name r -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name vtkvalidpointmask -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name arc_length -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points0 -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points1 -type numeric -extractor iline3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iLine3Extraction -set oline3iextraction -name points2 -type numeric -extractor iline3
+
+echo "Initial Visualization"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag iVisualization
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation iVisualization -name libmesh-sedimentation-opt::iVisualization -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iVisualization -tag ogetmaximumiterationstotransport -type input -dependency getMaximumIterationsToTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation iVisualization -tag oivisualization -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation iVisualization -set oivisualization -name png -type file
 
 echo "Solver Simulation to the Flow"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag solverSimulationFlow
@@ -426,184 +398,143 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation m
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name time_step -type numeric
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshWriter -set omeshwriter -name xdmf -type file
 
-if [ "$dimension" == "2" ]; then
-	# 2D Analysis
-	echo "Data Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag dataExtraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation dataExtraction -name libmesh-sedimentation-opt::DataExtraction -filepath $PGDIR
+# Analysis
+echo "Horizontal Line Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line0Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line0Extraction -name libmesh-sedimentation-opt::Line0Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation dataExtraction -tag odataextraction -type output
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line0Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line0Extraction -tag oline0extraction -type output
 
-	if [ "$access" == "extraction" ]; then
-		# extraction
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm EXTRACTION:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
-		# indexing - csv
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm INDEXING:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
-		# indexing - fastbit
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm INDEXING:FASTBIT
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "optimized_fastbit" ]; then
-		# indexing - fastbit
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation dataExtraction -set odataextraction -tag rde -algorithm INDEXING:OPTIMIZED_FASTBIT
-	fi
+echo "Vertical Line 1 Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line1Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line1Extraction -name libmesh-sedimentation-opt::Line1Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name u -type numeric -extractor rde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name v -type numeric -extractor rde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name p -type numeric -extractor rde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name s -type numeric -extractor rde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name d -type numeric -extractor rde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name points0 -type numeric -extractor rde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name points1 -type numeric -extractor rde
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation dataExtraction -set odataextraction -name points2 -type numeric -extractor rde
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line1Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line1Extraction -tag oline1extraction -type output
 
-elif [ "$dimension" == "3" ]; then
-	# 3D Analysis
-	echo "Horizontal Line Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line0Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line0Extraction -name libmesh-sedimentation-opt::Line0Extraction -filepath $PGDIR
+echo "Vertical Line 2 Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line2Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line2Extraction -name libmesh-sedimentation-opt::Line2Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line0Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line0Extraction -tag oline0extraction -type output
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line2Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line2Extraction -tag oline2extraction -type output
 
-	echo "Vertical Line 1 Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line1Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line1Extraction -name libmesh-sedimentation-opt::Line1Extraction -filepath $PGDIR
+echo "Vertical Line 3 Extraction"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line3Extraction
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line3Extraction -name libmesh-sedimentation-opt::Line3Extraction -filepath $PGDIR
 
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line1Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line1Extraction -tag oline1extraction -type output
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line3Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line3Extraction -tag oline3extraction -type output
 
-	echo "Vertical Line 2 Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line2Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line2Extraction -name libmesh-sedimentation-opt::Line2Extraction -filepath $PGDIR
-
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line2Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line2Extraction -tag oline2extraction -type output
-
-	echo "Vertical Line 3 Extraction"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag line3Extraction
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation line3Extraction -name libmesh-sedimentation-opt::Line3Extraction -filepath $PGDIR
-
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line3Extraction -tag osolversimulationtransport -type input -dependency solverSimulationTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation line3Extraction -tag oline3extraction -type output
-
-	if [ "$access" == "extraction" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm EXTRACTION:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm EXTRACTION:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm EXTRACTION:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm EXTRACTION:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm INDEXING:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:CSV
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:CSV
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm INDEXING:FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:FASTBIT
-	elif [ "$access" == "indexing" ] && [ "$cartridge" == "optimized_fastbit" ]; then
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm INDEXING:OPTIMIZED_FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:OPTIMIZED_FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:OPTIMIZED_FASTBIT
-		java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:OPTIMIZED_FASTBIT
-	fi
-
-	# line 0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name u -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name v -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name w -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name p -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name s -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name d -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name r -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name vtkvalidpointmask -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name arc_length -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name points0 -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name points1 -type numeric -extractor line0
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name points2 -type numeric -extractor line0
-
-	# line 1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name u -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name v -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name w -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name p -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name s -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name d -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name r -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name vtkvalidpointmask -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name arc_length -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name points0 -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name points1 -type numeric -extractor line1
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name points2 -type numeric -extractor line1
-
-	# line 2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name u -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name v -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name w -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name p -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name s -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name d -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name r -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name vtkvalidpointmask -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name arc_length -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name points0 -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name points1 -type numeric -extractor line2
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name points2 -type numeric -extractor line2
-
-	# line 3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name xdmf -type file
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name u -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name v -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name w -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name p -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name s -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name d -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name r -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name vtkvalidpointmask -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name arc_length -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points0 -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points1 -type numeric -extractor line3
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points2 -type numeric -extractor line3
-
-	echo "Visualization"
-	java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag visualization
-	java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation visualization -name libmesh-sedimentation-opt::Visualization -filepath $PGDIR
-
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag osolversimulationtransport -type input -dependency solverSimulationTransport
-	java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag ovisualization -type output
-
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name simulationID -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name time_step -type numeric
-	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name png -type file
+if [ "$access" == "extraction" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm EXTRACTION:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm EXTRACTION:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm EXTRACTION:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm EXTRACTION:CSV
+elif [ "$access" == "indexing" ] && [ "$cartridge" == "csv" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm INDEXING:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:CSV
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:CSV
+elif [ "$access" == "indexing" ] && [ "$cartridge" == "fastbit" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm INDEXING:FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:FASTBIT
+elif [ "$access" == "indexing" ] && [ "$cartridge" == "optimized_fastbit" ]; then
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line0Extraction -set oline0extraction -tag line0 -algorithm INDEXING:OPTIMIZED_FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line1Extraction -set oline1extraction -tag line1 -algorithm INDEXING:OPTIMIZED_FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line2Extraction -set oline2extraction -tag line2 -algorithm INDEXING:OPTIMIZED_FASTBIT
+	java -jar ../dfa/PG-1.0.jar -extractor -dataflow sedimentation -transformation line3Extraction -set oline3extraction -tag line3 -algorithm INDEXING:OPTIMIZED_FASTBIT
 fi
 
-# echo "Compute Statistics"
-# java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag computeStatistics
-# java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation computeStatistics -name libmesh-sedimentation-opt::ComputeStatistics -filepath $PGDIR
+# line 0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name u -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name v -type numeric -extractor line0
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name w -type numeric -extractor line0
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name p -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name s -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name d -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name r -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name vtkvalidpointmask -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name arc_length -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name points0 -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name points1 -type numeric -extractor line0
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line0Extraction -set oline0extraction -name points2 -type numeric -extractor line0
 
-# java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation computeStatistics -tag omeshwriter -type input -dependency meshWriter
-# java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation computeStatistics -tag ostatistics -type output
+# line 1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name u -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name v -type numeric -extractor line1
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name w -type numeric -extractor line1
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name p -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name s -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name d -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name r -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name vtkvalidpointmask -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name arc_length -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name points0 -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name points1 -type numeric -extractor line1
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line1Extraction -set oline1extraction -name points2 -type numeric -extractor line1
 
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeStatistics -set ostatistics -name simulationID -type numeric
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeStatistics -set ostatistics -name time_step -type numeric
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeStatistics -set ostatistics -name xdmf -type file
-# java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation computeStatistics -set ostatistics -name transport_amount -type numeric
+# line 2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name u -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name v -type numeric -extractor line2
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name w -type numeric -extractor line2
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name p -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name s -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name d -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name r -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name vtkvalidpointmask -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name arc_length -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name points0 -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name points1 -type numeric -extractor line2
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line2Extraction -set oline2extraction -name points2 -type numeric -extractor line2
+
+# line 3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name xdmf -type file
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name u -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name v -type numeric -extractor line3
+if [ "$dimension" == "3" ]; then
+	java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name w -type numeric -extractor line3
+fi
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name p -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name s -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name d -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name r -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name vtkvalidpointmask -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name arc_length -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points0 -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points1 -type numeric -extractor line3
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation line3Extraction -set oline3extraction -name points2 -type numeric -extractor line3
+
+echo "Visualization"
+java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag visualization
+java -jar ../dfa/PG-1.0.jar -program -dataflow sedimentation -transformation visualization -name libmesh-sedimentation-opt::Visualization -filepath $PGDIR
+
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag osolversimulationtransport -type input -dependency solverSimulationTransport
+java -jar ../dfa/PG-1.0.jar -set -dataflow sedimentation -transformation visualization -tag ovisualization -type output
+
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name simulationID -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name time_step -type numeric
+java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation visualization -set ovisualization -name png -type file
 
 echo "Mesh Aggregator"
 java -jar ../dfa/PG-1.0.jar -transformation -dataflow sedimentation -tag meshAggregator
