@@ -2,7 +2,7 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 
 # environments: xps-nacad,xps-home,inspiron-laptop
-environment="inspiron-laptop"
+environment="xps-home"
 PGDIR=""
 
 if [ "$environment" == "xps-nacad" ]; then

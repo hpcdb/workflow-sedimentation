@@ -3,7 +3,7 @@
 SOLVER=3D/lock_container
 SOLVER_IN=_cte
 # environments: xps-nacad,xps-home,inspiron-laptop
-environment="inspiron-laptop"
+environment="xps-home"
 experiment_dir=""
 
 if [ "$environment" == "xps-nacad" ]; then
@@ -21,7 +21,7 @@ rm output-solver.log
 rm output-statistics.log
 
 echo "time ../../libmesh-sedimentation/sediment-opt -i $SOLVER$SOLVER_IN.in -m $SOLVER.msh -e extraction.py -v visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a \"output-solver.log\""
-time ../../libmesh-sedimentation/sediment-opt -i $SOLVER$SOLVER_IN.in -m $SOLVER.msh -e extraction.py -v visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
+time ../../libmesh-sedimentation/sediment-opt -i $SOLVER$SOLVER_IN.in -m $SOLVER.msh -e $SOLVER_extraction.py -v $SOLVER_visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
 
 # mac
 #export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/lib/paraview-5.4:/usr/local/opt/gcc/lib/gcc/6/

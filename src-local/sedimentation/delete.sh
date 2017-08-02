@@ -24,7 +24,7 @@ echo "time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear
 echo "time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear_iterations;flag" > monitoring-transport.log
 
 # environments: xps-nacad,xps-home,inspiron-laptop
-ENVIRONMENT="inspiron-laptop"
+ENVIRONMENT="xps-home"
 cp -rf ../config/$ENVIRONMENT/* .
 
 mkdir prov
