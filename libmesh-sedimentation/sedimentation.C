@@ -679,6 +679,9 @@ int main(int argc, char** argv) {
         if (is_file_exist("abort.run")) break;
 
         if (is_file_exist("reset.run")) {
+            
+            cout << endl << endl << "----- RESET.RUN -----" << endl << endl;
+            
             GetPot reset(input);
 
             dt = reset("time/deltat", dt);
@@ -700,8 +703,6 @@ int main(int argc, char** argv) {
             r_fraction = reset("amr/r_fraction", r_fraction);
             c_fraction = reset("amr/c_fraction", c_fraction);
             max_h_level = reset("amr/max_h_level", max_h_level);
-
-
 
             refinement.refine_fraction() = r_fraction;
             refinement.coarsen_fraction() = c_fraction;
@@ -725,6 +726,8 @@ int main(int argc, char** argv) {
             sediment_transport.initial_linear_tolerance() = transport_initial_linear_solver_tol;
             sediment_transport.linear_tolerance_power() = linear_tolerance_power;
 
+            // remove file for resetting configuration
+            remove("reset.run");
         }
 
         // storing a copy of the solution vectors to be used in case of rejecting current time-step
