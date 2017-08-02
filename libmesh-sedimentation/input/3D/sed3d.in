@@ -45,12 +45,12 @@ mesh/dirichlet/nodisplacement  = '4'
 
 #------------------------------------------------------
 # refinement parameters
-amr/initial_unif_ref_mesh = 1
+amr/hlevels     = 0
 amr/max_r_steps = 2
-amr/r_fraction  = 0.7
-amr/c_fraction  = 0.1
+amr/r_fraction  = 0.9
+amr/c_fraction  = 0.001
 amr/max_h_level = 1
-amr/r_interval  = 2
+amr/r_interval  = 10
 amr/nelem_target = 0
 amr/amrc_flow_transp = true
 amr/first_step_refinement = true
@@ -89,7 +89,7 @@ ts_control/complete_flow_norm = false
 time/nssteady     = 30
 time/deltat       = 0.005
 time/init_time    = 0.0
-time/tmax         = 0.1
+time/tmax         = 5.0
 time/n_time_steps = 1000000
 time/theta        = 0.5
 time/dt_stab      = 0.5
@@ -102,8 +102,8 @@ flow_nonlinear_tolerance      = 1.0E-3
 transport_n_nonlinear_steps   = 10
 transport_nonlinear_tolerance = 1.0E-3
 max_linear_iterations         = 100
-flow_initial_linear_solver_tolerance = 0.01
-transport_initial_linear_solver_tolerance = 0.01 
+linear_solver_tolerance       = 1.0E-6
+
 
 #------------------------------------------------------
 # EQUATION PARAMETERS
@@ -116,5 +116,4 @@ ey          =  0.0
 ez          = -1.0
 
 # Write out every nth timestep to file.
-write_interval = 1
-catalyst_interval = 1
+write_interval = 100

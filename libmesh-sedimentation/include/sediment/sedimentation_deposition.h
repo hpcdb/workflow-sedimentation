@@ -60,7 +60,6 @@
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
-using namespace std;
 
 
 class SedimentationDeposition

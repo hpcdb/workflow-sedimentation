@@ -1,39 +1,21 @@
 #!/bin/bash
 # solver execution
 
-# environments:xps-nacad,xps-home,inspiron-laptop
-environment="inspiron-laptop"
+# environments: xps-nacad
+environment="xps-nacad"
 experiment_dir=""
-# mpi
-mpi=false
-processors=2
-# solver
-SOLVER_IN=3D/necker3d_cte.in
-SOLVER=3D/necker3d
 
 if [ "$environment" == "xps-nacad" ]; then
 	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
-elif [ "$environment" == "xps-home" ]; then
-	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
-elif [ "$environment" == "inspiron-laptop" ]; then
-	experiment_dir="/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation"
 fi
 
-export DYLD_LIBRARY_PATH=$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
-export LD_LIBRARY_PATH=$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
-
-echo $DYLD_LIBRARY_PATH
-echo $LD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
 
 rm output-solver.log
 rm output-statistics.log
 
-# without MPI
-if [ "$mpi" ]; then
-	time mpirun -np $processors ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER.msh -e $SOLVER_extraction.py -v $SOLVER_visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
-else	
-	time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER.msh -e $SOLVER_extraction.py -v $SOLVER_visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
-fi
+time ../../libmesh-sedimentation/sediment-opt -i 3D/lock_container_pc11.in -m 3D/lock_container_lc_25.msh -e extraction.py -v visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
 
 # mac
 #export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/lib/paraview-5.4:/usr/local/opt/gcc/lib/gcc/6/

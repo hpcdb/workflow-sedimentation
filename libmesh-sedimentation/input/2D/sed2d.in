@@ -10,11 +10,11 @@ version = 2.0
 mesh/file = 'necker2d.msh'
 
 xlock = 0.5
-hlock = 2.0
+hlock = 1.0
 
 # Mesh Refinement Parameters
 amr/hlevels     = 1
-amr/max_r_steps = 2
+amr/max_r_steps = 1
 amr/r_fraction  = 0.9
 amr/c_fraction  = 0.001
 amr/max_h_level = 1
@@ -33,7 +33,7 @@ amr/first_step_refinement = true
  
 # Flow Boundary Condition
 flow/dirichlet/slipx         = '1'
-#flow/dirichlet/slipy        = '4'
+#flow/dirichlet/slipy         = '4'
 flow/dirichlet/noslip        = '2 3'
 flow/dirichlet/pressure/zero = '4'
 
@@ -41,14 +41,13 @@ flow/dirichlet/pressure/zero = '4'
 #sediment transport boundary condition
 transport/deposition = '3'
 transport/neumann/erosion = '3' 
-transport/neumann/apply_bottom_flux = true
 
 
 #Mesh Moviment
 mesh/dirichlet/nodisplacement  = '4'
 
 #Time Step Control
-ts_control/model_name = FIXED
+ts_control/model_name = PID
 #ts_control/dt_init = 0.005
 ts_control/dt_min = 0.0001
 #ts_control/dt_max = 0.005
@@ -78,7 +77,7 @@ ts_control/complete_flow_norm = false
 time/nssteady     = 30
 time/deltat       = 0.001
 time/init_time    = 0.0
-time/tmax         = 5.0
+time/tmax         = 0.01
 time/n_time_steps = 1000000
 time/theta        = 1.0
 time/dt_stab      = 0.5
@@ -86,23 +85,12 @@ time/dt_stab      = 0.5
 #----------------------------------------------------
 # Linear and Non-Linear parameters
 
-flow_n_nonlinear_steps        = 11
-flow_nonlinear_tolerance      = 1.0e-3
-transport_n_nonlinear_steps   = 11
+flow_n_nonlinear_steps        = 10
+flow_nonlinear_tolerance      = 1.0e-2
+transport_n_nonlinear_steps   = 10
 transport_nonlinear_tolerance = 1.0E-3
-max_linear_iterations         = 400
-flow_initial_linear_solver_tolerance = 1.0E-5
-transport_initial_linear_solver_tolerance = 1.0E-7
-minimum_linear_solver_tolerance  = 1.0E-8
-linear_tolerance_power = 1.5
-
-#
-#------------------------------------------------------
-# Stabilization Parameters
-stabilization/dt_stab = 1.0
-stabilization/s_ref_bar_yzBeta = 1.0
-stabilization/delta_transient_factor = 0.1
-stabilization/rbvms = true
+max_linear_iterations         = 500
+linear_solver_tolerance       = 1.0E-6
 
 
 #------------------------------------------------------
@@ -117,5 +105,5 @@ c_factor    =  1.0
 
 
 # Write out every nth timestep to file.
-write_interval    = 100
+write_interval    = 2
 catalyst_interval = 1

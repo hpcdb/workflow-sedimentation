@@ -1,12 +1,12 @@
 // Gmsh project created on Fri Oct 28 15:48:31 2016
 xmin  = 0.0;
-xmax  = 20.0;
+xmax  = 10.0;
 ymin  = 0.0;
-ymax  = 2.0;
+ymax  = 1.0;
 zmin  = 0.0;
-zmax  = 2.0;
-xlock = 0.75;
-hlock = 2.0;
+zmax  = 1.0;
+xlock = 0.5;
+hlock = 1.0;
 
 lc    = 0.25;
 
@@ -190,3 +190,5 @@ Physical Surface("FRONT", 6)   = {10,11};
 Physical Volume("WATER", 7)    = {2};
 Physical Volume("SEDIMENT", 8) = {1};
 
+Mesh.RecombineAll = 1;
+Mesh.Algorithm    = 8;

@@ -31,7 +31,7 @@ class XDMFWriter
         void set_file_id(int n_time_file) {n_timestep = n_time_file; } 
         int  get_file_id() { return n_timestep; }
         string* write_time_step(EquationSystems &es, double time);
-        void mesh_changed_on();
+		void mesh_changed_on();
         virtual ~XDMFWriter();
 
     private:

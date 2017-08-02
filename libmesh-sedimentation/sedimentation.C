@@ -34,8 +34,6 @@
 #include "libmesh/perf_log.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h"
-#include "libmesh/elem.h"
-
 
 #include "libmesh/getpot.h"
 #include "libmesh/mesh_refinement.h"
@@ -83,6 +81,25 @@ using namespace std;
 void PrintStats(EquationSystems& es);
 
 void ComputeMassAndEnergy(EquationSystems& es, std::ostream &out, double &mass, double &mass_dep);
+
+double ramp(double t) {
+    double x[3];
+    double y[3];
+
+    x[0] = 0.0;
+    y[0] = 0.01;
+    x[1] = 1.0;
+    y[1] = 1.0;
+    x[2] = 1.0E04;
+    y[2] = 1.0;
+
+    double L0 = ((t - x[1])*(t - x[2])) / ((x[0] - x[1])*(x[0] - x[2]));
+    double L1 = ((t - x[0])*(t - x[2])) / ((x[1] - x[0])*(x[1] - x[2]));
+    double L2 = ((t - x[0])*(t - x[1])) / ((x[2] - x[0])*(x[2] - x[1]));
+
+    return (y[0] * L0 + y[1] * L1 + y[2] * L2);
+
+}
 
 bool is_file_exist(const char *fileName) {
     std::ifstream infile(fileName);
@@ -282,7 +299,7 @@ int main(int argc, char** argv) {
 
     // INPUT: TIME INTEGRATION
     Real dt_init = infile("time/deltat", 0.005);
-    unsigned int n_time_steps = infile("time/n_time_steps", 10000000);
+    unsigned int n_time_steps = infile("time/n_time_steps", 1000);
     Real tmax = infile("time/tmax", 0.1);
     equation_systems.parameters.set<Real> ("tmax") = tmax;
 
@@ -318,8 +335,8 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("delta_transient_factor") = infile("stabilization/delta_transient_factor", 0.5);
     std::string fem_model = infile("stabilization/fem_model", "");
     equation_systems.parameters.set<std::string> ("fem_model") = fem_model;
-    Real yzBeta = infile("stabilization/yzBeta", 0.0);
-    equation_systems.parameters.set<Real> ("yzBeta") = yzBeta;
+    bool yzBeta = infile("stabilization/yzBeta", true);
+    equation_systems.parameters.set<bool> ("yzBeta") = yzBeta;
 
 #ifdef PROVENANCE
     provenance.outputTSControlConfig(ts_control_model_name, dt_min, dt_max, tol_u, tol_s,
@@ -404,54 +421,8 @@ int main(int argc, char** argv) {
         std::cout << "\nOpening mesh file: " << mesh_file << std::endl;
 
         mesh.read(mesh_file);
-        
-        int size = infile.vector_variable_size("flow/dirichlet/inlet");
-        std::vector<int> inputwalls(size);
-        for (int i = 0; i < size; i++) 
-            inputwalls[i] = infile("flow/dirichlet/inlet", -1, i);
-        
-        int deposition_id = infile("transport/deposition", -1);
-        
-        if(infile("amr/refine_only_elements_on_deposition",false))
-        {
-            std::cout << "Refinning elements on depostion..." <<std::endl;
-            for(int h = 0; h < initial_unif_ref_mesh; h++) 
-            {
-                MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
-                const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
-                for (; el != end_el; ++el) {
-                    // Store a pointer to the element we are currently
-                    // working on.  This allows for nicer syntax later.
-                    Elem* elem = *el;
-                    
-                    bool has_inlet_wall      = false;
-                    bool has_deposition_wall = true;
-                    for(int s = 0; s < elem->n_sides(); s++)
-                        if(elem->neighbor(s)==NULL)
-                        {
-                            for(int i = 0; i < inputwalls.size(); i++)
-                                if(mesh.boundary_info->boundary_id(elem,s) == inputwalls[i])
-                                    has_inlet_wall = true;
-                               
-                            if(mesh.boundary_info->boundary_id(elem,s) == deposition_id)
-                                has_deposition_wall = true;
-                                
-                        }
-                    
-                    elem->set_refinement_flag(Elem::DO_NOTHING);
-                    if(has_inlet_wall && has_deposition_wall)
-                        elem->set_refinement_flag(Elem::REFINE);
-
-                }
-                
-                refinement.refine_elements();
-               
-            } 
-        }
-        else
-            refinement.uniformly_refine(initial_unif_ref_mesh);
-        
+        refinement.uniformly_refine(initial_unif_ref_mesh);
 
         equation_systems.parameters.set<int> ("dim") = mesh.mesh_dimension();
 
@@ -532,9 +503,9 @@ int main(int argc, char** argv) {
 
     // Print information about the mesh to the screen.
     mesh.print_info();
-    
+
     if (initial_unif_ref_mesh)
-        cout <<"  Applying "<<initial_unif_ref_mesh<<" level(s) of initial refinement throughout the mesh\n\n";
+        cout << "  Applying " << initial_unif_ref_mesh << " level(s) of initial refinement throughout the mesh\n\n";
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & transport_system =
@@ -573,7 +544,22 @@ int main(int argc, char** argv) {
             out_dat_name = rname + "_massXtime_PID.dat";
             foutMass.open(out_dat_name);
         }
-    }
+    }/*
+        else if (ts_control_model_name == "RES") {
+            ts_control = new timeStepControlResidual(dt_init, dt_min, dt_max, nsa_target_flow, nsa_target_transport, nsa_max, nsa_limit_flow, nsa_limit_transport, mult_factor_max, mult_factor_min, reduct_factor);
+            // to ensure not to use number NLI ratio for the first time-step control
+            equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_flow")      = flow_n_nonlinear_steps + 1;
+            equation_systems.parameters.set<unsigned int> ("old_n_non_linear_iter_transport") = transport_n_nonlinear_steps + 1;
+            dt = dt_init;
+            control_ts = true;
+            if (mesh.processor_id() == 0) {
+                out_dat_name = rname + "_dtXtime_RES.dat";
+                foutDt.open(out_dat_name);
+                out_dat_name = rname + "_massXtime_RES.dat";
+                foutMass.open(out_dat_name);
+            }
+       
+        }*/
     else if (ts_control_model_name == "PC11") {
         ts_control = new timeStepControlPC11(dt_init, dt_min, dt_max, nsa_max, tol_u, tol_s, pc11_theta, alpha, k_exp, s_min, s_max, complete_flow_norm);
         dt = dt_init;
@@ -620,6 +606,7 @@ int main(int argc, char** argv) {
     perf_log.start_event("Write", "XDMF");
     current_files = xdmf_writer.write_time_step(equation_systems, time);
     perf_log.stop_event("Write", "XDMF");
+    //cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
 #ifdef PROVENANCE
     perf_log.start_event("GetMaximumIterationsToFlow", "Provenance");
@@ -657,7 +644,7 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<double>("minimum_linear_solver_tolerance") = minimum_linear_solver_tol;
     equation_systems.parameters.set<unsigned int>("write_interval") = write_interval;
 
-    cout<<"\nAdopting "<<((fem_model=="SUPG/PSPG")? "SUPG/PSPG": "RbVMS")<< " to solve Flow and Transport problems\n"<<endl;
+    cout << "\nAdopting " << ((fem_model == "SUPG/PSPG") ? "SUPG/PSPG" : "RbVMS") << " to solve Flow and Transport problems\n" << endl;
 
     // Writing into a file the initial time-step value at the beginning of the simulation
     if (mesh.processor_id() == 0)
@@ -672,55 +659,27 @@ int main(int argc, char** argv) {
         provenance.incrementTaskID();
 #endif
 
-        if (is_file_exist("abort.run")) break;
+        if (is_file_exist("abort.run")) {
+            break;
+        }
 
-        if (is_file_exist("reset.run")) {            
+        if (is_file_exist("reset.run")) {
             GetPot reset(input);
-            
-            dt           = reset("time/deltat", dt);
-            tmax         = reset("time/tmax", tmax);
-            n_time_steps = reset("time/n_time_steps", n_time_steps);
+            dt = reset("time/deltat", 0.005);
+            tmax = reset("time/tmax", 0.1);
+            n_time_steps = reset("time/n_time_steps", 10);
 
-            flow_n_nonlinear_steps        = reset("flow_n_nonlinear_steps", flow_n_nonlinear_steps);
-            transport_n_nonlinear_steps   = reset("transport_n_nonlinear_steps", transport_n_nonlinear_steps);
-            flow_nonlinear_tolerance      = reset("flow_nonlinear_tolerance", flow_nonlinear_tolerance);
-            transport_nonlinear_tolerance = reset("transport_nonlinear_tolerance", transport_nonlinear_tolerance);
-            write_interval                = reset("write_interval", write_interval);
-            max_linear_iter               = reset("max_linear_iterations", max_linear_iter);
-            flow_initial_linear_solver_tol     = reset("flow_initial_linear_solver_tolerance", flow_initial_linear_solver_tol);
-            transport_initial_linear_solver_tol = reset("transport_initial_linear_solver_tolerance", transport_initial_linear_solver_tol);
-            minimum_linear_solver_tol       = reset("minimum_linear_solver_tolerance", minimum_linear_solver_tol);
-            linear_tolerance_power = reset("linear_tolerance_power", linear_tolerance_power);
+            flow_n_nonlinear_steps = reset("flow_n_nonlinear_steps", 10);
+            transport_n_nonlinear_steps = reset("transport_n_nonlinear_steps", 10);
+            flow_nonlinear_tolerance = reset("flow_nonlinear_tolerance", 1.0E-03);
+            transport_nonlinear_tolerance = reset("transport_nonlinear_tolerance", 1.0E-03);
+            write_interval = reset("write_interval", 10);
+            max_linear_iter = reset("max_linear_iterations", 2000);
 
-            ref_interval = reset("amr/r_interval", ref_interval);
-            r_fraction   = reset("amr/r_fraction", r_fraction);
-            c_fraction   = reset("amr/c_fraction", c_fraction);
-            max_h_level  = reset("amr/max_h_level", max_h_level);
-            
-            
-            
-            refinement.refine_fraction() = r_fraction;
-            refinement.coarsen_fraction() = c_fraction;
-            refinement.max_h_level() = max_h_level;
-            
-              
             // AKI DEVO INCLUIR TODOS OS PARÂMETROS LIDOS NO RESET
             equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iter;
-            equation_systems.parameters.set<double>("minimum_linear_solver_tolerance") = minimum_linear_solver_tol;
-            
             equation_systems.parameters.set<unsigned int>("write_interval") = write_interval;
             equation_systems.parameters.set<Real> ("tmax") = tmax;
-            
-            sediment_flow.non_linear_tolerance() = flow_nonlinear_tolerance;
-            sediment_flow.initial_linear_tolerance() = flow_initial_linear_solver_tol;
-            sediment_flow.max_nonlinear_iteractions() = flow_n_nonlinear_steps;
-            sediment_flow.linear_tolerance_power() = linear_tolerance_power;
-
-            sediment_transport.nonlinear_tolerance() = transport_nonlinear_tolerance;
-            sediment_transport.max_nonlinear_iteractions() = transport_n_nonlinear_steps;
-            sediment_transport.initial_linear_tolerance() = transport_initial_linear_solver_tol;
-            sediment_transport.linear_tolerance_power() = linear_tolerance_power;
-            
         }
 
         // storing a copy of the solution vectors to be used in case of rejecting current time-step
@@ -741,7 +700,7 @@ int main(int argc, char** argv) {
             equation_systems.parameters.set<Real> ("dt") = dt;
 
             // A pretty update message
-            std::cout << "\n" << std::setw(70)
+            std::cout << "\n" << std::setw(55)
                     << std::setfill('=')
                     << "\n";
             std::cout << " Time step ";
@@ -760,13 +719,13 @@ int main(int argc, char** argv) {
                         << "...";
                 std::cout << out.str() << std::endl;
             }
-            std::cout << std::setw(70)
-                      << std::setfill('=')
-                      << "\n";
+            std::cout << std::setw(55)
+                    << std::setfill('=')
+                    << "\n";
 
-            // SolverSimulationFlow
+            // SolverSimulationFluid
             sediment_flow.solve(t_step, dt, time, 0, diverged_flow);
-
+            // SolverSimulationTransport
             sediment_transport.solve(t_step, dt, time, 0, diverged_transport);
 
             n_flow_nonlinear_iterations_total += sediment_flow.nonlinear_iteractions();
@@ -806,7 +765,8 @@ int main(int argc, char** argv) {
                 flow_system.time = time;
                 transport_system.time = time;
 
-                // Recovering previous solution
+                cout << "Recovering previous solution " << endl;
+
                 perf_log.start_event("RestoreSolution", "Time-Step Control");
                 flow_system.solution->zero();
                 flow_system.solution->add(*flow_soln_saved);
@@ -833,12 +793,10 @@ int main(int argc, char** argv) {
                 provenance.inputComputeTimeStep();
                 perf_log.stop_event("ComputeTimeStep", "Provenance");
 #endif
-                
+
                 perf_log.start_event("computeTimeStep", "Time-Step Control");
                 if (t_step >= ts_control->getStartTimeStepControl() - 1 && (abs(equation_systems.parameters.get<Real> ("time") - tmax) > 1.0e-08 || !TimeStepAccepted))
                     ts_control->computeTimeStep(TimeStepAccepted, time, tmax, dt);
-                else
-                    cout<<"\n";
                 perf_log.start_event("computeTimeStep", "Time-Step Control");
 
 #ifdef PROVENANCE
@@ -859,10 +817,9 @@ int main(int argc, char** argv) {
 #endif
 
                 int beforeNActiveElem = mesh.n_active_elem();
-                std::cout << std::setw(70) << std::setfill('*') << std::endl;
-                std::cout << "\nMesh Refinement: " << std::endl;
+                std::cout << "\n****************** Mesh Refinement *******************  " << std::endl;
                 std::cout << " Considering Transport" << ((amrc_flow_transp && !first_step_refinement) ? " & Flow Variables\n" : " Variable\n");
-                std::cout << " Number of elements before AMR step: " << beforeNActiveElem << std::endl;
+                std::cout << "Number of elements before AMR step: " << beforeNActiveElem << std::endl;
 
                 ErrorVector error_flow, error;
                 KellyErrorEstimator error_estimator_flow;
@@ -911,12 +868,11 @@ int main(int argc, char** argv) {
 #endif 
 
                 int AfterNActiveElem = mesh.n_active_elem();
-                std::cout << " Number of elements after AMR step: " << AfterNActiveElem << std::endl;
+                std::cout << "Number of elements after AMR step: " << AfterNActiveElem << std::endl;
                 double var_nelem = double((AfterNActiveElem - beforeNActiveElem)) / beforeNActiveElem * 100;
-                std::cout << " Nelem variation = " << var_nelem << " %." << endl;
+                std::cout << "Nelem variation = " << var_nelem << " %." << endl;
 
-                std::cout << std::setw(70) << std::setfill('*') << std::endl;
-                std::cout << "\n";
+                std::cout << "******************************************************\n" << std::endl;
 #ifdef PROVENANCE
                 perf_log.start_event("MeshRefinement", "Provenance");
                 provenance.outputMeshRefinement(first_step_refinement, t_step, beforeNActiveElem, AfterNActiveElem);
@@ -924,15 +880,10 @@ int main(int argc, char** argv) {
 #endif
                 xdmf_writer.mesh_changed_on();
 
-                // getting the last accepted time-step value
-                double last_dt = equation_systems.parameters.get<Real>("dt"); // Keeping it for while cause ts_control instance is deleted in case of fixed TS. May be improved!!
+                // Solve Flow and Transport to new mesh
+                sediment_flow.solve(t_step, dt, time, 1, diverged_flow);
 
-                // Solve Flow and Transport problems to new mesh using last accepted time-step
-                //sediment_flow.solve(t_step, ts_control->getLastAcceptedTS(), time, 1, diverged_flow);
-                sediment_flow.solve(t_step, last_dt, time, 1, diverged_flow);
-
-                //sediment_transport.solve(t_step, ts_control->getLastAcceptedTS(), time, 1, diverged_transport);
-                sediment_transport.solve(t_step, last_dt, time, 1, diverged_transport);                
+                sediment_transport.solve(t_step, dt, time, 1, diverged_transport);
 
             }
         }
@@ -940,7 +891,7 @@ int main(int argc, char** argv) {
         sediment_deposition.ComputeDeposition();
 
 #ifdef MESH_MOVIMENT
-        std::cout << "Solving Mesh movement..." << std::endl;
+        std::cout << "Solving Mesh moviment..." << std::endl;
 
         //equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
         mesh_system.solve();
@@ -1038,8 +989,9 @@ int main(int argc, char** argv) {
 #endif
 
     } // end time step loop
-        
-    if (t_step % write_interval != 0) {
+
+    if (!diverged_flow && !diverged_transport) {
+        if (t_step % write_interval != 0) {
 
 #ifdef PROVENANCE
             provenance.incrementSubTaskID();
@@ -1048,10 +1000,10 @@ int main(int argc, char** argv) {
             perf_log.stop_event("MeshWriter", "Provenance");
 #endif
 
-        perf_log.start_event("Write", "XDMF");
-        current_files = xdmf_writer.write_time_step(equation_systems, time);
-        perf_log.stop_event("Write", "XDMF");
-            
+            perf_log.start_event("Write", "XDMF");
+            current_files = xdmf_writer.write_time_step(equation_systems, time);
+            perf_log.stop_event("Write", "XDMF");
+            //cout << "[WRITE] " + current_files[0] + " - " + current_files[1] << endl;
 
 #ifdef PROVENANCE
             perf_log.start_event("MeshWriter", "Provenance");
@@ -1059,11 +1011,11 @@ int main(int argc, char** argv) {
             perf_log.stop_event("MeshWriter", "Provenance");
 #endif
 
-        // Writing into a file time-step at current simulation time
-        if (mesh.processor_id() == 0)
-            foutDt << t_step << "  " << equation_systems.parameters.get<Real> ("time") << "  " << dt << endl;
+            // Writing into a file time-step at current simulation time
+            if (mesh.processor_id() == 0)
+                foutDt << t_step << "  " << equation_systems.parameters.get<Real> ("time") << "  " << dt << endl;
 
-    }
+        }
 
 #ifdef USE_CATALYST
         if ((t_step) % catalyst_interval != 0) {
@@ -1081,18 +1033,18 @@ int main(int argc, char** argv) {
         perf_log.start_event("MeshAggregator", "Provenance");
         provenance.meshAggregator(out_filename, libMesh::global_n_processors());
         perf_log.stop_event("MeshAggregator", "Provenance");
-        provenance.finishDataIngestor();
+        if (!is_file_exist("abort.run")) {
+            provenance.finishDataIngestor();
+        }
         solverPerformance.end();
 #endif
 
-    // Write time-step control performance
-    if (control_ts)
-        std::cout << *ts_control;
-
-    if (!diverged_flow && !diverged_transport) {
+        // Write time-step control performance
+        if (control_ts)
+            std::cout << *ts_control;
 
         // Write performance parameters to output file
-        std::cout << "\n End of Simulation: " << ((flow_sstate_count > n_flow_sstate && transport_sstate_count > n_transport_sstate) ? "Steady-State reached!\n                   ---------------------" : "Final Simulation time reached!\n                    ------------------------------")
+        std::cout << "\n End of Simulation: " << ((flow_sstate_count > n_flow_sstate && transport_sstate_count > n_transport_sstate) ? "Steady-State reached!\n                   ---------------------" : "Final Simulation time reached!\n                   ----------------------------")
                 << "\n Final number of active elements = " << mesh.n_active_elem() << endl;
         std::cout << "\nPERFORMANCE PARAMETERS"
                 << "\n Total number of non-linear iterations: "
@@ -1135,8 +1087,7 @@ int main(int argc, char** argv) {
 
         // All done.
         cout << "\nAll done!" << endl;
-
-    } else  {
+    } else {
         cout << "\nSimulation diverged. Aborting!\n";
     }
 

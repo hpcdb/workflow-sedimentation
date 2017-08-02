@@ -4,7 +4,7 @@ clear
 
 # Restart MonetDB
 cd ../dfa
-./reinit-monetdb.sh
+./restart-monetdb.sh
 
 # delete files from the previous execution
 cd ../sedimentation
