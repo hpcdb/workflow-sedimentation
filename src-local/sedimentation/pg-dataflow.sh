@@ -1,6 +1,17 @@
 rm -rf prov/di/*
 rm -rf prov/pg/*
 
+# environments:xps-nacad,xps-home
+environment="xps-home"
+PGDIR=""
+
+if [ "$environment" == "xps-nacad" ]; then
+	PGDIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+elif [ "$environment" == "xps-home" ]; then
+	PGDIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+fi
+
+
 # Ubuntu - Inspiron
 #PGDIR=/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation
 # docker
@@ -8,7 +19,7 @@ rm -rf prov/pg/*
 # Virtual Box - mint
 #PGDIR=/home/vitor/dev/workflow-sedimentation/libmesh-sedimentation
 # Ubuntu
-PGDIR=/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation
+# PGDIR=/home/vitor/Documents/dev/workflow-sedimentation/libmesh-sedimentation
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
 # LoboC

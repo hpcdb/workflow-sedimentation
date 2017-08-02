@@ -12,14 +12,9 @@ void SedimentationDeposition::init() {
 
     ExplicitSystem & deposition_system = es.add_system<ExplicitSystem>("deposition");
     ExplicitSystem & deposition_rate   = es.add_system<ExplicitSystem>("deposition rate");
-    //ExplicitSystem & bed_load = es.add_system<ExplicitSystem>("bed load");
-
+    
     deposition_system.add_variable("d");
     deposition_rate.add_variable("r");
-    //bed_load.add_variable("q-x");
-    //bed_load.add_variable("q-y");
-    //if (es.get_mesh().mesh_dimension() == 3)
-    //    bed_load.add_variable("q-z");
 
 }
 
@@ -66,41 +61,33 @@ void SedimentationDeposition::ComputeDeposition() {
 
     ExplicitSystem & deposition_rate = es.get_system<ExplicitSystem>("deposition rate");
 
-
+    // A reference to the DofMap object for this system.
     const DofMap& dof_map = sediment_system.get_dof_map();
     std::vector<dof_id_type> dof_indices_face;
 
     // Numeric ids corresponding to each variable in the system
     const unsigned int s_var = sediment_system.variable_number("s");
-    const unsigned int d_var = deposition_system.variable_number("d");
     const unsigned int r_var = deposition_rate.variable_number("r");
+
+    // Get a constant reference to the Finite Element type
     FEType fe_type = sediment_system.variable_type(s_var);
-
-    UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_type));
-
-    // A Gauss quadrature rule for numerical integration.
-    // Let the \p FEType object decide what order rule is appropriate.
-    QGauss qface(dim - 1, fe_type.default_quadrature_order());
-
-    // Tell the finite element object to use our quadrature rule.
-    fe_face->attach_quadrature_rule(&qface);
 
     const Real c_factor = es.parameters.get<Real>("c_factor");
     const Real Us = es.parameters.get<Real>("Us");
     const Real dt = es.parameters.get<Real>("dt");
-
 
     MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
     NumericVector<Number> & sys_soln(*sediment_system.current_local_solution);
     std::vector<Number> elem_soln;
     std::vector<Number> nodal_soln;
-    
-    
 
-    for (; el != end_el; ++el) {
-        // Store a pointer to the element we are currently
-        // working on.  This allows for nicer syntax later.
+    // To clear last deposition rate solution
+    deposition_rate.solution->zero();
+
+    for (; el != end_el; ++el) 
+    {
+        // Store a pointer to the element we are currently working on
         const Elem * elem = *el;
 
         for (unsigned int s = 0; s < elem->n_sides(); s++)
@@ -121,22 +108,16 @@ void SedimentationDeposition::ComputeDeposition() {
                     libmesh_assert_equal_to(nodal_soln.size(), side->n_nodes());
                     libmesh_assert_equal_to(nodal_soln.size(), dof_indices_face.size());
 
-                    for (int i = 0; i < side->n_nodes(); i++) {
+                    for (int i = 0; i < side->n_nodes(); i++) 
+                    {
                         const Node *node = side->get_node(i);
-                        unsigned int source_dof = node->dof_number(sediment_system.number(), s_var, 0);
-                        //unsigned int dep_dof = node->dof_number(deposition_system.number(), d_var, 0);
                         unsigned int r_dof = node->dof_number(deposition_rate.number(), r_var, 0);
-                        Number value = nodal_soln[i] * Us * dt*c_factor;
+                        Number value = nodal_soln[i] * Us * dt * c_factor;
                         deposition_rate.solution->set(r_dof, value);
-                        //deposition_system.solution->add(dep_dof, value);
-
-
                     }
-
                 }
             }
     }
-
 
     deposition_rate.solution->close();
     
@@ -321,15 +302,12 @@ void SedimentationDeposition::ComputeBedLoad() {
     }
 
 
-
     deposition_rate.solution->close();
     deposition_system.solution->close();
 
     deposition_rate.update();
     deposition_system.update();
    
-    
-
 
 }
 

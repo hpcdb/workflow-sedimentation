@@ -1,21 +1,37 @@
 #!/bin/bash
 # solver execution
 
-# environments: xps-nacad
-environment="xps-nacad"
+# environments:xps-nacad,xps-home
+environment="xps-home"
 experiment_dir=""
+# mpi
+mpi=false
+processors=2
+# solver
+SOLVER_IN=lock_necker3D_cte.in
+SOLVER=lock_necker3D
 
 if [ "$environment" == "xps-nacad" ]; then
 	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+elif [ "$environment" == "xps-home" ]; then
+	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
 fi
 
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
+export DYLD_LIBRARY_PATH=$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
+export LD_LIBRARY_PATH=$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
+
+echo $DYLD_LIBRARY_PATH
+echo $LD_LIBRARY_PATH
 
 rm output-solver.log
 rm output-statistics.log
 
-time ../../libmesh-sedimentation/sediment-opt -i lock_necker3D_pc11.in -m lock_necker3D.msh -e extraction.py -v visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
+# without MPI
+if [ "$mpi" ]; then
+	time mpirun -np $processors ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER.msh -e $SOLVER_extraction.py -v $SOLVER_visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
+else	
+	time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER.msh -e $SOLVER_extraction.py -v $SOLVER_visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
+fi
 
 # mac
 #export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/lib/paraview-5.4:/usr/local/opt/gcc/lib/gcc/6/

@@ -1,3 +1,1 @@
 time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear_iterations;flag
-0;0.0100000000;0.0016051461;0.0000000002;0.0000001420;13;ok
-0;0.0100000000;0.0026175456;0.0000000013;0.0000005088;15;ok

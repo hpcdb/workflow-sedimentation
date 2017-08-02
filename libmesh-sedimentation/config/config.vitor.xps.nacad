@@ -1,3 +1,0 @@
-export LIBMESH_DIR=/home/vitor/program/libmesh
-export PARAVIEW_VERSION=5.3
-export PARAVIEW_DIR=/home/vitor/program/paraview-5.3.0

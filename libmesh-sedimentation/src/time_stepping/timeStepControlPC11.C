@@ -138,7 +138,7 @@ void  timeStepControlPC11::computeSolutionChangeInTime(EquationSystems & es) {
     // PS: Must be checked cause "transport" system may not be defined
     if ( es.has_system("transport") ) {
         
-        std::cout << " \nChange Flow solution in time = " << r_flow;
+        //std::cout << " \nChange Flow solution in time = " << r_flow;
         
         TransientLinearImplicitSystem & transport_system_reference =
         es.get_system<TransientLinearImplicitSystem> ("transport");
@@ -169,14 +169,14 @@ void  timeStepControlPC11::computeSolutionChangeInTime(EquationSystems & es) {
             r_transport /= this->tol_S;
         }
         
-        std::cout << " \nChange Transport solution in time = " << r_transport << std::endl;        
+        //std::cout << " \nChange Transport solution in time = " << r_transport << std::endl;
     }
             
     // compute the maximum measure of the change in time for the systems
     this->rn = std::max(r_flow, r_transport);
 
-    std::cout << "\nMeasure of the solution change in current  time = " << this->rn << std::endl;
-    std::cout << "Measure of the solution change in previous time = " <<this->rn_1<<std::endl;
+    std::cout << "\n Measure of the solution change in current TS = " << this->rn;
+    //std::cout << "\n Measure of the solution change in previous TS = " <<this->rn_1;
 }
 
 void timeStepControlPC11::checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted)
@@ -197,12 +197,14 @@ void timeStepControlPC11::computeTimeStep(bool accepted, Real time, Real tmax, R
     
     if(!accepted)
     {
+        cout << "\n Current solution was REJECTED";
+        
         this->dt_avg -= dt;
        
         // For while next time-step will be reduced by an alpha factor [0,1]
         dt = this->alpha * dt;  
         
-        std::cout << " New calculated time step = " << dt << std::endl;
+        //std::cout << " New calculated time step = " << dt << std::endl;
         
         // For while next time-step will be reduced by an alpha factor [0,1] but not smaller than dt_min!
         dt = max(dt, this->dt_min);        
@@ -213,17 +215,17 @@ void timeStepControlPC11::computeTimeStep(bool accepted, Real time, Real tmax, R
         
     }else
     {   
-        std::cout << "\nCurrent solution was accepted";
+        std::cout << "\n Current solution was ACCEPTED";
                 
         if(this->keep_dt_min) {
-            std::cout <<" because time-step is minimum!" << std::endl;
+            std::cout <<" because time-step is minimum";
             // since current time-step value was accepted only because it is equal the minimum, it's value will be repeated
 
             //storing last accepted time-step
             this->dt_last = dt;
 
         } else {
-            std::cout <<"!" << std::endl;
+            //std::cout <<"!";
             double exp = 1.0/(this->k_exp+1.0);
             double dt_star = this->theta * pow( this->rn_1/(this->rn*this->rn ),exp) * dt*dt/this->dt_last;
             
@@ -232,7 +234,7 @@ void timeStepControlPC11::computeTimeStep(bool accepted, Real time, Real tmax, R
 
             dt = std::min(this->s_max*dt, std::max(this->s_min*dt, dt_star) );
 
-            std::cout << " New calculated time step = " << dt <<std::endl;
+            //std::cout << "\n New calculated time step = " << dt;
 
             // check time step range
             dt = max(dt,this->dt_min);
@@ -252,7 +254,7 @@ void timeStepControlPC11::computeTimeStep(bool accepted, Real time, Real tmax, R
     if (time+dt>tmax || tmax-(time+dt) < this->dt_min)
         dt = tmax - time;
 
-    std::cout << " Next adopted time step = " << dt <<". Var = "<<(dt-this->dt_last)/this->dt_last*100 <<"%"<< std::endl;
+    std::cout << "\n Next adopted time step = " << dt <<". Var = "<<(dt-this->dt_last)/this->dt_last*100 <<"%"<< std::endl;
 }
 
 

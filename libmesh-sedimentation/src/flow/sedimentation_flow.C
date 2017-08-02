@@ -3,6 +3,7 @@
 #include "libmesh/parsed_function.h"
 #include "libmesh/zero_function.h"
 #include "libmesh/perf_log.h"
+#include "libmesh/petsc_linear_solver.h"
 
 #include "define.h"
 
@@ -11,6 +12,53 @@
 #include "mesh_moviment.h"
 
 // Boundary conditions for the 2D test case
+
+double ramp(double t) 
+{
+    double x[3];
+    double y[3];
+
+    x[0] = 0.0;
+    y[0] = 0.01;
+    x[1] = 1.0;
+    y[1] = 1.0;
+    x[2] = 1.0E04;
+    y[2] = 1.0;
+
+    double L0 = ((t - x[1])*(t - x[2])) / ((x[0] - x[1])*(x[0] - x[2]));
+    double L1 = ((t - x[0])*(t - x[2])) / ((x[1] - x[0])*(x[1] - x[2]));
+    double L2 = ((t - x[0])*(t - x[1])) / ((x[2] - x[0])*(x[2] - x[1]));
+
+    return (y[0] * L0 + y[1] * L1 + y[2] * L2);
+
+}
+
+class InletVelocityXRampFunction : public FunctionBase<Number> {
+public:
+
+    InletVelocityXRampFunction(Real Vx) : _Vx(Vx) {
+        this->_initialized = true;
+    }
+
+    virtual Number operator()(const Point &, const Real = 0) {
+        libmesh_not_implemented();
+    }
+
+    virtual void operator()(const Point & p,
+            const Real time,
+            DenseVector<Number> & output) {
+        output(0) = _Vx*ramp(time);
+    }
+
+    virtual UniquePtr<FunctionBase<Number> > clone() const {
+        return UniquePtr<FunctionBase<Number> > (new InletVelocityXRampFunction(_Vx));
+    }
+
+private:
+    Real _Vx;
+ 
+};
+
 
 class HydrostaticPressureFunction : public FunctionBase<Number> {
 public:
@@ -218,6 +266,7 @@ void SedimentationFlow::setup(GetPot &infile) {
         if (infile.vector_variable_size("flow/dirichlet/inlet/constant/u") == 1) {
             Real u_value = infile("flow/dirichlet/inlet/constant/u", 0.0, 0);
             ConstFunction<Number> ubc(u_value);
+            //InletVelocityXRampFunction ubc(u_value);
             flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(inlet, velocity_x, &ubc));
         }
         if (infile.vector_variable_size("flow/dirichlet/inlet/constant/v") == 1) {
@@ -275,7 +324,7 @@ void SedimentationFlow::setup(GetPot &infile) {
     this->outbflow_id = infile("flow/neumann/outflow", -1);
 
     // For the lock exchange problem, we may initialize only the pressure as a hydrostatic field
-    flow_system.attach_init_function(init_flow);
+    if(infile("flow/has_initial_condition", false)) flow_system.attach_init_function(init_flow);
 
     cout << "\n";
 
@@ -285,18 +334,18 @@ void SedimentationFlow::assemble() {
     std::string fem_model = es.parameters.get<std::string> ("fem_model");
     switch (this->dim) {
         case 2:
-            if (fem_model == "SUPG/PSPG")
+            if (fem_model=="SUPG/PSPG")
                 this->assembleSUPG2D();
-            else if (fem_model == "RBVMS")
+            else if (fem_model=="RBVMS")
                 this->assembleRBVMS2D();
             else
                 this->assemble2D();
             break;
         default:
-            if (fem_model == "SUPG/PSPG")
+            if (fem_model=="SUPG/PSPG")
                 this->assembleSUPG3D();
-            else if (fem_model == "RBVMS")
-                this->assembleRBVMS3D();
+            else if (fem_model=="RBVMS")
+                this->assembleRBVMS3D();            
             else
                 this->assemble3D();
             break;
@@ -358,6 +407,8 @@ void SedimentationFlow::assemble3D() {
 
     // The element shape functions evaluated at the quadrature points.
     const std::vector<std::vector<Real> >& phi = fe_vel->get_phi();
+    
+    //const std::vector<std::vector<RealGradient> >& d2phi = fe_vel->get_d2phi();
 
     // The element shape function gradients for the velocity
     // variables evaluated at the quadrature points.
@@ -505,6 +556,7 @@ void SedimentationFlow::assemble3D() {
             Number c = 0.;
             Number u_mesh = 0.0, v_mesh = 0.0, w_mesh = 0.0;
             Gradient grad_u, grad_v, grad_w, grad_p;
+            Gradient laplace_u, laplace_v, laplace_w;
             Point f;
             f.zero();
 
@@ -532,6 +584,8 @@ void SedimentationFlow::assemble3D() {
                 grad_v.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_v[l]));
                 grad_w.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_w[l]));
                 grad_p.add_scaled(dphi[l][qp], flow_system.current_solution(dof_indices_p[l]));
+                
+                
 
             }
 
@@ -1035,7 +1089,8 @@ void SedimentationFlow::assemble2D() {
     return;
 }
 
-void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& diverged) {
+void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& diverged) 
+{
 
     int flow_nli_counter;
     this->_nonlinear_iteractions = 0;
@@ -1055,24 +1110,26 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
         std::ostringstream out;
 
         // We write the file in the ExodusII format.
-        out << std::setw(55)
+        out << std::setw(70)
                 << std::setfill('-')
                 << "\n"
                 << std::setfill(' ')
                 << std::setw(5)
                 << std::left
-                << "STEP"
-                << std::setw(5)
-                << "LI "
-                << std::setw(15)
+                << "Step"
+                << std::setw(10)
+                << "L. Iter."
+                << std::setw(12)
                 << "|b-AX|"
-                << std::setw(15)
+                << std::setw(12)
                 << "|du|"
-                << std::setw(15)
+                << std::setw(12)
                 << "|du|/|u|"
+                << std::setw(10)
+                << "C. R."
                 << "\n"
                 << std::right
-                << std::setw(55)
+                << std::setw(70)
                 << std::setfill('-')
                 << "\n";
         std::cout << out.str() << std::flush;
@@ -1081,12 +1138,9 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
     // before to start solving the non-linear problem we reset linear solver tolerance to the initial value defined by user
     es.parameters.set<Real> ("linear solver tolerance") = this->_initial_linear_tolerance;
 
-#ifdef PROVENANCE
-    // monitoring
-    Real initial_norm_delta;
-    Real final_norm_delta;
-#endif
-
+    
+    //flow_system.linear_solver->get_converged_reason();
+    
     // Fluid
     // FLOW NONLINEAR LOOP
     for (flow_nli_counter = 0; flow_nli_counter < _max_nonlinear_iteractions; ++flow_nli_counter) {
@@ -1131,7 +1185,12 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
         // Number of linear iterations for the current time-step is stored
         // to compute number of non-effective linear iterations in case of non acceptance of current time-step
         //n_rejected_flow_linear_iterations_per_ts += n_linear_iterations;
-
+        
+        //flow_system.linear_solver->get_converged_reason();
+        //PetscLinearSolver<Number > solver = *(flow_system.linear_solver.get());
+        //int flag = (*(flow_system.linear_solver.get())).get_converged_reason();
+        LinearConvergenceReason flag = flow_system.linear_solver->get_converged_reason();
+        
         {
             std::ostringstream out;
 
@@ -1139,14 +1198,16 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
             out << std::setw(5)
                     << std::left
                     << flow_nli_counter + 1
-                    << std::setw(5)
+                    << std::setw(10)
                     << _current_n_linear_iteractions
-                    << std::setw(15)
+                    << std::setw(12)
                     << _current_final_linear_residual
-                    << std::setw(15)
+                    << std::setw(12)
                     << norm_delta
-                    << std::setw(15)
+                    << std::setw(12)
                     << norm_delta / u_norm
+                    << std::setw(50)
+                    << Utility::enum_to_string(flag)
                     << "\n";
 
             std::cout << out.str() << std::flush;
@@ -1162,12 +1223,6 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
         perf_log->start_event("SolverSimulationFluid", "Provenance");
         prov->outputSolverSimulationFlow(t_step, dt, time, r_step, flow_nli_counter, _linear_iteractions, _current_final_linear_residual, norm_delta, norm_delta / u_norm, !diverged);
         perf_log->stop_event("SolverSimulationFluid", "Provenance");
-        // monitoring
-        if (flow_nli_counter == 0) {
-            initial_norm_delta = norm_delta;
-        } else {
-            final_norm_delta = norm_delta;
-        }
 #endif
 
         // Terminate the solution iteration if the difference between
@@ -1177,7 +1232,7 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
         {
             std::ostringstream out;
             // We write the file in the ExodusII format.
-            out << std::setw(55)
+            out << std::setw(70)
                     << std::setfill('-')
                     << "\n";
             std::cout << out.str()
@@ -1189,7 +1244,7 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
             std::cout << " Nonlinear solver did not converge after " << this->_max_nonlinear_iteractions << " iterations." << endl;
 
         // check for aborting simulation due divergence in flow solution
-        if (norm_delta > 1.0e3) {
+        if (norm_delta > 1.0e10) {
             diverged = true;
             break;
         }
@@ -1199,12 +1254,6 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
                 std::max(std::min(std::pow(this->_current_final_linear_residual, this->_linear_tolerance_power), this->_initial_linear_tolerance), min_lsolver_tol);
 
     } // end nonlinear loop
-
-#ifdef PROVENANCE
-    // monitoring - writing data into file
-    prov->writeMonitoringDataIntoFile("monitoring-flow.log", t_step, time, initial_norm_delta, final_norm_delta, _linear_iteractions);
-#endif    
-    
 }
 
 void SedimentationFlow::assembleSUPG2D() {
@@ -1305,7 +1354,7 @@ void SedimentationFlow::assembleSUPG2D() {
     const Real invPi = 1.0 / libMesh::pi;
     const NumberVectorValue norm(ex, ey);
     const Real Cs = es.parameters.get<Real>("Cs");
-    const Real tau_dt_contrib = dt_stab * 4.0 / (dt * dt);
+    const Real tau_dt_contrib = dt_stab * 4.0/(dt*dt);
 
     // Now we will loop over all the elements in the mesh that
     // live on the local processor.
@@ -1426,14 +1475,14 @@ void SedimentationFlow::assembleSUPG2D() {
 
                 const Number Udphi_i = U * dphi[i][qp];
 
-                Fu(i) += JxW[qp]*((phi[i][qp] + tau * Udphi_i) * u_old + // Galerkin and SUPG mass-vector term
-                        dt * (phi[i][qp] + tau * Udphi_i) * f(0)); // Galerkin and SUPG force term
+                Fu(i) += JxW[qp]*((phi[i][qp] + tau * Udphi_i) * u_old +        // Galerkin and SUPG mass-vector term
+                             dt * (phi[i][qp] + tau * Udphi_i) * f(0) );        // Galerkin and SUPG force term
 
-                Fv(i) += JxW[qp]*((phi[i][qp] + tau * Udphi_i) * v_old + // Galerkin and SUPG mass-vector term
-                        dt * (phi[i][qp] + tau * Udphi_i) * f(1)); // Galerkin and SUPG force term
+                Fv(i) += JxW[qp]*((phi[i][qp] + tau * Udphi_i) * v_old +        // Galerkin and SUPG mass-vector term
+                             dt * (phi[i][qp] + tau * Udphi_i) * f(1) );        // Galerkin and SUPG force term
 
-                Fp(i) += JxW[qp] * tau * (dphi[i][qp] * U_old + // PSPG mass vector
-                        dt * (dphi[i][qp] * f)); // PSPG force vector
+                Fp(i) += JxW[qp]*tau*(dphi[i][qp] * U_old +                     // PSPG mass vector
+                                  dt*(dphi[i][qp] * f) );                       // PSPG force vector
 
                 // Matrix contributions
                 for (unsigned int j = 0; j < n_u_dofs; j++) {
@@ -1448,31 +1497,31 @@ void SedimentationFlow::assembleSUPG2D() {
                     Kuv(i, j) += JxW[qp] * dt * uRe_smg * (dphi[i][qp](1) * dphi[j][qp](0)); // XY diffusion term
                     Kup(i, j) += JxW[qp]*(-dt * dphi[i][qp](0) * phi[j][qp]); // X pressure gradient term
 
-                    Kvv(i, j) += JxW[qp]*(phi[i][qp] * phi[j][qp] + // mass matrix term
-                            dt * phi[i][qp] * Udphi_j + // convection term
-                            dt * uRe * (dphi[i][qp](0) * dphi[j][qp](0) +
-                            2.0 * dphi[i][qp](1) * dphi[j][qp](1))); // YY diffusion term
+                    Kvv(i, j) += JxW[qp]*( phi[i][qp] * phi[j][qp] +                     // mass matrix term
+                                     dt *  phi[i][qp] * Udphi_j    +                     // convection term
+                            dt * uRe * ( dphi[i][qp](0) * dphi[j][qp](0) +
+                                   2.0 * dphi[i][qp](1) * dphi[j][qp](1)) );             // YY diffusion term
                     Kvu(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](0) * dphi[j][qp](1)); // YX diffusion term
-                    Kvp(i, j) += JxW[qp]*(-dt * dphi[i][qp](1) * phi[j][qp]); // Y pressure gradient term
+                    Kvp(i, j) += JxW[qp]*(-dt * dphi[i][qp](1) * phi[j][qp]);            // Y pressure gradient term
 
                     Kpu(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](0)); // X divergent operator
                     Kpv(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](1)); // Y divergent operator
 
                     // SUPG Contribution
-                    Kuu(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kup(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](0)); // X pressure gradient term
+                    Kuu(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] +                 // mass-matrix term
+                                            dt * Udphi_i * Udphi_j);                     // advection term
+                    Kup(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](0));        // X pressure gradient term
 
-                    Kvv(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kvp(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](1)); // Y pressure gradient term
+                    Kvv(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] +                 // mass-matrix term
+                                            dt * Udphi_i * Udphi_j);                     // advection term
+                    Kvp(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](1));        // Y pressure gradient term
 
                     //  PSPG contribution
-                    Kpu(i, j) += JxW[qp] * (tau * (dphi[i][qp](0) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](0) * Udphi_j)); // advection term
-                    Kpv(i, j) += JxW[qp] * (tau * (dphi[i][qp](1) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](1) * Udphi_j)); // advection term
-                    Kpp(i, j) += JxW[qp] * dt * tau * (dphi[i][qp] * dphi[j][qp]); // gradient operator
+                    Kpu(i, j) += JxW[qp] * (tau * (dphi[i][qp](0) * phi[j][qp] +         // mass-matrix term
+                                             dt *  dphi[i][qp](0) * Udphi_j) );          // advection term
+                    Kpv(i, j) += JxW[qp] * (tau * (dphi[i][qp](1) * phi[j][qp] +         // mass-matrix term
+                                             dt *  dphi[i][qp](1) * Udphi_j) );          // advection term
+                    Kpp(i, j) += JxW[qp] * dt * tau * (dphi[i][qp] * dphi[j][qp]);       // gradient operator
 
                     // LSIC contribution
                     Kuu(i, j) += JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](0); // XX  operator
@@ -1601,8 +1650,8 @@ void SedimentationFlow::assembleSUPG3D() {
     const Real invPi = 1.0 / libMesh::pi;
     const NumberVectorValue norm(ex, ey, ez);
     const Real Cs = es.parameters.get<Real>("Cs");
-    const Real um_terco = 1.0 / 3.0;
-    const Real tau_dt_contrib = dt_stab * 4.0 / (dt * dt);
+    const Real um_terco = 1.0/3.0;
+    const Real tau_dt_contrib =  dt_stab * 4.0/(dt*dt);
 
     // Now we will loop over all the elements in the mesh that
     // live on the local processor.
@@ -1757,59 +1806,59 @@ void SedimentationFlow::assembleSUPG3D() {
                     const Number Udphi_j = U * dphi[j][qp];
 
                     // Galerkin contribution
-                    Kuu(i, j) += JxW[qp]*(phi[i][qp] * phi[j][qp] + // mass matrix term
-                            dt * phi[i][qp] * Udphi_j + // convection term
-                            dt * uRe * (2.0 * dphi[i][qp](0) * dphi[j][qp](0) +
-                            dphi[i][qp](1) * dphi[j][qp](1) +
-                            dphi[i][qp](2) * dphi[j][qp](2))); // XX diffusion term
+                    Kuu(i, j) += JxW[qp]*( phi[i][qp] * phi[j][qp] +                     // mass matrix term
+                                     dt *  phi[i][qp] * Udphi_j    +                     // convection term
+                               dt * uRe * (2.0 * dphi[i][qp](0) * dphi[j][qp](0) +
+                                                 dphi[i][qp](1) * dphi[j][qp](1) +
+                                                 dphi[i][qp](2) * dphi[j][qp](2) ) );    // XX diffusion term
                     Kuv(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](1) * dphi[j][qp](0)); // XY diffusion term
                     Kuw(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](2) * dphi[j][qp](0)); // XZ diffusion term
-                    Kup(i, j) += JxW[qp]*(-dt * dphi[i][qp](0) * phi[j][qp]); // X pressure gradient term
+                    Kup(i, j) += JxW[qp]*(-dt * dphi[i][qp](0) * phi[j][qp]);            // X pressure gradient term
 
-                    Kvv(i, j) += JxW[qp]*(phi[i][qp] * phi[j][qp] + // mass matrix term
-                            dt * phi[i][qp] * Udphi_j + // convection term
-                            dt * uRe * (dphi[i][qp](0) * dphi[j][qp](0) +
-                            2.0 * dphi[i][qp](1) * dphi[j][qp](1) +
-                            dphi[i][qp](2) * dphi[j][qp](2))); // YY diffusion term
+                    Kvv(i, j) += JxW[qp]*( phi[i][qp] * phi[j][qp] +                     // mass matrix term
+                                     dt *  phi[i][qp] * Udphi_j    +                     // convection term
+                            dt * uRe * ( dphi[i][qp](0) * dphi[j][qp](0) +
+                                   2.0 * dphi[i][qp](1) * dphi[j][qp](1) +
+                                         dphi[i][qp](2) * dphi[j][qp](2) ) );            // YY diffusion term
                     Kvu(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](0) * dphi[j][qp](1)); // YX diffusion term
                     Kvw(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](2) * dphi[j][qp](1)); // YZ diffusion term
-                    Kvp(i, j) += JxW[qp]*(-dt * dphi[i][qp](1) * phi[j][qp]); // Y pressure gradient term
+                    Kvp(i, j) += JxW[qp]*(-dt * dphi[i][qp](1) * phi[j][qp]);            // Y pressure gradient term
 
-                    Kww(i, j) += JxW[qp]*(phi[i][qp] * phi[j][qp] + // mass matrix term
-                            dt * phi[i][qp] * Udphi_j + // convection term
-                            dt * uRe * (dphi[i][qp](0) * dphi[j][qp](0) +
-                            dphi[i][qp](1) * dphi[j][qp](1) +
-                            2.0 * dphi[i][qp](2) * dphi[j][qp](2))); // ZZ diffusion term
+                    Kww(i, j) += JxW[qp]*( phi[i][qp] * phi[j][qp] +                     // mass matrix term
+                                     dt *  phi[i][qp] * Udphi_j    +                     // convection term
+                            dt * uRe * ( dphi[i][qp](0) * dphi[j][qp](0) +
+                                         dphi[i][qp](1) * dphi[j][qp](1) +
+                                   2.0 * dphi[i][qp](2) * dphi[j][qp](2) ) );            // ZZ diffusion term
                     Kwu(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](0) * dphi[j][qp](2)); // ZX diffusion term
                     Kwv(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](1) * dphi[j][qp](2)); // ZY diffusion term
-                    Kwp(i, j) += JxW[qp]*(-dt * dphi[i][qp](2) * phi[j][qp]); // Z pressure gradient term
+                    Kwp(i, j) += JxW[qp]*(-dt * dphi[i][qp](2) * phi[j][qp]);            // Z pressure gradient term
 
-                    Kpu(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](0)); // X divergent operator
-                    Kpv(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](1)); // Y divergent operator
-                    Kpw(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](2)); // Z divergent operator
+                    Kpu(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](0));           // X divergent operator
+                    Kpv(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](1));           // Y divergent operator
+                    Kpw(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](2));           // Z divergent operator
 
                     // SUPG Contribution
-                    Kuu(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kup(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](0)); // X pressure gradient term
+                    Kuu(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] +                 // mass-matrix term
+                                            dt * Udphi_i * Udphi_j );                    // advection term
+                    Kup(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](0));        // X pressure gradient term
 
-                    Kvv(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kvp(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](1)); // Y pressure gradient term
+                    Kvv(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] +                 // mass-matrix term
+                                            dt * Udphi_i * Udphi_j );                    // advection term
+                    Kvp(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](1));        // Y pressure gradient term
 
-                    Kww(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kwp(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](2)); // Z pressure gradient term
+                    Kww(i, j) += JxW[qp] * tau * (Udphi_i * phi[j][qp] +                 // mass-matrix term
+                                            dt * Udphi_i * Udphi_j );                    // advection term
+                    Kwp(i, j) += JxW[qp] * (dt * tau * Udphi_i * dphi[j][qp](2));        // Z pressure gradient term
 
 
                     //  PSPG contribution
-                    Kpu(i, j) += JxW[qp] * (tau * (dphi[i][qp](0) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](0) * Udphi_j)); // advection term
-                    Kpv(i, j) += JxW[qp] * (tau * (dphi[i][qp](1) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](1) * Udphi_j)); // advection term
-                    Kpw(i, j) += JxW[qp] * (tau * (dphi[i][qp](2) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](2) * Udphi_j)); // advection term
-                    Kpp(i, j) += JxW[qp] * dt * tau * (dphi[i][qp] * dphi[j][qp]); // gradient operator
+                    Kpu(i, j) += JxW[qp] * (tau * (dphi[i][qp](0) * phi[j][qp] +         // mass-matrix term
+                                             dt *  dphi[i][qp](0) * Udphi_j) );          // advection term
+                    Kpv(i, j) += JxW[qp] * (tau * (dphi[i][qp](1) * phi[j][qp] +         // mass-matrix term
+                                             dt *  dphi[i][qp](1) * Udphi_j) );          // advection term
+                    Kpw(i, j) += JxW[qp] * (tau * (dphi[i][qp](2) * phi[j][qp] +         // mass-matrix term
+                                             dt *  dphi[i][qp](2) * Udphi_j) );          // advection term
+                    Kpp(i, j) += JxW[qp] * dt * tau * (dphi[i][qp] * dphi[j][qp]);       // gradient operator
 
                     // LSIC contribution
                     Kuu(i, j) += JxW[qp] * teta * dt * dphi[i][qp](0) * dphi[j][qp](0); // XX  operator
@@ -1820,9 +1869,9 @@ void SedimentationFlow::assembleSUPG3D() {
                     Kvv(i, j) += JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](1); // YY  operator
                     Kvw(i, j) += JxW[qp] * teta * dt * dphi[i][qp](1) * dphi[j][qp](2); // YZ  operator
 
-                    Kwu(i, j) += JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](0); // ZX  operator
-                    Kwv(i, j) += JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](1); // ZY  operator
-                    Kww(i, j) += JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](2); // ZZ  operator
+                    Kwu(i, j) += JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](0);  // ZX  operator
+                    Kwv(i, j) += JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](1);  // ZY  operator
+                    Kww(i, j) += JxW[qp] * teta * dt * dphi[i][qp](2) * dphi[j][qp](2);  // ZZ  operator
                 }
             }
         } // end of the quadrature point qp-loop
@@ -1855,7 +1904,7 @@ void SedimentationFlow::assembleRBVMS2D() {
 
     TransientLinearImplicitSystem & flow_system =
             es.get_system<TransientLinearImplicitSystem> ("flow");
-
+    
     TransientLinearImplicitSystem & transport_system =
             es.get_system<TransientLinearImplicitSystem> ("transport");
 
@@ -2004,17 +2053,17 @@ void SedimentationFlow::assembleRBVMS2D() {
             f.zero();
 
             RealGradient g = compute_g(fe_vel.get(), 2, qp);
-            RealTensor G = compute_G(fe_vel.get(), 2, qp);
+            RealTensor   G = compute_G(fe_vel.get(), 2, qp);
 
             // to compute variable values at integration points            
             for (unsigned int l = 0; l < n_u_dofs; l++) {
                 // From the old time step:
                 u_old += phi[l][qp] * flow_system.old_solution(dof_indices_u[l]);
                 v_old += phi[l][qp] * flow_system.old_solution(dof_indices_v[l]);
-
+                
 #ifdef MESH_MOVIMENT
                 double vel = one_dt * mesh_system.current_solution(dof_indices_mesh[l]);
-                v_mesh += phi[l][qp] * vel;
+                v_mesh  += phi[l][qp] * vel;
 #endif              
 
                 // From the previous non linear iterate:
@@ -2039,13 +2088,13 @@ void SedimentationFlow::assembleRBVMS2D() {
             // Residual VMS term
             Real r_m_x = (u - u_old) / dt + (U * grad_u) + grad_p(0) - f(0);
             Real r_m_y = (v - v_old) / dt + (U * grad_v) + grad_p(1) - f(1);
-
+            
             // Stabilization parameters
             Real tau_m = compute_tau_M(g, G, U, uRe, dt, dt_stab);
-            Real tau_c = compute_tau_C(g, tau_m);
+            Real tau_c = compute_tau_C(g, tau_m);            
 
             // Velocity fine scale
-            const NumberVectorValue Ufine(-tau_m * r_m_x, -tau_m * r_m_y); // u'           
+            const NumberVectorValue Ufine(-tau_m * r_m_x, -tau_m * r_m_y ); // u'           
             // Velocity vector plus fine scale
             const NumberVectorValue Uvms = U + Ufine; // u^h - u^'
 
@@ -2056,73 +2105,73 @@ void SedimentationFlow::assembleRBVMS2D() {
                 const Number Ufinedphi_i = Ufine * dphi[i][qp];
                 const Number phi_iTauUdphi_i = phi[i][qp] + tau_m * Udphi_i;
 
-                Fu(i) += JxW[qp]*(phi_iTauUdphi_i * u_old + // Galerkin & SUPG mass vector term
-                        dt * (phi_iTauUdphi_i * f(0) + // Galerkin & SUPG body force vector
-                        Ufinedphi_i * Ufine(0))); // VMS velocity fine scales tensorial product. PS: computed at integration point
+                Fu(i) += JxW[qp]*( phi_iTauUdphi_i * u_old +                    // Galerkin & SUPG mass vector term
+                             dt *( phi_iTauUdphi_i * f(0) +                     // Galerkin & SUPG body force vector
+                                    Ufinedphi_i * Ufine(0) ) );                 // VMS velocity fine scales tensorial product. PS: computed at integration point
+                        
+                Fv(i) += JxW[qp]*( phi_iTauUdphi_i * v_old +                    // Galerkin & SUPG mass vector term
+                             dt *( phi_iTauUdphi_i * f(1) +                     // Galerkin & SUPG body force vector
+                                    Ufinedphi_i * Ufine(1) ) );                 // VMV velocity fine scales tensorial product. PS: computed at integration point
 
-                Fv(i) += JxW[qp]*(phi_iTauUdphi_i * v_old + // Galerkin & SUPG mass vector term
-                        dt * (phi_iTauUdphi_i * f(1) + // Galerkin & SUPG body force vector
-                        Ufinedphi_i * Ufine(1))); // VMV velocity fine scales tensorial product. PS: computed at integration point
-
-                Fp(i) += JxW[qp] * tau_m * (U_old * dphi[i][qp] + //PSPG mass vector
-                        dt * (dphi[i][qp] * f)); //PSPG buoyancy vector
+                Fp(i) += JxW[qp] * tau_m * (U_old * dphi[i][qp] +               //PSPG mass vector
+                              dt * (dphi[i][qp] * f) );                         //PSPG buoyancy vector
 
                 // Matrix contributions: j-loop
                 for (unsigned int j = 0; j < n_u_dofs; j++) {
 
                     const Number Uvmsdphi_j = Uvms * dphi[j][qp];
-                    const Number Udphi_j = U * dphi[j][qp];
+                    const Number Udphi_j    = U * dphi[j][qp];
                     const Number phi_iphi_j = phi[i][qp] * phi[j][qp];
 
                     // Galerkin contribution
                     // G.1: u row
-                    Kuu(i, j) += JxW[qp] * (phi_iphi_j + // mass matrix term
-                            dt * (phi[i][qp] * Uvmsdphi_j + // convection term                            
-                            uRe * (2.0 * dphi[i][qp](0) * dphi[j][qp](0) +
-                            dphi[i][qp](1) * dphi[j][qp](1)))); // XX diffusion term
+                    Kuu(i, j) += JxW[qp] * (phi_iphi_j +                                 // mass matrix term
+                                      dt * (phi[i][qp] * Uvmsdphi_j +                    // convection term                            
+                                     uRe * (2.0 * dphi[i][qp](0) * dphi[j][qp](0) +
+                                                  dphi[i][qp](1) * dphi[j][qp](1) ) ) ); // XX diffusion term
                     Kuv(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](1) * dphi[j][qp](0)); // XY diffusion term
-                    Kup(i, j) += JxW[qp]*(-dt * dphi[i][qp](0) * phi[j][qp]); // Pressure gradient
-
+                    Kup(i, j) += JxW[qp]*(-dt * dphi[i][qp](0) * phi[j][qp] );           // Pressure gradient
+                    
                     // G.2: v row
-                    Kvv(i, j) += JxW[qp] * (phi_iphi_j + // mass matrix term
-                            dt * (phi[i][qp] * Uvmsdphi_j + // convection term                            
-                            uRe * (2.0 * dphi[i][qp](1) * dphi[j][qp](1) +
-                            dphi[i][qp](0) * dphi[j][qp](0)))); // YY diffusion term
+                    Kvv(i, j) += JxW[qp] * (phi_iphi_j +                                 // mass matrix term
+                                      dt * (phi[i][qp] * Uvmsdphi_j +                    // convection term                            
+                                     uRe * (2.0 * dphi[i][qp](1) * dphi[j][qp](1) +
+                                                  dphi[i][qp](0) * dphi[j][qp](0) ) ) ); // YY diffusion term
                     Kvu(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](0) * dphi[j][qp](1)); // YX diffusion term
                     Kvp(i, j) += JxW[qp]*(-dt * dphi[i][qp](1) * phi[j][qp]);
 
                     // G.3: p row
-                    Kpu(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](0)); // X divergent operator
-                    Kpv(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](1)); // Y divergent operator
+                    Kpu(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](0));           // X divergent operator
+                    Kpv(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](1));           // Y divergent operator
 
                     // SUPG
                     // S1) u row                    
-                    Kuu(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kup(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](0)); // X pressure gradient term
+                    Kuu(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] +                  // mass-matrix term
+                                              dt * Udphi_i * Udphi_j );                     // advection term
+                    Kup(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](0) );        // X pressure gradient term
 
                     // S2) v row   
-                    Kvv(i, j) += JxW[qp] * tau_m * ((Udphi_i) * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kvp(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](1)); // Y pressure gradient term
+                    Kvv(i, j) += JxW[qp] * tau_m * ((Udphi_i) * phi[j][qp] +                // mass-matrix term
+                                              dt * Udphi_i * Udphi_j );                     // advection term
+                    Kvp(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](1));         // Y pressure gradient term
 
                     //  PSPG
                     // ----
                     //P.1) P row
-                    Kpu(i, j) += JxW[qp] * tau_m * (dphi[i][qp](0) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](0) * Udphi_j); // advection term
-                    Kpv(i, j) += JxW[qp] * tau_m * (dphi[i][qp](1) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](1) * Udphi_j); // advection term
-                    Kpp(i, j) += JxW[qp] * dt * tau_m * (dphi[i][qp] * dphi[j][qp]); // pressure gradient operator
+                    Kpu(i, j) += JxW[qp] * tau_m * (dphi[i][qp](0) * phi[j][qp] +          // mass-matrix term
+                                      dt * dphi[i][qp](0) * Udphi_j );                     // advection term
+                    Kpv(i, j) += JxW[qp] * tau_m * (dphi[i][qp](1) * phi[j][qp] +          // mass-matrix term
+                                      dt * dphi[i][qp](1) * Udphi_j );                     // advection term
+                    Kpp(i, j) += JxW[qp] * dt * tau_m * (dphi[i][qp] * dphi[j][qp]);       // pressure gradient operator
 
                     // Div(phi) * tau_c * Div(U): Similar to LSIC
                     //L.1) U row
-                    Kuu(i, j) += JxW[qp] * dt * dphi[i][qp](0) * tau_c * dphi[j][qp](0); // XX operator
-                    Kuv(i, j) += JxW[qp] * dt * dphi[i][qp](0) * tau_c * dphi[j][qp](1); // XY operator
+                    Kuu(i, j) += JxW[qp] * dt * dphi[i][qp](0) * tau_c * dphi[j][qp](0);  // XX operator
+                    Kuv(i, j) += JxW[qp] * dt * dphi[i][qp](0) * tau_c * dphi[j][qp](1);  // XY operator
 
                     //L.2) V row
-                    Kvu(i, j) += JxW[qp] * dt * dphi[i][qp](1) * tau_c * dphi[j][qp](0); // YX operator
-                    Kvv(i, j) += JxW[qp] * dt * dphi[i][qp](1) * tau_c * dphi[j][qp](1); // YY operator
+                    Kvu(i, j) += JxW[qp] * dt * dphi[i][qp](1) * tau_c * dphi[j][qp](0);  // YX operator
+                    Kvv(i, j) += JxW[qp] * dt * dphi[i][qp](1) * tau_c * dphi[j][qp](1);  // YY operator
                 }
             }
         } // end of the quadrature point qp-loop
@@ -2198,7 +2247,7 @@ void SedimentationFlow::assembleRBVMS3D() {
     // object handles the index translation from node and element numbers
     // to degree of freedom numbers.  We will talk more about the \p DofMap
     // in future examples.
-    const DofMap & dof_map = flow_system.get_dof_map();
+    const DofMap & dof_map     = flow_system.get_dof_map();
     const DofMap & dof_map_sed = transport_system.get_dof_map();
 
 #ifdef MESH_MOVIMENT      
@@ -2235,11 +2284,11 @@ void SedimentationFlow::assembleRBVMS3D() {
     std::vector<dof_id_type> dof_indices_s;
 
     const Real dt = es.parameters.get<Real>("dt");
-    const Real one_dt = 1.0 / dt;
+    const Real one_dt = 1.0 / dt;    
     const Real dt_stab = es.parameters.get<Real>("dt_stab");
     Real Reynolds = es.parameters.get<Real>("Reynolds");
     const Real uRe = 1.0 / Reynolds;
-    const Real Ri = es.parameters.get<Real> ("Richardson");
+    const Real Ri = es.parameters.get<Real> ("Richardson");    
     Real ex = es.parameters.get<Real>("ex");
     Real ey = es.parameters.get<Real>("ey");
     Real ez = es.parameters.get<Real>("ez");
@@ -2352,7 +2401,7 @@ void SedimentationFlow::assembleRBVMS3D() {
 
             // Data to compute Tau parameters
             RealGradient g = compute_g(fe_vel.get(), 3, qp);
-            RealTensor G = compute_G(fe_vel.get(), 3, qp);
+            RealTensor   G = compute_G(fe_vel.get(), 3, qp);
 
             // Definitions for convenience.  It is sometimes simpler to do a
             // dot product if you have the full vector at your disposal.
@@ -2369,70 +2418,69 @@ void SedimentationFlow::assembleRBVMS3D() {
             Real r_m_z = (w - w_old) / dt + (U * grad_w) + grad_p(2) - f(2);
 
             // Velocity fine scale
-            const NumberVectorValue Ufine(-tau_m * r_m_x, -tau_m * r_m_y, -tau_m * r_m_z);
+            const NumberVectorValue Ufine(-tau_m * r_m_x, -tau_m * r_m_y, - tau_m * r_m_z );
             // Velocity vector plus fine scale            
-            const NumberVectorValue Uvms = U + Ufine;
-            ;
-
+            const NumberVectorValue Uvms = U + Ufine;;            
+            
             // First, an i-loop over the velocity degrees of freedom.
             for (unsigned int i = 0; i < n_u_dofs; i++) {
-
+                
                 const Number Udphi_i = U * dphi[i][qp];
                 const Number Ufinedphi_i = Ufine * dphi[i][qp];
                 const Number phi_iTauUdphi_i = phi[i][qp] + tau_m * Udphi_i;
 
-                Fu(i) += JxW[qp]*(phi_iTauUdphi_i * u_old + // Galerkin & SUPG mass term
-                        dt * (phi_iTauUdphi_i * f(0) + // Galerkin & SUPG body force vector
-                        Ufinedphi_i * Ufine(0))); // VMS velocity fine scales tensorial product. PS: computed at integration point 
+                Fu(i) += JxW[qp]*( phi_iTauUdphi_i * u_old +                    // Galerkin & SUPG mass term
+                             dt *( phi_iTauUdphi_i * f(0) +                     // Galerkin & SUPG body force vector
+                                    Ufinedphi_i * Ufine(0) ) );                 // VMS velocity fine scales tensorial product. PS: computed at integration point 
 
-                Fv(i) += JxW[qp]*(phi_iTauUdphi_i * v_old + // Galerkin & SUPG mass term
-                        dt * (phi_iTauUdphi_i * f(1) + // Galerkin & SUPG body force vector
-                        Ufinedphi_i * Ufine(1))); // VMS velocity fine scales tensorial product. PS: computed at integration point                        
+                Fv(i) += JxW[qp]*( phi_iTauUdphi_i * v_old +                    // Galerkin & SUPG mass term
+                             dt *( phi_iTauUdphi_i * f(1) +                     // Galerkin & SUPG body force vector
+                                    Ufinedphi_i * Ufine(1) ) );                 // VMS velocity fine scales tensorial product. PS: computed at integration point                        
 
-                Fw(i) += JxW[qp]*(phi_iTauUdphi_i * w_old + // Galerkin & SUPG mass term
-                        dt * (phi_iTauUdphi_i * f(2) + // Galerkin & SUPG body force vector
-                        Ufinedphi_i * Ufine(2))); // VMS velocity fine scales tensorial product. PS: computed at integration point                          
+                Fw(i) += JxW[qp]*( phi_iTauUdphi_i * w_old +                    // Galerkin & SUPG mass term
+                             dt *( phi_iTauUdphi_i * f(2) +                     // Galerkin & SUPG body force vector
+                                    Ufinedphi_i * Ufine(2) ) );                 // VMS velocity fine scales tensorial product. PS: computed at integration point                          
 
-                Fp(i) += JxW[qp] * tau_m * (U_old * dphi[i][qp] + // PSPG mass term
-                        dt * (dphi[i][qp] * f)); // PSPG body force vector
+                Fp(i) += JxW[qp] * tau_m * (U_old * dphi[i][qp] +               // PSPG mass term
+                                      dt * (dphi[i][qp] * f) );                 // PSPG body force vector
 
                 // Matrix contributions: j-loop
                 for (unsigned int j = 0; j < n_u_dofs; j++) {
 
                     const Number Uvmsdphi_j = Uvms * dphi[j][qp];
-                    const Number Udphi_j = U * dphi[j][qp];
+                    const Number Udphi_j    = U * dphi[j][qp];
                     const Number phi_iphi_j = phi[i][qp] * phi[j][qp];
 
                     // Galerkin contribution
                     // G.1: u row
-                    Kuu(i, j) += JxW[qp] * (phi_iphi_j + // mass matrix term
-                            dt * (phi[i][qp] * Uvmsdphi_j + // convection term                            
-                            uRe * (2.0 * dphi[i][qp](0) * dphi[j][qp](0) +
-                            dphi[i][qp](1) * dphi[j][qp](1) +
-                            dphi[i][qp](2) * dphi[j][qp](2)))); // xx diffusion term
+                    Kuu(i, j) += JxW[qp] * ( phi_iphi_j +                                // mass matrix term
+                                      dt * ( phi[i][qp] * Uvmsdphi_j +                   // convection term                            
+                                     uRe * (2.0 * dphi[i][qp](0) * dphi[j][qp](0) +
+                                                  dphi[i][qp](1) * dphi[j][qp](1) +
+                                                  dphi[i][qp](2) * dphi[j][qp](2) ) ) ); // xx diffusion term
                     Kuv(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](1) * dphi[j][qp](0)); // xy diffusion term
                     Kuw(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](2) * dphi[j][qp](0)); // xz diffusion term
-                    Kup(i, j) += JxW[qp] * (-dt * dphi[i][qp](0) * phi[j][qp]); // Pressure gradient
+                    Kup(i, j) += JxW[qp] * (-dt * dphi[i][qp](0) * phi[j][qp]);          // Pressure gradient
 
                     // G.2: v row
                     Kvu(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](0) * dphi[j][qp](1)); // yx diffusion term
-                    Kvv(i, j) += JxW[qp] * (phi_iphi_j + // mass matrix term
-                            dt * (phi[i][qp] * Uvmsdphi_j + // convection term                            
-                            uRe * (2.0 * dphi[i][qp](1) * dphi[j][qp](1) +
-                            dphi[i][qp](0) * dphi[j][qp](0) +
-                            dphi[i][qp](2) * dphi[j][qp](2)))); // yy diffusion term
+                    Kvv(i, j) += JxW[qp] * ( phi_iphi_j +                                // mass matrix term
+                                      dt * ( phi[i][qp] * Uvmsdphi_j +                   // convection term                            
+                                     uRe * (2.0 * dphi[i][qp](1) * dphi[j][qp](1) +
+                                                  dphi[i][qp](0) * dphi[j][qp](0) +
+                                                  dphi[i][qp](2) * dphi[j][qp](2) ) ) ); // yy diffusion term
                     Kvw(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](2) * dphi[j][qp](1)); // yz diffusion term
-                    Kvp(i, j) += JxW[qp] * (-dt * dphi[i][qp](1) * phi[j][qp]); // Pressure gradient
+                    Kvp(i, j) += JxW[qp] * (-dt * dphi[i][qp](1) * phi[j][qp]);          // Pressure gradient
 
                     // G.3: w row
                     Kwu(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](0) * dphi[j][qp](2)); // zx diffusion term
                     Kwv(i, j) += JxW[qp] * dt * uRe * (dphi[i][qp](1) * dphi[j][qp](2)); // zy diffusion term
-                    Kww(i, j) += JxW[qp] * (phi_iphi_j + // mass matrix term
-                            dt * (phi[i][qp] * Uvmsdphi_j + // convection term                            
-                            uRe * (2.0 * dphi[i][qp](2) * dphi[j][qp](2) +
-                            dphi[i][qp](0) * dphi[j][qp](0) +
-                            dphi[i][qp](1) * dphi[j][qp](1)))); // zz diffusion term
-                    Kwp(i, j) += JxW[qp] * (-dt * dphi[i][qp](2) * phi[j][qp]); // Pressure gradient
+                    Kww(i, j) += JxW[qp] * ( phi_iphi_j +                                // mass matrix term
+                                      dt * ( phi[i][qp] * Uvmsdphi_j +                   // convection term                            
+                                     uRe * (2.0 * dphi[i][qp](2) * dphi[j][qp](2) +
+                                                  dphi[i][qp](0) * dphi[j][qp](0) +
+                                                  dphi[i][qp](1) * dphi[j][qp](1) ) ) ); // zz diffusion term
+                    Kwp(i, j) += JxW[qp] * (-dt * dphi[i][qp](2) * phi[j][qp]);          // Pressure gradient
 
                     // G.4: p row
                     Kpu(i, j) += JxW[qp] * (dt * phi[i][qp] * dphi[j][qp](0)); // X divergent operator
@@ -2441,33 +2489,33 @@ void SedimentationFlow::assembleRBVMS3D() {
 
                     // SUPG
                     // S1) u row
-                    Kuu(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kup(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](0)); // X pressure gradient term
+                    Kuu(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] +                  // mass-matrix term
+                                              dt * Udphi_i * Udphi_j );                     // advection term
+                    Kup(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](0)  );       // X pressure gradient term
 
                     //S2) v row
-                    Kvv(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kvp(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](1)); // Y pressure gradient term
+                    Kvv(i, j) += JxW[qp] * tau_m * (Udphi_i * phi[j][qp] +                  // mass-matrix term
+                                              dt * Udphi_i * Udphi_j );                     // advection term
+                    Kvp(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](1)  );       // Y pressure gradient term
 
                     //S3) w row
-                    Kww(i, j) += JxW[qp] * tau_m * ((Udphi_i) * phi[j][qp] + // mass-matrix term
-                            dt * Udphi_i * Udphi_j); // advection term
-                    Kwp(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](2)); // Z pressure gradient term
+                    Kww(i, j) += JxW[qp] * tau_m * ((Udphi_i) * phi[j][qp] +                // mass-matrix term
+                                              dt * Udphi_i * Udphi_j );                     // advection term
+                    Kwp(i, j) += JxW[qp] * (dt * tau_m * Udphi_i * dphi[j][qp](2));         // Z pressure gradient term
 
                     // PSPG
                     // ----
                     //P.1) u row
-                    Kpu(i, j) += JxW[qp] * (tau_m * (dphi[i][qp](0) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](0) * Udphi_j)); // advection term
+                    Kpu(i, j) += JxW[qp] * (tau_m * (dphi[i][qp](0) * phi[j][qp] +          // mass-matrix term
+                                      dt * dphi[i][qp](0) * Udphi_j ) );                    // advection term
                     //P.2) v row                    
-                    Kpv(i, j) += JxW[qp] * (tau_m * (dphi[i][qp](1) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](1) * Udphi_j)); // advection term
+                    Kpv(i, j) += JxW[qp] * (tau_m * (dphi[i][qp](1) * phi[j][qp] +          // mass-matrix term
+                                      dt * dphi[i][qp](1) * Udphi_j ) );                    // advection term
                     //P.3) w row
-                    Kpw(i, j) += JxW[qp] * (tau_m * (dphi[i][qp](2) * phi[j][qp] + // mass-matrix term
-                            dt * dphi[i][qp](2) * Udphi_j)); // advection term
+                    Kpw(i, j) += JxW[qp] * (tau_m * (dphi[i][qp](2) * phi[j][qp] +          // mass-matrix term
+                                      dt * dphi[i][qp](2) * Udphi_j ) );                    // advection term
                     //P.4) p row                    
-                    Kpp(i, j) += JxW[qp] * dt * tau_m * (dphi[i][qp] * dphi[j][qp]); // gradient operator
+                    Kpp(i, j) += JxW[qp] * dt * tau_m * (dphi[i][qp] * dphi[j][qp]);        // gradient operator
 
                     // Div(phi)*Tau_c*Div(U): Similar to LSIC
                     //L.1) U row
