@@ -22,7 +22,7 @@ namespace FEAdaptor
 {
   void mark_to_rebuild_grid();
 
-  void Initialize(int numScripts, string extractionScript, string visualizationScript);
+  void Initialize(int numScripts, string extractionScript, vector<string> visualizationScripts);
 
   void Finalize();
 

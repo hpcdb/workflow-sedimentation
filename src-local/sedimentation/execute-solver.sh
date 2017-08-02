@@ -1,17 +1,20 @@
 #!/bin/bash
 # solver execution
-SOLVER=3D/lock_container
-SOLVER_IN=_cte
-# environments: xps-nacad,xps-home,inspiron-laptop
-environment="xps-home"
-experiment_dir=""
+SOLVER="3D/lock_container"
+SOLVER_MESH=$SOLVER".msh"
+SOLVER_IN=$SOLVER"_cte.in"
+SOLVER_EXTRACTION=$SOLVER"_extraction.py"
+SOLVER_VISUALIZATION=$SOLVER"_visualization_surface.py,"$SOLVER"_visualization_volume.py,"$SOLVER"_visualization_wireframe.py"
+# ENVIRONMENTs: xps-nacad,xps-home,inspiron-laptop
+ENVIRONMENT="xps-home"
+EXPERIMENT_DIR=""
 
-if [ "$environment" == "xps-nacad" ]; then
-	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
-elif [ "$environment" == "xps-home" ]; then
-	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"	
-elif [ "$environment" == "inspiron-laptop" ]; then
-	experiment_dir="/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation"	
+if [ "$ENVIRONMENT" == "xps-nacad" ]; then
+	EXPERIMENT_DIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+elif [ "$ENVIRONMENT" == "xps-home" ]; then
+	EXPERIMENT_DIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"	
+elif [ "$ENVIRONMENT" == "inspiron-laptop" ]; then
+	EXPERIMENT_DIR="/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation"	
 fi
 
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
@@ -20,8 +23,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VER
 rm output-solver.log
 rm output-statistics.log
 
-echo "time ../../libmesh-sedimentation/sediment-opt -i $SOLVER$SOLVER_IN.in -m $SOLVER.msh -e extraction.py -v visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a \"output-solver.log\""
-time ../../libmesh-sedimentation/sediment-opt -i $SOLVER$SOLVER_IN.in -m $SOLVER.msh -e $SOLVER_extraction.py -v $SOLVER_visualization.py -o output -d $experiment_dir/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
+echo "time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o output -d $EXPERIMENT_DIR/output -ksp_converged_use_min_initial_residual_norm | tee -a \"output-solver.log\""
+time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o output -d $EXPERIMENT_DIR/output -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
 
 # mac
 #export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/lib/paraview-5.4:/usr/local/opt/gcc/lib/gcc/6/

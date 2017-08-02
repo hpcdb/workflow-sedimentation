@@ -90,7 +90,7 @@ bool is_file_exist(const char *fileName) {
 }
 
 void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
-        string &extractionScript, string& visualizationScript,
+        string &extractionScript, vector<string> &visualizationScript,
         int t_step, int write_interval, string* current_files,
         EquationSystems & equation_systems,
         PerfLog& perf_log, Provenance &provenance);
@@ -98,7 +98,7 @@ void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
 
 
 void InSituCatalystCoprocessing(int dim, int numberOfScripts,
-        string &extractionScript, string& visualizationScript,
+        string &extractionScript, vector<string> &visualizationScript,
         int t_step, double time, int write_interval, string* current_files,
         EquationSystems & equation_systems,
         PerfLog& perf_log, Provenance &provenance);
@@ -362,7 +362,7 @@ int main(int argc, char** argv) {
 
     int numberOfScripts = 0;
     std::string extractionScript = "not defined";
-    std::string visualizationScript = "not defined";
+    vector<string> visualizationScripts;
 
     if (command_line.search(1, "-o"))
         rname = command_line.next(rname);
@@ -376,7 +376,12 @@ int main(int argc, char** argv) {
     }
 
     if (command_line.search(1, "-v")) {
-        visualizationScript = command_line.next(visualizationScript);
+        string visualizationScript = command_line.next(visualizationScript);
+        istringstream f(visualizationScript);
+        string script;
+        while (getline(f, script, ',')) {
+            visualizationScripts.push_back(script);
+        }
         numberOfScripts++;
     }
 
@@ -388,7 +393,11 @@ int main(int argc, char** argv) {
     std::cout << " Catalyst interval   : " << to_string(catalyst_interval) << endl;
     std::cout << " Number of scripts   : " << numberOfScripts << endl;
     std::cout << " Extraction script   : " << extractionScript << endl;
-    std::cout << " Visualization script: " << visualizationScript << endl;
+    std::cout << " Number of visualization scripts: " << to_string(visualizationScripts.size()) << endl;
+    std::cout << " Visualization scripts: " << endl;;
+    for (int i = 0; i < visualizationScripts.size(); i++) {
+        cout <<  "                        " << visualizationScripts[i] << " , " << endl;
+    }
 
 #ifdef PROVENANCE
     provenance.outputIOConfig(dpath, rname, write_interval, catalyst_interval, write_restart);
@@ -404,19 +413,17 @@ int main(int argc, char** argv) {
         std::cout << "\nOpening mesh file: " << mesh_file << std::endl;
 
         mesh.read(mesh_file);
-        
+
         int size = infile.vector_variable_size("flow/dirichlet/inlet");
         std::vector<int> inputwalls(size);
-        for (int i = 0; i < size; i++) 
+        for (int i = 0; i < size; i++)
             inputwalls[i] = infile("flow/dirichlet/inlet", -1, i);
-        
+
         int deposition_id = infile("transport/deposition", -1);
-        
-        if(infile("amr/refine_only_elements_on_deposition",false))
-        {
-            std::cout << "Refinning elements on depostion..." <<std::endl;
-            for(int h = 0; h < initial_unif_ref_mesh; h++) 
-            {
+
+        if (infile("amr/refine_only_elements_on_deposition", false)) {
+            std::cout << "Refinning elements on depostion..." << std::endl;
+            for (int h = 0; h < initial_unif_ref_mesh; h++) {
                 MeshBase::const_element_iterator el = mesh.active_local_elements_begin();
                 const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
@@ -424,34 +431,32 @@ int main(int argc, char** argv) {
                     // Store a pointer to the element we are currently
                     // working on.  This allows for nicer syntax later.
                     Elem* elem = *el;
-                    
-                    bool has_inlet_wall      = false;
+
+                    bool has_inlet_wall = false;
                     bool has_deposition_wall = true;
-                    for(int s = 0; s < elem->n_sides(); s++)
-                        if(elem->neighbor(s)==NULL)
-                        {
-                            for(int i = 0; i < inputwalls.size(); i++)
-                                if(mesh.boundary_info->boundary_id(elem,s) == inputwalls[i])
+                    for (int s = 0; s < elem->n_sides(); s++)
+                        if (elem->neighbor(s) == NULL) {
+                            for (int i = 0; i < inputwalls.size(); i++)
+                                if (mesh.boundary_info->boundary_id(elem, s) == inputwalls[i])
                                     has_inlet_wall = true;
-                               
-                            if(mesh.boundary_info->boundary_id(elem,s) == deposition_id)
+
+                            if (mesh.boundary_info->boundary_id(elem, s) == deposition_id)
                                 has_deposition_wall = true;
-                                
+
                         }
-                    
+
                     elem->set_refinement_flag(Elem::DO_NOTHING);
-                    if(has_inlet_wall && has_deposition_wall)
+                    if (has_inlet_wall && has_deposition_wall)
                         elem->set_refinement_flag(Elem::REFINE);
 
                 }
-                
+
                 refinement.refine_elements();
-               
-            } 
-        }
-        else
+
+            }
+        } else
             refinement.uniformly_refine(initial_unif_ref_mesh);
-        
+
 
         equation_systems.parameters.set<int> ("dim") = mesh.mesh_dimension();
 
@@ -532,9 +537,9 @@ int main(int argc, char** argv) {
 
     // Print information about the mesh to the screen.
     mesh.print_info();
-    
+
     if (initial_unif_ref_mesh)
-        cout <<"  Applying "<<initial_unif_ref_mesh<<" level(s) of initial refinement throughout the mesh\n\n";
+        cout << "  Applying " << initial_unif_ref_mesh << " level(s) of initial refinement throughout the mesh\n\n";
 
     // Get a reference to the Convection-Diffusion system object.
     TransientLinearImplicitSystem & transport_system =
@@ -573,8 +578,7 @@ int main(int argc, char** argv) {
             out_dat_name = rname + "_massXtime_PID.dat";
             foutMass.open(out_dat_name);
         }
-    }
-    else if (ts_control_model_name == "PC11") {
+    } else if (ts_control_model_name == "PC11") {
         ts_control = new timeStepControlPC11(dt_init, dt_min, dt_max, nsa_max, tol_u, tol_s, pc11_theta, alpha, k_exp, s_min, s_max, complete_flow_norm);
         dt = dt_init;
         control_ts = true;
@@ -632,7 +636,7 @@ int main(int argc, char** argv) {
 #endif
 
 #ifdef USE_CATALYST   
-    InSituCatalystInitCoprocessing(dim, numberOfScripts, extractionScript, visualizationScript,
+    InSituCatalystInitCoprocessing(dim, numberOfScripts, extractionScript, visualizationScripts,
             t_step, write_interval, current_files,
             equation_systems, perf_log, provenance);
 #endif
@@ -657,7 +661,7 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<double>("minimum_linear_solver_tolerance") = minimum_linear_solver_tol;
     equation_systems.parameters.set<unsigned int>("write_interval") = write_interval;
 
-    cout<<"\nAdopting "<<((fem_model=="SUPG/PSPG")? "SUPG/PSPG": "RbVMS")<< " to solve Flow and Transport problems\n"<<endl;
+    cout << "\nAdopting " << ((fem_model == "SUPG/PSPG") ? "SUPG/PSPG" : "RbVMS") << " to solve Flow and Transport problems\n" << endl;
 
     // Writing into a file the initial time-step value at the beginning of the simulation
     if (mesh.processor_id() == 0)
@@ -674,43 +678,43 @@ int main(int argc, char** argv) {
 
         if (is_file_exist("abort.run")) break;
 
-        if (is_file_exist("reset.run")) {            
+        if (is_file_exist("reset.run")) {
             GetPot reset(input);
-            
-            dt           = reset("time/deltat", dt);
-            tmax         = reset("time/tmax", tmax);
+
+            dt = reset("time/deltat", dt);
+            tmax = reset("time/tmax", tmax);
             n_time_steps = reset("time/n_time_steps", n_time_steps);
 
-            flow_n_nonlinear_steps        = reset("flow_n_nonlinear_steps", flow_n_nonlinear_steps);
-            transport_n_nonlinear_steps   = reset("transport_n_nonlinear_steps", transport_n_nonlinear_steps);
-            flow_nonlinear_tolerance      = reset("flow_nonlinear_tolerance", flow_nonlinear_tolerance);
+            flow_n_nonlinear_steps = reset("flow_n_nonlinear_steps", flow_n_nonlinear_steps);
+            transport_n_nonlinear_steps = reset("transport_n_nonlinear_steps", transport_n_nonlinear_steps);
+            flow_nonlinear_tolerance = reset("flow_nonlinear_tolerance", flow_nonlinear_tolerance);
             transport_nonlinear_tolerance = reset("transport_nonlinear_tolerance", transport_nonlinear_tolerance);
-            write_interval                = reset("write_interval", write_interval);
-            max_linear_iter               = reset("max_linear_iterations", max_linear_iter);
-            flow_initial_linear_solver_tol     = reset("flow_initial_linear_solver_tolerance", flow_initial_linear_solver_tol);
+            write_interval = reset("write_interval", write_interval);
+            max_linear_iter = reset("max_linear_iterations", max_linear_iter);
+            flow_initial_linear_solver_tol = reset("flow_initial_linear_solver_tolerance", flow_initial_linear_solver_tol);
             transport_initial_linear_solver_tol = reset("transport_initial_linear_solver_tolerance", transport_initial_linear_solver_tol);
-            minimum_linear_solver_tol       = reset("minimum_linear_solver_tolerance", minimum_linear_solver_tol);
+            minimum_linear_solver_tol = reset("minimum_linear_solver_tolerance", minimum_linear_solver_tol);
             linear_tolerance_power = reset("linear_tolerance_power", linear_tolerance_power);
 
             ref_interval = reset("amr/r_interval", ref_interval);
-            r_fraction   = reset("amr/r_fraction", r_fraction);
-            c_fraction   = reset("amr/c_fraction", c_fraction);
-            max_h_level  = reset("amr/max_h_level", max_h_level);
-            
-            
-            
+            r_fraction = reset("amr/r_fraction", r_fraction);
+            c_fraction = reset("amr/c_fraction", c_fraction);
+            max_h_level = reset("amr/max_h_level", max_h_level);
+
+
+
             refinement.refine_fraction() = r_fraction;
             refinement.coarsen_fraction() = c_fraction;
             refinement.max_h_level() = max_h_level;
-            
-              
+
+
             // AKI DEVO INCLUIR TODOS OS PARÂMETROS LIDOS NO RESET
             equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iter;
             equation_systems.parameters.set<double>("minimum_linear_solver_tolerance") = minimum_linear_solver_tol;
-            
+
             equation_systems.parameters.set<unsigned int>("write_interval") = write_interval;
             equation_systems.parameters.set<Real> ("tmax") = tmax;
-            
+
             sediment_flow.non_linear_tolerance() = flow_nonlinear_tolerance;
             sediment_flow.initial_linear_tolerance() = flow_initial_linear_solver_tol;
             sediment_flow.max_nonlinear_iteractions() = flow_n_nonlinear_steps;
@@ -720,7 +724,7 @@ int main(int argc, char** argv) {
             sediment_transport.max_nonlinear_iteractions() = transport_n_nonlinear_steps;
             sediment_transport.initial_linear_tolerance() = transport_initial_linear_solver_tol;
             sediment_transport.linear_tolerance_power() = linear_tolerance_power;
-            
+
         }
 
         // storing a copy of the solution vectors to be used in case of rejecting current time-step
@@ -761,8 +765,8 @@ int main(int argc, char** argv) {
                 std::cout << out.str() << std::endl;
             }
             std::cout << std::setw(70)
-                      << std::setfill('=')
-                      << "\n";
+                    << std::setfill('=')
+                    << "\n";
 
             // SolverSimulationFlow
             sediment_flow.solve(t_step, dt, time, 0, diverged_flow);
@@ -833,12 +837,12 @@ int main(int argc, char** argv) {
                 provenance.inputComputeTimeStep();
                 perf_log.stop_event("ComputeTimeStep", "Provenance");
 #endif
-                
+
                 perf_log.start_event("computeTimeStep", "Time-Step Control");
                 if (t_step >= ts_control->getStartTimeStepControl() - 1 && (abs(equation_systems.parameters.get<Real> ("time") - tmax) > 1.0e-08 || !TimeStepAccepted))
                     ts_control->computeTimeStep(TimeStepAccepted, time, tmax, dt);
                 else
-                    cout<<"\n";
+                    cout << "\n";
                 perf_log.start_event("computeTimeStep", "Time-Step Control");
 
 #ifdef PROVENANCE
@@ -932,7 +936,7 @@ int main(int argc, char** argv) {
                 sediment_flow.solve(t_step, last_dt, time, 1, diverged_flow);
 
                 //sediment_transport.solve(t_step, ts_control->getLastAcceptedTS(), time, 1, diverged_transport);
-                sediment_transport.solve(t_step, last_dt, time, 1, diverged_transport);                
+                sediment_transport.solve(t_step, last_dt, time, 1, diverged_transport);
 
             }
         }
@@ -1030,33 +1034,32 @@ int main(int argc, char** argv) {
 
 #ifdef USE_CATALYST
         if (((t_step + 1) % catalyst_interval == 0)) {
-
-            InSituCatalystCoprocessing(dim, numberOfScripts, extractionScript, visualizationScript,
+            InSituCatalystCoprocessing(dim, numberOfScripts, extractionScript, visualizationScripts,
                     t_step, time, write_interval, current_files,
                     equation_systems, perf_log, provenance);
         }
 #endif
 
     } // end time step loop
-        
+
     if (t_step % write_interval != 0) {
 
 #ifdef PROVENANCE
-            provenance.incrementSubTaskID();
-            perf_log.start_event("MeshWriter", "Provenance");
-            provenance.inputMeshWriter();
-            perf_log.stop_event("MeshWriter", "Provenance");
+        provenance.incrementSubTaskID();
+        perf_log.start_event("MeshWriter", "Provenance");
+        provenance.inputMeshWriter();
+        perf_log.stop_event("MeshWriter", "Provenance");
 #endif
 
         perf_log.start_event("Write", "XDMF");
         current_files = xdmf_writer.write_time_step(equation_systems, time);
         perf_log.stop_event("Write", "XDMF");
-            
+
 
 #ifdef PROVENANCE
-            perf_log.start_event("MeshWriter", "Provenance");
-            provenance.outputMeshWriter(t_step, current_files[1]);
-            perf_log.stop_event("MeshWriter", "Provenance");
+        perf_log.start_event("MeshWriter", "Provenance");
+        provenance.outputMeshWriter(t_step, current_files[1]);
+        perf_log.stop_event("MeshWriter", "Provenance");
 #endif
 
         // Writing into a file time-step at current simulation time
@@ -1066,23 +1069,23 @@ int main(int argc, char** argv) {
     }
 
 #ifdef USE_CATALYST
-        if ((t_step) % catalyst_interval != 0) {
-            InSituCatalystCoprocessing(dim, numberOfScripts, extractionScript, visualizationScript,
-                    t_step, time, write_interval, current_files,
-                    equation_systems, perf_log, provenance);
-            FEAdaptor::Finalize();
-        }
+    if ((t_step) % catalyst_interval != 0) {
+        InSituCatalystCoprocessing(dim, numberOfScripts, extractionScript, visualizationScripts,
+                t_step, time, write_interval, current_files,
+                equation_systems, perf_log, provenance);
+        FEAdaptor::Finalize();
+    }
 #endif
 
 #ifdef PROVENANCE
-        char out_filename[256];
-        sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
+    char out_filename[256];
+    sprintf(out_filename, "%s_%d.xmf", rname.c_str(), libMesh::global_n_processors());
 
-        perf_log.start_event("MeshAggregator", "Provenance");
-        provenance.meshAggregator(out_filename, libMesh::global_n_processors());
-        perf_log.stop_event("MeshAggregator", "Provenance");
-        provenance.finishDataIngestor();
-        solverPerformance.end();
+    perf_log.start_event("MeshAggregator", "Provenance");
+    provenance.meshAggregator(out_filename, libMesh::global_n_processors());
+    perf_log.stop_event("MeshAggregator", "Provenance");
+    provenance.finishDataIngestor();
+    solverPerformance.end();
 #endif
 
     // Write time-step control performance
@@ -1136,7 +1139,7 @@ int main(int argc, char** argv) {
         // All done.
         cout << "\nAll done!" << endl;
 
-    } else  {
+    } else {
         cout << "\nSimulation diverged. Aborting!\n";
     }
 
@@ -1284,7 +1287,7 @@ void PrintStats(EquationSystems & es) {
 #ifdef USE_CATALYST
 
 inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
-        string &extractionScript, string& visualizationScript,
+        string &extractionScript, vector<string> &visualizationScripts,
         int t_step, int write_interval, string* current_files,
         EquationSystems & equation_systems,
         PerfLog& perf_log, Provenance &provenance) {
@@ -1296,7 +1299,7 @@ inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
         perf_log.stop_event("InitDataExtraction", "Provenance");
 #endif
         perf_log.start_event("Init", "Catalyst");
-        FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
+        FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScripts);
         perf_log.stop_event("Init", "Catalyst");
         perf_log.start_event("CoProcess", "Catalyst");
         FEAdaptor::CoProcess(equation_systems, 0.0, t_step, write_interval, false, false);
@@ -1312,7 +1315,7 @@ inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
         // 3D analysis
         for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROVENANCE
-            if (!visualizationScript.empty()) {
+            if (!visualizationScripts.empty()) {
                 perf_log.start_event("InitVisualization", "Provenance");
                 provenance.inputInitVisualization(lineID);
                 perf_log.stop_event("InitVisualization", "Provenance");
@@ -1326,7 +1329,7 @@ inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
 #endif
             if (lineID == 0) {
                 perf_log.start_event("Init", "Catalyst");
-                FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScript);
+                FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScripts);
                 perf_log.stop_event("Init", "Catalyst");
                 perf_log.start_event("CoProcess", "Catalyst");
                 FEAdaptor::CoProcess(equation_systems, 0.0, t_step, write_interval, false, false);
@@ -1339,7 +1342,7 @@ inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
 
             provenance.incrementIndexerID();
 
-            if (!visualizationScript.empty()) {
+            if (!visualizationScripts.empty()) {
                 perf_log.start_event("InitVisualization", "Provenance");
                 provenance.outputInitVisualization(lineID, t_step);
                 perf_log.stop_event("InitVisualization", "Provenance");
@@ -1356,7 +1359,7 @@ inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
 }
 
 inline void InSituCatalystCoprocessing(int dim, int numberOfScripts,
-        string &extractionScript, string& visualizationScript,
+        string &extractionScript, vector<string> &visualizationScripts,
         int t_step, double time, int write_interval, string* current_files,
         EquationSystems & equation_systems,
         PerfLog& perf_log, Provenance &provenance) {
@@ -1381,10 +1384,12 @@ inline void InSituCatalystCoprocessing(int dim, int numberOfScripts,
         // 3D analysis
         for (int lineID = 0; lineID <= 3; lineID++) {
 #ifdef PROVENANCE
-            if (!visualizationScript.empty()) {
-                perf_log.start_event("Visualization", "Provenance");
-                provenance.inputVisualization(lineID);
-                perf_log.stop_event("Visualization", "Provenance");
+            for (int i = 0; i < visualizationScripts.size(); i++) {
+                if (!visualizationScripts[i].empty()) {
+                    perf_log.start_event("Visualization", "Provenance");
+                    provenance.inputVisualization(lineID);
+                    perf_log.stop_event("Visualization", "Provenance");
+                }
             }
 
             if (!extractionScript.empty()) {
@@ -1405,10 +1410,12 @@ inline void InSituCatalystCoprocessing(int dim, int numberOfScripts,
 
             provenance.incrementIndexerID();
 
-            if (!visualizationScript.empty()) {
-                perf_log.start_event("Visualization", "Provenance");
-                provenance.outputVisualization(lineID, t_step);
-                perf_log.stop_event("Visualization", "Provenance");
+            for (int i = 0; i < visualizationScripts.size(); i++) {
+                if (!visualizationScripts[i].empty()) {
+                    perf_log.start_event("Visualization", "Provenance");
+                    provenance.outputVisualization(lineID, t_step);
+                    perf_log.stop_event("Visualization", "Provenance");
+                }
             }
 
             if (!extractionScript.empty()) {
