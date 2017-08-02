@@ -2,14 +2,16 @@
 # solver execution
 SOLVER=3D/lock_container
 SOLVER_IN=_cte
-# environments: xps-nacad,xps-home
-environment="xps-home"
+# environments: xps-nacad,xps-home,inspiron-laptop
+environment="inspiron-laptop"
 experiment_dir=""
 
 if [ "$environment" == "xps-nacad" ]; then
 	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
 elif [ "$environment" == "xps-home" ]; then
 	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"	
+elif [ "$environment" == "inspiron-laptop" ]; then
+	experiment_dir="/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation"	
 fi
 
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
