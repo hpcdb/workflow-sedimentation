@@ -13,11 +13,11 @@ xlock = 0.75
 hlock = 2.0
 
 # Mesh Refinement Parameters
-amr/initial_unif_ref_mesh     = 3
+amr/initial_unif_ref_mesh     = 2
 amr/max_r_steps = 2
-amr/r_fraction  = 0.9
-amr/c_fraction  = 0.001
-amr/max_h_level = 3
+amr/r_fraction  = 0.95
+amr/c_fraction  = 0.01
+amr/max_h_level = 2
 amr/r_interval  = 20
 amr/amrc_flow_transp = true
 amr/first_step_refinement = true
@@ -32,9 +32,9 @@ amr/first_step_refinement = true
 # top wall   : 4
  
 # Flow Boundary Condition
-#flow/dirichlet/slipx         = '1 2'
+flow/dirichlet/slipx         = '1 2'
 flow/dirichlet/slipy         = '4'
-flow/dirichlet/noslip        = '1 2 3'
+#flow/dirichlet/noslip        = '1 2 3'
 #flow/dirichlet/pressure/zero = '4'
 
 #sediment transport boundary condition
@@ -115,5 +115,5 @@ Cs          =  0.0
 
 
 # Write out every nth timestep to file.
-write_interval    = 500
+write_interval    = 20
 catalyst_interval = 1

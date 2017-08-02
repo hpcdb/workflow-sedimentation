@@ -118,7 +118,7 @@ void  timeStepControlPID::computeSolutionChangeInTime(EquationSystems & es) {
     // PS: Must be checked cause "transport" system may not be defined
     if ( es.has_system("transport") ) {
         
-        std::cout << " \nChange Flow solution in time = " << e_flow;
+        //std::cout << " \nChange Flow solution in time = " << e_flow;
         
         TransientLinearImplicitSystem & transport_system_reference =
         es.get_system<TransientLinearImplicitSystem> ("transport");
@@ -148,15 +148,15 @@ void  timeStepControlPID::computeSolutionChangeInTime(EquationSystems & es) {
             e_transport /= this->tol_S;
         }
         
-        std::cout << " \nChange Transport solution in time = " << e_transport << std::endl;        
+        //std::cout << " \nChange Transport solution in time = " << e_transport << std::endl;        
     }
             
     // compute the maximum measure of the change in time for the systems
     this->en = std::max(e_flow, e_transport);
 
-    std::cout << "\nMeasure of the solution change in current  time = " << this->en << std::endl;
-    std::cout << "Measure of the solution change in previous time = " << this->en_1 << std::endl;
-    std::cout << "Measure of the solution change in older    time = " << this->en_2 << std::endl;
+    std::cout << "\n Measure of the solution change in current TS = " << this->en;
+    //std::cout << "\n Measure of the solution change in previous TS = " << this->en_1;
+    //std::cout << "\n Measure of the solution change in older    TS = " << this->en_2;
 }
 
 /*
@@ -260,7 +260,9 @@ void timeStepControlPID::checkTimeStepAcceptance(Real dt, int flow_nonlinear_ite
 void timeStepControlPID::computeTimeStep(bool accepted, Real time, Real tmax, Real &dt)
 {
     if(!accepted) 
-    { 
+    {
+        cout << "\n Current solution was REJECTED";
+
         this->dt_avg -= dt;
         Real factor = 1.0/this->en;
 
@@ -268,7 +270,7 @@ void timeStepControlPID::computeTimeStep(bool accepted, Real time, Real tmax, Re
             factor = 0.8;
         
         dt = factor*dt;
-        std::cout << " New calculated time step = "<< dt<<endl;
+        //std::cout << " New calculated time step = "<< dt<<endl;
                 
         // check time-step range
         dt = max(dt,this->dt_min);
@@ -284,16 +286,16 @@ void timeStepControlPID::computeTimeStep(bool accepted, Real time, Real tmax, Re
         //storing last accepted time-step
         this->dt_last = dt;
 
-        std::cout << "\nCurrent solution was accepted";
+        std::cout << "\n Current solution was ACCEPTED";
                 
         if(this->keep_dt_min) {
-            std::cout <<" because time-step is minimum!" << std::endl;
+            std::cout <<" because time-step is minimum";
             // since current time-step value was accepted only because it is equal the minimum, it's value will be repeated
         } else {
-            std::cout <<"!" << std::endl;
+            //std::cout <<"!";
             dt = pow(this->en_1/this->en,this->kp)*pow(1.0/this->en,this->ki)*pow(this->en_1*this->en_1/(this->en*this->en_2),this->kd) * this->dt_prev;
 
-            std::cout << " New calculated time step = " << dt << std::endl;
+            //std::cout << "\n New calculated time step = " << dt << std::endl;
 
             // check time step range
             dt = max(dt,this->dt_min);
@@ -312,7 +314,7 @@ void timeStepControlPID::computeTimeStep(bool accepted, Real time, Real tmax, Re
     if (time+dt>tmax || tmax-(time+dt) < this->dt_min)
         dt = tmax - time;
 
-    std::cout << " Next adopted time step = " << dt <<". Var = "<<(dt-this->dt_last)/this->dt_last*100<<"%"<< std::endl;
+    std::cout << "\n Next adopted time step = " << dt <<". Var = "<<(dt-this->dt_last)/this->dt_last*100<<"%"<< std::endl;
     
 }
 

@@ -1,0 +1,3 @@
+export LIBMESH_DIR=/sw/apps/suse/shared/libmesh/release-no-pmesh-opt/intel
+export PARAVIEW_VERSION=5.2
+export PARAVIEW_DIR=/home/users/vitorss/local/all/paraview-5.2.0

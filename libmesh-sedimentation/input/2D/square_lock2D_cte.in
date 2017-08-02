@@ -6,21 +6,19 @@ version = 2.0
 # Mesh Parameters
 #------------------------------------------------------
 
-# The coarse mesh from which to start adaptivity
-mesh/file = 'necker2d.msh'
-
 xlock = 0.5
 hlock = 1.0
 
 # Mesh Refinement Parameters
-amr/hlevels     = 0
-amr/max_r_steps = 1
+amr/initial_unif_ref_mesh     = 0
+amr/max_r_steps = 2
 amr/r_fraction  = 0.9
-amr/c_fraction  = 0.001
-amr/max_h_level = 3
-amr/r_interval  = 20
+amr/c_fraction  = 0.01
+amr/max_h_level = 2
+amr/r_interval  = 10
 amr/amrc_flow_transp = true
-amr/first_step_refinement = false
+amr/first_step_refinement = true
+amr/refine_only_elements_on_deposition = false
 
 ## 2D
 # Boundary Condition
@@ -33,9 +31,12 @@ amr/first_step_refinement = false
  
 # Flow Boundary Condition
 flow/dirichlet/slipx         = '1 2'
-#flow/dirichlet/slipy         = '4'
+flow/dirichlet/slipy         = '4'
 flow/dirichlet/noslip        = '3'
-flow/dirichlet/pressure/zero = '4'
+
+# Flow & Transport Initial Condition
+transport/has_initial_condition = true
+flow/has_initial_condition = true
 
 
 #sediment transport boundary condition
@@ -50,11 +51,11 @@ mesh/dirichlet/nodisplacement  = '4'
 #Time Step Control
 ts_control/model_name = CTE
 #ts_control/dt_init = 0.005
-ts_control/dt_min = 0.00001
-ts_control/dt_max = 0.0001
+ts_control/dt_min = 0.0001
+ts_control/dt_max = 0.01
 ts_control/tol_u = 0.1
-ts_control/tol_s = 0.001
-ts_control/nsa_max = 9
+ts_control/tol_s = 0.1
+ts_control/nsa_max = 5
 ts_control/kp = 0.075
 ts_control/ki = 0.175
 ts_control/kd = 0.01
@@ -65,34 +66,42 @@ ts_control/nsa_target_flow = 4
 ts_control/nsa_target_transport = 2
 ts_control/nsa_limit_flow = 5
 ts_control/nsa_limit_transport = 2
-ts_control/pc11_theta = 0.9
-ts_control/alpha = 0.5
+ts_control/pc11_theta = 0.95
+ts_control/alpha = 0.8
 ts_control/k_exp = 2.0
 ts_control/s_mim = 0.1
 ts_control/s_max = 1.1
 ts_control/complete_flow_norm = false
 
-
 #----------------------------------------------------
 # TIME INTEGRATION PARAMETERS
 time/nssteady     = 30
-time/deltat       = 0.0001
+time/deltat       = 0.001
 time/init_time    = 0.0
-time/tmax         = 3
+time/tmax         = .05
 time/n_time_steps = 1000000
 time/theta        = 1.0
-time/dt_stab      = 1.0
 
 #----------------------------------------------------
 # Linear and Non-Linear parameters
 
-flow_n_nonlinear_steps        = 2
-flow_nonlinear_tolerance      = 1.0e-3
-transport_n_nonlinear_steps   = 1
+flow_n_nonlinear_steps        = 6
+flow_nonlinear_tolerance      = 1.0e-6
+transport_n_nonlinear_steps   = 6
 transport_nonlinear_tolerance = 1.0E-6
-max_linear_iterations         = 1000
-linear_solver_tolerance       = 1.0E-6
+max_linear_iterations         = 400
+flow_initial_linear_solver_tolerance       = 1.0E-3
+transport_initial_linear_solver_tolerance       = 1.0E-5
+minimum_linear_solver_tolerance       = 1.0E-5
+linear_tolerance_power = 1.5
 
+#------------------------------------------------------
+# Stabilization Parameters
+stabilization/dt_stab = 1.0
+stabilization/fem_model = RBVMS
+stabilization/yzBeta = false
+stabilization/s_ref_bar_yzBeta = 1.0
+stabilization/delta_transient_factor = 0.1
 
 #------------------------------------------------------
 # EQUATION PARAMETERS
@@ -106,5 +115,5 @@ c_factor    =  1.0
 
 
 # Write out every nth timestep to file.
-write_interval    = 200
+write_interval    = 2
 catalyst_interval = 1
