@@ -1,20 +1,22 @@
 #!/bin/bash
 # solver execution
 
-# environments:xps-nacad,xps-home
-environment="xps-home"
+# environments:xps-nacad,xps-home,inspiron-laptop
+environment="inspiron-laptop"
 experiment_dir=""
 # mpi
 mpi=false
 processors=2
 # solver
-SOLVER_IN=lock_necker3D_cte.in
-SOLVER=lock_necker3D
+SOLVER_IN=3D/necker3d_cte.in
+SOLVER=3D/necker3d
 
 if [ "$environment" == "xps-nacad" ]; then
 	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
 elif [ "$environment" == "xps-home" ]; then
 	experiment_dir="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
+elif [ "$environment" == "inspiron-laptop" ]; then
+	experiment_dir="/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation"
 fi
 
 export DYLD_LIBRARY_PATH=$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
