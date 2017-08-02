@@ -82,6 +82,12 @@ def DoCoProcessing(datadescription):
     # create a producer from a simulation input
     output_2_00003xmf = coprocessor.CreateProducer(datadescription, 'input')
 
+    # Full Extraction
+    # SaveData('full_extraction_' + str(timeStep) + ".csv", proxy=output_2_00003xmf, Precision=5,
+    #   UseScientificNotation=0,
+    #   WriteAllTimeSteps=0,
+    #   FieldAssociation='Points')
+
     # create a new 'Plot Over Line'
     plotOverLine3 = PlotOverLine(Input=output_2_00003xmf,
         Source='High Resolution Line Source')
