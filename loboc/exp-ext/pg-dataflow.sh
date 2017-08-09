@@ -12,7 +12,7 @@ rm -rf prov/pg/*
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
 # LoboC
-PGDIR=/home/users/vitorss/simulation/sedimentation/libmesh-sedimentation
+PGDIR=/scratch/10061a/vitorss/simulation/sedimentation/libmesh-sedimentation
 # Mint
 # PGDIR=/home/vitor/Documents/dev/workflow-sedimentation/src-local/libmesh-sedimentation
 

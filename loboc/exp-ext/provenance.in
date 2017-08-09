@@ -1,7 +1,7 @@
-directory = /home/users/vitorss/simulation/sedimentation/exp-ext/
-pgFilePath = /home/users/vitorss/simulation/sedimentation/dfa/PG-1.0.jar
-rdeFilePath = /home/users/vitorss/simulation/sedimentation/dfa/RDE-1.0.jar
-rdiFilePath = /home/users/vitorss/simulation/sedimentation/dfa/RDI-1.0.jar
+directory=/scratch/10061a/vitorss/simulation/sedimentation/exp-ext/
+pgFilePath=/scratch/10061a/vitorss/simulation/sedimentation/dfa/PG-1.0.jar
+rdeFilePath=/scratch/10061a/vitorss/simulation/sedimentation/dfa/RDE-1.0.jar
+rdiFilePath=/scratch/10061a/vitorss/simulation/sedimentation/dfa/RDI-1.0.jar
 access=EXTRACTION
 cartridge=CSV
 bin=/home/users/vitorss/local/all/fastbit/bin
