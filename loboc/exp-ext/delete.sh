@@ -22,6 +22,9 @@ rm -rf data
 rm -rf *.data
 rm -rf *.index
 rm -rf index
+rm -rf *.png
+rm -rf *.dat
+rm -rf *.xdr
 rm -rf solver.output
 rm -rf solver.error
 rm -rf db-err.txt
@@ -29,7 +32,6 @@ rm -rf db-out.txt
 rm -rf err.txt
 rm -rf out.txt
 rm -rf sed-ext*
-rm -rf image_*.png
 rm -rf video.mp4
 mkdir prov
 mkdir prov/di
