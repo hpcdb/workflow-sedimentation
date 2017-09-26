@@ -29,8 +29,8 @@ protected:
     string resource;
     string status;
     vector<PerformanceMetric> performances;
-    vector<string> dtDependencies; 
-    vector<string> idDependencies; 
+    vector<string> dtDependencies;
+    vector<string> idDependencies;
     vector<File> files;
 
 public:
@@ -47,7 +47,7 @@ public:
     void setSubID(int subID) {
         this->subID = subID;
     }
-    
+
     string getDataflow() const {
         return dataflow;
     }
@@ -59,7 +59,7 @@ public:
     vector<PerformanceMetric> getPerformances() const {
         return performances;
     }
-    
+
     void addPerformanceMetric(PerformanceMetric perf) {
         this->performances.push_back(perf);
     }
@@ -79,9 +79,19 @@ public:
     map<string, vector<string> > getSets() const {
         return sets;
     }
-    
+
     void addSet(string set, vector<string> elements) {
-        this->sets.insert(pair<string,vector<string>>(set,elements));
+        if (this->sets.find(set) == this->sets.end()) {
+            this->sets.insert(pair<string,vector<string>>(set,elements));
+        } else {
+            this->sets[set].insert(this->sets[set].begin(),elements[0]);
+        }
+
+
+        //        elements.insert(elements.begin(), this->sets[set]);
+//        this->sets[set].insert(elements[0]);
+        //        this->sets.erase(set);
+        //        this->sets.insert(pair<string,vector<string>>(set,elements));
     }
 
     void setSets(map<string, vector<string> > sets) {
@@ -115,7 +125,7 @@ public:
     vector<string> getDtDependencies() const {
         return dtDependencies;
     }
-    
+
     void addDtDependency(string dtDependency) {
         this->dtDependencies.push_back(dtDependency);
     }
@@ -127,7 +137,7 @@ public:
     vector<string> getIdDependencies() const {
         return idDependencies;
     }
-    
+
     void addIdDependency(string idDependency) {
         this->idDependencies.push_back(idDependency);
     }
@@ -135,11 +145,11 @@ public:
     void setIdDependencies(vector<string> idDependencies) {
         this->idDependencies = idDependencies;
     }
-    
+
     vector<File> getFiles() const {
         return files;
     }
-    
+
     void addFile(File file) {
         this->files.push_back(file);
     }
