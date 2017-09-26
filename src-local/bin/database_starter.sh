@@ -5,7 +5,7 @@ cpath=$2
 datapath=$3
 lines=`cat $conf  | egrep -v "#"`
 dir=`pwd`
-SIMULATION_DIR=/home/vitor/Documents/dev/workflow-sedimentation/src-local
+SIMULATION_DIR=/Users/vitor/Documents/repository/workflow-sedimentation/src-local
 
 for i in `echo $lines`; do 
   host=`echo $i`

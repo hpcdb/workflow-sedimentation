@@ -12,7 +12,6 @@
  */
 
 #include "timeStepControlBase.h"
-//#include "libmesh/libmesh.h"
 
 using namespace libMesh;
 using namespace std;
@@ -26,7 +25,7 @@ timeStepControlBase::timeStepControlBase( double init_dt, double dt_min, double 
                                 start_control(n_start_control),
                                 model_name(name),
                                 nsa_max(max_nsa),
-                                n_accepted_time_step(n_start_control),
+                                n_accepted_time_step(n_start_control-1),
                                 n_rejected_time_step(0)
         
 {

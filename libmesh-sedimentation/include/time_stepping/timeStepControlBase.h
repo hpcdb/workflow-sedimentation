@@ -59,7 +59,17 @@ public:
     
     virtual void computeSolutionChangeInTime(EquationSystems & es) = 0;
     
-    virtual double getError() = 0;
+    virtual double getCurrentError() = 0;
+    
+    virtual double getOldError() = 0;
+    
+    virtual double getOlderError() = 0;
+    
+    virtual void setCurrentError( double currentError) = 0;
+    
+    virtual void setOldError(double oldError) = 0;
+    
+    virtual void setOlderError(double olderError) = 0;
     
     virtual void checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted) = 0;
     
@@ -71,6 +81,10 @@ public:
     
     virtual void printSelf (ostream& os, const char* indent) const = 0;
     
+    virtual double getPreviousDt() = 0;
+    
+    virtual void setPreviousDt(double previousDt) = 0;
+    
     unsigned int getStartTimeStepControl() const {
         return this->start_control;
     }
@@ -78,6 +92,38 @@ public:
     double getLastAcceptedTS() const {
         return this->dt_last;
     }
+    
+    void setLastAcceptedTS( double lastDt) {
+        this->dt_last = lastDt;
+    }
+    
+    double getAverageTS() const {
+        return this->dt_avg;
+    }
+    
+    void setAverageTS( double avgDt) {
+        this->dt_avg = avgDt;
+    }
+    
+    void updateAverageTS( double avgDt) {
+        this->dt_avg += avgDt;
+    }
+    
+    unsigned int getNumberAcceptedTS() {
+        return this->n_accepted_time_step;
+    }
+    
+    void setNumberAcceptedTS (unsigned int n_accepted_ts) {
+        this->n_accepted_time_step = n_accepted_ts;
+    }
+    
+    unsigned int getNumberRejectedTS() {
+        return this->n_rejected_time_step;
+    }
+    
+    void setNumberRejectedTS (unsigned int n_rejected_ts) {
+        this->n_rejected_time_step = n_rejected_ts;
+    }    
 
     friend ostream& operator<<(ostream& os, const timeStepControlBase& o) {
         o.printSelf(os, "\t");

@@ -38,9 +38,37 @@ public:
     
     void computeSolutionChangeInTime(EquationSystems & es);
     
-    double getError(){
+    double getCurrentError(){
         return this->rn;
     };
+    
+    double getOldError(){
+        return this->rn_1;
+    };
+    
+    double getOlderError(){
+        return 0.0;
+    };
+    
+    void setCurrentError( double currentError) {
+        this->rn = currentError;
+    }
+    
+    void setOldError( double oldError) {
+        this->rn_1 = oldError;
+    }
+    
+    void setOlderError( double oldError) {
+        cout<<"not necessary here\n";
+    }
+    
+    double getPreviousDt() {
+        return this->dt_last;
+    }
+    
+    void setPreviousDt(double previousDt) {
+        this->dt_last = previousDt;
+    } 
     
     //void checkTimeStepAcceptance(EquationSystems & es, double& dt, unsigned int& t_step, bool& accepted);
     

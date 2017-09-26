@@ -36,31 +36,6 @@ public:
     timeStepControlPID(const timeStepControlPID& orig);
     ~timeStepControlPID();
     
-//    void setInitDt(double idt);
-//    void setDtMin(double dt_min);
-//    void setDtMax(double dt_max);
-//    void setTolU(double tol_u);
-//    void setNumberSucessiveAproxMax(double nsa_max);
-//    
-//    double getInitDt(){
-//        return this->init_dt;
-//    }
-//    double getDtMin(){
-//        return this->dt_min;
-//    }
-//    double getDtMax(){
-//        return this->dt_max;
-//    }
-//    double getTolU(){
-//        return this->tol_U;
-//    }
-//    double getTolS(){
-//        return this->tol_S;
-//    }    
-//    double getNumberSucessiveAproxMax(){
-//        return this->nsa_max;
-//    }
-    
     void computeSolutionChangeInTime(EquationSystems & es);
      
     void checkTimeStepAcceptance(Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions, bool& accepted);
@@ -71,9 +46,37 @@ public:
     
     void ckeckKeepMinTimeStep( Real dt, int flow_nonlinear_iteractions, int transport_nonlinear_iteractions);
     
-    double getError(){
+    double getCurrentError(){
         return this->en;
     };
+    
+    double getOldError(){
+        return this->en_1;
+    };
+    
+    double getOlderError(){
+        return this->en_2;
+    };    
+    
+    void setCurrentError( double currentError) {
+        this->en = currentError;
+    }
+    
+    void setOldError( double oldError) {
+        this->en_1 = oldError;
+    }
+    
+    void setOlderError( double olderError) {
+        this->en_2 = olderError;
+    }
+    
+    double getPreviousDt() {
+        return this->dt_prev;
+    }
+    
+    void setPreviousDt(double previousDt) {
+        this->dt_prev = previousDt;
+    }    
     
     void printSelf (ostream& os, const char* indent) const;
     

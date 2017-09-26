@@ -1,10 +1,5 @@
 #!/bin/bash
 clear
-# monetdb-start-all
-
-# Restart MonetDB
-cd ../dfa
-./reinit-monetdb.sh
 
 # delete files from the previous execution
 cd ../sedimentation
@@ -13,9 +8,15 @@ cd ../sedimentation
 # cp -rf prov/pg/* prov/di/
 # cp ../dfa/finish.token prov/di
 
+# monetdb-start-all
+
+# Restart MonetDB
+# ./reinit-database.sh
+./restore-database.sh
+
 # Start daemon process to Data Ingestor
-cd ../sedimentation
-java -jar ../dfa/DI-1.0.jar -daemon start
+# cd ../sedimentation
+# java -jar ../dfa/DI-1.0.jar -daemon start
 
 # commandline
 #clear;monetdb-start-all;cd ../dfa;./restart-monetdb.sh;cd ../sedimentation;java -jar ../dfa/DI-1.0.jar -daemon start

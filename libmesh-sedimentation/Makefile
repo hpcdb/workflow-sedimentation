@@ -1,12 +1,11 @@
 ######################################################################
 #
 # Template libMesh application Makefile
-
 CATALYST?=1
 PROVENANCE?=1
-MACOS?=0
+MACOS?=1
 
-include config/vitor.xps.home
+# include config/vitor.mac
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common

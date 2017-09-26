@@ -15,7 +15,7 @@ elif [ "$CASE_STUDY" == "meiburg2D" ]; then
 	SOLVER_VISUALIZATION=$SOLVER"_visualization.py"
 fi
 # ENVIRONMENT: xps-nacad,xps-home,inspiron-laptop
-ENVIRONMENT="xps-home"
+ENVIRONMENT="macos"
 EXPERIMENT_DIR=""
 if [ "$ENVIRONMENT" == "xps-nacad" ]; then
 	EXPERIMENT_DIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
@@ -23,6 +23,8 @@ elif [ "$ENVIRONMENT" == "xps-home" ]; then
 	EXPERIMENT_DIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"	
 elif [ "$ENVIRONMENT" == "inspiron-laptop" ]; then
 	EXPERIMENT_DIR="/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation"	
+elif [ "$ENVIRONMENT" == "macos" ]; then
+	EXPERIMENT_DIR="/Users/vitor/Documents/repository/workflow-sedimentation/src-local/sedimentation"	
 fi
 
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION

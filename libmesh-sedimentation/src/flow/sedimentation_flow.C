@@ -145,7 +145,7 @@ void SedimentationFlow::init() {
 
 }
 
-void SedimentationFlow::setup(GetPot &infile) {
+void SedimentationFlow::setup(GetPot &infile, bool restartControl) {
 
     MeshBase& mesh = this->es.get_mesh();
 
@@ -324,7 +324,7 @@ void SedimentationFlow::setup(GetPot &infile) {
     this->outbflow_id = infile("flow/neumann/outflow", -1);
 
     // For the lock exchange problem, we may initialize only the pressure as a hydrostatic field
-    if(infile("flow/has_initial_condition", false)) flow_system.attach_init_function(init_flow);
+    if(infile("flow/has_initial_condition", false) && !restartControl) flow_system.attach_init_function(init_flow);
 
     cout << "\n";
 

@@ -89,7 +89,7 @@ void SedimentationTransport::init() {
     unsigned int s_var = transport_system.add_variable("s");
 }
 
-void SedimentationTransport::setup(GetPot &infile) {
+void SedimentationTransport::setup(GetPot &infile, bool restartControl) {
     const MeshBase& mesh = es.get_mesh();
 
     // The dimension that we are running
@@ -131,7 +131,7 @@ void SedimentationTransport::setup(GetPot &infile) {
         cout << " Considering mass outflow across deposition wall" << endl << endl;
 
     bool init = infile("transport/has_initial_condition", true);
-    if (init) transport_system.attach_init_function(init_sedimentation);
+    if (init && !restartControl) transport_system.attach_init_function(init_sedimentation);
 
 }
 

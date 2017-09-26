@@ -75,7 +75,7 @@ public:
 
     void assemble();
     void init();
-    void setup(GetPot &infile);
+    void setup(GetPot &infile, bool restartControl = false);
     void solve(int t_step, Real dt, Real time, int r_step, bool& diverged);
     void restart(GetPot &restart);
     //void attach_time_stepping(timeStepControlBase *ts) {this->tsControl = ts;}

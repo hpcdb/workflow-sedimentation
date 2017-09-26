@@ -2,7 +2,7 @@ rm -rf prov/di/*
 rm -rf prov/pg/*
 
 # environments: xps-nacad,xps-home,inspiron-laptop
-environment="xps-home"
+environment="macos"
 PGDIR=""
 
 if [ "$environment" == "xps-nacad" ]; then
@@ -11,6 +11,8 @@ elif [ "$environment" == "xps-home" ]; then
 	PGDIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"	
 elif [ "$environment" == "inspiron-laptop" ]; then
 	PGDIR="/media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation"	
+elif [ "$environment" == "macos" ]; then
+	PGDIR="/Users/vitor/Documents/repository/workflow-sedimentation/src-local/sedimentation"
 fi
 
 # Ubuntu - Inspiron
