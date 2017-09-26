@@ -936,7 +936,7 @@ Task Provenance::addElementToOutputSolverSimulationFlow(Task t, int time_step, R
             norm_delta_u, converged ? "true" : "false");
     vector<string> e = {memalloc};
     t.addSet("osolversimulationflow", e);
-    
+
     return t;
 }
 
@@ -948,7 +948,7 @@ void Provenance::finishTaskToOutputSolverSimulationFlow(Task t) {
 
     string transformation = "solversimulationflow";
     char memalloc[jsonArraySize];
-    
+
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
             transformation.c_str(), simulationID, numberIterationsFlow);
@@ -1004,10 +1004,8 @@ void Provenance::inputSolverSimulationTransport() {
 #endif
 }
 
-void Provenance::outputSolverSimulationTransport(int time_step, Real dt,
-        Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations,
-        Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
-    if (processor_id != 0) return;
+Task Provenance::generateTaskToOutputSolverSimulationTransport() {
+    if (processor_id != 0) return NULL;
 #ifdef VERBOSE
     cout << "Output Solver Simulation Transport" << endl;
 #endif
@@ -1025,12 +1023,38 @@ void Provenance::outputSolverSimulationTransport(int time_step, Real dt,
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
+    return t;
+}
+
+Task Provenance::addElementToOutputSolverSimulationTransport(Task t, int time_step, Real dt, Real time,
+        int linear_step, int n_linear_step, unsigned int n_linear_iterations,
+        Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
+    if (processor_id != 0) return NULL;
+#ifdef VERBOSE
+    cout << "Add Elemento to Output Solver Simulation Transport" << endl;
+#endif
+
+    string transformation = "solversimulationtransport";
+    char memalloc[jsonArraySize];
+
     sprintf(memalloc, "%d;%d;%.7f;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
             simulationID, time_step, dt, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta, norm_delta_u,
             converged ? "true" : "false");
     vector<string> e = {memalloc};
     t.addSet("o" + transformation, e);
+
+    return t;
+}
+
+void Provenance::finishTaskToOutputSolverSimulationTransport(Task t) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Finish Task to Output Solver Simulation Transport" << endl;
+#endif
+
+    string transformation = "solversimulationtransport";
+    char memalloc[jsonArraySize];
 
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
@@ -1609,7 +1633,7 @@ void Provenance::createIndexDirectory() {
     int exitStatus = system(cmd);
 }
 
-void Provenance::writeMonitoringDataIntoFile(char* filename, int timeStep, Real time, 
+void Provenance::writeMonitoringDataIntoFile(char* filename, int timeStep, Real time,
         Real initial_norm_delta, Real final_norm_delta, int linear_iteractions) {
     if (processor_id != 0) return;
 
@@ -1619,7 +1643,7 @@ void Provenance::writeMonitoringDataIntoFile(char* filename, int timeStep, Real 
         flag.assign("stagnant");
     } else if (ratio > 1) {
         flag.assign("bad_convergence");
-    }else{
+    } else {
         flag.assign("ok");
     }
 

@@ -61,12 +61,16 @@ public:
     void inputSolverSimulationFlow();
     Task generateTaskToOutputSolverSimulationFlow();
     Task addElementToOutputSolverSimulationFlow(Task t, int time_step, Real dt, Real time,
-        int linear_step, int n_linear_step, unsigned int n_linear_iterations,
-        Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+            int linear_step, int n_linear_step, unsigned int n_linear_iterations,
+            Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
     void finishTaskToOutputSolverSimulationFlow(Task t);
 
     void inputSolverSimulationTransport();
-    void outputSolverSimulationTransport(int time_step, Real dt, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    Task generateTaskToOutputSolverSimulationTransport();
+    Task addElementToOutputSolverSimulationTransport(Task t, int time_step, Real dt, Real time,
+            int linear_step, int n_linear_step, unsigned int n_linear_iterations,
+            Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void finishTaskToOutputSolverSimulationTransport(Task t);
 
     void inputComputeSolutionChange();
     void outputComputeSolutionChange(int time_step, Real time, Real dt,
@@ -91,8 +95,8 @@ public:
 
     void meshAggregator(string xdmf, int n_processors);
 
-    void writeMonitoringDataIntoFile(char* filename, int timeStep, Real time, 
-        Real initial_norm_delta, Real final_norm_delta, int linear_iteractions);
+    void writeMonitoringDataIntoFile(char* filename, int timeStep, Real time,
+            Real initial_norm_delta, Real final_norm_delta, int linear_iteractions);
 
     void finishDataIngestor();
 

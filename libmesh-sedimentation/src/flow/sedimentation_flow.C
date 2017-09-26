@@ -1211,7 +1211,7 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
         this->_nonlinear_iteractions++;
 
 #ifdef PROVENANCE
-        prov->addElementToOutputSolverSimulationFlow(task, t_step, dt, time, 
+        task = prov->addElementToOutputSolverSimulationFlow(task, t_step, dt, time, 
                 r_step, flow_nli_counter, _linear_iteractions, 
                 _current_final_linear_residual, norm_delta, norm_delta / u_norm, 
                 !diverged);
