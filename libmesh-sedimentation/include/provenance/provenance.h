@@ -20,6 +20,8 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/perf_log.h"
 
+#include "dfanalyzer/task.h"
+
 // #define VERBOSE
 
 using namespace std;
@@ -57,7 +59,11 @@ public:
     void outputInitVisualization(int lineID, int timeStep);
 
     void inputSolverSimulationFlow();
-    void outputSolverSimulationFlow(int time_step, Real dt, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    Task generateTaskToOutputSolverSimulationFlow();
+    Task addElementToOutputSolverSimulationFlow(Task t, int time_step, Real dt, Real time,
+        int linear_step, int n_linear_step, unsigned int n_linear_iterations,
+        Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
+    void finishTaskToOutputSolverSimulationFlow(Task t);
 
     void inputSolverSimulationTransport();
     void outputSolverSimulationTransport(int time_step, Real dt, Real time, int linear_step, int n_linear_step, unsigned int n_linear_iterations, Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);

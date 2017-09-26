@@ -22,7 +22,6 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include "dfanalyzer/task.h"
 #include "dfanalyzer/indexer.h"
 
 #include "libmesh/libmesh.h"
@@ -900,10 +899,8 @@ void Provenance::inputSolverSimulationFlow() {
 #endif
 }
 
-void Provenance::outputSolverSimulationFlow(int time_step, Real dt, Real time,
-        int linear_step, int n_linear_step, unsigned int n_linear_iterations,
-        Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
-    if (processor_id != 0) return;
+Task Provenance::generateTaskToOutputSolverSimulationFlow() {
+    if (processor_id != 0) return NULL;
 #ifdef VERBOSE
     cout << "Output Solver Simulation Flow" << endl;
 #endif
@@ -921,13 +918,37 @@ void Provenance::outputSolverSimulationFlow(int time_step, Real dt, Real time,
     sprintf(memalloc, "%d", simulationID);
     t.addIdDependency(memalloc);
 
+    return t;
+}
+
+Task Provenance::addElementToOutputSolverSimulationFlow(Task t, int time_step, Real dt, Real time,
+        int linear_step, int n_linear_step, unsigned int n_linear_iterations,
+        Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged) {
+    if (processor_id != 0) return NULL;
+#ifdef VERBOSE
+    cout << "Add Element to Output Solver Simulation Flow" << endl;
+#endif
+
+    char memalloc[jsonArraySize];
     sprintf(memalloc, "%d;%d;%.7f;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
             simulationID, time_step, dt, time, linear_step, n_linear_step,
             n_linear_iterations, linear_residual, norm_delta,
             norm_delta_u, converged ? "true" : "false");
     vector<string> e = {memalloc};
-    t.addSet("o" + transformation, e);
+    t.addSet("osolversimulationflow", e);
+    
+    return t;
+}
 
+void Provenance::finishTaskToOutputSolverSimulationFlow(Task t) {
+    if (processor_id != 0) return;
+#ifdef VERBOSE
+    cout << "Finish task to Output Solver Simulation Flow" << endl;
+#endif
+
+    string transformation = "solversimulationflow";
+    char memalloc[jsonArraySize];
+    
     PerformanceMetric p;
     sprintf(memalloc, "libMeshSedimentation::%s-%d-%d",
             transformation.c_str(), simulationID, numberIterationsFlow);
