@@ -7,7 +7,7 @@ rm -rf prov
 mkdir prov
 mkdir prov/pg
 mkdir prov/di
-# edit the file provenance.in (directory)
+# edit the files provenance.in and DfA.properties (directory)
 # 
 # edit and run the script pg-dataflow.sh 
 ./pg-dataflow.sh
