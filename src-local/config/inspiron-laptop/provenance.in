@@ -1,7 +1,7 @@
-directory = /home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation/
-pgFilePath = /home/vitor/Documents/dev/workflow-sedimentation/src-local/dfa/PG-1.0.jar
-rdeFilePath = /home/vitor/Documents/dev/workflow-sedimentation/src-local/dfa/RDE-1.0.jar
-rdiFilePath = /home/vitor/Documents/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar
+directory = /media/vitor/data-linux/dev/workflow-sedimentation/src-local/sedimentation/
+pgFilePath = /media/vitor/data-linux/dev/workflow-sedimentation/src-local/dfa/PG-1.0.jar
+rdeFilePath = /media/vitor/data-linux/dev/workflow-sedimentation/src-local/dfa/RDE-1.0.jar
+rdiFilePath = /media/vitor/data-linux/dev/workflow-sedimentation/src-local/dfa/RDI-1.0.jar
 access=EXTRACTION
 cartridge=csv
 bin=/home/vitor/Documents/program/fastbit-2.0.3/bin

@@ -7,7 +7,7 @@ clear
 # cd ../sedimentation
 
 echo "Starting database system..."
-SIMULATION_DIR=/home/vitor/Documents/dev/workflow-sedimentation/src-local
+SIMULATION_DIR=/media/vitor/data-linux/dev/workflow-sedimentation/src-local
 CPATH=$SIMULATION_DIR/sedimentation
 DATAPATH=$CPATH/data
 rm -rf data
