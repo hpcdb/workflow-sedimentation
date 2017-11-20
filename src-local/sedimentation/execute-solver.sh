@@ -14,8 +14,8 @@ elif [ "$CASE_STUDY" == "meiburg2D" ]; then
 	SOLVER_EXTRACTION=$SOLVER"_extraction.py"
 	SOLVER_VISUALIZATION=$SOLVER"_visualization.py"
 fi
-# ENVIRONMENT: xps-nacad,xps-home,inspiron-laptop
-ENVIRONMENT="inspiron-laptop"
+# ENVIRONMENT: xps-nacad,xps-home,inspiron-laptop, macos
+ENVIRONMENT="macos"
 EXPERIMENT_DIR=""
 if [ "$ENVIRONMENT" == "xps-nacad" ]; then
 	EXPERIMENT_DIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"

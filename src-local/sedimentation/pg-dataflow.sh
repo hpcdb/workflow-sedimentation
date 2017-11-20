@@ -1,7 +1,7 @@
 rm -rf prov/di/*
 rm -rf prov/pg/*
 
-# environments: xps-nacad,xps-home,inspiron-laptop
+# environments: xps-nacad,xps-home,inspiron-laptop, macos
 environment="macos"
 PGDIR=""
 

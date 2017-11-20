@@ -1,5 +1,4 @@
 #!/bin/bash
-SIMULATION_DIR=/media/vitor/data-linux/dev/workflow-sedimentation/src-local
-CPATH=$SIMULATION_DIR/sedimentation
-DATAPATH=$CPATH/data
-$SIMULATION_DIR/bin/database_stopper.sh database.conf $CPATH $DATAPATH
+SIMULATION_DIR=`pwd`
+DATAPATH=$SIMULATION_DIR/data
+$SIMULATION_DIR/../bin/database_stopper.sh database.conf $SIMULATION_DIR $DATAPATH
