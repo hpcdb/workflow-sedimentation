@@ -30,6 +30,9 @@ fi
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VERSION
 
+# send dataflow specification
+./send-dataflow-spec.sh
+
 rm output-solver.log
 rm output-statistics.log
 

@@ -1,28 +1,45 @@
 #!/bin/bash
 clear
-
-# delete files from the previous execution
-cd ../sedimentation
+echo "Setting up environment variables"
+SIMULATION_DIR=`pwd`
+DFA_PROPERTIES=$SIMULATION_DIR/DfA.properties
+DI_DIR=$SIMULATION_DIR/provenance
+echo "--------------------------------------------"
+echo "Removing data from previous executions"
+rm $DFA_PROPERTIES
+# organizing provenance directories
+rm -rf provenance/*
 ./delete.sh
-# rm -rf prov/di/*
-# cp -rf prov/pg/* prov/di/
-# cp ../dfa/finish.token prov/di
-
-# monetdb-start-all
-
-# Restart MonetDB
-# ./reinit-database.sh
-./restore-database.sh
-
-# Start daemon process to Data Ingestor
-# cd ../sedimentation
-# java -jar ../dfa/DI-1.0.jar -daemon start
-
-# commandline
-#clear;monetdb-start-all;cd ../dfa;./restart-monetdb.sh;cd ../sedimentation;java -jar ../dfa/DI-1.0.jar -daemon start
-
-# Back up database
-# rm prov-db.dump
-# mclient -p 50000 -d dataflow_analyzer --dump > prov-db.dump
-# Restore database
-# mclient -p 50000 -d dataflow_analyzer -lsql prov-db.dump
+# cleaning up MonetDB directory
+killall mserver5
+killall monetdbd
+sleep 3
+rm -rf data
+rm prov-db.dump
+# configuring computational environment for application run
+rm database.conf
+rm nodes.txt
+# killing previous processes
+# killall java
+echo "--------------------------------------------"
+echo "Configuring DfA.properties file"
+echo "di_dir="$DI_DIR >> $DFA_PROPERTIES
+echo "dbms=MONETDB" >> $DFA_PROPERTIES
+echo "db_server=localhost" >> $DFA_PROPERTIES
+echo "db_port=50000" >> $DFA_PROPERTIES
+echo "db_name=dataflow_analyzer" >> $DFA_PROPERTIES
+echo "db_user=monetdb" >> $DFA_PROPERTIES
+echo "db_password=monetdb" >> $DFA_PROPERTIES
+echo "--------------------------------------------"
+echo "Restoring MonetDB database..."
+echo "localhost" >> database.conf
+unzip -q data.zip
+clear
+echo "--------------------------------------------"
+echo "Starting database system..."
+DATAPATH=$SIMULATION_DIR/data
+$SIMULATION_DIR/../dfa/database_starter.sh database.conf $SIMULATION_DIR $DATAPATH
+# > out.txt 2> err.txt
+echo "--------------------------------------------"
+echo "Starting DfA RESTful API"
+java -jar $SIMULATION_DIR/../dfa/REST-DfA-1.0.jar

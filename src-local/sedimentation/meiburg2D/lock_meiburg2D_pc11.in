@@ -76,7 +76,7 @@ ts_control/complete_flow_norm = false
 time/nssteady     = 30
 time/deltat       = 0.00001
 time/init_time    = 0.0
-time/tmax         = 0.00010
+time/tmax         = 0.00005
 time/n_time_steps = 1000000
 time/theta        = 1.0
 
