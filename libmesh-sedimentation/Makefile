@@ -4,6 +4,7 @@
 CATALYST?=1
 PROVENANCE?=1
 MACOS?=1
+LDFLAGS=-L/usr/lib -lcurl
 
 # include config/vitor.mac
 
