@@ -1,5 +1,4 @@
-rm -rf prov/di/*
-rm -rf prov/pg/*
+rm -rf sedimentation
 
 # MacOS
 # PGDIR=/Users/vitor/Documents/Repository/Thesis/Workflow-Sedimentation/src-local/sedimentation
@@ -12,7 +11,7 @@ rm -rf prov/pg/*
 # Stampede
 #PGDIR=/work/03664/silva/experiments/sedimentation
 # LoboC
-PGDIR=/scratch/10061a/vitorss/simulation/sedimentation/libmesh-sedimentation
+PGDIR=/scratch/10061a/vitorss/simulation/sedimentation-rest/libmesh-sedimentation
 # Mint
 # PGDIR=/home/vitor/Documents/dev/workflow-sedimentation/src-local/libmesh-sedimentation
 
@@ -606,9 +605,7 @@ java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation m
 java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name n_processors -type numeric
 # java -jar ../dfa/PG-1.0.jar -attribute -dataflow sedimentation -transformation meshAggregator -set omeshaggregator -name video -type file
 
-echo "Dataflow ingestion"
-java -jar ../dfa/PG-1.0.jar -ingest -dataflow sedimentation
-
-cp prov/pg/sedimentation/dataflow.json .
+# echo "Dataflow ingestion"
+# java -jar ../dfa/PG-1.0.jar -ingest -dataflow sedimentation
 
 

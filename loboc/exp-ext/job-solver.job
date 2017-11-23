@@ -1,4 +1,4 @@
-#PBS -l select=21:ncpus=48:mpiprocs=12
+#PBS -l select=2:ncpus=48:mpiprocs=12
 #PBS -l walltime=999:00:00
 #PBS -j oe  
 #PBS -N sed-ext
@@ -11,14 +11,13 @@ echo "Starting job..."
 module load intel
 
 echo "Configuring workspace..."
-export CPATH=/scratch/10061a/vitorss/simulation/sedimentation/exp-ext
+export CPATH=/scratch/10061a/vitorss/simulation/sedimentation-rest/exp-ext
 export CASE_STUDY="necker3D"
-export DB_OPERATION="restore"
 
 export DATAPATH=$CPATH/data
 export DATAFLOW_TAG=sedimentation
-export DFA=/scratch/10061a/vitorss/simulation/sedimentation/dfa
-export LIBMESH_SEDIMENTATION=/home/users/vitorss/program/libmesh-sedimentation/v2
+export DFA=/scratch/10061a/vitorss/simulation/sedimentation-rest/dfa
+export LIBMESH_SEDIMENTATION=/home/users/vitorss/program/libmesh-sedimentation/v3-rest
 export CASE_STUDY_DIR=/home/users/vitorss/input_dataset/sedimentation
 cd $CPATH
 
@@ -28,40 +27,29 @@ export SOLVER_IN=$SOLVER"_cte.in"
 export SOLVER_EXTRACTION=$SOLVER"_extraction.py"
 export SOLVER_VISUALIZATION=$SOLVER"_visualization_surface.py,"$SOLVER"_visualization_volume.py,"$SOLVER"_visualization_wireframe.py"
 
-#echo "Specifying dataflow generation..."
-#./pg-dataflow.sh
-
 echo "Configuring the lists of machines for the solver and database system..."
 cp $PBS_NODEFILE nodes.txt
-java -jar /scratch/10061a/vitorss/simulation/sedimentation/bin/EnvironmentFileGenerator-LoboC-1.0.jar nodes.txt
+java -jar /scratch/10061a/vitorss/simulation/sedimentation-rest/bin/EnvironmentFileGenerator-LoboC-1.0.jar nodes.txt
 
 echo "Starting database system..."
-if [ "$DB_OPERATION" == "restart" ]; then
-	$SIMULATION_DIR/bin/database_starter.sh database.conf $CPATH $DATAPATH
-elif [ "$DB_OPERATION" == "restore" ]; then
-	rm -rf data
-	unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
-	/scratch/10061a/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
-fi
-
-#rm -rf data
-#unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
-#/scratch/10061a/vitorss/simulation/sedimentation/bin/database_starter.sh database.conf $CPATH $DATAPATH
+db_host=`cat database.conf`
+./start-dfa.sh $db_host
 
 echo "Setting up environment variables..."
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user2/local/gnu/paraview/5.1/lib/paraview-5.1
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/users/vitorss/local/all/paraview/lib/paraview-5.1
 export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/site-packages:/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2
 export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
+
+echo "Sending dataflow specification..."
+./send-dataflow-spec.sh >> out.txt 2>> err.txt
 
 echo "Executing sedimentation solver..."
 echo -n "/usr/bin/time mpirun -machinefile machines.conf -n $JCORES $LIBMESH_SEDIMENTATION/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $CPATH/output_$CASE_STUDY -ksp_converged_use_min_initial_residual_norm >> out.txt 2>> err.txt" > mpirun.sh 
 chmod 774 mpirun.sh
 ./mpirun.sh
 
-echo "Executing termination algorithm..."
-/scratch/10061a/vitorss/simulation/sedimentation/bin/termination.sh $CPATH $DATAFLOW_TAG
-/scratch/10061a/vitorss/simulation/sedimentation/bin/database_stopper.sh database.conf $CPATH $DATAPATH
+#echo "Executing termination algorithm..."
+./shutdown-dfa.sh $db_host
+$CPATH/../bin/termination.sh $CPATH
 
 echo "Finishing job..."
 

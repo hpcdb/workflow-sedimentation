@@ -1621,7 +1621,7 @@ void Provenance::meshAggregator(string xdmf, int n_processors) {
 void Provenance::finishDataIngestor() {
     if (processor_id != 0) return;
 
-    string str = "cp ../dfa/finish.token prov/di/sedimentation";
+    string str = "cp ../dfa/finish.token .";
     int exitStatus = system(strdup(str.c_str()));
 
     cout << "[Provenance] Finish Data Ingestor" << endl;

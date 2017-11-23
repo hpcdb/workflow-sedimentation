@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "Starting server..."
-monetdbd start /scratch/10061a/vitorss/simulation/sedimentation/exp-ext/data
-monetdbd get all /scratch/10061a/vitorss/simulation/sedimentation/exp-ext/data
+monetdbd start /scratch/10061a/vitorss/simulation/sedimentation-rest/exp-ext/data
+monetdbd get all /scratch/10061a/vitorss/simulation/sedimentation-rest/exp-ext/data
 
 echo "Starting database..."
 monetdb start dataflow_analyzer
