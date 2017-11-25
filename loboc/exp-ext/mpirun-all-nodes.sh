@@ -1,0 +1,1 @@
+/usr/bin/time mpirun r1i3n6.ib0.smc-default.americas.sgi.com

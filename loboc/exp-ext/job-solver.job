@@ -1,5 +1,5 @@
 #PBS -l select=2:ncpus=48:mpiprocs=12
-#PBS -l walltime=999:00:00
+#PBS -l walltime=24:00:00
 #PBS -j oe  
 #PBS -N sed-ext
 #PBS -V 
@@ -29,7 +29,7 @@ export SOLVER_VISUALIZATION=$SOLVER"_visualization_surface.py,"$SOLVER"_visualiz
 
 echo "Configuring the lists of machines for the solver and database system..."
 cp $PBS_NODEFILE nodes.txt
-java -jar /scratch/10061a/vitorss/simulation/sedimentation-rest/bin/EnvironmentFileGenerator-LoboC-1.0.jar nodes.txt
+python $CPATH/../bin/ConfigureLoboCFiles/Main.py nodes.txt
 
 echo "Starting database system..."
 db_host=`cat database.conf`
@@ -40,7 +40,7 @@ export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/
 export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
 
 echo "Sending dataflow specification..."
-./send-dataflow-spec.sh >> out.txt 2>> err.txt
+./send-dataflow-spec.sh $db_host >> out.txt 2>> err.txt
 
 echo "Executing sedimentation solver..."
 echo -n "/usr/bin/time mpirun -machinefile machines.conf -n $JCORES $LIBMESH_SEDIMENTATION/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $CPATH/output_$CASE_STUDY -ksp_converged_use_min_initial_residual_norm >> out.txt 2>> err.txt" > mpirun.sh 
@@ -48,9 +48,10 @@ chmod 774 mpirun.sh
 ./mpirun.sh
 
 #echo "Executing termination algorithm..."
-./shutdown-dfa.sh $db_host
-$CPATH/../bin/termination.sh $CPATH
+#./shutdown-dfa.sh $db_host
+#$CPATH/../bin/termination.sh $CPATH
 
+sleep 960
 echo "Finishing job..."
 
 

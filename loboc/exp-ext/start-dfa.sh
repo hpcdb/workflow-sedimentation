@@ -25,7 +25,8 @@ killall java
 sleep 3
 rm dfa.log
 rm -rf data
-unzip -q backup/data-loboc.zip
+#unzip -q backup/data-loboc.zip
+unzip /home/users/vitorss/local/all/monetdb/monetdb-database.zip
 clear
 echo "--------------------------------------------"
 echo "Starting DfAnalyzer..."

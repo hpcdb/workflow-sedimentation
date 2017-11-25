@@ -1,3 +1,0 @@
-#!/bin/bash
-./delete.sh
-sbatch job-solver.job

@@ -1,6 +1,6 @@
 #!/bin/bash
 SIMULATION_DIR=`pwd`
-curl -X POST http://localhost:22000/pde/dataflow/json \
+curl -X POST http://$1:22000/pde/dataflow/json \
     -H "Content-Type: application/text" \
     --data '{
   "transformations": [
