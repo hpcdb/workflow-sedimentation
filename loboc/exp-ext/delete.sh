@@ -1,6 +1,8 @@
 #!/bin/bash
 # delete files from the previous execution
-rm restart.in
+rm dfa.log
+rm DfA.properties
+rm restart.*
 rm -rf out*
 rm -rf err*
 rm -rf finish.token

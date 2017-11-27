@@ -36,8 +36,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PARAVIEW_DIR/lib/paraview-$PARAVIEW_VER
 rm output-solver.log
 rm output-statistics.log
 
-echo "time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $EXPERIMENT_DIR/$CASE_STUDY -ksp_converged_use_min_initial_residual_norm | tee -a \"output-solver.log\""
-time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $EXPERIMENT_DIR/output_$CASE_STUDY -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
+echo "time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $EXPERIMENT_DIR/$CASE_STUDY -dfa localhost -ksp_converged_use_min_initial_residual_norm | tee -a \"output-solver.log\""
+time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $EXPERIMENT_DIR/output_$CASE_STUDY -dfa localhost -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
 
 # mac
 #export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/vitor/Documents/program/paraview-5.4.0/CMakeFiles/__macos_install/lib/paraview-5.4:/usr/local/opt/gcc/lib/gcc/6/

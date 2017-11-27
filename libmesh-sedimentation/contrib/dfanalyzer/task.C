@@ -1,7 +1,7 @@
 #include "task.h"
 #include <curl/curl.h>
 
-void Task::writeJSON(string filename) {
+void Task::writeJSON(string filename, string dfa_hostname) {
     Document document;
     document.SetObject();
 
@@ -176,7 +176,8 @@ void Task::writeJSON(string filename) {
 
     CURL *hnd = curl_easy_init();
     curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_easy_setopt(hnd, CURLOPT_URL, "http://localhost:22000/pde/task/json");
+    string hostname = "http://" + dfa_hostname + ":22000/pde/task/json";
+    curl_easy_setopt(hnd, CURLOPT_URL, hostname.c_str());
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(headers, "postman-token: 6afcae02-81cb-821f-379f-f66efb776d94");
     headers = curl_slist_append(headers, "cache-control: no-cache");

@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
     if (command_line.search(1, "-i"))
         input = command_line.next(input);
     else {
-        std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh -o [output file prefix] -d [output file path] -e [extraction script].py -v [visualization script].py" << std::endl;
+        std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh -o [output file prefix] -d [output file path] -e [extraction script].py -v [visualization script].py -dfa [hostname]" << std::endl;
         libmesh_error_msg("You need specify a input file!");
     }
 
@@ -141,6 +141,10 @@ int main(int argc, char** argv) {
         std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh" << std::endl;
         libmesh_error_msg("You need specify a mesh file!");
     }
+    
+    string dfa_hostname;
+    if (command_line.search(1, "-dfa"))
+        dfa_hostname = command_line.next(dfa_hostname);
 
     GetPot infile(input);
     double v = infile("version", 1.0);
@@ -149,7 +153,7 @@ int main(int argc, char** argv) {
     }
 
     perf_log.start_event("Init", "Provenance");
-    Provenance provenance(libMesh::global_processor_id());
+    Provenance provenance(libMesh::global_processor_id(), dfa_hostname);
     perf_log.stop_event("Init", "Provenance");
 
 #ifdef PROVENANCE

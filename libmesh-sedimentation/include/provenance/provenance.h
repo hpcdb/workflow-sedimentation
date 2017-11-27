@@ -30,7 +30,7 @@ using namespace libMesh;
 class Provenance {
 public:
 
-    Provenance(int processorID);
+    Provenance(int processorID, string dfa_hostname);
 
     void SetUp();
     void inputInputMesh();
@@ -243,6 +243,7 @@ public:
 
 private:
     int processor_id;
+    string hostname;
     int simulationID;
 
     int indexerID = 0;

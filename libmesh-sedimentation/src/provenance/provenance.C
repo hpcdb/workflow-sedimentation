@@ -37,13 +37,13 @@
 using namespace std;
 using namespace libMesh;
 
-Provenance::Provenance(int processorID) {
+Provenance::Provenance(int processorID, string dfa_hostname) {
     processor_id = processorID;
     simulationID = 1;
+    hostname = dfa_hostname;
 }
 
 void Provenance::SetUp() {
-
     GetPot infile("provenance.in");
     directory = infile("directory", "/Users/vitor/Documents/Repository/Thesis/WorkflowSedimentation/sedimentation");
 
@@ -99,11 +99,11 @@ void Provenance::inputInputMesh() {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -133,11 +133,11 @@ void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl)
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 
     //    AMR Config
@@ -159,11 +159,11 @@ void Provenance::outputInputMesh(int dim, string mesh_file, bool restartControl)
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -202,11 +202,11 @@ void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double ma
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 
     //    Create Equation Systems
@@ -228,11 +228,11 @@ void Provenance::outputAMRConfig(double r_fraction, double c_fraction, double ma
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -270,11 +270,11 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 
     //    Time Step Control Config
@@ -296,11 +296,11 @@ void Provenance::outputCreateEquationSystems(Real Reynolds, Real Gr,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -342,11 +342,11 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 
     //    IO Config
@@ -368,11 +368,11 @@ void Provenance::outputTSControlConfig(string ts_control_model_name, double dt_m
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -408,11 +408,11 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 
     //    Get Maximum Iterations
@@ -434,11 +434,11 @@ void Provenance::outputIOConfig(string dpath, string rname, unsigned int write_i
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -479,11 +479,11 @@ void Provenance::outputGetMaximumIterationsToFlow(Real dt, Real tmax,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 
     //    Get Maximum Iterations to Transport
@@ -505,11 +505,11 @@ void Provenance::outputGetMaximumIterationsToFlow(Real dt, Real tmax,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t2.writeJSON(memalloc);
+    t2.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -550,11 +550,11 @@ void Provenance::outputGetMaximumIterationsToTransport(Real dt, Real tmax,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -591,11 +591,11 @@ void Provenance::inputInitDataExtraction(int lineID) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -694,11 +694,11 @@ void Provenance::outputInitDataExtraction(int lineID, string xdmf, int dimension
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformationTag, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformationTag, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -731,11 +731,11 @@ void Provenance::inputInitVisualization(int lineID) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -774,11 +774,11 @@ void Provenance::outputInitVisualization(int lineID, int timeStep) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation, simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -811,11 +811,11 @@ void Provenance::inputVisualization(int lineID) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-R.json", jsonDirectory.c_str(), transformation, taskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-R.json", pgDirectory.c_str(), transformation, taskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -854,11 +854,11 @@ void Provenance::outputVisualization(int lineID, int timeStep) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation, taskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation, taskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -891,11 +891,11 @@ void Provenance::inputSolverSimulationFlow() {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -959,11 +959,11 @@ void Provenance::finishTaskToOutputSolverSimulationFlow(Task t) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsFlow);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -996,11 +996,11 @@ void Provenance::inputSolverSimulationTransport() {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), taskID, numberIterationsTransport);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), taskID, numberIterationsTransport);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1066,11 +1066,11 @@ void Provenance::finishTaskToOutputSolverSimulationTransport(Task t) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), taskID, numberIterationsTransport);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), taskID, numberIterationsTransport);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1104,11 +1104,11 @@ void Provenance::inputComputeSolutionChange() {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeSolutionChange);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeSolutionChange);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1154,11 +1154,11 @@ void Provenance::outputComputeSolutionChange(int time_step, Real time, Real dt,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeSolutionChange);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeSolutionChange);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1192,11 +1192,11 @@ void Provenance::inputComputeTimeStep() {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeTimeStep);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeTimeStep);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1236,11 +1236,11 @@ void Provenance::outputComputeTimeStep(int time_step, Real time, Real dt, bool t
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeTimeStep);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), taskID, numberIterationsComputeTimeStep);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1277,11 +1277,11 @@ void Provenance::inputMeshRefinement() {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsMeshRefinements);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsMeshRefinements);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1323,11 +1323,11 @@ void Provenance::outputMeshRefinement(bool first_step_refinement,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsMeshRefinements);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, numberIterationsMeshRefinements);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1360,11 +1360,11 @@ void Provenance::inputMeshWriter() {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1406,11 +1406,11 @@ void Provenance::outputMeshWriter(int time_step, string xdmf) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 
     addMeshDependencyToList();
@@ -1451,11 +1451,11 @@ void Provenance::inputDataExtraction(int lineID) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-R.json", jsonDirectory.c_str(), transformation, simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-R.json", pgDirectory.c_str(), transformation, simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1554,11 +1554,11 @@ void Provenance::outputDataExtraction(int lineID, int timeStep,
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-%d-F.json", jsonDirectory.c_str(), transformation, simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-%d-F.json", pgDirectory.c_str(), transformation, simulationID, subTaskID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 
@@ -1610,11 +1610,11 @@ void Provenance::meshAggregator(string xdmf, int n_processors) {
 
 #ifdef DATABASE
     sprintf(memalloc, "%s%s-%d-F.json", jsonDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 #ifdef BACKUP
     sprintf(memalloc, "%s%s-%d-F.json", pgDirectory.c_str(), transformation.c_str(), simulationID);
-    t.writeJSON(memalloc);
+    t.writeJSON(memalloc, hostname);
 #endif
 }
 

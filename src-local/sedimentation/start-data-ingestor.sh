@@ -42,4 +42,4 @@ $SIMULATION_DIR/../dfa/database_starter.sh database.conf $SIMULATION_DIR $DATAPA
 # > out.txt 2> err.txt
 echo "--------------------------------------------"
 echo "Starting DfA RESTful API"
-java -jar $SIMULATION_DIR/../dfa/REST-DfA-1.0.jar
+# java -jar $SIMULATION_DIR/../dfa/REST-DfA-1.0.jar

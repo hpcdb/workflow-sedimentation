@@ -8,28 +8,22 @@ class ConfigurationFile():
 
     # constants
     databaseFileName = "database.conf"
-    computingFileName = "nodes.conf"
+    computingFileName = "machines.conf"
 
     def __init__(self, filePath):
         """Define a new configuration file"""
         self.filePath  = filePath;
 
-    def organizeNodes(self, nodes):
-        """Organize computational nodes to the database and computing processes."""
-        for node in nodes:
-            if(self.databaseNode == None):
-                self.databaseNode = node
-	    else:
-            	self.computingNodes += [node]
-
     def read(self):
         """Read computational nodes from configuration file"""
-        nodes = []
+        self.databaseNode = None
+        self.computingNodes = []
         with open(self.filePath) as f:
             for line in f:
-                if line not in nodes:
-                    nodes += [line]
-        self.organizeNodes(nodes)
+                if self.databaseNode == None:
+                    self.databaseNode = line
+                elif line != self.databaseNode:
+                    self.computingNodes += [line]
 
     def writeConfigurationFiles(self):
         """Write configuration files based on database and computing nodes."""
