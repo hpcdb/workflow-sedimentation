@@ -928,7 +928,7 @@ Task Provenance::addElementToOutputSolverSimulationFlow(Task t, int time_step, R
 #ifdef VERBOSE
     cout << "Add Element to Output Solver Simulation Flow" << endl;
 #endif
-    
+
     char memalloc[jsonArraySize];
     sprintf(memalloc, "%d;%d;%.7f;%.7f;%d;%d;%d;%.9f;%.9f;%.9f;%s",
             simulationID, time_step, dt, time, linear_step, n_linear_step,
@@ -1621,7 +1621,7 @@ void Provenance::meshAggregator(string xdmf, int n_processors) {
 void Provenance::finishDataIngestor() {
     if (processor_id != 0) return;
 
-    string str = "cp ../dfa/finish.token .";
+    string str = "cp ../dfa/finish.token prov/di/sedimentation";
     int exitStatus = system(strdup(str.c_str()));
 
     cout << "[Provenance] Finish Data Ingestor" << endl;

@@ -9,7 +9,7 @@ void Task::writeJSON(string filename, string dfa_hostname) {
         char vs[10];
         int len = sprintf(vs, "%d", ID);
         Value v;
-        v.SetString(vs, static_cast<SizeType> (len), document.GetAllocator());
+        v.SetString(vs, static_cast<SizeType>(len), document.GetAllocator());
         document.AddMember("id", v, document.GetAllocator());
     }
 
@@ -17,7 +17,7 @@ void Task::writeJSON(string filename, string dfa_hostname) {
         char vs[10];
         int len = sprintf(vs, "%d", subID);
         Value v;
-        v.SetString(vs, static_cast<SizeType> (len), document.GetAllocator());
+        v.SetString(vs, static_cast<SizeType>(len), document.GetAllocator());
         document.AddMember("subid", v, document.GetAllocator());
     } else {
         Value v;
@@ -66,14 +66,14 @@ void Task::writeJSON(string filename, string dfa_hostname) {
         Value method;
         method.SetString(pm.GetMethod().c_str(), pm.GetMethod().size(), document.GetAllocator());
         p.AddMember("method", method, document.GetAllocator());
-
-        if (!pm.GetStartTime().empty()) {
+        
+        if(!pm.GetStartTime().empty()){
             Value time;
             time.SetString(pm.GetStartTime().c_str(), pm.GetStartTime().size(), document.GetAllocator());
             p.AddMember("startTime", time, document.GetAllocator());
         }
-
-        if (!pm.GetEndTime().empty()) {
+        
+        if(!pm.GetEndTime().empty()){
             Value time;
             time.SetString(pm.GetEndTime().c_str(), pm.GetEndTime().size(), document.GetAllocator());
             p.AddMember("endTime", time, document.GetAllocator());
@@ -146,7 +146,7 @@ void Task::writeJSON(string filename, string dfa_hostname) {
         adeps.AddMember("ids", aids, document.GetAllocator());
     }
     document.AddMember("dependency", adeps, document.GetAllocator());
-
+    
     Value afiles(kArrayType);
     for (File pfile : this->files) {
         Value p;
@@ -159,7 +159,7 @@ void Task::writeJSON(string filename, string dfa_hostname) {
         Value path;
         path.SetString(pfile.GetPath().c_str(), pfile.GetPath().size(), document.GetAllocator());
         p.AddMember("path", path, document.GetAllocator());
-
+        
         afiles.PushBack(p, document.GetAllocator());
     }
     document.AddMember("files", afiles, document.GetAllocator());

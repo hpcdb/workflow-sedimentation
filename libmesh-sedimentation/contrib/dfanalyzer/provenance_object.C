@@ -4,5 +4,5 @@ ProvenanceObject::ProvenanceObject(int newID) {
     ID = newID;
 }
 
-void ProvenanceObject::writeJSON(string filename) {
+void ProvenanceObject::writeJSON(string filename, string dfa_hostname) {
 }

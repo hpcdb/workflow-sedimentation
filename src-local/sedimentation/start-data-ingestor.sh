@@ -3,12 +3,12 @@ clear
 echo "Setting up environment variables"
 SIMULATION_DIR=`pwd`
 DFA_PROPERTIES=$SIMULATION_DIR/DfA.properties
-DI_DIR=$SIMULATION_DIR/provenance
+DI_DIR=$SIMULATION_DIR
 echo "--------------------------------------------"
 echo "Removing data from previous executions"
 rm $DFA_PROPERTIES
 # organizing provenance directories
-rm -rf provenance/*
+rm -rf provenance
 ./delete.sh
 # cleaning up MonetDB directory
 killall mserver5
@@ -42,4 +42,4 @@ $SIMULATION_DIR/../dfa/database_starter.sh database.conf $SIMULATION_DIR $DATAPA
 # > out.txt 2> err.txt
 echo "--------------------------------------------"
 echo "Starting DfA RESTful API"
-# java -jar $SIMULATION_DIR/../dfa/REST-DfA-1.0.jar
+java -jar $SIMULATION_DIR/../dfa/REST-DfA-1.0.jar

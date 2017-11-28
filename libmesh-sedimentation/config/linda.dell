@@ -1,0 +1,4 @@
+
+export LIBMESH_DIR=/home/linda/local/libmesh
+export PARAVIEW_VERSION=5.2
+export PARAVIEW_DIR=/home/users/vitorss/local/all/paraview-5.2.0
