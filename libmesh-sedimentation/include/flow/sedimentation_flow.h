@@ -111,10 +111,6 @@ public:
     unsigned int nonlinear_iteractions() {
         return _nonlinear_iteractions;
     };
-    
-    unsigned int get_ssteady_count() {
-        return flow_ssteady_count;
-    };    
 
     Number strainRateTensorNorm2D(const RealGradient& GradU, const RealGradient& GradV) {
         /* GradU = (dphi_x*U, dphi_y*U)
@@ -173,14 +169,13 @@ private:
     Real gravity;
     Real rho;
     Real viscosity;
-    int outflow_id;
+    int outbflow_id;
     Real _non_linear_tolerance;
     Real _linear_tolerance;
     unsigned int _max_nonlinear_iteractions;
     unsigned int _nonlinear_iteractions;
     unsigned int _current_n_linear_iteractions;
     unsigned int _linear_iteractions;
-    unsigned int flow_ssteady_count;
     Real _current_final_linear_residual;
     Real _solution_norm;
     Real _nonlinear_step_norm;

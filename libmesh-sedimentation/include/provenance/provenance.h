@@ -22,8 +22,6 @@
 
 #include "dfanalyzer/task.h"
 
-// #define VERBOSE
-
 using namespace std;
 using namespace libMesh;
 
@@ -33,13 +31,12 @@ public:
     Provenance(int processorID, string dfa_hostname);
 
     void SetUp();
-    void inputInputMesh();
-    void outputInputMesh(int dim, string mesh_file, bool restarControl);
+    void inputMesh(int dim, string mesh_file, bool restarControl);
 
-    void outputAMRConfig(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels, bool first_step_refinement,
+    void AMRConfig(double r_fraction, double c_fraction, double max_h_level, unsigned int hlevels, bool first_step_refinement,
             bool amrc_flow_transp, int ref_interval, int max_r_steps);
 
-    void outputCreateEquationSystems(Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc, Real theta, Real ex, Real ey, Real ez, Real c_factor);
+    void createEquationSystems(Real Reynolds, Real Gr, Real Sc, Real Us, Real Diffusivity, Real xlock, Real fopc, Real theta, Real ex, Real ey, Real ez, Real c_factor);
 
     void outputTSControlConfig(string ts_control_model_name, double dt_min, double dt_max, double tol_u, double tol_s,
             double kp, double ki, double kd, unsigned int nsa_max, unsigned int nsa_target_flow, unsigned int nsa_target_transport,
@@ -52,45 +49,35 @@ public:
 
     void outputGetMaximumIterationsToTransport(Real dt, Real tmax, unsigned int n_time_steps, unsigned int n_nonlinear_steps, double nonlinear_tolerance, int max_linear_iters, string xdmf);
 
-    void inputInitDataExtraction(int lineID);
     void outputInitDataExtraction(int lineID, string xdmf, int dimension);
 
-    void inputInitVisualization(int lineID);
     void outputInitVisualization(int lineID, int timeStep);
 
-    void inputSolverSimulationFlow();
     Task generateTaskToOutputSolverSimulationFlow();
     Task addElementToOutputSolverSimulationFlow(Task t, int time_step, Real dt, Real time,
             int linear_step, int n_linear_step, unsigned int n_linear_iterations,
             Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
     void finishTaskToOutputSolverSimulationFlow(Task t);
 
-    void inputSolverSimulationTransport();
     Task generateTaskToOutputSolverSimulationTransport();
     Task addElementToOutputSolverSimulationTransport(Task t, int time_step, Real dt, Real time,
             int linear_step, int n_linear_step, unsigned int n_linear_iterations,
             Real linear_residual, Real norm_delta, Real norm_delta_u, bool converged);
     void finishTaskToOutputSolverSimulationTransport(Task t);
 
-    void inputComputeSolutionChange();
     void outputComputeSolutionChange(int time_step, Real time, Real dt,
             unsigned int n_flow_linear_iterations_total, unsigned int n_flow_nonlinear_iterations_total,
             unsigned int n_transport_linear_iterations_total, unsigned int n_transport_nonlinear_iterations_total,
             bool timeStepAccepted, double error);
 
-    void inputComputeTimeStep();
     void outputComputeTimeStep(int time_step, Real time, Real dt, bool timeStepAccepted);
 
-    void inputMeshRefinement();
     void outputMeshRefinement(bool first_step_refinement, int time_step, int before_n_active_elem, int after_n_active_elem);
 
-    void inputMeshWriter();
     void outputMeshWriter(int time_step, string xdmf);
 
-    void inputDataExtraction(int lineID);
     void outputDataExtraction(int lineID, int time_step, string xdmf, int dimension);
 
-    void inputVisualization(int lineID);
     void outputVisualization(int lineID, int time_step);
 
     void meshAggregator(string xdmf, int n_processors);

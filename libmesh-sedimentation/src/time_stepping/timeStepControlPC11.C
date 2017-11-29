@@ -74,7 +74,7 @@ void  timeStepControlPC11::computeSolutionChangeInTime(EquationSystems & es) {
         // Compute the l2 norm of the difference between two successive solutions
         flow_diff_norm = current_flow_soln->l2_norm();
     
-        //cout<<"Complete Solution L2 norm = "<<flow_norm<<" Complete Diff Solution L2 norm = "<<flow_diff_norm<<endl;
+        cout<<"Complete Solution L2 norm = "<<flow_norm<<" Complete Diff Solution L2 norm = "<<flow_diff_norm<<endl;
     
         // compute the measure of the change in time for flow
         if (flow_diff_norm>1.0e-10) { // avoid 'e_flow' becomes zero!
@@ -82,7 +82,7 @@ void  timeStepControlPC11::computeSolutionChangeInTime(EquationSystems & es) {
             // divide by tolerance here to compare this value with that floe transport problem
             r_flow /= this->tol_U;
         }
-        //cout<<" rflow_complete = "<< r_flow<<endl;
+        cout<<" rflow_complete = "<< r_flow<<endl;
     } else { // to compute the only velocity solution vector L2 norm (excludes pressure)
 
         // The dimension that we are running

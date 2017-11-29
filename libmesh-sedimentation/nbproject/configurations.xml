@@ -29,16 +29,16 @@
         <df name="provenance">
           <in>provenance.C</in>
         </df>
+        <df name="sediment">
+          <in>sediment_mass_energy.C</in>
+          <in>sedimentation_deposition.C</in>
+          <in>sedimentation_transport.C</in>
+        </df>
         <df name="time_stepping">
           <in>timeStepControlBase.C</in>
           <in>timeStepControlPC11.C</in>
           <in>timeStepControlPID.C</in>
           <in>timeStepControlResidual.C</in>
-        </df>
-        <df name="transport">
-          <in>sediment_mass_energy.C</in>
-          <in>sedimentation_deposition.C</in>
-          <in>sedimentation_transport.C</in>
         </df>
       </df>
       <in>sedimentation.C</in>
@@ -105,6 +105,21 @@
       </item>
       <item path="src/provenance/provenance.C" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/sediment/sediment_mass_energy.C"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/sediment/sedimentation_deposition.C"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="src/sediment/sedimentation_transport.C"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
       <item path="src/time_stepping/timeStepControlBase.C"
             ex="false"
             tool="1"
@@ -121,21 +136,6 @@
             flavor2="0">
       </item>
       <item path="src/time_stepping/timeStepControlResidual.C"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/transport/sediment_mass_energy.C"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/transport/sedimentation_deposition.C"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="src/transport/sedimentation_transport.C"
             ex="false"
             tool="1"
             flavor2="0">

@@ -66,19 +66,23 @@ std::pair<int, int> CellTypeLibMeshToVTK(ElemType etype) {
 
 namespace {
 
-    vtkCPProcessor *Processor    = NULL;
+    vtkCPProcessor *Processor = NULL;
     vtkUnstructuredGrid *VTKGrid = NULL;
-    int rebuild_grid             = false;
+    int rebuild_grid = false;
 
     void CreateVTKGrid(EquationSystems &eq, std::map<unsigned int, unsigned int> &g2l) {
 
-     
+        // The grid structure isn't changing so we only build it
+        // the first time it's needed. If we needed the memory
+        // we could delete it and rebuild as necessary.
+
+
         const MeshBase &mesh = eq.get_mesh();
         g2l.clear();
 
         std::cout << "  Creating Grid..." << std::endl;
 
-        int unsigned ncells  = mesh.n_local_elem();
+        int unsigned ncells = mesh.n_local_elem();
         int unsigned npoints = mesh.n_local_nodes();
 
         // create the points information
@@ -88,20 +92,20 @@ namespace {
 
 
         MeshBase::const_element_iterator e_iter = mesh.active_local_elements_begin();
-        MeshBase::const_element_iterator e_end  = mesh.active_local_elements_end();
+        MeshBase::const_element_iterator e_end = mesh.active_local_elements_end();
         ElemType etype = (*e_iter)->type();
-        int nodal_counter = 0;
+        int node_counter = 0;
         for (; e_iter != e_end; e_iter++) {
             const Elem* elem = *e_iter;
             for (int n = 0; n < elem->n_nodes(); n++) {
                 int g_id = elem->node(n);
                 if (g2l.find(g_id) == g2l.end()) {
-                    g2l[g_id] = nodal_counter;
+                    g2l[g_id] = node_counter;
 
                     pointArray->InsertNextTuple3(elem->point(n)(0),
                             elem->point(n)(1),
                             elem->point(n)(2));
-                    nodal_counter++;
+                    node_counter++;
                 }
             }
         }
@@ -185,7 +189,7 @@ namespace {
             CreateVTKGrid(eq, libmesh_global_to_local_map);
         }
 
-        // If AMR is used, we need to rebuild the VTKGrid.
+        // If AMR is used, wee need rebuild the VTKGrid.
         if (VTKGrid != NULL && rebuild_grid) {
             libmesh_global_to_local_map.clear();
             VTKGrid->Delete();

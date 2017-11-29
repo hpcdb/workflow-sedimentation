@@ -1,7 +1,7 @@
 #include "task.h"
 #include <curl/curl.h>
 
-void Task::writeJSON(string filename, string dfa_hostname) {
+void Task::writeJSON(string dfa_hostname) {
     Document document;
     document.SetObject();
 

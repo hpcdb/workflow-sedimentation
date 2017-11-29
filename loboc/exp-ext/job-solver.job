@@ -1,11 +1,11 @@
-#PBS -l select=2:ncpus=48:mpiprocs=12
+#PBS -l select=41:ncpus=48:mpiprocs=12
 #PBS -l walltime=24:00:00
 #PBS -j oe  
 #PBS -N sed-ext
 #PBS -V 
 #PBS -m bae
 #PBS -M vitor.silva.sousa@gmail.com
-JCORES=240
+JCORES=480
 
 echo "Starting job..."
 module load intel

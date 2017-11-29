@@ -259,7 +259,6 @@ void SedimentationFlow::setup(GetPot &infile, bool restartControl) {
             inlet.insert(inlet_id);
         }
     }
-    
     if (inlet.size() != 0) {
 
         if (infile.vector_variable_size("flow/dirichlet/inlet/constant/u") == 1) {
@@ -279,22 +278,21 @@ void SedimentationFlow::setup(GetPot &infile, bool restartControl) {
             flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(inlet, velocity_z, &wbc));
         }
 
-        if (infile.vector_variable_size("flow/dirichlet/inlet/function/u") == 1) {
+        if (infile.vector_variable_size("flow/dirichlet/inlet/functiont/u") == 1) {
             std::string f = infile("flow/dirichlet/inlet/function/u", "0.0", 0);
             flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(inlet, velocity_x, ParsedFunction<Number>(f)));
-            cout<<"\n Vx = " <<f<<endl;
         }
         if (infile.vector_variable_size("flow/dirichlet/inlet/function/v") == 1) {
             std::string f = infile("flow/dirichlet/inlet/function/v", "0.0", 0);
             flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(inlet, velocity_y, ParsedFunction<Number>(f)));
-                        cout<<"\n Vy = " <<f<<endl;
         }
         if (infile.vector_variable_size("flow/dirichlet/inlet/function/w") == 1) {
             std::string f = infile("flow/dirichlet/inlet/function/w", "0.0", 0);
             flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(inlet, velocity_z, ParsedFunction<Number>(f)));
         }
     }
-    
+
+
     size = infile.vector_variable_size("flow/dirichlet/pressure/zero");
     for (int i = 0; i < size; i++) {
         int pnull_id = infile("flow/dirichlet/pressure/zero", -1, i);
@@ -308,7 +306,7 @@ void SedimentationFlow::setup(GetPot &infile, bool restartControl) {
     }
 
     pnull.clear();
-    
+
     /*
     size = infile.vector_variable_size("flow/dirichlet/pressure/hydrostatic");
     for (int i = 0; i < size; i++) {
@@ -321,11 +319,7 @@ void SedimentationFlow::setup(GetPot &infile, bool restartControl) {
         flow_system.get_dof_map().add_dirichlet_boundary(DirichletBoundary(pnull, pressure, HydrostaticPressureFunction(dim, rho, gravity)));
     }
      */
-    this->outflow_id = infile("flow/neumann/outlet", -1);
-    if (this->outflow_id != -1) {
-        std::cout << " Outlet flow wall is " << this->outflow_id << std::endl;
-    }
-    es.parameters.set<int> ("outflow_id") = this->outflow_id;    
+    this->outbflow_id = infile("flow/neumann/outflow", -1);
 
     // For the lock exchange problem, we may initialize only the pressure as a hydrostatic field
     if (infile("flow/has_initial_condition", false) && !restartControl) flow_system.attach_init_function(init_flow);
@@ -1149,7 +1143,6 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
 #ifdef PROVENANCE
     prov->incrementIterationsFlow();
     perf_log->start_event("SolverSimulationFluid", "Provenance");
-    prov->inputSolverSimulationFlow();
     Task task = prov->generateTaskToOutputSolverSimulationFlow();
     perf_log->stop_event("SolverSimulationFluid", "Provenance");
 #endif
@@ -1232,12 +1225,6 @@ void SedimentationFlow::solve(int t_step, Real dt, Real time, int r_step, bool& 
         // if the most recent linear system was solved to a sufficient tolerance.
         if ((norm_delta < this->_non_linear_tolerance)) // && (flow_system.final_linear_residual() < nonlinear_tolerance)
         {
-	    // to check whether steady-state was reached
-            if(flow_nli_counter == 0) 
-                this->flow_ssteady_count++;
-            else
-                this->flow_ssteady_count = 0;
-                 
             std::ostringstream out;
             // We write the file in the ExodusII format.
             out << std::setw(70)
@@ -1311,23 +1298,12 @@ void SedimentationFlow::assembleSUPG2D() {
     // The element Jacobian * quadrature weight at each integration point.
     const std::vector<Real>& JxW = fe_vel->get_JxW();
 
-    // Face Finite element     
-    UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_vel_type));
-    // A Gauss quadrature rule for numerical integration at faces.
-    QGauss qface(dim - 1, fe_vel_type.default_quadrature_order());
-    // Tell the face finite element object to use our quadrature rule.
-    fe_face->attach_quadrature_rule(&qface);
-    // The face element Jacobian * quadrature weight at each integration point.
-    const std::vector<Real>& JxW_face = fe_face->get_JxW();    
-
     // The element shape functions evaluated at the quadrature points.
     const std::vector<std::vector<Real> >& phi = fe_vel->get_phi();
-    const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
 
     // The element shape function gradients for the velocity
     // variables evaluated at the quadrature points.
     const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
-    const std::vector<std::vector<RealGradient> >& dphi_face = fe_face->get_dphi();
 
     // A reference to the \p DofMap object for this system.  The \p DofMap
     // object handles the index translation from node and element numbers
@@ -1557,34 +1533,6 @@ void SedimentationFlow::assembleSUPG2D() {
                 }
             }
         } // end of the quadrature point qp-loop
-        
-        // Boundary action at outflow
-        for (unsigned int sd = 0; sd < elem->n_sides(); sd++) {
-            if (elem->neighbor(sd) == NULL) {
-
-                fe_face->reinit(elem, sd);                
-                // Computing equivalent force at "outlet" wall
-                if (mesh.boundary_info->boundary_id(elem, sd) == es.parameters.set<int> ("outflow_id")) {
-                    // normal to the element face
-                    const std::vector<Point> normal = fe_face->get_normals();
-                    double aux;
-                    for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
-                        for (unsigned int i = 0; i < phi_face.size(); i++) {
-                            aux = JxW_face[qp] * dt * phi_face[i][qp];
-                            for (unsigned int j = 0; j < phi_face.size(); j++) {
-                                // PS: sign was change to take into account the equivalente force due the "external domain" into the internal one
-                                Kuu(i, j) += aux * uRe * ( 2.0 * dphi_face[j][qp](0) * normal[qp](0) + dphi_face[j][qp](1) * normal[qp](1) );
-                                Kuv(i, j) += aux * uRe * dphi_face[j][qp](0) * normal[qp](1);
-                                Kup(i, j) -= aux * phi_face[j][qp] * normal[qp](0);
-                                Kvu(i, j) += aux * uRe * dphi_face[j][qp](1) * normal[qp](0);
-                                Kvv(i, j) += aux * uRe * ( dphi_face[j][qp](0) * normal[qp](0) + 2.0 * dphi_face[j][qp](1) * normal[qp](1) );
-                                Kvp(i, j) -= aux * phi_face[j][qp] * normal[qp](1);
-                            }
-                        }
-                    }
-                } //end if (outlet_BC)
-            } //end if (elem->neighbor(sd) == NULL)
-        } // end loop over element's sides          
 
         dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
 
@@ -1642,23 +1590,12 @@ void SedimentationFlow::assembleSUPG3D() {
     // The element Jacobian * quadrature weight at each integration point.
     const std::vector<Real>& JxW = fe_vel->get_JxW();
 
-    // Face Finite element     
-    UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_vel_type));
-    // A Gauss quadrature rule for numerical integration at faces.
-    QGauss qface(dim - 1, fe_vel_type.default_quadrature_order());
-    // Tell the face finite element object to use our quadrature rule.
-    fe_face->attach_quadrature_rule(&qface);
-    // The face element Jacobian * quadrature weight at each integration point.
-    const std::vector<Real>& JxW_face = fe_face->get_JxW();    
-
     // The element shape functions evaluated at the quadrature points.
     const std::vector<std::vector<Real> >& phi = fe_vel->get_phi();
-    const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
 
     // The element shape function gradients for the velocity
     // variables evaluated at the quadrature points.
     const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
-    const std::vector<std::vector<RealGradient> >& dphi_face = fe_face->get_dphi();
 
     // A reference to the \p DofMap object for this system.  The \p DofMap
     // object handles the index translation from node and element numbers
@@ -1939,40 +1876,6 @@ void SedimentationFlow::assembleSUPG3D() {
                 }
             }
         } // end of the quadrature point qp-loop
-        
-        // Boundary action at outflow
-        for (unsigned int sd = 0; sd < elem->n_sides(); sd++) {
-            if (elem->neighbor(sd) == NULL) {
-
-                fe_face->reinit(elem, sd);                
-                // Computing equivalent force at "outlet" wall
-                if (mesh.boundary_info->boundary_id(elem, sd) == es.parameters.set<int> ("outflow_id")) {
-                    // normal to the element face
-                    const std::vector<Point> normal = fe_face->get_normals();
-                    double aux;
-                    for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
-                        for (unsigned int i = 0; i < phi_face.size(); i++) {
-                            aux = JxW_face[qp] * dt * phi_face[i][qp];
-                            for (unsigned int j = 0; j < phi_face.size(); j++) {
-                                // PS: sign was change to take into account the equivalente force due the "external domain" into the internal one
-                                Kuu(i, j) += aux * uRe * ( 2.0 * dphi_face[j][qp](0) * normal[qp](0) + dphi_face[j][qp](1) * normal[qp](1) + dphi_face[j][qp](2) * normal[qp](2) );
-                                Kuv(i, j) += aux * uRe * dphi_face[j][qp](0) * normal[qp](1);
-                                Kuw(i, j) += aux * uRe * dphi_face[j][qp](0) * normal[qp](2);
-                                Kup(i, j) -= aux * phi_face[j][qp] * normal[qp](0);
-                                Kvu(i, j) += aux * uRe * dphi_face[j][qp](1) * normal[qp](0);
-                                Kvv(i, j) += aux * uRe * ( dphi_face[j][qp](0) * normal[qp](0) + 2.0 * dphi_face[j][qp](1) * normal[qp](1) + dphi_face[j][qp](2) * normal[qp](2) );
-                                Kvw(i, j) += aux * uRe * dphi_face[j][qp](1) * normal[qp](2);
-                                Kvp(i, j) -= aux * phi_face[j][qp] * normal[qp](1);
-                                Kwu(i, j) += aux * uRe * dphi_face[j][qp](2) * normal[qp](0);
-                                Kwv(i, j) += aux * uRe * dphi_face[j][qp](2) * normal[qp](1);
-                                Kww(i, j) += aux * uRe * ( dphi_face[j][qp](0) * normal[qp](0) + dphi_face[j][qp](1) * normal[qp](1) + 2.0 * dphi_face[j][qp](2) * normal[qp](2) );                                
-                                Kwp(i, j) -= aux * phi_face[j][qp] * normal[qp](2);  
-                            }
-                        }
-                    }
-                } //end if (outlet_BC)
-            } //end if (elem->neighbor(sd) == NULL)
-        } // end loop over element's sides              
 
         dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
 
@@ -2018,32 +1921,23 @@ void SedimentationFlow::assembleRBVMS2D() {
     const unsigned int disp_var = mesh_system.variable_number("disp-z");
 #endif
 
-    //Finite element type
     FEType fe_vel_type = flow_system.variable_type(u_var);
+
     UniquePtr<FEBase> fe_vel(FEBase::build(dim, fe_vel_type));
     QGauss qrule(dim, fe_vel_type.default_quadrature_order());
+
     // Tell the finite element objects to use our quadrature rule.
     fe_vel->attach_quadrature_rule(&qrule);
+    //
     // The element Jacobian * quadrature weight at each integration point.
     const std::vector<Real>& JxW = fe_vel->get_JxW();
-    
-    // Face Finite element     
-    UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_vel_type));
-    // A Gauss quadrature rule for numerical integration at faces.
-    QGauss qface(dim - 1, fe_vel_type.default_quadrature_order());
-    // Tell the face finite element object to use our quadrature rule.
-    fe_face->attach_quadrature_rule(&qface);
-    // The face element Jacobian * quadrature weight at each integration point.
-    const std::vector<Real>& JxW_face = fe_face->get_JxW();    
 
     // The element shape functions evaluated at the quadrature points.
     const std::vector<std::vector<Real> >& phi = fe_vel->get_phi();
-    const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
 
     // The element shape function gradients for the velocity
     // variables evaluated at the quadrature points.
     const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
-    const std::vector<std::vector<RealGradient> >& dphi_face = fe_face->get_dphi();
 
     // A reference to the \p DofMap object for this system.  The \p DofMap
     // object handles the index translation from node and element numbers
@@ -2282,34 +2176,6 @@ void SedimentationFlow::assembleRBVMS2D() {
                 }
             }
         } // end of the quadrature point qp-loop
-        
-        // Boundary action at outflow
-        for (unsigned int sd = 0; sd < elem->n_sides(); sd++) {
-            if (elem->neighbor(sd) == NULL) {
-
-                fe_face->reinit(elem, sd);                
-                // Computing equivalent force at "outlet" wall
-                if (mesh.boundary_info->boundary_id(elem, sd) == es.parameters.set<int> ("outflow_id")) {
-                    // normal to the element face
-                    const std::vector<Point> normal = fe_face->get_normals();
-                    double aux;
-                    for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
-                        for (unsigned int i = 0; i < phi_face.size(); i++) {
-                            aux = JxW_face[qp] * dt * phi_face[i][qp];
-                            for (unsigned int j = 0; j < phi_face.size(); j++) {
-                                // PS: sign was change to take into account the equivalente force due the "external domain" into the internal one
-                                Kuu(i, j) += aux * uRe * ( 2.0 * dphi_face[j][qp](0) * normal[qp](0) + dphi_face[j][qp](1) * normal[qp](1) );
-                                Kuv(i, j) += aux * uRe * dphi_face[j][qp](0) * normal[qp](1);
-                                Kup(i, j) -= aux * phi_face[j][qp] * normal[qp](0);
-                                Kvu(i, j) += aux * uRe * dphi_face[j][qp](1) * normal[qp](0);
-                                Kvv(i, j) += aux * uRe * ( dphi_face[j][qp](0) * normal[qp](0) + 2.0 * dphi_face[j][qp](1) * normal[qp](1) );
-                                Kvp(i, j) -= aux * phi_face[j][qp] * normal[qp](1);
-                            }
-                        }
-                    }
-                } //end if (outlet_BC)
-            } //end if (elem->neighbor(sd) == NULL)
-        } // end loop over element's sides        
 
         dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
 
@@ -2371,23 +2237,12 @@ void SedimentationFlow::assembleRBVMS3D() {
     // The element Jacobian * quadrature weight at each integration point.
     const std::vector<Real>& JxW = fe_vel->get_JxW();
 
-    // Face Finite element     
-    UniquePtr<FEBase> fe_face(FEBase::build(dim, fe_vel_type));
-    // A Gauss quadrature rule for numerical integration at faces.
-    QGauss qface(dim - 1, fe_vel_type.default_quadrature_order());
-    // Tell the face finite element object to use our quadrature rule.
-    fe_face->attach_quadrature_rule(&qface);
-    // The face element Jacobian * quadrature weight at each integration point.
-    const std::vector<Real>& JxW_face = fe_face->get_JxW();    
-
     // The element shape functions evaluated at the quadrature points.
     const std::vector<std::vector<Real> >& phi = fe_vel->get_phi();
-    const std::vector<std::vector<Real> >& phi_face = fe_face->get_phi();
 
     // The element shape function gradients for the velocity
     // variables evaluated at the quadrature points.
     const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
-    const std::vector<std::vector<RealGradient> >& dphi_face = fe_face->get_dphi();
 
     // A reference to the \p DofMap object for this system.  The \p DofMap
     // object handles the index translation from node and element numbers
@@ -2682,40 +2537,6 @@ void SedimentationFlow::assembleRBVMS3D() {
                 }
             }
         } // end of the quadrature point qp-loop
-        
-        // Boundary action at outflow
-        for (unsigned int sd = 0; sd < elem->n_sides(); sd++) {
-            if (elem->neighbor(sd) == NULL) {
-
-                fe_face->reinit(elem, sd);                
-                // Computing equivalent force at "outlet" wall
-                if (mesh.boundary_info->boundary_id(elem, sd) == es.parameters.set<int> ("outflow_id")) {
-                    // normal to the element face
-                    const std::vector<Point> normal = fe_face->get_normals();
-                    double aux;
-                    for (unsigned int qp = 0; qp < qface.n_points(); qp++) {
-                        for (unsigned int i = 0; i < phi_face.size(); i++) {
-                            aux = JxW_face[qp] * dt * phi_face[i][qp];
-                            for (unsigned int j = 0; j < phi_face.size(); j++) {
-                                // PS: sign was change to take into account the equivalente force due the "external domain" into the internal one
-                                Kuu(i, j) += aux * uRe * ( 2.0 * dphi_face[j][qp](0) * normal[qp](0) + dphi_face[j][qp](1) * normal[qp](1) + dphi_face[j][qp](2) * normal[qp](2) );
-                                Kuv(i, j) += aux * uRe * dphi_face[j][qp](0) * normal[qp](1);
-                                Kuw(i, j) += aux * uRe * dphi_face[j][qp](0) * normal[qp](2);
-                                Kup(i, j) -= aux * phi_face[j][qp] * normal[qp](0);
-                                Kvu(i, j) += aux * uRe * dphi_face[j][qp](1) * normal[qp](0);
-                                Kvv(i, j) += aux * uRe * ( dphi_face[j][qp](0) * normal[qp](0) + 2.0 * dphi_face[j][qp](1) * normal[qp](1) + dphi_face[j][qp](2) * normal[qp](2) );
-                                Kvw(i, j) += aux * uRe * dphi_face[j][qp](1) * normal[qp](2);
-                                Kvp(i, j) -= aux * phi_face[j][qp] * normal[qp](1);
-                                Kwu(i, j) += aux * uRe * dphi_face[j][qp](2) * normal[qp](0);
-                                Kwv(i, j) += aux * uRe * dphi_face[j][qp](2) * normal[qp](1);
-                                Kww(i, j) += aux * uRe * ( dphi_face[j][qp](0) * normal[qp](0) + dphi_face[j][qp](1) * normal[qp](1) + 2.0 * dphi_face[j][qp](2) * normal[qp](2) );                                
-                                Kwp(i, j) -= aux * phi_face[j][qp] * normal[qp](2);                                
-                            }
-                        }
-                    }
-                } //end if (outlet_BC)
-            } //end if (elem->neighbor(sd) == NULL)
-        } // end loop over element's sides         
 
         dof_map.heterogenously_constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
 
