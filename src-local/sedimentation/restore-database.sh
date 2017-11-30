@@ -1,9 +1,5 @@
 #!/bin/bash
 clear
-killall monetdbd
-killall mserver5
-sleep 5
-./stop-database.sh
 # monetdb-start-all
 # Restart MonetDB
 # cd ../dfa
@@ -11,8 +7,9 @@ sleep 5
 # cd ../sedimentation
 
 echo "Starting database system..."
-SIMULATION_DIR=`pwd`
-DATAPATH=$SIMULATION_DIR/data
+SIMULATION_DIR=/home/vitor/Documents/dev/workflow-sedimentation/src-local
+CPATH=$SIMULATION_DIR/sedimentation
+DATAPATH=$CPATH/data
 rm -rf data
-unzip $SIMULATION_DIR/data.zip
-$SIMULATION_DIR/../bin/database_starter.sh database.conf $SIMULATION_DIR $DATAPATH
+unzip $SIMULATION_DIR/bin/monetdb-database.zip
+$SIMULATION_DIR/bin/database_starter.sh database.conf $CPATH $DATAPATH

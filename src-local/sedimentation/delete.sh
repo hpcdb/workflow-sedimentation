@@ -30,8 +30,8 @@ rm -rf monitoring*.log
 # echo "time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear_iterations;flag" > monitoring-transport.log
 
 # environments: xps-nacad,xps-home,inspiron-laptop
-# ENVIRONMENT="inspiron-laptop"
-# cp -rf ../config/$ENVIRONMENT/* .
+ENVIRONMENT="inspiron-laptop"
+cp -rf ../config/$ENVIRONMENT/* .
 
 # mkdir prov
 # mkdir prov/di
@@ -40,5 +40,5 @@ rm -rf monitoring*.log
 # mkdir prov/di/sedimentation
 # cp dataflow.json prov/pg/sedimentation/
 # cp dataflow.json prov/di/sedimentation/
-mkdir output
+# mkdir output
 mkdir index

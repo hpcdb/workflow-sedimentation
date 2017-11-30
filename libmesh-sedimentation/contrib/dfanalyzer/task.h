@@ -38,7 +38,7 @@ public:
     Task(int ID) : ProvenanceObject(ID) {
     };
 
-    void writeJSON(string dfa_hostname);
+    void sendRequest(string dfa_hostname);
 
     int getSubID() const {
         return subID;

@@ -1,6 +1,8 @@
 /*
  * File:   sedimentation.cpp
- * Author: camata, vitor
+ * Authors: Jose J. Camata
+ *          Vitor ,
+ *          Andre Rossa 
  *
  * Created on December 9, 2014, 3:05 PM
  */
@@ -53,7 +55,6 @@
 
 // The definition of a geometric element
 #include "libmesh/elem.h"
-
 #include "xdmf.h"
 
 // Bring in everything from the libMesh namespace
@@ -67,9 +68,9 @@ using namespace std;
 
 #include "performance.h"
 #include "contrib/dfanalyzer/extractor.h"
-#include "viscosity_flow.h"
 #include "include/catalyst/FEAdaptor.h"
 
+#include "viscosity_flow.h"
 #include "mesh_moviment.h"
 #include "sedimentation_transport.h"
 #include "sedimentation_deposition.h"
@@ -106,18 +107,20 @@ void InSituCatalystCoprocessing(int dim, int numberOfScripts,
 
 
 // We can now begin the main program.  Note that this
-// example will fail if you are using complex numbers
+// code will fail if you are using complex numbers
 // since it was designed to be run only with real numbers.
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) 
+{
     // Initialize libMesh.
     LibMeshInit init(argc, argv);
 
     //    Restart
     bool restartControl = does_file_exist("restart.run");
     FILE* fpause;
-    unsigned int stop = 0;
+    unsigned int stop   = 0;
 
+    
     PerfLog perf_log("Sedimentation Solver");
 
     // This example requires Adaptive Mesh Refinement support - although
@@ -141,16 +144,19 @@ int main(int argc, char** argv) {
         std::cout << "Usage: " << argv[0] << " -i [input file].in -m [gmsh file].msh" << std::endl;
         libmesh_error_msg("You need specify a mesh file!");
     }
-    
-    string dfa_hostname;
-    if (command_line.search(1, "-dfa"))
-        dfa_hostname = command_line.next(dfa_hostname);
 
     GetPot infile(input);
     double v = infile("version", 1.0);
     if (v == 1.0) {
         libmesh_error_msg("This input file is not compatible with this libMesh-Sedimentation version !");
     }
+    
+    string dfa_hostname;
+    if (command_line.search(1, "-dfa")){
+        dfa_hostname = command_line.next(dfa_hostname);
+    }
+    
+    cout << dfa_hostname << endl;
 
     perf_log.start_event("Init", "Provenance");
     Provenance provenance(libMesh::global_processor_id(), dfa_hostname);
@@ -178,13 +184,19 @@ int main(int argc, char** argv) {
 
     int dim = infile("dim", 3);
 
+#ifdef PROVENANCE
+    perf_log.start_event("InputMesh", "Provenance");
+    provenance.inputInputMesh();
+    perf_log.stop_event("InputMesh", "Provenance");
+#endif
+
     // Create a mesh object, with dimension to be overridden later,
     // distributed across the default MPI communicator.
     Mesh mesh(init.comm());
 
 #ifdef PROVENANCE
     perf_log.start_event("InputMesh", "Provenance");
-    provenance.inputMesh(dim, mesh_file, restartControl);
+    provenance.outputInputMesh(dim, mesh_file, restartControl);
     perf_log.stop_event("InputMesh", "Provenance");
 #endif
 
@@ -197,6 +209,7 @@ int main(int argc, char** argv) {
     bool amrc_flow_transp = infile("amr/amrc_flow_transp", false);
     int ref_interval = infile("amr/r_interval", 1);
     int max_r_steps = infile("amr/max_r_steps", 1);
+    double amr_pressure_weight = infile("amr/pressure_weight", 0.0);
     bool use_amr = (max_r_steps > 1);
 
     MeshRefinement refinement(mesh);
@@ -206,7 +219,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("AMRConfig", "Provenance");
-    provenance.AMRConfig(r_fraction, c_fraction, max_h_level, initial_unif_ref_mesh, first_step_refinement,
+    provenance.outputAMRConfig(r_fraction, c_fraction, max_h_level, initial_unif_ref_mesh, first_step_refinement,
             amrc_flow_transp, ref_interval, max_r_steps);
     perf_log.stop_event("AMRConfig", "Provenance");
 #endif
@@ -271,7 +284,7 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
     perf_log.start_event("CreateEquationSystems", "Provenance");
-    provenance.createEquationSystems(Re, Gr, Sc, Us, Df, xlock, alfa, theta, ex, ey, ez, c_factor);
+    provenance.outputCreateEquationSystems(Re, Gr, Sc, Us, Df, xlock, alfa, theta, ex, ey, ez, c_factor);
     perf_log.stop_event("CreateEquationSystems", "Provenance");
 #endif
 
@@ -289,6 +302,9 @@ int main(int argc, char** argv) {
     unsigned int n_time_steps = infile("time/n_time_steps", 10000000);
     Real tmax = infile("time/tmax", 0.1);
     equation_systems.parameters.set<Real> ("tmax") = tmax;
+    // Steady-state counters
+    unsigned int n_flow_sstate = infile("time/n_flow_sstate", 50);
+    unsigned int n_transport_sstate = infile("time/n_transport_sstate", 50);
 
     // Time step control input data
     //-----------------------------
@@ -353,9 +369,6 @@ int main(int argc, char** argv) {
     sediment_transport.initial_linear_tolerance() = transport_initial_linear_solver_tol;
     sediment_transport.linear_tolerance_power() = linear_tolerance_power;
 
-    unsigned int n_flow_sstate = infile("n_flow_sstate", 50);
-    unsigned int n_transport_sstate = infile("n_transport_sstate", 50);
-
     // Output parameters
     unsigned int write_interval = infile("write_interval", 10);
     unsigned int catalyst_interval = infile("catalyst_interval", 10);
@@ -399,7 +412,7 @@ int main(int argc, char** argv) {
     std::cout << " Extraction script   : " << extractionScript << endl;
     std::cout << " Number of visualization scripts: " << to_string(visualizationScripts.size()) << endl;
     std::cout << " Visualization scripts: " << endl;
-    ;
+
     for (int i = 0; i < visualizationScripts.size(); i++) {
         cout << "                        " << visualizationScripts[i] << " , " << endl;
     }
@@ -502,6 +515,8 @@ int main(int argc, char** argv) {
 
         sediment_transport.init_mass = restart("initial_mass", 0.0);
         sediment_transport.mass_dep = restart("mass_dep", 0.0);
+        sediment_transport.inlet_mass = restart("inlet_mass", 0.0);
+        sediment_transport.outlet_volume = restart("outlet_volume", 0.0);
 
         int xdmf_file_id = restart("xdmf_file_id", 0);
         xdmf_writer.set_file_id(xdmf_file_id);
@@ -639,15 +654,11 @@ int main(int argc, char** argv) {
     // assert for time-step control the maximum number of successive approximation (nsa_max) parameter
     if (ts_control) {
         if (nsa_max > flow_n_nonlinear_steps || nsa_max > transport_n_nonlinear_steps) {
-            std::cout << "\nError: Maximum number of successive approximation greater than number NLI for Flow and/or Transport problem! ";
-            std::cout << "Simulation will be abort.";
-            return 0;
+            std::cout << "\n Warning: Maximum number of successive approximation greater than number NLI for Flow and/or Transport problem! ";
+            nsa_max = min(flow_n_nonlinear_steps, transport_n_nonlinear_steps);
+            std::cout << "\nMaximum number of successive approximation setted equal to " << nsa_max<<std::endl;
         }
     }
-
-    // Steady-state control parameters
-    unsigned int flow_sstate_count = 0;
-    unsigned int transport_sstate_count = 0;
 
     // non-linear iteration counter
     unsigned int flow_nli_counter = 0;
@@ -711,7 +722,8 @@ int main(int argc, char** argv) {
 
     bool aborted = false;
 
-    for (t_step = init_tstep; (t_step < n_time_steps) && abs(time - tmax) > 1.0e-08 && (!diverged_flow && !diverged_transport); ++t_step) {
+    for ( t_step = init_tstep; (t_step < n_time_steps) && abs(time - tmax) > 1.0e-08 && (!diverged_flow && !diverged_transport) &&
+                              ( ( sediment_flow.get_ssteady_count() < n_flow_sstate) || ( sediment_transport.get_ssteady_count() < n_transport_sstate) ); ++t_step ) {
 
 #ifdef PROVENANCE       
         provenance.incrementTaskID();
@@ -757,7 +769,7 @@ int main(int argc, char** argv) {
             refinement.max_h_level() = max_h_level;
 
 
-            // AKI DEVO INCLUIR TODOS OS PARÂMETROS LIDOS NO RESET
+           
             equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_linear_iter;
             equation_systems.parameters.set<double>("minimum_linear_solver_tolerance") = minimum_linear_solver_tol;
 
@@ -785,7 +797,7 @@ int main(int argc, char** argv) {
         UniquePtr<NumericVector<Number> > transp_soln_saved = transport_system.solution->clone();
 
         // storing the last accepted solutions as "old solutions"
-        *flow_system.old_local_solution = *flow_system.current_local_solution;
+        *flow_system.old_local_solution      = *flow_system.current_local_solution;
         *transport_system.old_local_solution = *transport_system.current_local_solution;
 
         bool TimeStepAccepted = true;
@@ -832,6 +844,12 @@ int main(int argc, char** argv) {
             n_transport_linear_iterations_total += sediment_transport.linear_iteractions();
 
             if (ts_control) {
+#ifdef PROVENANCE
+                perf_log.start_event("ComputeSolutionChange", "Provenance");
+                provenance.inputComputeSolutionChange();
+                perf_log.stop_event("ComputeSolutionChange", "Provenance");
+#endif
+
                 // to compute effective average time-step size
                 ts_control->updateAverageTS(dt);
 
@@ -855,8 +873,8 @@ int main(int argc, char** argv) {
             }
 
             if (!TimeStepAccepted) {
-                time -= dt;
-                flow_system.time = time;
+                time                 -= dt;
+                flow_system.time      = time;
                 transport_system.time = time;
 
                 // Recovering previous solution
@@ -881,6 +899,12 @@ int main(int argc, char** argv) {
             }
 
             if (ts_control) {
+#ifdef PROVENANCE
+                perf_log.start_event("ComputeTimeStep", "Provenance");
+                provenance.inputComputeTimeStep();
+                perf_log.stop_event("ComputeTimeStep", "Provenance");
+#endif
+
                 perf_log.start_event("computeTimeStep", "Time-Step Control");
                 if (t_step >= ts_control->getStartTimeStepControl() - 1)
                     ts_control->computeTimeStep(TimeStepAccepted, time, tmax, dt);
@@ -899,6 +923,12 @@ int main(int argc, char** argv) {
 
         if (use_amr || first_step_refinement) {
             if ((t_step + 1) % ref_interval == 0 || first_step_refinement) {
+#ifdef PROVENANCE
+                perf_log.start_event("MeshRefinement", "Provenance");
+                provenance.inputMeshRefinement();
+                perf_log.stop_event("MeshRefinement", "Provenance");
+#endif
+
                 int beforeNActiveElem = mesh.n_active_elem();
                 std::cout << std::setw(70) << std::setfill('*') << std::endl;
                 std::cout << "\nMesh Refinement: " << std::endl;
@@ -917,12 +947,12 @@ int main(int argc, char** argv) {
                 if (amrc_flow_transp && !first_step_refinement) {
                     // Weights to compute error for the Flow variables (to exclude pressure)
                     std::vector<Real> weights(flow_system.n_vars(), 1.0);
-                    weights[flow_system.n_vars() - 1] = 0.0; // excluding pressure for while
+                    weights[flow_system.n_vars() - 1] = amr_pressure_weight; // to use pressure is a user choice
                     error_estimator_flow.error_norm = SystemNorm(std::vector<FEMNormType>(flow_system.n_vars(), error_estimator_flow.error_norm.type(0)), weights);
                     error_estimator_flow.estimate_error(flow_system, error_flow);
 
                     libmesh_assert(error_flow == error);
-                    for (unsigned int i = 0; i < error.size(); i++)
+                    for (unsigned int i = 0; i < error.size(); i++) 
                         error[i] += error_flow[i];
                 }
 
@@ -1015,6 +1045,9 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
             provenance.incrementSubTaskID();
+            perf_log.start_event("MeshWriter", "Provenance");
+            provenance.inputMeshWriter();
+            perf_log.stop_event("MeshWriter", "Provenance");
 #endif
 
             // IF simulations is being paused, resulting files are writed different as abort
@@ -1051,6 +1084,8 @@ int main(int argc, char** argv) {
             f_restart << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
             f_restart << "mass_dep = " << setw(10) << setprecision(9) << sediment_transport.mass_dep << std::endl;
             f_restart << "initial_mass = " << setw(10) << setprecision(9) << sediment_transport.init_mass << std::endl;
+            f_restart << "inlet_mass = " << setw(10) << setprecision(9) << sediment_transport.inlet_mass << std::endl;
+            f_restart << "outlet_volume = " << setw(10) << setprecision(9) << sediment_transport.outlet_volume << std::endl;            
             f_restart << "n_flow_nonlinear_iterations_total = " << n_flow_nonlinear_iterations_total << std::endl;
             f_restart << "n_transport_nonlinear_iterations_total = " << n_transport_nonlinear_iterations_total << std::endl;
             f_restart << "n_flow_linear_iterations_total    = " << n_flow_linear_iterations_total << std::endl;
@@ -1102,6 +1137,9 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
         provenance.incrementSubTaskID();
+        perf_log.start_event("MeshWriter", "Provenance");
+        provenance.inputMeshWriter();
+        perf_log.stop_event("MeshWriter", "Provenance");
 #endif
 
         perf_log.start_event("Write", "XDMF");
@@ -1141,6 +1179,8 @@ int main(int argc, char** argv) {
         f_restart << "xdmf_file_id = " << xdmf_writer.get_file_id() << std::endl;
         f_restart << "mass_dep = " << setw(10) << setprecision(9) << sediment_transport.mass_dep << std::endl;
         f_restart << "initial_mass = " << setw(10) << setprecision(9) << sediment_transport.init_mass << std::endl;
+        f_restart << "inlet_mass = " << setw(10) << setprecision(9) << sediment_transport.inlet_mass << std::endl;
+        f_restart << "outlet_volume = " << setw(10) << setprecision(9) << sediment_transport.outlet_volume << std::endl;         
         f_restart << "n_flow_nonlinear_iterations_total = " << n_flow_nonlinear_iterations_total << std::endl;
         f_restart << "n_transport_nonlinear_iterations_total = " << n_transport_nonlinear_iterations_total << std::endl;
         f_restart << "n_flow_linear_iterations_total    = " << n_flow_linear_iterations_total << std::endl;
@@ -1194,6 +1234,8 @@ int main(int argc, char** argv) {
         f_restart << "solution_restart = " << solution_restart << std::endl;
         f_restart << "mass_dep = " << setw(10) << setprecision(9) << sediment_transport.mass_dep << std::endl;
         f_restart << "initial_mass = " << setw(10) << setprecision(9) << sediment_transport.init_mass << std::endl;
+        f_restart << "inlet_mass = " << setw(10) << setprecision(9) << sediment_transport.inlet_mass << std::endl;
+        f_restart << "outlet_volume = " << setw(10) << setprecision(9) << sediment_transport.outlet_volume << std::endl;         
         f_restart << "n_flow_nonlinear_iterations_total = " << n_flow_nonlinear_iterations_total << std::endl;
         f_restart << "n_transport_nonlinear_iterations_total = " << n_transport_nonlinear_iterations_total << std::endl;
         f_restart << "n_flow_linear_iterations_total    = " << n_flow_linear_iterations_total << std::endl;
@@ -1216,6 +1258,10 @@ int main(int argc, char** argv) {
 
 #ifdef PROVENANCE
         provenance.incrementSubTaskID();
+//        f_restart << "indexerID = " << provenance.getIndexerID() << std::endl;
+        perf_log.start_event("MeshWriter", "Provenance");
+        provenance.inputMeshWriter();
+        perf_log.stop_event("MeshWriter", "Provenance");
 #endif
         f_restart.close();
 
@@ -1251,7 +1297,8 @@ int main(int argc, char** argv) {
 
         // Write performance parameters to output file
         if (!stop)
-            std::cout << "\n End of Simulation: " << ((flow_sstate_count > n_flow_sstate && transport_sstate_count > n_transport_sstate) ? "Steady-State reached!\n                   ---------------------" : "Final Simulation time reached!\n                    ------------------------------")
+            std::cout << "\n End of Simulation: " << ( (sediment_flow.get_ssteady_count() >= n_flow_sstate && sediment_transport.get_ssteady_count() >= n_transport_sstate) ?
+                         "Steady-State reached!\n                   ---------------------" : "Final Simulation time reached!\n                    ------------------------------")
             << "\n Final number of active elements = " << mesh.n_active_elem() << endl;
         std::cout << "\nPERFORMANCE PARAMETERS"
                 << "\n Total number of non-linear iterations: "
@@ -1448,7 +1495,12 @@ inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
         EquationSystems & equation_systems,
         PerfLog& perf_log, Provenance &provenance) {
     if (dim == 2 && numberOfScripts > 0 && !extractionScript.empty()) {
-        // 2D analysis    
+        // 2D analysis       
+#ifdef PROVENANCE
+        perf_log.start_event("InitDataExtraction", "Provenance");
+        provenance.inputInitDataExtraction(-1);
+        perf_log.stop_event("InitDataExtraction", "Provenance");
+#endif
         perf_log.start_event("Init", "Catalyst");
         FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScripts);
         perf_log.stop_event("Init", "Catalyst");
@@ -1465,6 +1517,19 @@ inline void InSituCatalystInitCoprocessing(int dim, int numberOfScripts,
     } else if (dim == 3 && numberOfScripts > 0) {
         // 3D analysis
         for (int lineID = 0; lineID <= 3; lineID++) {
+#ifdef PROVENANCE
+            if (!visualizationScripts.empty()) {
+                perf_log.start_event("InitVisualization", "Provenance");
+                provenance.inputInitVisualization(lineID);
+                perf_log.stop_event("InitVisualization", "Provenance");
+            }
+
+            if (!extractionScript.empty()) {
+                perf_log.start_event("InitDataExtraction", "Provenance");
+                provenance.inputInitDataExtraction(lineID);
+                perf_log.stop_event("InitDataExtraction", "Provenance");
+            }
+#endif
             if (lineID == 0) {
                 perf_log.start_event("Init", "Catalyst");
                 FEAdaptor::Initialize(numberOfScripts, extractionScript, visualizationScripts);
@@ -1502,6 +1567,11 @@ inline void InSituCatalystCoprocessing(int dim, int numberOfScripts,
         EquationSystems & equation_systems,
         PerfLog& perf_log, Provenance &provenance) {
     if (dim == 2 && numberOfScripts > 0 && !extractionScript.empty()) {
+#ifdef PROVENANCE
+        perf_log.start_event("DataExtraction", "Provenance");
+        provenance.inputDataExtraction(-1);
+        perf_log.stop_event("DataExtraction", "Provenance");
+#endif
         perf_log.start_event("CoProcess", "Catalyst");
         FEAdaptor::CoProcess(equation_systems, time, t_step, write_interval, false, false);
         perf_log.stop_event("CoProcess", "Catalyst");
@@ -1516,6 +1586,21 @@ inline void InSituCatalystCoprocessing(int dim, int numberOfScripts,
     } else if (dim == 3 && numberOfScripts > 0) {
         // 3D analysis
         for (int lineID = 0; lineID <= 3; lineID++) {
+#ifdef PROVENANCE
+            for (int i = 0; i < visualizationScripts.size(); i++) {
+                if (!visualizationScripts[i].empty()) {
+                    perf_log.start_event("Visualization", "Provenance");
+                    provenance.inputVisualization(lineID);
+                    perf_log.stop_event("Visualization", "Provenance");
+                }
+            }
+
+            if (!extractionScript.empty()) {
+                perf_log.start_event("DataExtraction", "Provenance");
+                provenance.inputDataExtraction(lineID);
+                perf_log.stop_event("DataExtraction", "Provenance");
+            }
+#endif
             if (lineID == 0) {
                 perf_log.start_event("CoProcess", "Catalyst");
                 FEAdaptor::CoProcess(equation_systems, time, t_step, write_interval, false, false);

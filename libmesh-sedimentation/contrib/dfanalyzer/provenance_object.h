@@ -21,7 +21,7 @@ public:
 
     ProvenanceObject(int newID);
 
-    virtual void writeJSON(string dfa_hostname);
+    virtual void sendRequest(string dfa_hostname);
     
     int getID() const {
         return ID;
