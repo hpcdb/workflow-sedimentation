@@ -4,6 +4,9 @@ rm restart.in
 rm -rf out*
 rm temp*
 rm *.csv
+rm provenance.in
+rm DfA.properties
+rm *.dat
 # rm -rf prov/pg/*
 # rm -rf prov/di/*
 rm -rf log.*.out
