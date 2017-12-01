@@ -177,7 +177,6 @@ void Task::sendRequest(string dfa_hostname) {
     CURL *hnd = curl_easy_init();
     curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
     string hostname = "http://" + dfa_hostname + ":22000/pde/task/json";
-    cout << hostname << endl;
     curl_easy_setopt(hnd, CURLOPT_URL, hostname.c_str());
     struct curl_slist *headers = NULL;
     headers = curl_slist_append(headers, "postman-token: 6afcae02-81cb-821f-379f-f66efb776d94");

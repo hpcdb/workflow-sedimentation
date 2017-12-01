@@ -3,7 +3,7 @@
 # Template libMesh application Makefile
 CATALYST=1
 PROVENANCE=1
-MACOS?=0
+MACOS?=1
 
 #include config/linda.dell
 
@@ -30,12 +30,25 @@ endif
 
 libmesh_LDFLAGS += -lcurl 
 
+#ifeq (${CATALYST}, 1) 
+#PARAVIEW_INCLUDE = $(shell /media/vitor/data-linux/program/paraview-5.4/bin/paraview-config --include vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb)
+#PARAVIEW_LIBS    = $(shell /media/vitor/data-linux/program/paraview-5.4/bin/paraview-config --libs vtkUtilitiesPythonInitializer vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb) 
+#libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) 
+#libmesh_CXXFLAGS +=-I./include/catalyst -DUSE_CATALYST
+#libmesh_LDFLAGS +=$(PARAVIEW_LIBS)
+#srcfiles +=  $(wildcard src/catalyst/*.C)
+#endif
+
 ifeq (${CATALYST}, 1) 
-PARAVIEW_INCLUDE = $(shell /media/vitor/data-linux/program/paraview-5.4/bin/paraview-config --include vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb)
-PARAVIEW_LIBS    = $(shell /media/vitor/data-linux/program/paraview-5.4/bin/paraview-config --libs vtkUtilitiesPythonInitializer vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb) 
+PARAVIEW_LIB_DIR  =$(PARAVIEW_DIR)/lib/paraview-$(PARAVIEW_VERSION)
+PARAVIEW_LIBS     =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerApplication-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerCore-pv$(PARAVIEW_VERSION) -lvtkPVServerImplementationCore-pv$(PARAVIEW_VERSION) -lvtkPVClientServerCoreCore-pv$(PARAVIEW_VERSION) -lvtkFiltersParallel-pv$(PARAVIEW_VERSION) -lvtkFiltersModeling-pv$(PARAVIEW_VERSION) -lvtkRenderingCore-pv$(PARAVIEW_VERSION) -lvtkFiltersExtraction-pv$(PARAVIEW_VERSION) -lvtkFiltersStatistics-pv$(PARAVIEW_VERSION) -lvtkImagingFourier-pv$(PARAVIEW_VERSION) -lvtkImagingCore-pv$(PARAVIEW_VERSION) -lvtkalglib-pv$(PARAVIEW_VERSION) -lvtkFiltersGeometry-pv$(PARAVIEW_VERSION) -lvtkFiltersSources-pv$(PARAVIEW_VERSION) -lvtkFiltersGeneral-pv$(PARAVIEW_VERSION) -lvtkCommonComputationalGeometry-pv$(PARAVIEW_VERSION) -lvtkCommonColor-pv$(PARAVIEW_VERSION) -lvtkFiltersProgrammable-pv$(PARAVIEW_VERSION) -lvtkPVVTKExtensionsCore-pv$(PARAVIEW_VERSION) -lvtkPVCommon-pv$(PARAVIEW_VERSION) -lvtkClientServer-pv$(PARAVIEW_VERSION) -lvtkIOXMLParser-pv$(PARAVIEW_VERSION) -lvtkFiltersCore-pv$(PARAVIEW_VERSION) -lvtkParallelMPI-pv$(PARAVIEW_VERSION) -lvtkParallelCore-pv$(PARAVIEW_VERSION) -lvtkIOLegacy-pv$(PARAVIEW_VERSION) -lvtkCommonExecutionModel-pv$(PARAVIEW_VERSION) -lvtkCommonDataModel-pv$(PARAVIEW_VERSION) -lvtkCommonSystem-pv$(PARAVIEW_VERSION) -lvtkCommonTransforms-pv$(PARAVIEW_VERSION) -lvtkCommonMisc-pv$(PARAVIEW_VERSION) -lvtkCommonMath-pv$(PARAVIEW_VERSION) -lprotobuf -lpthread  -lvtkPythonInterpreter-pv$(PARAVIEW_VERSION) -lvtkWrappingPython27Core-pv$(PARAVIEW_VERSION) -lvtkCommonCore-pv$(PARAVIEW_VERSION) -lpython2.7 -lvtksys-pv$(PARAVIEW_VERSION) -Wl,-rpath,$(PARAVIEW_LIB_DIR) -Wl,-rpath-link,$(PARAVIEW_LIB_DIR)
+ifeq (${MACOS}, 1) 
+PARAVIEW_LIBS     =-L$(PARAVIEW_LIB_DIR) -lvtkPVPythonCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVCatalyst-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerApplication-pv$(PARAVIEW_VERSION) -lvtkPVServerManagerCore-pv$(PARAVIEW_VERSION) -lvtkPVServerImplementationCore-pv$(PARAVIEW_VERSION) -lvtkPVClientServerCoreCore-pv$(PARAVIEW_VERSION) -lvtkFiltersParallel-pv$(PARAVIEW_VERSION) -lvtkFiltersModeling-pv$(PARAVIEW_VERSION) -lvtkRenderingCore-pv$(PARAVIEW_VERSION) -lvtkFiltersExtraction-pv$(PARAVIEW_VERSION) -lvtkFiltersStatistics-pv$(PARAVIEW_VERSION) -lvtkImagingFourier-pv$(PARAVIEW_VERSION) -lvtkImagingCore-pv$(PARAVIEW_VERSION) -lvtkalglib-pv$(PARAVIEW_VERSION) -lvtkFiltersGeometry-pv$(PARAVIEW_VERSION) -lvtkFiltersSources-pv$(PARAVIEW_VERSION) -lvtkFiltersGeneral-pv$(PARAVIEW_VERSION) -lvtkCommonComputationalGeometry-pv$(PARAVIEW_VERSION) -lvtkCommonColor-pv$(PARAVIEW_VERSION) -lvtkFiltersProgrammable-pv$(PARAVIEW_VERSION) -lvtkPVVTKExtensionsCore-pv$(PARAVIEW_VERSION) -lvtkPVCommon-pv$(PARAVIEW_VERSION) -lvtkClientServer-pv$(PARAVIEW_VERSION) -lvtkIOXMLParser-pv$(PARAVIEW_VERSION) -lvtkFiltersCore-pv$(PARAVIEW_VERSION) -lvtkParallelMPI-pv$(PARAVIEW_VERSION) -lvtkParallelCore-pv$(PARAVIEW_VERSION) -lvtkIOLegacy-pv$(PARAVIEW_VERSION) -lvtkCommonExecutionModel-pv$(PARAVIEW_VERSION) -lvtkCommonDataModel-pv$(PARAVIEW_VERSION) -lvtkCommonSystem-pv$(PARAVIEW_VERSION) -lvtkCommonTransforms-pv$(PARAVIEW_VERSION) -lvtkCommonMisc-pv$(PARAVIEW_VERSION) -lvtkCommonMath-pv$(PARAVIEW_VERSION) -lprotobuf -lpthread  -lvtkPythonInterpreter-pv$(PARAVIEW_VERSION) -lvtkWrappingPython27Core-pv$(PARAVIEW_VERSION) -lvtkCommonCore-pv$(PARAVIEW_VERSION) -lpython2.7 -lvtksys-pv$(PARAVIEW_VERSION) -Wl,-rpath,$(PARAVIEW_LIB_DIR) 
+endif
+PARAVIEW_INCLUDE  =-I$(PARAVIEW_DIR)/include/paraview-$(PARAVIEW_VERSION)
 libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) 
 libmesh_CXXFLAGS +=-I./include/catalyst -DUSE_CATALYST
-libmesh_LDFLAGS +=$(PARAVIEW_LIBS)
+libmesh_LDFLAGS +=$(PARAVIEW_LIBS) -lcurl
 srcfiles +=  $(wildcard src/catalyst/*.C)
 endif
 

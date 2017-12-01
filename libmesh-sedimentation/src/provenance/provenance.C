@@ -29,6 +29,7 @@
 
 #include "provenance.h"
 #include "performance.h"
+#include <curl/curl.h>
 
 #define LINUX
 #define DATABASE
@@ -1445,8 +1446,19 @@ void Provenance::meshAggregator(string xdmf, int n_processors) {
 void Provenance::finishDataIngestor() {
     if (processor_id != 0) return;
 
-    string str = "cp ../dfa/finish.token prov/di/sedimentation";
-    int exitStatus = system(strdup(str.c_str()));
+    CURL *hnd = curl_easy_init();
+    curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
+    string url = "http://" + hostname + ":22000/pde/shutdown";
+    curl_easy_setopt(hnd, CURLOPT_URL, url.c_str());
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "postman-token: 6afcae02-81cb-821f-379f-f66efb776d94");
+    headers = curl_slist_append(headers, "cache-control: no-cache");
+    headers = curl_slist_append(headers, "Content-Type: application/text");
+    curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(hnd, CURLOPT_VERBOSE, 0L); //0 disable messages
+    curl_easy_perform(hnd); //send request
+    curl_easy_cleanup(hnd);
+    curl_global_cleanup();
 
     cout << "[Provenance] Finish Data Ingestor" << endl;
 }
