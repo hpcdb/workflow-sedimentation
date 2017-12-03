@@ -1,5 +1,7 @@
 #!/bin/bash
 # delete files from the previous execution
+rm -rf ~/tmp/*
+rm -rf tmp/*
 rm dfa.log
 rm DfA.properties
 rm restart.*
@@ -12,7 +14,8 @@ rm -rf log.*.out
 rm -rf log.*.err
 rm -rf *.conf
 rm -rf nodes.txt
-rm -rf *.dump
+rm -rf prov-db.dump
+rm -rf prov-db.sql
 rm -rf data
 rm -rf *.data
 rm -rf *.index

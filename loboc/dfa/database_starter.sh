@@ -11,5 +11,5 @@ for i in `echo $lines`; do
   echo "cd $cpath;monetdbd start $datapath;monetdbd get all $datapath;monetdb start dataflow_analyzer;monetdb status;java -jar $cpath/../dfa/REST-DfA-1.0.jar >> dfa.log"
   #cd $cpath;monetdbd start $datapath;monetdbd get all $datapath;monetdb start dataflow_analyzer;monetdb status
   # echo "cd $cpath;killall monetdb;killall monetdbd;killall mserver5;monetdbd set port=54321 $datapath; monetdbd start $datapath;monetdbd get all $datapath;monetdb start dataflow_analyzer;monetdb status"
-  ssh $host "cd $cpath;monetdbd stop $datapath;killall monetdb;killall monetdbd;killall mserver5;monetdbd set port=54321 $datapath; monetdbd start $datapath;monetdbd get all $datapath;monetdb start dataflow_analyzer;monetdb status;java -jar $cpath/../dfa/REST-DfA-1.0.jar >> dfa.log" &
+  ssh $host "cd $cpath;monetdbd stop $datapath;killall monetdb;killall monetdbd;killall mserver5;monetdbd set port=54321 $datapath; monetdbd start $datapath;monetdbd get all $datapath;monetdb start dataflow_analyzer;monetdb status;java -Xmx49512m -jar $cpath/../dfa/REST-DfA-1.0.jar >> dfa.log 2>&1" &
 done

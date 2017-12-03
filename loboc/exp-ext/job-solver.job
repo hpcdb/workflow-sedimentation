@@ -17,7 +17,7 @@ export CASE_STUDY="necker3D"
 export DATAPATH=$CPATH/data
 export DATAFLOW_TAG=sedimentation
 export DFA=/scratch/10061a/vitorss/simulation/sedimentation-rest/dfa
-export LIBMESH_SEDIMENTATION=/home/users/vitorss/program/libmesh-sedimentation/v3-rest
+export LIBMESH_SEDIMENTATION=/home/users/vitorss/program/libmesh-sedimentation/v4-rest
 export CASE_STUDY_DIR=/home/users/vitorss/input_dataset/sedimentation
 cd $CPATH
 
@@ -33,25 +33,34 @@ python $CPATH/../bin/ConfigureLoboCFiles/Main.py nodes.txt
 
 echo "Starting database system..."
 db_host=`cat database.conf`
-./start-dfa.sh $db_host
-
-echo "Setting up environment variables..."
-export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/site-packages:/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2
-export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
+TMP=/home/users/vitorss/tmp
+#TMP=$CPATH/tmp
+cd $TMP
+mkdir $PBS_JOBID
+chmod -R 774 $PBS_JOBID
+cd $PBS_JOBID
+$CPATH/start-dfa.sh $db_host $CPATH $TMP/$PBS_JOBID
+cd $CPATH
 
 echo "Sending dataflow specification..."
-./send-dataflow-spec.sh $db_host >> out.txt 2>> err.txt
+./send-dataflow-spec.sh $db_host >> out.txt 2>&1
 
 echo "Executing sedimentation solver..."
-echo -n "/usr/bin/time mpirun -machinefile machines.conf -n $JCORES $LIBMESH_SEDIMENTATION/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $CPATH/output_$CASE_STUDY -dfa $db_host -ksp_converged_use_min_initial_residual_norm >> out.txt 2>> err.txt" > mpirun.sh 
+echo -n "/usr/bin/time mpirun -machinefile machines.conf -n $JCORES $LIBMESH_SEDIMENTATION/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $CPATH/output_$CASE_STUDY -dfa $db_host -ksp_converged_use_min_initial_residual_norm  > out.txt 2>&1" > mpirun.sh 
 chmod 774 mpirun.sh
 ./mpirun.sh
 
-#echo "Executing termination algorithm..."
-#./shutdown-dfa.sh $db_host
-#$CPATH/../bin/termination.sh $CPATH
+echo "Executing termination algorithm..."
+$CPATH/../bin/termination.sh $CPATH
 
-sleep 960
+echo "Backing up database..."
+#monetdbd start $TMP/$PBS_JOBID/data
+#monetdbd get all $TMP/$PBS_JOBID/data
+#monetdb start dataflow_analyzer
+#monetdb status
+rm prov-db.dump prov-db.sql
+mclient -p 54321 -d dataflow_analyzer --dump > prov-db.sql
+msqldump -p 54321 -d dataflow_analyzer > prov-db.dump
 echo "Finishing job..."
 
 

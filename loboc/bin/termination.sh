@@ -8,4 +8,4 @@ while [ ! -f "$CPATH/finish.token" ]; do
    sleep 60
 done
 
-mclient -p 54321 -d dataflow_analyzer --dump > prov-db.dump
+#mclient -p 54321 -d dataflow_analyzer --dump > prov-db.dump

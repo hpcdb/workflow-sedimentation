@@ -1672,3 +1672,4 @@ curl -X POST http://$1:22000/pde/dataflow/json \
   ],
   "tag": "sedimentation"
 }'
+sleep 3
