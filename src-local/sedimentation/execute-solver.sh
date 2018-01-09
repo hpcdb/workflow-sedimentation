@@ -15,7 +15,7 @@ elif [ "$CASE_STUDY" == "meiburg2D" ]; then
 	SOLVER_VISUALIZATION=$SOLVER"_visualization.py"
 fi
 # ENVIRONMENT: macos,xps-nacad,xps-home,inspiron-laptop, macos
-ENVIRONMENT="macos"
+ENVIRONMENT="inspiron-laptop"
 EXPERIMENT_DIR=""
 if [ "$ENVIRONMENT" == "xps-nacad" ]; then
 	EXPERIMENT_DIR="/home/vitor/Documents/dev/workflow-sedimentation/src-local/sedimentation"
@@ -41,3 +41,5 @@ rm output-statistics.log
 
 echo "time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $EXPERIMENT_DIR/$CASE_STUDY -dfa localhost -ksp_converged_use_min_initial_residual_norm | tee -a \"output-solver.log\""
 time ../../libmesh-sedimentation/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $EXPERIMENT_DIR/output_$CASE_STUDY -dfa localhost -ksp_converged_use_min_initial_residual_norm | tee -a "output-solver.log"
+
+killall python

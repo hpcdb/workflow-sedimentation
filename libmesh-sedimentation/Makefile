@@ -3,7 +3,7 @@
 # Template libMesh application Makefile
 CATALYST=1
 PROVENANCE=1
-MACOS?=1
+MACOS?=0
 
 #include config/linda.dell
 
@@ -31,8 +31,8 @@ endif
 libmesh_LDFLAGS += -lcurl 
 
 ifeq (${CATALYST}, 1) 
-PARAVIEW_INCLUDE = $(shell /Users/vitor/Documents/program/paraview-5.4.0/bin/paraview-config --include vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb)
-PARAVIEW_LIBS    = $(shell /Users/vitor/Documents/program/paraview-5.4.0/bin/paraview-config --libs vtkUtilitiesPythonInitializer vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb) 
+PARAVIEW_INCLUDE = $(shell /media/vitor/data-linux/program/paraview-5.4/bin/paraview-config --include vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb)
+PARAVIEW_LIBS    = $(shell /media/vitor/data-linux/program/paraview-5.4/bin/paraview-config --libs vtkUtilitiesPythonInitializer vtkPVCatalyst vtkPVPythonCatalyst vtkParaViewWeb) 
 libmesh_CXXFLAGS += $(PARAVIEW_INCLUDE) 
 libmesh_CXXFLAGS +=-I./include/catalyst -DUSE_CATALYST
 libmesh_LDFLAGS +=$(PARAVIEW_LIBS)

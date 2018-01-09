@@ -39,6 +39,9 @@ echo "--------------------------------------------"
 echo "Starting database system..."
 DATAPATH=$SIMULATION_DIR/data
 $SIMULATION_DIR/../dfa/database_starter.sh database.conf $SIMULATION_DIR $DATAPATH
+echo "--------------------------------------------"
+echo "Starting performance monitor..."
+$SIMULATION_DIR/../monitor/start_monitor.sh localhost 
 # > out.txt 2> err.txt
 echo "--------------------------------------------"
 echo "Starting DfA RESTful API"

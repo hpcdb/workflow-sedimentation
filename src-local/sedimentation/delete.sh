@@ -33,7 +33,7 @@ rm -rf monitoring*.log
 # echo "time_step;time;initial_norm_delta;final_norm_delta;ratio_norm_delta;linear_iterations;flag" > monitoring-transport.log
 
 # environments: macos,xps-nacad,xps-home,inspiron-laptop
-ENVIRONMENT="macos"
+ENVIRONMENT="inspiron-laptop"
 cp -rf ../config/$ENVIRONMENT/* .
 
 # mkdir prov
