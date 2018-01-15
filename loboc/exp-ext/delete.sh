@@ -32,3 +32,4 @@ rm -rf out.txt
 rm -rf sed-ext*
 rm -rf video.mp4
 mkdir index
+rm performance.log

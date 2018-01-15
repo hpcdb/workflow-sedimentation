@@ -1,11 +1,11 @@
-#PBS -l select=41:ncpus=48:mpiprocs=12
+#PBS -l select=6:ncpus=48:mpiprocs=12
 #PBS -l walltime=24:00:00
 #PBS -j oe  
 #PBS -N sed-ext
 #PBS -V 
 #PBS -m bae
 #PBS -M vitor.silva.sousa@gmail.com
-JCORES=480
+JCORES=60
 
 echo "Starting job..."
 module load intel
@@ -23,7 +23,7 @@ cd $CPATH
 
 export SOLVER=$CASE_STUDY_DIR"/"$CASE_STUDY"/"$CASE_STUDY
 export SOLVER_MESH=$SOLVER".msh"
-export SOLVER_IN=$SOLVER"_cte.in"
+export SOLVER_IN=$SOLVER"_pc11.in"
 export SOLVER_EXTRACTION=$SOLVER"_extraction.py"
 export SOLVER_VISUALIZATION=$SOLVER"_visualization_surface.py,"$SOLVER"_visualization_volume.py,"$SOLVER"_visualization_wireframe.py"
 
@@ -42,8 +42,15 @@ cd $PBS_JOBID
 $CPATH/start-dfa.sh $db_host $CPATH $TMP/$PBS_JOBID
 cd $CPATH
 
+echo "Starting performance monitor..."
+$CPATH/../monitor/start_monitor.sh $db_host 
+
 echo "Sending dataflow specification..."
 ./send-dataflow-spec.sh $db_host >> out.txt 2>&1
+
+echo "Setting up environment variables..."
+export PYTHONPATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2/site-packages:/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2
+export LD_LIBRARY_PATH=/home/users/vitorss/local/all/paraview-5.2.0/lib/paraview-5.2:$LD_LIBRARY_PATH
 
 echo "Executing sedimentation solver..."
 echo -n "/usr/bin/time mpirun -machinefile machines.conf -n $JCORES $LIBMESH_SEDIMENTATION/sediment-opt -i $SOLVER_IN -m $SOLVER_MESH -e $SOLVER_EXTRACTION -v $SOLVER_VISUALIZATION -o $CASE_STUDY -d $CPATH/output_$CASE_STUDY -dfa $db_host -ksp_converged_use_min_initial_residual_norm  > out.txt 2>&1" > mpirun.sh 
@@ -52,6 +59,7 @@ chmod 774 mpirun.sh
 
 echo "Executing termination algorithm..."
 $CPATH/../bin/termination.sh $CPATH
+touch finish_performance.tkn
 
 echo "Backing up database..."
 #monetdbd start $TMP/$PBS_JOBID/data
