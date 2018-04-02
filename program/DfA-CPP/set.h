@@ -13,23 +13,27 @@
 
 using namespace std;
 
-class Set{
+class Set {
 protected:
     string tag;
     vector<Attribute> attributes;
     vector<Extractor> extractors;
-        
+
 public:
-    Set(string tag){
+
+    Set(string tag) {
         this->tag = tag;
     }
-        
-    Attribute& add_attribute(string name, attribute_type type);
-    vector<Attribute>& add_attributes(vector<string> names, vector<attribute_type> types);
-    Extractor add_extractor(string tag);
-    
-    Extractor get_extractor_by_tag(string tag);
+
+    void add_attribute(string name, attribute_type type);
+    void add_attributes(vector<string> names, vector<attribute_type> types);
+
+    Extractor& add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension);
+    Extractor& add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension,
+            string attribute_name, attribute_type attribute_type);
+    Extractor& add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension,
+            vector<string> attribute_names, vector<attribute_type> attribute_types);
+
     string get_tag();
-    
     string get_specification();
 };

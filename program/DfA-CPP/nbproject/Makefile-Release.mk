@@ -37,6 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/attribute.o \
 	${OBJECTDIR}/dataflow.o \
+	${OBJECTDIR}/extractor.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/set.o \
 	${OBJECTDIR}/transformation.o
@@ -85,6 +86,11 @@ ${OBJECTDIR}/dataflow.o: dataflow.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataflow.o dataflow.cpp
+
+${OBJECTDIR}/extractor.o: extractor.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/extractor.o extractor.cpp
 
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
@@ -143,6 +149,19 @@ ${OBJECTDIR}/dataflow_nomain.o: ${OBJECTDIR}/dataflow.o dataflow.cpp
 	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataflow_nomain.o dataflow.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/dataflow.o ${OBJECTDIR}/dataflow_nomain.o;\
+	fi
+
+${OBJECTDIR}/extractor_nomain.o: ${OBJECTDIR}/extractor.o extractor.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/extractor.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/extractor_nomain.o extractor.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/extractor.o ${OBJECTDIR}/extractor_nomain.o;\
 	fi
 
 ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp 

@@ -9,6 +9,8 @@
 
 using namespace std;
 
+#ifndef ATTRIBUTE_H
+#define ATTRIBUTE_H
 enum attribute_type {TEXT, NUMERIC, RDFILE};
 
 class Attribute{
@@ -25,3 +27,5 @@ public:
     string get_name();
     string get_type();
 };
+
+#endif /* ATTRIBUTE_H */

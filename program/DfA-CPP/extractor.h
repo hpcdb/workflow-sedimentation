@@ -7,24 +7,34 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 using namespace std;
+
+enum cartridge_type {EXTRACTION, INDEXING};
+enum extension_type {CSV, PROGRAM, FASTBIT, POSTGRES_RAW};
 
 class Extractor{
 protected:
     string tag;
-    enum cartridge_type {EXTRACTION, INDEXING};
+    string set_tag;
     cartridge_type cartridge;
-    enum extension_type {CSV, PROGRAM, FASTBIT, POSTGRES_RAW};
     extension_type extension;
     vector<Attribute> attributes;
     
 public:
-    Extractor(string tag, cartridge_type cartridge, extension_type extension){
+    Extractor(string tag, string set_tag, cartridge_type cartridge, extension_type extension){
         this->tag = tag;
+        this->set_tag = set_tag;
         this->cartridge = cartridge;
         this->extension = extension;
     }
     
-    Attribute add_attribute(string name, attribute_type type);
+    void add_attribute(string name, attribute_type type);
+    void add_attributes(vector<string> names, vector<attribute_type> types);
+    
+    string get_tag();
+    string get_set_tag();
+    Attribute& get_attribute_by_name(string name);
+    string get_specification();
 };

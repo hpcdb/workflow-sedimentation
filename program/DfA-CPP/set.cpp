@@ -1,13 +1,12 @@
 
 #include "set.h"
 
-Attribute& Set::add_attribute(string name, attribute_type type) {
+void Set::add_attribute(string name, attribute_type type) {
     Attribute new_attribute = Attribute(name, type);
     this->attributes.push_back(new_attribute);
-    return this->attributes.at(this->attributes.size() - 1);
 }
 
-vector<Attribute>& Set::add_attributes(vector<string> names, vector<attribute_type> types) {
+void Set::add_attributes(vector<string> names, vector<attribute_type> types) {
     if (names.size() == types.size()) {
         for (int index = 0; index < names.size(); index++) {
             string name = names.at(index);
@@ -15,7 +14,24 @@ vector<Attribute>& Set::add_attributes(vector<string> names, vector<attribute_ty
             this->add_attribute(name, type);
         }
     }
-    return this->attributes;
+}
+
+Extractor& Set::add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension) {
+    Extractor new_extractor = Extractor(extractor_tag, this->tag, cartridge, extension);
+    this->extractors.push_back(new_extractor);
+}
+
+Extractor& Set::add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension,
+        string attribute_name, attribute_type attribute_type) {
+    Extractor& extractor = this->add_extractor(extractor_tag, cartridge, extension);
+    extractor.add_attribute(attribute_name, attribute_type);
+    this->extractors.push_back(extractor);
+}
+
+Extractor& Set::add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension, 
+        vector<string> attribute_names, vector<attribute_type> attribute_types) {
+    Extractor& extractor = this->add_extractor(extractor_tag, cartridge, extension);
+    extractor.add_attributes(attribute_names, attribute_types);
 }
 
 string Set::get_tag() {

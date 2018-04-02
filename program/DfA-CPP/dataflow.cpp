@@ -8,6 +8,12 @@ Set& Dataflow::add_set(string tag) {
     return this->sets.find(tag)->second;
 }
 
+Set& Dataflow::add_set(string tag, string attribute_name, attribute_type attribute_type){
+    Set& set = this->add_set(tag);
+    set.add_attribute(attribute_name, attribute_type);
+    return set;
+}
+
 Set& Dataflow::add_set(string tag, vector<string> attribute_names, vector<attribute_type> attribute_types) {
     Set& set = this->add_set(tag);
     set.add_attributes(attribute_names, attribute_types);
@@ -36,6 +42,10 @@ Transformation& Dataflow::add_transformation(string tag, vector<Set> input_sets,
 Transformation& Dataflow::add_transformation(string tag, Set input_set, vector<Set> output_sets) {
     vector<Set> input_sets = {input_set};
     return this->add_transformation(tag, input_sets, output_sets);
+}
+
+string Dataflow::get_tag(){
+    return this->tag;
 }
 
 string Dataflow::get_post_message() {
