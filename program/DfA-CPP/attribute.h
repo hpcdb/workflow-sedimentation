@@ -21,4 +21,7 @@ public:
         this->name = name;
         this->type = type;
     }
+    
+    string get_name();
+    string get_type();
 };

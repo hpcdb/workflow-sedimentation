@@ -8,7 +8,6 @@
 #include "dfa_configuration.h"
 #include "dfa_config.h"
 #include "transformation.h"
-#include "set.h"
 
 #include <string>
 #include <vector>
@@ -33,6 +32,9 @@ public:
     
     void save(); 
     
-    void add_transformation(string tag);
-    void add_set(string tag);
+    void add_transformation(Transformation transformation, vector<Set> input_sets, vector<Set> output_sets);
+    void add_transformation(Transformation transformation, Set input_sets, Set output_sets);
+    void add_transformation(Transformation transformation, vector<Set> input_sets, Set output_sets);
+    void add_transformation(Transformation transformation, Set input_sets, vector<Set> output_sets);
+    void add_set(Set set);
 };

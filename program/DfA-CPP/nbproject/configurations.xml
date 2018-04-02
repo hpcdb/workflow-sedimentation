@@ -30,7 +30,10 @@
                    displayName="Source Files"
                    projectFiles="true">
       <logicalFolder name="f1" displayName="dataflow" projectFiles="true">
+        <itemPath>attribute.cpp</itemPath>
         <itemPath>dataflow.cpp</itemPath>
+        <itemPath>set.cpp</itemPath>
+        <itemPath>transformation.cpp</itemPath>
       </logicalFolder>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
@@ -62,6 +65,8 @@
           <commandLine>-lcurl</commandLine>
         </linkerTool>
       </compileType>
+      <item path="attribute.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="attribute.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="dataflow.cpp" ex="false" tool="1" flavor2="0">
@@ -97,11 +102,15 @@
       </folder>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="set.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="set.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="task.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/dataflow_spec_test.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="transformation.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="transformation.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -126,6 +135,8 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="attribute.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="attribute.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="dataflow.cpp" ex="false" tool="1" flavor2="0">
@@ -161,11 +172,15 @@
       </folder>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="set.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="set.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="task.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tests/dataflow_spec_test.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="transformation.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="transformation.h" ex="false" tool="3" flavor2="0">
       </item>

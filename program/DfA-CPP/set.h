@@ -23,9 +23,12 @@ public:
     Set(string tag){
         this->tag = tag;
     }
-    
+        
     Attribute add_attribute(string name, attribute_type type);
     Extractor add_extractor(string tag);
     
     Extractor get_extractor_by_tag(string tag);
+    string get_tag();
+    
+    string get_specification();
 };

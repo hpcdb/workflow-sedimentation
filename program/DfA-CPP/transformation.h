@@ -5,16 +5,30 @@
  * Created on March 31, 2018, 11:07 AM
  */
 
+#include "set.h"
+
 #include <string>
+#include <vector>
 
 using namespace std;
 
 class Transformation{
 protected:
     string tag;
+    vector<Set> input_sets;
+    vector<Set> output_sets;
     
 public:
     Transformation(string tag){
         this->tag = tag;
     }
+    
+    void add_input_set(Set set);
+    void add_output_set(Set set);
+    
+    string get_tag();    
+    string get_specification();
+    
+    void set_input_sets(vector<Set> input_sets);
+    void set_output_sets(vector<Set> output_sets);
 };
