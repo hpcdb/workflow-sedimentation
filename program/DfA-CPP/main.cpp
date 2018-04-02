@@ -9,13 +9,17 @@
 #include "task.h"
 
 #include <cstdlib>
-
-using namespace std;
+#include <string>
 
 /*
  * 
  */
 int main(int argc, char** argv) {
+
+    cout << "running main..." << endl;
+    
+    Dataflow dataflow = Dataflow("clothing");
+    dataflow.save();
 
     return 0;
 }
