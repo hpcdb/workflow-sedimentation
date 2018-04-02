@@ -2,49 +2,59 @@
 #include "dataflow.h"
 #include <curl/curl.h>
 
-void Dataflow::add_set(Set set) {
-    this->sets.push_back(set);
+Set& Dataflow::add_set(string tag) {
+    Set set = Set(tag);
+    this->sets.insert(make_pair(tag, set));    
+    return this->sets.find(tag)->second;
 }
 
-void Dataflow::add_transformation(Transformation transformation, vector<Set> input_sets, vector<Set> output_sets) {
+Set& Dataflow::add_set(string tag, vector<string> attribute_names, vector<attribute_type> attribute_types) {
+    Set& set = this->add_set(tag);
+    set.add_attributes(attribute_names, attribute_types);
+    return set;
+}
+
+Transformation& Dataflow::add_transformation(string tag, vector<Set> input_sets, vector<Set> output_sets) {
+    Transformation transformation = Transformation(tag);
     transformation.set_input_sets(input_sets);
-    transformation.set_output_sets(output_sets);
-    this->transformations.push_back(transformation);
+    transformation.set_output_sets(output_sets);    
+    this->transformations.insert(make_pair(tag, transformation));    
+    return this->transformations.find(tag)->second;
 }
 
-void Dataflow::add_transformation(Transformation transformation, Set input_set, Set output_set) {
+Transformation& Dataflow::add_transformation(string tag, Set input_set, Set output_set) {
     vector<Set> input_sets = {input_set};
-    transformation.set_input_sets(input_sets);
     vector<Set> output_sets = {output_set};
-    transformation.set_output_sets(output_sets);
-    this->transformations.push_back(transformation);
+    return this->add_transformation(tag, input_sets, output_sets);
 }
 
-void Dataflow::add_transformation(Transformation transformation, vector<Set> input_sets, Set output_set) {
-    transformation.set_input_sets(input_sets);
+Transformation& Dataflow::add_transformation(string tag, vector<Set> input_sets, Set output_set) {
     vector<Set> output_sets = {output_set};
-    transformation.set_output_sets(output_sets);
-    this->transformations.push_back(transformation);
+    return this->add_transformation(tag, input_sets, output_sets);
 }
 
-void Dataflow::add_transformation(Transformation transformation, Set input_set, vector<Set> output_sets) {
+Transformation& Dataflow::add_transformation(string tag, Set input_set, vector<Set> output_sets) {
     vector<Set> input_sets = {input_set};
-    transformation.set_input_sets(input_sets);
-    transformation.set_output_sets(output_sets);
-    this->transformations.push_back(transformation);
+    return this->add_transformation(tag, input_sets, output_sets);
 }
 
 string Dataflow::get_post_message() {
     string message = "dataflow(" + this->tag + ")";
 
-    for (Set set : this->sets) {
+    map<string, Set>::iterator it = this->sets.begin();
+    while (it != this->sets.end()) {
+        Set set = it->second;
         message += "\n" + set.get_specification();
+        it++;
     }
 
-    for (Transformation transformation : this->transformations) {
+    map<string, Transformation>::iterator it_transformations = this->transformations.begin();
+    while (it_transformations != this->transformations.end()) {
+        Transformation transformation = it_transformations->second;
         message += "\n" + transformation.get_specification();
+        it_transformations++;
     }
-    
+
     return message;
 }
 
@@ -63,7 +73,7 @@ void Dataflow::save() {
     headers = curl_slist_append(headers, "Content-Type: application/text");
 
     string message = this->get_post_message();
-    
+
     curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, message.c_str());
     curl_easy_setopt(hnd, CURLOPT_VERBOSE, 0L); //0 disable messages

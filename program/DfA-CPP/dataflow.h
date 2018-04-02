@@ -11,30 +11,34 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <iterator>
 
 using namespace std;
 
-class Dataflow{
+class Dataflow {
 protected:
     DfA_Config config;
     string tag;
-    vector<Transformation> transformations;
-    vector<Set> sets;
-    
+    map<string, Transformation> transformations;
+    map<string, Set> sets;
+
     string get_post_message();
-    
+
 public:
-    Dataflow(string tag, string hostname=dfa_hostname, int port=dfa_port){
+
+    Dataflow(string tag, string hostname = dfa_hostname, int port = dfa_port) {
         this->config.hostname = hostname;
         this->config.port = port;
         this->tag = tag;
     }
-    
-    void save(); 
-    
-    void add_transformation(Transformation transformation, vector<Set> input_sets, vector<Set> output_sets);
-    void add_transformation(Transformation transformation, Set input_sets, Set output_sets);
-    void add_transformation(Transformation transformation, vector<Set> input_sets, Set output_sets);
-    void add_transformation(Transformation transformation, Set input_sets, vector<Set> output_sets);
-    void add_set(Set set);
+
+    void save();
+
+    Transformation& add_transformation(string tag, vector<Set> input_sets, vector<Set> output_sets);
+    Transformation& add_transformation(string tag, Set input_sets, Set output_sets);
+    Transformation& add_transformation(string tag, vector<Set> input_sets, Set output_sets);
+    Transformation& add_transformation(string tag, Set input_sets, vector<Set> output_sets);
+    Set& add_set(string tag);
+    Set& add_set(string tag, vector<string> attribute_names, vector<attribute_type> attribute_types);
 };

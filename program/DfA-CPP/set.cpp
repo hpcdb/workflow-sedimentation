@@ -1,13 +1,24 @@
 
 #include "set.h"
 
-Attribute Set::add_attribute(string name, attribute_type type) {
+Attribute& Set::add_attribute(string name, attribute_type type) {
     Attribute new_attribute = Attribute(name, type);
     this->attributes.push_back(new_attribute);
-    return new_attribute;
+    return this->attributes.at(this->attributes.size() - 1);
 }
 
-string Set::get_tag(){
+vector<Attribute>& Set::add_attributes(vector<string> names, vector<attribute_type> types) {
+    if (names.size() == types.size()) {
+        for (int index = 0; index < names.size(); index++) {
+            string name = names.at(index);
+            attribute_type type = types.at(index);
+            this->add_attribute(name, type);
+        }
+    }
+    return this->attributes;
+}
+
+string Set::get_tag() {
     return this->tag;
 }
 
