@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
 
     cout << "running main..." << endl;
 
+    //prospective provenance
     Dataflow dataflow = Dataflow("clothing");
 
     //set ideduplication
@@ -40,6 +41,9 @@ int main(int argc, char** argv) {
     Transformation& europe = dataflow.add_transformation("europe", odeduplication, oeurope);
     
     dataflow.save();
+    
+    //retrospective provenance
+    
 
     return 0;
 }

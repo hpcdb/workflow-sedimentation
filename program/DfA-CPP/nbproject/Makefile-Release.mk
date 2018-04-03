@@ -37,9 +37,12 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/attribute.o \
 	${OBJECTDIR}/dataflow.o \
+	${OBJECTDIR}/dataset.o \
+	${OBJECTDIR}/dependency.o \
 	${OBJECTDIR}/extractor.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/set.o \
+	${OBJECTDIR}/task.o \
 	${OBJECTDIR}/transformation.o
 
 # Test Directory
@@ -87,6 +90,16 @@ ${OBJECTDIR}/dataflow.o: dataflow.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataflow.o dataflow.cpp
 
+${OBJECTDIR}/dataset.o: dataset.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataset.o dataset.cpp
+
+${OBJECTDIR}/dependency.o: dependency.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency.o dependency.cpp
+
 ${OBJECTDIR}/extractor.o: extractor.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -101,6 +114,11 @@ ${OBJECTDIR}/set.o: set.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/set.o set.cpp
+
+${OBJECTDIR}/task.o: task.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/task.o task.cpp
 
 ${OBJECTDIR}/transformation.o: transformation.cpp
 	${MKDIR} -p ${OBJECTDIR}
@@ -151,6 +169,32 @@ ${OBJECTDIR}/dataflow_nomain.o: ${OBJECTDIR}/dataflow.o dataflow.cpp
 	    ${CP} ${OBJECTDIR}/dataflow.o ${OBJECTDIR}/dataflow_nomain.o;\
 	fi
 
+${OBJECTDIR}/dataset_nomain.o: ${OBJECTDIR}/dataset.o dataset.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/dataset.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataset_nomain.o dataset.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/dataset.o ${OBJECTDIR}/dataset_nomain.o;\
+	fi
+
+${OBJECTDIR}/dependency_nomain.o: ${OBJECTDIR}/dependency.o dependency.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/dependency.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency_nomain.o dependency.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/dependency.o ${OBJECTDIR}/dependency_nomain.o;\
+	fi
+
 ${OBJECTDIR}/extractor_nomain.o: ${OBJECTDIR}/extractor.o extractor.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/extractor.o`; \
@@ -188,6 +232,19 @@ ${OBJECTDIR}/set_nomain.o: ${OBJECTDIR}/set.o set.cpp
 	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/set_nomain.o set.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/set.o ${OBJECTDIR}/set_nomain.o;\
+	fi
+
+${OBJECTDIR}/task_nomain.o: ${OBJECTDIR}/task.o task.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/task.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/task_nomain.o task.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/task.o ${OBJECTDIR}/task_nomain.o;\
 	fi
 
 ${OBJECTDIR}/transformation_nomain.o: ${OBJECTDIR}/transformation.o transformation.cpp 

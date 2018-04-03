@@ -16,9 +16,11 @@ protected:
     vector<vector<int>> transformation_ids; 
     
 public:
-    Dependency(...){
-        
-    }
+    Dependency(){};
     
-    void add_transformation_ids(...);
+    void add_transformation_tag(string transformation_tag);
+    void add_transformation_ids(vector<int> transformation_ids);
+    
+    vector<string>& get_transformation_tags();
+    vector<vector<int>>& get_transformation_ids();
 };
