@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ class Set {
 protected:
     string tag;
     vector<Attribute> attributes;
-    vector<Extractor> extractors;
+    map<string, Extractor> extractors;
 
 public:
 
@@ -28,12 +29,15 @@ public:
     void add_attribute(string name, attribute_type type);
     void add_attributes(vector<string> names, vector<attribute_type> types);
 
-    Extractor& add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension);
-    Extractor& add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension,
+    Extractor& add_extractor(string extractor_tag, method_type method, cartridge_type cartridge);
+    Extractor& add_extractor(string extractor_tag, method_type method, cartridge_type cartridge,
             string attribute_name, attribute_type attribute_type);
-    Extractor& add_extractor(string extractor_tag, cartridge_type cartridge, extension_type extension,
+    Extractor& add_extractor(string extractor_tag, method_type method, cartridge_type cartridge,
             vector<string> attribute_names, vector<attribute_type> attribute_types);
 
     string get_tag();
+    Attribute& get_attribute_by_name(string name);
+    Extractor& get_extractor_by_tag(string tag);
+    map<string, Extractor>& get_extractors();
     string get_specification();
 };

@@ -15,6 +15,10 @@
         <itemPath>set.h</itemPath>
         <itemPath>transformation.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f4" displayName="enumeration" projectFiles="true">
+        <itemPath>attribute_enum.h</itemPath>
+        <itemPath>extractor_enum.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="f1" displayName="task" projectFiles="true">
         <itemPath>dataset.h</itemPath>
         <itemPath>dependency.h</itemPath>
@@ -70,6 +74,8 @@
       </item>
       <item path="attribute.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="attribute_enum.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="dataflow.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="dataflow.h" ex="false" tool="3" flavor2="0">
@@ -87,6 +93,8 @@
       <item path="extractor.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="extractor.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="extractor_enum.h" ex="false" tool="3" flavor2="0">
       </item>
       <folder path="TestFiles/f1">
         <cTool>
@@ -142,6 +150,8 @@
       </item>
       <item path="attribute.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="attribute_enum.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="dataflow.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="dataflow.h" ex="false" tool="3" flavor2="0">
@@ -159,6 +169,8 @@
       <item path="extractor.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="extractor.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="extractor_enum.h" ex="false" tool="3" flavor2="0">
       </item>
       <folder path="TestFiles/f1">
         <cTool>

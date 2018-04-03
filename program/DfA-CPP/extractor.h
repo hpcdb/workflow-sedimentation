@@ -5,36 +5,43 @@
  * Created on March 31, 2018, 11:45 AM
  */
 
+#ifndef EXTRACTOR_H
+#define EXTRACTOR_H
+
+#include "extractor_enum.h"
+
 #include <string>
 #include <vector>
 #include <iostream>
 
 using namespace std;
 
-enum cartridge_type {EXTRACTION, INDEXING};
-enum extension_type {CSV, PROGRAM, FASTBIT, POSTGRES_RAW};
-
-class Extractor{
+class Extractor {
 protected:
     string tag;
     string set_tag;
+    method_type method;
     cartridge_type cartridge;
-    extension_type extension;
     vector<Attribute> attributes;
-    
+
 public:
-    Extractor(string tag, string set_tag, cartridge_type cartridge, extension_type extension){
+
+    Extractor(string tag, string set_tag, method_type method, cartridge_type cartridge) {
         this->tag = tag;
         this->set_tag = set_tag;
+        this->method = method;
         this->cartridge = cartridge;
-        this->extension = extension;
     }
-    
+
     void add_attribute(string name, attribute_type type);
     void add_attributes(vector<string> names, vector<attribute_type> types);
-    
+
     string get_tag();
     string get_set_tag();
     Attribute& get_attribute_by_name(string name);
     string get_specification();
+    string get_method();
+    string get_cartridge();
 };
+
+#endif /* EXTRACTOR_H */

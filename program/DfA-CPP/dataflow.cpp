@@ -51,18 +51,25 @@ string Dataflow::get_tag(){
 string Dataflow::get_post_message() {
     string message = "dataflow(" + this->tag + ")";
 
-    map<string, Set>::iterator it = this->sets.begin();
-    while (it != this->sets.end()) {
-        Set set = it->second;
+    map<string, Set>::iterator it_set = this->sets.begin();
+    while (it_set != this->sets.end()) {
+        Set set = it_set->second;
         message += "\n" + set.get_specification();
-        it++;
+        
+        map<string, Extractor>::iterator it_extractor = set.get_extractors().begin();
+        while (it_extractor != set.get_extractors().end()) {
+            Extractor extractor = it_extractor->second;
+            message += "\n" + extractor.get_specification();
+            it_extractor++;
+        }
+        it_set++;
     }
 
-    map<string, Transformation>::iterator it_transformations = this->transformations.begin();
-    while (it_transformations != this->transformations.end()) {
-        Transformation transformation = it_transformations->second;
+    map<string, Transformation>::iterator it_transformation = this->transformations.begin();
+    while (it_transformation != this->transformations.end()) {
+        Transformation transformation = it_transformation->second;
         message += "\n" + transformation.get_specification();
-        it_transformations++;
+        it_transformation++;
     }
 
     return message;

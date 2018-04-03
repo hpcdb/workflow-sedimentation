@@ -11,7 +11,8 @@ using namespace std;
 
 #ifndef ATTRIBUTE_H
 #define ATTRIBUTE_H
-enum attribute_type {TEXT, NUMERIC, RDFILE};
+
+#include "attribute_enum.h"
 
 class Attribute{
 protected:

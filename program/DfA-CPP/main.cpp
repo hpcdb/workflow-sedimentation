@@ -27,7 +27,8 @@ int main(int argc, char** argv) {
     Set& ideduplication = dataflow.add_set("ideduplication", attribute_names, attribute_types);
 
     //set odeduplication
-    Set& odeduplication = dataflow.add_set("odeduplication", attribute_names, attribute_types);
+    Set& odeduplication = dataflow.add_set("odeduplication");
+    odeduplication.add_extractor("ext_odeduplication", EXTRACTION, PROGRAM, attribute_names, attribute_types);
 
     //transformation deduplication
     Transformation& deduplication = dataflow.add_transformation("deduplication", ideduplication, odeduplication);
