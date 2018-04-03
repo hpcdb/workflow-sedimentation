@@ -39,6 +39,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/dataflow.o \
 	${OBJECTDIR}/dataset.o \
 	${OBJECTDIR}/dependency.o \
+	${OBJECTDIR}/element.o \
 	${OBJECTDIR}/extractor.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/set.o \
@@ -99,6 +100,11 @@ ${OBJECTDIR}/dependency.o: dependency.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency.o dependency.cpp
+
+${OBJECTDIR}/element.o: element.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/element.o element.cpp
 
 ${OBJECTDIR}/extractor.o: extractor.cpp
 	${MKDIR} -p ${OBJECTDIR}
@@ -193,6 +199,19 @@ ${OBJECTDIR}/dependency_nomain.o: ${OBJECTDIR}/dependency.o dependency.cpp
 	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency_nomain.o dependency.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/dependency.o ${OBJECTDIR}/dependency_nomain.o;\
+	fi
+
+${OBJECTDIR}/element_nomain.o: ${OBJECTDIR}/element.o element.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/element.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/element_nomain.o element.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/element.o ${OBJECTDIR}/element_nomain.o;\
 	fi
 
 ${OBJECTDIR}/extractor_nomain.o: ${OBJECTDIR}/extractor.o extractor.cpp 

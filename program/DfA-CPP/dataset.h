@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -22,8 +23,12 @@ public:
         this->tag = tag;
     }
     
-    void add_element(Element element);
+    void add_element_with_value(string value);
+    void add_element_with_values(vector<string> values);
+    void clear_elements();
     
     string get_tag();
     vector<Element>& get_elements();    
+    
+    string get_specification();
 };

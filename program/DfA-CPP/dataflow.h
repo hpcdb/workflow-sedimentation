@@ -6,13 +6,14 @@
  */
 
 #include "dfa_configuration.h"
-#include "dfa_config.h"
+#include "dfa_configuration_struct.h"
 #include "transformation.h"
 
 #include <string>
 #include <vector>
 #include <map>
 #include <iterator>
+#include <sstream>
 
 using namespace std;
 
@@ -44,4 +45,5 @@ public:
     Set& add_set(string tag, vector<string> attribute_names, vector<attribute_type> attribute_types);
     
     string get_tag();
+    string get_specification();
 };

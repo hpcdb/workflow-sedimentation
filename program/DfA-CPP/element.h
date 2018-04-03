@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -14,10 +15,21 @@ class Element{
 protected:
     vector<string> values;
     
-public:    
-    void add_value(string value);
+public:
+    Element(){};
     
-    vector<string> get_values();
+    Element(string value){
+        this->add_value(value);
+    }
+    
+    Element(vector<string> values){
+        this->set_values(values);
+    }
+    
+    void add_value(string value);
+    void set_values(vector<string> values);
+    
+    vector<string>& get_values();
     string get_values_as_string();
     
 };

@@ -9,3 +9,9 @@ SELECT * FROM extractor;
 SELECT * FROM attribute;
 
 SELECT a.name, a.type, s.tag, a.extractor_id FROM attribute a, data_set s WHERE a.ds_id=s.id ;
+
+SELECT * FROM task;
+
+SELECT * FROM ideduplication;
+
+SELECT * FROM odeduplication;

@@ -39,9 +39,9 @@ public:
     string get_tag();
     string get_set_tag();
     Attribute& get_attribute_by_name(string name);
-    string get_specification();
     string get_method();
     string get_cartridge();
+    string get_specification();
 };
 
 #endif /* EXTRACTOR_H */

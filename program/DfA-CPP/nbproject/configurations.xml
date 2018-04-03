@@ -5,8 +5,8 @@
                    displayName="Header Files"
                    projectFiles="true">
       <logicalFolder name="f3" displayName="configuration" projectFiles="true">
-        <itemPath>dfa_config.h</itemPath>
         <itemPath>dfa_configuration.h</itemPath>
+        <itemPath>dfa_configuration_struct.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="dataflow" projectFiles="true">
         <itemPath>attribute.h</itemPath>
@@ -26,6 +26,7 @@
         <itemPath>element.h</itemPath>
         <itemPath>task.h</itemPath>
       </logicalFolder>
+      <itemPath>dfa.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -44,6 +45,7 @@
       <logicalFolder name="f2" displayName="task" projectFiles="true">
         <itemPath>dataset.cpp</itemPath>
         <itemPath>dependency.cpp</itemPath>
+        <itemPath>element.cpp</itemPath>
         <itemPath>task.cpp</itemPath>
       </logicalFolder>
       <itemPath>main.cpp</itemPath>
@@ -94,9 +96,13 @@
       </item>
       <item path="dependency.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="dfa_config.h" ex="false" tool="3" flavor2="0">
+      <item path="dfa.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="dfa_configuration.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="dfa_configuration_struct.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="element.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="element.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -178,9 +184,13 @@
       </item>
       <item path="dependency.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="dfa_config.h" ex="false" tool="3" flavor2="0">
+      <item path="dfa.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="dfa_configuration.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="dfa_configuration_struct.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="element.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="element.h" ex="false" tool="3" flavor2="0">
       </item>

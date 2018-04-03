@@ -48,18 +48,23 @@ string Dataflow::get_tag(){
     return this->tag;
 }
 
+string Dataflow::get_specification(){
+    return "dataflow(" + this->tag + ")";
+}
+
 string Dataflow::get_post_message() {
-    string message = "dataflow(" + this->tag + ")";
+    stringstream message;
+    message << this->get_specification();
 
     map<string, Set>::iterator it_set = this->sets.begin();
     while (it_set != this->sets.end()) {
         Set set = it_set->second;
-        message += "\n" + set.get_specification();
+        message << "\n" << set.get_specification();
         
         map<string, Extractor>::iterator it_extractor = set.get_extractors().begin();
         while (it_extractor != set.get_extractors().end()) {
             Extractor extractor = it_extractor->second;
-            message += "\n" + extractor.get_specification();
+            message << "\n" << extractor.get_specification();
             it_extractor++;
         }
         it_set++;
@@ -68,14 +73,15 @@ string Dataflow::get_post_message() {
     map<string, Transformation>::iterator it_transformation = this->transformations.begin();
     while (it_transformation != this->transformations.end()) {
         Transformation transformation = it_transformation->second;
-        message += "\n" + transformation.get_specification();
+        message << "\n" << transformation.get_specification();
         it_transformation++;
     }
 
-    return message;
+    return message.str();
 }
 
 void Dataflow::save() {
+    cout << endl << "[DfAnalyzer] saving dataflow..." << endl;
     CURL *hnd = curl_easy_init();
     curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
 
@@ -98,4 +104,5 @@ void Dataflow::save() {
     curl_easy_perform(hnd); //send request
     curl_easy_cleanup(hnd);
     curl_global_cleanup();
+    cout << endl;
 }
