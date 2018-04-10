@@ -76,6 +76,7 @@
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
+using namespace std;
 
 // Function prototype.  This function will assemble the system
 // matrix and right-hand-side.
@@ -90,6 +91,10 @@ void set_poiseuille_bcs(TransientLinearImplicitSystem & system);
 // The main program.
 int main (int argc, char** argv)
 {
+  //dfa - init_mesh
+  //iinit_mesh(default_solver_package())
+  //oinit_mesh nx=20, ny=20, xmin=0, xmax=1, ymin=0, ymax=1, type=QUAD9)
+    
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
@@ -114,7 +119,7 @@ int main (int argc, char** argv)
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 8x8 Quad9 elements in 2D.  Building these
   // higher-order elements allows us to use higher-order polynomial
-  // approximations for the velocity.
+  // approximations for the velocity.  
   MeshTools::Generation::build_square (mesh,
                                        20, 20,
                                        0., 1.,
@@ -123,6 +128,10 @@ int main (int argc, char** argv)
 
   // Print information about the mesh to the screen.
   mesh.print_info();
+  
+  //dfa - create_equation_systems
+  //dependency - init_mesh
+  //ocreate_equation_systems(dt, time, n_timesteps, n_nonlinear_steps, nonlinear_tolerance, nu)  
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
@@ -195,6 +204,10 @@ int main (int argc, char** argv)
 
   // Since we are not doing adaptivity, write all solutions to a single Exodus file.
   ExodusII_IO exo_io(mesh);
+  
+  //dfa - solve_equation_systems
+  //dependency - create_equation_systems
+  //osolve_equation_systems(t_step, time, l or n_nonlinear_steps, n_linear_iterations, final_linear_residual, norm_delta, converged)  
 
   for (unsigned int t_step=1; t_step<=n_timesteps; ++t_step)
     {
@@ -307,6 +320,10 @@ int main (int argc, char** argv)
       // Don't keep going if we failed to converge.
       if (!converged)
         libmesh_error_msg("Error: Newton iterations failed to converge!");
+      
+      //dfa - write_mesh
+      //dependency - solve_equation_systems
+      //owrite_mesh(t_step,time,filename)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write out every nth timestep to file.
