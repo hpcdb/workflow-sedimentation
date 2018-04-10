@@ -23,17 +23,17 @@ vector<Element>& Dataset::get_elements() {
 }
 
 string Dataset::get_specification() {
-    stringstream task_specification;
+    stringstream dataset_specification;
     
     if (!this->get_elements().empty()) {
-        task_specification << "collection(" << this->tag << ",{";
+        dataset_specification << "collection(" << this->tag << ",{";
 
         for (Element element : this->get_elements()) {
-            task_specification << "{" << element.get_values_as_string() << "}";
+            dataset_specification << "{" << element.get_values_as_string() << "}";
         }
 
-        task_specification << "})";
+        dataset_specification << "})";
     }
     
-    return task_specification.str();
+    return dataset_specification.str();
 }

@@ -114,6 +114,10 @@ string Task::get_post_message() {
         message << "\n" << dataset.get_specification();
         it_dataset++;
     }
+    
+    if(!this->get_dependency().get_transformation_ids().empty() && !this->get_dependency().get_transformation_tags().empty()){
+        message << "\n" << this->dependency.get_specification();
+    }
 
     return message.str();
 }
@@ -153,4 +157,20 @@ int Task::begin() {
 int Task::end() {
     this->set_status(FINISHED);
     this->save();
+}
+
+void Task::add_dependent_transformation_tag(string transformation_tag){
+    this->dependency.add_transformation_tag(transformation_tag);
+}
+
+void Task::add_dependent_transformation_tags(vector<string> transformation_tags){
+    this->dependency.set_transformation_tags(transformation_tags);
+}
+
+void Task::add_dependent_transformation_id(int task_id){
+    this->dependency.add_transformation_ids({task_id});
+}
+
+void Task::add_dependent_transformation_ids(vector<int> transformation_ids){
+    this->dependency.add_transformation_ids(transformation_ids);
 }

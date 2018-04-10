@@ -7,20 +7,31 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
+#include <algorithm>
+#include <iostream>
+#include <boost/algorithm/string/join.hpp>
 
 using namespace std;
 
-class Dependency{
+class Dependency {
 protected:
     vector<string> transformation_tags;
-    vector<vector<int>> transformation_ids; 
-    
+    vector<vector<int>> transformation_ids;
+
 public:
-    Dependency(){};
-    
+
+    Dependency() {
+    };
+
     void add_transformation_tag(string transformation_tag);
-    void add_transformation_ids(vector<int> transformation_ids);
+    void add_transformation_ids(vector<int> transformation_ids);    
     
+    void set_transformation_tags(vector<string> transformation_tags);
+
     vector<string>& get_transformation_tags();
-    vector<vector<int>>& get_transformation_ids();
+    vector<vector<int>>&get_transformation_ids();
+    string get_transformation_tags_as_string();
+    string get_transformation_ids_as_string();
+    string get_specification();
 };

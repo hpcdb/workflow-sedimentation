@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <boost/algorithm/string/join.hpp>
 
 using namespace std;
 

@@ -45,7 +45,8 @@ int main(int argc, char** argv) {
     dataflow.save();
     
     //retrospective provenance
-    Task task_deduplication = Task(dataflow.get_tag(), deduplication.get_tag(), 1);
+    int task_id = 1;
+    Task task_deduplication = Task(dataflow.get_tag(), deduplication.get_tag(), task_id);
     task_deduplication.set_workspace("/path/");
     task_deduplication.set_resource("local");
     
@@ -59,6 +60,21 @@ int main(int argc, char** argv) {
     Dataset& ds_odeduplication = task_deduplication.add_dataset(odeduplication.get_tag());
     ds_odeduplication.add_element_with_values(ideduplication_values);
     task_deduplication.end();
+    
+    task_id++;
+    Task task_europe = Task(dataflow.get_tag(), europe.get_tag(), task_id);
+    task_europe.set_workspace("/path/");
+    task_europe.set_resource("local");
+    
+    vector<string> transformation_tags = {deduplication.get_tag()};
+    task_europe.add_dependent_transformation_tags(transformation_tags);
+    task_europe.add_dependent_transformation_id(task_deduplication.get_id());
+
+    task_europe.begin();
+    
+    Dataset& ds_oeurope = task_europe.add_dataset(oeurope.get_tag());
+    ds_oeurope.add_element_with_values(ideduplication_values);
+    task_europe.end();
     
     return 0;
 }
