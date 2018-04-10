@@ -15,3 +15,7 @@ SELECT * FROM task;
 SELECT * FROM ideduplication;
 
 SELECT * FROM odeduplication;
+
+SELECT * FROM "ext_ext_oeurope";
+
+SELECT * FROM oeurope;

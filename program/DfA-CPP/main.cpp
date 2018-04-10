@@ -28,16 +28,15 @@ int main(int argc, char** argv) {
 
     //set odeduplication
     Set& odeduplication = dataflow.add_set("odeduplication", attribute_names, attribute_types);
-    
-//    with raw data extraction
-//    Set& odeduplication = dataflow.add_set("odeduplication");
-//    odeduplication.add_extractor("ext_odeduplication", EXTRACTION, PROGRAM, attribute_names, attribute_types);
 
     //transformation deduplication
     Transformation& deduplication = dataflow.add_transformation("deduplication", ideduplication, odeduplication);
     
     //set oeurope
-    Set& oeurope = dataflow.add_set("oeurope", attribute_names, attribute_types);
+    Set& oeurope = dataflow.add_set("oeurope");    
+    
+    //with raw data extraction
+    oeurope.add_extractor("ext_oeurope", EXTRACTION, PROGRAM, attribute_names, attribute_types);
     
     //transformation europe
     Transformation& europe = dataflow.add_transformation("europe", odeduplication, oeurope);
@@ -72,8 +71,9 @@ int main(int argc, char** argv) {
 
     task_europe.begin();
     
-    Dataset& ds_oeurope = task_europe.add_dataset(oeurope.get_tag());
-    ds_oeurope.add_element_with_values(ideduplication_values);
+    Dataset& ds_oeurope = task_europe.add_dataset(oeurope.get_tag());    
+    vector<string> oeurope_values = {"/home/vitor/Documents/dev/workflow-sedimentation/program/DfA-CPP/ext.data"};
+    ds_oeurope.add_element_with_values(oeurope_values);
     task_europe.end();
     
     return 0;
