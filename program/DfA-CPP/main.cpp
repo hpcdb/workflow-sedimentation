@@ -20,6 +20,7 @@ int main(int argc, char** argv) {
 
     //prospective provenance
     Dataflow dataflow = Dataflow("clothing");
+    cout << dataflow.get_tag() << endl;
 
     //set ideduplication
     vector<string> attribute_names = {"customerid", "country", "continent", "age", "gender", "children", "status"};

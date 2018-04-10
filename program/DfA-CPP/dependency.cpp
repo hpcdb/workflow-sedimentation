@@ -49,7 +49,7 @@ string Dependency::get_transformation_ids_as_string() {
             }
             
             stringstream transformation_id_as_stream;
-            copy(transformation_id.begin(), transformation_id.end(), ostream_iterator<int>(transformation_id_as_stream, ","));
+            copy(transformation_id.begin(), transformation_id.end(), ostream_iterator<int>(transformation_id_as_stream, ";"));
             
             string transformation_id_as_string = transformation_id_as_stream.str();
             transformation_id_as_string = transformation_id_as_string.substr(0, transformation_id_as_string.length()-1);
