@@ -95,47 +95,55 @@ void set_poiseuille_bcs(TransientLinearImplicitSystem & system);
 // The main program.
 
 int main(int argc, char** argv) {
-    
+
     // Initialize libMesh.
-    LibMeshInit init(argc, argv);    
+    LibMeshInit init(argc, argv);
     int processor_id = libMesh::global_processor_id();
+    
+    // DfAnalyzer
+    int task_id = 1;
 
 #ifdef DFANALYZER
-    if (processor_id == 0){
-        //DfAnalyzer - Prospective Provenance
+    if (processor_id == 0) {
         Dataflow dataflow = Dataflow("systems_of_equations_ex2");
 
-        Set& iinit_mesh = dataflow.add_set("iinit_mesh", "solver_package", TEXT);
-        Set& oinit_mesh = dataflow.add_set("oinit_mesh", 
-                    {"nx", "ny", "xmin", "xmax", "ymin", "ymax", "type"}, 
-                    {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
+        Set iinit_mesh = dataflow.add_set("iinit_mesh", "solver_package", NUMERIC);
+        Set oinit_mesh = dataflow.add_set("oinit_mesh",{"nx", "ny", "xmin", "xmax", "ymin", "ymax", "type"},
+        {
+            NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT
+        });
         Transformation& init_mesh = dataflow.add_transformation("init_mesh", iinit_mesh, oinit_mesh);
 
-        Set& ocreate_equation_systems = dataflow.add_set("ocreate_equation_systems", 
-                    {"dt", "max_time", "timesteps", "nonlinear_steps", "nonlinear_tolerance", "nu"}, 
-                    {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
+        Set ocreate_equation_systems = dataflow.add_set("ocreate_equation_systems",{"dt", "max_time", "timesteps", "nonlinear_steps", "nonlinear_tolerance", "nu"},
+        {
+            NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC
+        });
         Transformation& create_equation_systems = dataflow.add_transformation("create_equation_systems", oinit_mesh, ocreate_equation_systems);
 
-        Set& osolve_equation_systems = dataflow.add_set("osolve_equation_systems", 
-                    {"timestep", "time", "nonlinear_steps", "linear_iterations", "final_linear_residual", "norm_delta", "converged"},
-                    {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
+        Set osolve_equation_systems = dataflow.add_set("osolve_equation_systems",{"timestep", "time", "nonlinear_steps", "linear_iterations", "final_linear_residual", "norm_delta", "converged"},
+        {
+            NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT
+        });
         Transformation& solve_equation_systems = dataflow.add_transformation("solve_equation_systems", ocreate_equation_systems, osolve_equation_systems);
 
-        Set& owrite_mesh = dataflow.add_set("owrite_mesh",
-                    {"timestep", "time", "filename"},
-                    {NUMERIC, NUMERIC, TEXT});
+        Set owrite_mesh = dataflow.add_set("owrite_mesh",{"timestep", "time", "filename"},
+        {
+            NUMERIC, NUMERIC, TEXT
+        });
         Transformation& write_mesh = dataflow.add_transformation("write_mesh", osolve_equation_systems, owrite_mesh);
 
         dataflow.save();
+
+        Task task_init_mesh = Task("systems_of_equations_ex2", "init_mesh", task_id);
+        Dataset& ds_iinit_mesh = task_init_mesh.add_dataset_with_element_values("iinit_mesh",{to_string(libMesh::default_solver_package())});
+        task_init_mesh.begin();
     }
 #endif
-    
-    return 0;
 
     //dfa - init_mesh
     //iinit_mesh(default_solver_package())
     //oinit_mesh nx=20, ny=20, xmin=0, xmax=1, ymin=0, ymax=1, type=QUAD9)
-    
+
     // This example requires a linear solver package.
     libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
             "--enable-petsc, --enable-trilinos, or --enable-eigen");
@@ -170,6 +178,18 @@ int main(int argc, char** argv) {
     //dfa - create_equation_systems
     //dependency - init_mesh
     //ocreate_equation_systems(dt, time, n_timesteps, n_nonlinear_steps, nonlinear_tolerance, nu)  
+
+#ifdef DFANALYZER
+    if (processor_id == 0) {
+        Task init_mesh = Task("systems_of_equations_ex2", "init_mesh", task_id);
+        init_mesh.add_dataset_with_element_values("oinit_mesh",
+            {"20.00", "20.00", "0.0", "1.0", "0.0", "1.0", "QUAD9"});
+        init_mesh.end();
+    }
+#endif
+    
+    //debugging
+    return 0;
 
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);

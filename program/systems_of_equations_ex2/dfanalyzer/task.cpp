@@ -48,6 +48,18 @@ Dataset& Task::add_dataset(string dataset_tag) {
     return this->get_dataset_by_tag(dataset_tag);
 }
 
+Dataset& Task::add_dataset_with_element_value(string dataset_tag, string value){
+    Dataset& dataset = this->add_dataset(dataset_tag);
+    dataset.add_element_with_value(value);
+    return dataset;
+}
+
+Dataset& Task::add_dataset_with_element_values(string dataset_tag, vector<string> values){
+    Dataset& dataset = this->add_dataset(dataset_tag);
+    dataset.add_element_with_values(values);
+    return dataset;
+}
+
 void Task::insert_dataset(string dataset_tag) {
     Dataset dataset = Dataset(dataset_tag);
     this->datasets.insert(make_pair(dataset_tag, dataset));
@@ -152,6 +164,13 @@ void Task::save() {
 int Task::begin() {
     this->set_status(RUNNING);
     this->save();
+    
+    map<string, Dataset>::iterator it_dataset = this->datasets.begin();
+    while (it_dataset != this->datasets.end()) {
+        Dataset dataset = it_dataset->second;
+        dataset.clear_elements();
+        it_dataset++;
+    }
 }
 
 int Task::end() {

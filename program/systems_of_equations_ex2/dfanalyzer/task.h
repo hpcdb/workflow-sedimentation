@@ -52,6 +52,8 @@ public:
     int end();
     
     Dataset& add_dataset(string dataset_tag);
+    Dataset& add_dataset_with_element_value(string dataset_tag, string value);
+    Dataset& add_dataset_with_element_values(string dataset_tag, vector<string> values);
 
     void add_dependent_transformation_tag(string transformation_tag);
     void add_dependent_transformation_tags(vector<string> transformation_tags);
