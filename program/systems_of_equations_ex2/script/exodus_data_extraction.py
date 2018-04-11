@@ -47,6 +47,7 @@ renderView1.ResetCamera()
 renderView1.InteractionMode = '2D'
 renderView1.CameraPosition = [0.5, 0.5, 10000.0]
 renderView1.CameraFocalPoint = [0.5, 0.5, 0.0]
+renderView1.CameraViewUp = [0.0, 1.0, 0.0]
 
 # set scalar coloring
 ColorBy(outeDisplay, ('FIELD', 'vtkBlockColors'))
@@ -65,96 +66,10 @@ vtkBlockColorsLUT.IndexedColors = [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 
 vtkBlockColorsPWF = GetOpacityTransferFunction('vtkBlockColors')
 
 # set scalar coloring
-ColorBy(outeDisplay, ('POINTS', 'p'))
-
-# Hide the scalar bar for this color map if no visible data is colored by it.
-HideScalarBarIfNotNeeded(vtkBlockColorsLUT, renderView1)
-
-# rescale color and/or opacity maps used to include current data range
-outeDisplay.RescaleTransferFunctionToDataRange(True, False)
-
-# show color bar/color legend
-outeDisplay.SetScalarBarVisibility(renderView1, True)
-
-# get color transfer function/color map for 'p'
-pLUT = GetColorTransferFunction('p')
-pLUT.RGBPoints = [0.0, 0.231373, 0.298039, 0.752941, 0.0, 0.865003, 0.865003, 0.865003, 0.0, 0.705882, 0.0156863, 0.14902]
-pLUT.ScalarRangeInitialized = 1.0
-
-# get opacity transfer function/opacity map for 'p'
-pPWF = GetOpacityTransferFunction('p')
-pPWF.Points = [0.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.0]
-pPWF.ScalarRangeInitialized = 1
-
-# create a new 'Slice'
-slice1 = Slice(Input=oute)
-slice1.SliceType = 'Plane'
-slice1.SliceOffsetValues = [0.0]
-
-# init the 'Plane' selected for 'SliceType'
-slice1.SliceType.Origin = [0.5, 0.5, 0.0]
-
-# set active source
-SetActiveSource(slice1)
-
-# show data in view
-slice1Display = Show(slice1, renderView1)
-# trace defaults for the display properties.
-slice1Display.ColorArrayName = ['POINTS', 'p']
-slice1Display.LookupTable = pLUT
-slice1Display.OSPRayScaleArray = 'p'
-slice1Display.OSPRayScaleFunction = 'PiecewiseFunction'
-slice1Display.SelectOrientationVectors = 'None'
-slice1Display.ScaleFactor = 0.1
-slice1Display.SelectScaleArray = 'None'
-slice1Display.GlyphType = 'Arrow'
-slice1Display.GaussianRadius = 0.05
-slice1Display.SetScaleArray = ['POINTS', 'p']
-slice1Display.ScaleTransferFunction = 'PiecewiseFunction'
-slice1Display.OpacityArray = ['POINTS', 'p']
-slice1Display.OpacityTransferFunction = 'PiecewiseFunction'
-
-# show color bar/color legend
-slice1Display.SetScalarBarVisibility(renderView1, True)
-
-# hide data in view
-Hide(oute, renderView1)
-
-# set active source
-SetActiveSource(oute)
-
-# show data in view
-outeDisplay = Show(oute, renderView1)
-
-# show color bar/color legend
-outeDisplay.SetScalarBarVisibility(renderView1, True)
-
-# show data in view
-slice1Display = Show(slice1, renderView1)
-
-# hide data in view
-Hide(oute, renderView1)
-
-# show color bar/color legend
-slice1Display.SetScalarBarVisibility(renderView1, True)
-
-# set active source
-SetActiveSource(slice1)
-
-# set active source
-SetActiveSource(oute)
-
-# show data in view
-outeDisplay = Show(oute, renderView1)
-
-# show color bar/color legend
-outeDisplay.SetScalarBarVisibility(renderView1, True)
-
-# set scalar coloring
 ColorBy(outeDisplay, ('POINTS', 'vel_'))
 
 # Hide the scalar bar for this color map if no visible data is colored by it.
-HideScalarBarIfNotNeeded(pLUT, renderView1)
+HideScalarBarIfNotNeeded(vtkBlockColorsLUT, renderView1)
 
 # rescale color and/or opacity maps used to include current data range
 outeDisplay.RescaleTransferFunctionToDataRange(True, False)
@@ -172,35 +87,59 @@ vel_PWF = GetOpacityTransferFunction('vel_')
 vel_PWF.Points = [0.0, 0.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.0]
 vel_PWF.ScalarRangeInitialized = 1
 
-# set active source
-SetActiveSource(slice1)
+# create a new 'Plot Over Line'
+plotOverLine1 = PlotOverLine(Input=oute,
+    Source='High Resolution Line Source')
 
-# set active source
-SetActiveSource(oute)
+# init the 'High Resolution Line Source' selected for 'Source'
+plotOverLine1.Source.Point2 = [1.0, 1.0, 0.0]
 
-# set active source
-SetActiveSource(slice1)
+# Properties modified on plotOverLine1.Source
+plotOverLine1.Source.Point1 = [0.5, 0.0, 0.0]
+plotOverLine1.Source.Point2 = [0.5, 1.0, 0.0]
 
-# set scalar coloring
-ColorBy(slice1Display, ('POINTS', 'vel_'))
+# Properties modified on plotOverLine1
+plotOverLine1.Tolerance = 2.22044604925031e-16
 
-# Hide the scalar bar for this color map if no visible data is colored by it.
-HideScalarBarIfNotNeeded(pLUT, renderView1)
+# Properties modified on plotOverLine1.Source
+plotOverLine1.Source.Point1 = [0.5, 0.0, 0.0]
+plotOverLine1.Source.Point2 = [0.5, 1.0, 0.0]
 
-# rescale color and/or opacity maps used to include current data range
-slice1Display.RescaleTransferFunctionToDataRange(True, False)
+# Create a new 'Line Chart View'
+lineChartView1 = CreateView('XYChartView')
+lineChartView1.ViewSize = [801, 832]
 
-# show color bar/color legend
-slice1Display.SetScalarBarVisibility(renderView1, True)
+# get layout
+layout1 = GetLayout()
 
-# set active source
-SetActiveSource(oute)
+# place view in the layout
+layout1.AssignView(2, lineChartView1)
 
-# turn off scalar coloring
-ColorBy(outeDisplay, None)
+# show data in view
+plotOverLine1Display = Show(plotOverLine1, lineChartView1)
+# trace defaults for the display properties.
+plotOverLine1Display.CompositeDataSetIndex = [0]
+plotOverLine1Display.UseIndexForXAxis = 0
+plotOverLine1Display.XArrayName = 'arc_length'
+plotOverLine1Display.SeriesVisibility = ['p', 'vel__Magnitude']
+plotOverLine1Display.SeriesLabel = ['arc_length', 'arc_length', 'ObjectId', 'ObjectId', 'p', 'p', 'vel__X', 'vel__X', 'vel__Y', 'vel__Y', 'vel__Z', 'vel__Z', 'vel__Magnitude', 'vel__Magnitude', 'vtkValidPointMask', 'vtkValidPointMask', 'Points_X', 'Points_X', 'Points_Y', 'Points_Y', 'Points_Z', 'Points_Z', 'Points_Magnitude', 'Points_Magnitude']
+plotOverLine1Display.SeriesColor = ['arc_length', '0', '0', '0', 'ObjectId', '0.89', '0.1', '0.11', 'p', '0.22', '0.49', '0.72', 'vel__X', '0.3', '0.69', '0.29', 'vel__Y', '0.6', '0.31', '0.64', 'vel__Z', '1', '0.5', '0', 'vel__Magnitude', '0.65', '0.34', '0.16', 'vtkValidPointMask', '0', '0', '0', 'Points_X', '0.89', '0.1', '0.11', 'Points_Y', '0.22', '0.49', '0.72', 'Points_Z', '0.3', '0.69', '0.29', 'Points_Magnitude', '0.6', '0.31', '0.64']
+plotOverLine1Display.SeriesPlotCorner = ['arc_length', '0', 'ObjectId', '0', 'p', '0', 'vel__X', '0', 'vel__Y', '0', 'vel__Z', '0', 'vel__Magnitude', '0', 'vtkValidPointMask', '0', 'Points_X', '0', 'Points_Y', '0', 'Points_Z', '0', 'Points_Magnitude', '0']
+plotOverLine1Display.SeriesLineStyle = ['arc_length', '1', 'ObjectId', '1', 'p', '1', 'vel__X', '1', 'vel__Y', '1', 'vel__Z', '1', 'vel__Magnitude', '1', 'vtkValidPointMask', '1', 'Points_X', '1', 'Points_Y', '1', 'Points_Z', '1', 'Points_Magnitude', '1']
+plotOverLine1Display.SeriesLineThickness = ['arc_length', '2', 'ObjectId', '2', 'p', '2', 'vel__X', '2', 'vel__Y', '2', 'vel__Z', '2', 'vel__Magnitude', '2', 'vtkValidPointMask', '2', 'Points_X', '2', 'Points_Y', '2', 'Points_Z', '2', 'Points_Magnitude', '2']
+plotOverLine1Display.SeriesMarkerStyle = ['arc_length', '0', 'ObjectId', '0', 'p', '0', 'vel__X', '0', 'vel__Y', '0', 'vel__Z', '0', 'vel__Magnitude', '0', 'vtkValidPointMask', '0', 'Points_X', '0', 'Points_Y', '0', 'Points_Z', '0', 'Points_Magnitude', '0']
+plotOverLine1Display.SeriesLabelPrefix = ''
 
-# Hide the scalar bar for this color map if no visible data is colored by it.
-HideScalarBarIfNotNeeded(vel_LUT, renderView1)
+# destroy lineChartView1
+Delete(lineChartView1)
+del lineChartView1
 
-# set active source
-SetActiveSource(slice1)
+# close an empty frame
+layout1.Collapse(2)
+
+# set active view
+SetActiveView(renderView1)
+
+writer = CreateWriter("/home/vitor/Desktop/fulldata.csv", plotOverLine1)
+writer.FieldAssociation = "Points" # or "Cells"
+writer.UpdatePipeline()
