@@ -2,6 +2,7 @@
 #
 # Template libMesh application Makefile
 LIBMESH_DIR ?= /media/vitor/data-linux/program/libmesh
+DFANALYZER_DIR ?= ./dfanalyzer
 
 
 # include the library options determined by configure
@@ -16,7 +17,8 @@ target     := ./example-$(METHOD)
 
 #
 # source files
-srcfiles 	:= $(wildcard *.C)
+srcfiles 	:= $(DFANALYZER_DIR)/*.cpp $(wildcard *.C)
+libmesh_CXXFLAGS +=  -I$(DFANALYZER_DIR)/*.h -lcurl 
 
 #
 # object files
@@ -43,10 +45,10 @@ $(notdir $(target)): $(objects)
 # Useful rules.
 dust:
 	@echo "Deleting old output and runtime files"
-	@rm -f out*.m job_output.txt output.txt* *.gmv.* *.plt.* out*.xdr* out*.xda* PI* complete
+	@rm -rf out*.m job_output.txt output.txt* *.gmv.* *.plt.* out*.xdr* out*.xda* PI* complete .depend .libs
 
 clean: dust
-	@rm -f $(objects) *.$(obj-suffix) *.lo
+	@rm -f *.$(obj-suffix) *.lo 
 
 clobber: clean 
 	@rm -f $(target)

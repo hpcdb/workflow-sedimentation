@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/dependency.o \
 	${OBJECTDIR}/element.o \
 	${OBJECTDIR}/extractor.o \
-	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/set.o \
 	${OBJECTDIR}/task.o \
 	${OBJECTDIR}/transformation.o
@@ -55,7 +54,7 @@ TESTFILES= \
 
 # Test Object Files
 TESTOBJECTFILES= \
-	${TESTDIR}/tests/dataflow_spec_test.o
+	${TESTDIR}/tests/dataflow_test.o
 
 # C Compiler Flags
 CFLAGS=
@@ -75,61 +74,56 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/dfa-cpp
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libDfA-CPP.${CND_DLIB_EXT}
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/dfa-cpp: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libDfA-CPP.${CND_DLIB_EXT}: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/dfa-cpp ${OBJECTFILES} ${LDLIBSOPTIONS} -lcurl
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libDfA-CPP.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -lcurl -shared -fPIC
 
 ${OBJECTDIR}/attribute.o: attribute.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/attribute.o attribute.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/attribute.o attribute.cpp
 
 ${OBJECTDIR}/dataflow.o: dataflow.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataflow.o dataflow.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataflow.o dataflow.cpp
 
 ${OBJECTDIR}/dataset.o: dataset.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataset.o dataset.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataset.o dataset.cpp
 
 ${OBJECTDIR}/dependency.o: dependency.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency.o dependency.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency.o dependency.cpp
 
 ${OBJECTDIR}/element.o: element.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/element.o element.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/element.o element.cpp
 
 ${OBJECTDIR}/extractor.o: extractor.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/extractor.o extractor.cpp
-
-${OBJECTDIR}/main.o: main.cpp
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/extractor.o extractor.cpp
 
 ${OBJECTDIR}/set.o: set.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/set.o set.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/set.o set.cpp
 
 ${OBJECTDIR}/task.o: task.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/task.o task.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/task.o task.cpp
 
 ${OBJECTDIR}/transformation.o: transformation.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/transformation.o transformation.cpp
+	$(COMPILE.cc) -g -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/transformation.o transformation.cpp
 
 # Subprojects
 .build-subprojects:
@@ -138,15 +132,15 @@ ${OBJECTDIR}/transformation.o: transformation.cpp
 .build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
 .build-tests-subprojects:
 
-${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/dataflow_spec_test.o ${OBJECTFILES:%.o=%_nomain.o}
+${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/dataflow_test.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}   
+	${LINK.cc} -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS}  -lcurl 
 
 
-${TESTDIR}/tests/dataflow_spec_test.o: tests/dataflow_spec_test.cpp 
+${TESTDIR}/tests/dataflow_test.o: tests/dataflow_test.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I. -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/dataflow_spec_test.o tests/dataflow_spec_test.cpp
+	$(COMPILE.cc) -g -I. -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/dataflow_test.o tests/dataflow_test.cpp
 
 
 ${OBJECTDIR}/attribute_nomain.o: ${OBJECTDIR}/attribute.o attribute.cpp 
@@ -157,7 +151,7 @@ ${OBJECTDIR}/attribute_nomain.o: ${OBJECTDIR}/attribute.o attribute.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/attribute_nomain.o attribute.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/attribute_nomain.o attribute.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/attribute.o ${OBJECTDIR}/attribute_nomain.o;\
 	fi
@@ -170,7 +164,7 @@ ${OBJECTDIR}/dataflow_nomain.o: ${OBJECTDIR}/dataflow.o dataflow.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataflow_nomain.o dataflow.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataflow_nomain.o dataflow.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/dataflow.o ${OBJECTDIR}/dataflow_nomain.o;\
 	fi
@@ -183,7 +177,7 @@ ${OBJECTDIR}/dataset_nomain.o: ${OBJECTDIR}/dataset.o dataset.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataset_nomain.o dataset.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dataset_nomain.o dataset.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/dataset.o ${OBJECTDIR}/dataset_nomain.o;\
 	fi
@@ -196,7 +190,7 @@ ${OBJECTDIR}/dependency_nomain.o: ${OBJECTDIR}/dependency.o dependency.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency_nomain.o dependency.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/dependency_nomain.o dependency.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/dependency.o ${OBJECTDIR}/dependency_nomain.o;\
 	fi
@@ -209,7 +203,7 @@ ${OBJECTDIR}/element_nomain.o: ${OBJECTDIR}/element.o element.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/element_nomain.o element.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/element_nomain.o element.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/element.o ${OBJECTDIR}/element_nomain.o;\
 	fi
@@ -222,22 +216,9 @@ ${OBJECTDIR}/extractor_nomain.o: ${OBJECTDIR}/extractor.o extractor.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/extractor_nomain.o extractor.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/extractor_nomain.o extractor.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/extractor.o ${OBJECTDIR}/extractor_nomain.o;\
-	fi
-
-${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/main.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main_nomain.o main.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/main.o ${OBJECTDIR}/main_nomain.o;\
 	fi
 
 ${OBJECTDIR}/set_nomain.o: ${OBJECTDIR}/set.o set.cpp 
@@ -248,7 +229,7 @@ ${OBJECTDIR}/set_nomain.o: ${OBJECTDIR}/set.o set.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/set_nomain.o set.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/set_nomain.o set.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/set.o ${OBJECTDIR}/set_nomain.o;\
 	fi
@@ -261,7 +242,7 @@ ${OBJECTDIR}/task_nomain.o: ${OBJECTDIR}/task.o task.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/task_nomain.o task.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/task_nomain.o task.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/task.o ${OBJECTDIR}/task_nomain.o;\
 	fi
@@ -274,7 +255,7 @@ ${OBJECTDIR}/transformation_nomain.o: ${OBJECTDIR}/transformation.o transformati
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/transformation_nomain.o transformation.cpp;\
+	    $(COMPILE.cc) -g -fPIC  -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/transformation_nomain.o transformation.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/transformation.o ${OBJECTDIR}/transformation_nomain.o;\
 	fi

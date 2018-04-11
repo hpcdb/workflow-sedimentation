@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=GNU-Linux
 CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
-CND_ARTIFACT_NAME_Debug=dfa-cpp
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/dfa-cpp
+CND_ARTIFACT_NAME_Debug=libDfA-CPP.so
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/libDfA-CPP.so
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
-CND_PACKAGE_NAME_Debug=dfa-cpp.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/dfa-cpp.tar
+CND_PACKAGE_NAME_Debug=libDfA-CPP.so.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/libDfA-CPP.so.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
-CND_ARTIFACT_NAME_Release=dfa-cpp
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/dfa-cpp
+CND_ARTIFACT_NAME_Release=libDfA-CPP.so
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/libDfA-CPP.so
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
-CND_PACKAGE_NAME_Release=dfa-cpp.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/dfa-cpp.tar
+CND_PACKAGE_NAME_Release=libDfA-CPP.so.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/libDfA-CPP.so.tar
 #
 # include compiler specific variables
 #

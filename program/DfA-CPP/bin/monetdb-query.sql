@@ -4,6 +4,12 @@ SELECT * FROM data_set;
 
 SELECT * FROM data_dependency;
 
+SELECT prev_dt.tag, next_dt.tag, ds.tag
+FROM data_dependency dep, data_transformation prev_dt, data_transformation next_dt, data_set ds
+WHERE dep.previous_dt_id = prev_dt.id
+AND dep.next_dt_id = next_dt.id
+AND dep.ds_id = ds.id;
+
 SELECT * FROM extractor;
 
 SELECT * FROM attribute;
