@@ -13,6 +13,12 @@ void Task::set_status(task_status status) {
     this->status = status;
 }
 
+void Task::set_sub_id(int sub_id){
+    if(sub_id >= 0){
+        this->sub_id = sub_id;
+    }
+}
+
 int Task::get_id() {
     return this->id;
 }
@@ -150,6 +156,7 @@ void Task::save() {
     headers = curl_slist_append(headers, "Content-Type: application/text");
 
     string message = this->get_post_message();
+    cout << message << endl;
 
     curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, message.c_str());
@@ -164,13 +171,7 @@ void Task::save() {
 int Task::begin() {
     this->set_status(RUNNING);
     this->save();
-    
-    map<string, Dataset>::iterator it_dataset = this->datasets.begin();
-    while (it_dataset != this->datasets.end()) {
-        Dataset dataset = it_dataset->second;
-        dataset.clear_elements();
-        it_dataset++;
-    }
+    this->datasets.clear();
 }
 
 int Task::end() {

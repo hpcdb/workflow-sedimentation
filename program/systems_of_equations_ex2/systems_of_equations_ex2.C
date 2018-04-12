@@ -98,51 +98,59 @@ int main(int argc, char** argv) {
 
     // Initialize libMesh.
     LibMeshInit init(argc, argv);
-    int processor_id = libMesh::global_processor_id();
-    
-    // DfAnalyzer
-    int task_id = 1;
 
 #ifdef DFANALYZER
+    int processor_id = libMesh::global_processor_id();
+    int task_id = 1;
+    const string DATAFLOW = "systems_of_equations_ex2";
+    // transformations
+    const string INIT_MESH = "init_mesh";
+    const string CREATE_EQUATION_SYSTEMS = "create_equation_systems";
+    const string SOLVE_EQUATION_SYSTEMS = "solve_equation_systems";
+    const string WRITE_MESH = "write_mesh";
+    // datasets
+    const string IINIT_MESH = "iinit_mesh";
+    const string OINIT_MESH = "oinit_mesh";
+    const string OCREATE_EQUATION_SYSTEMS = "ocreate_equation_systems";
+    const string OSOLVE_EQUATION_SYSTEMS = "osolve_equation_systems";
+    const string OWRITE_MESH = "owrite_mesh";
+
+    Task *init_mesh, *create_equation_systems, *solve_equation_systems, *write_mesh;
+    vector<int> solve_equation_systems_dependencies;
+    
     if (processor_id == 0) {
-        Dataflow dataflow = Dataflow("systems_of_equations_ex2");
+        Dataflow dataflow = Dataflow(DATAFLOW);
 
-        Set iinit_mesh = dataflow.add_set("iinit_mesh", "solver_package", NUMERIC);
-        Set oinit_mesh = dataflow.add_set("oinit_mesh",{"nx", "ny", "xmin", "xmax", "ymin", "ymax", "type"},
-        {
-            NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT
-        });
-        Transformation& init_mesh = dataflow.add_transformation("init_mesh", iinit_mesh, oinit_mesh);
+        Set ds_iinit_mesh = dataflow.add_set(IINIT_MESH, "solver_package", NUMERIC);
+        Set ds_oinit_mesh = dataflow.add_set(OINIT_MESH,
+            {"nx", "ny", "xmin", "xmax", "ymin", "ymax", "type"},
+            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
+        Transformation& dt_init_mesh = dataflow.add_transformation(INIT_MESH, ds_iinit_mesh, ds_oinit_mesh);
 
-        Set ocreate_equation_systems = dataflow.add_set("ocreate_equation_systems",{"dt", "max_time", "timesteps", "nonlinear_steps", "nonlinear_tolerance", "nu"},
-        {
-            NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC
-        });
-        Transformation& create_equation_systems = dataflow.add_transformation("create_equation_systems", oinit_mesh, ocreate_equation_systems);
+        Set ds_ocreate_equation_systems = dataflow.add_set(OCREATE_EQUATION_SYSTEMS,
+            {"dt", "timesteps", "nonlinear_steps", "nonlinear_tolerance", "nu"},
+            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
+        Transformation& dt_create_equation_systems = dataflow.add_transformation(CREATE_EQUATION_SYSTEMS, ds_oinit_mesh, ds_ocreate_equation_systems);
 
-        Set osolve_equation_systems = dataflow.add_set("osolve_equation_systems",{"timestep", "time", "nonlinear_steps", "linear_iterations", "final_linear_residual", "norm_delta", "converged"},
-        {
-            NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT
-        });
-        Transformation& solve_equation_systems = dataflow.add_transformation("solve_equation_systems", ocreate_equation_systems, osolve_equation_systems);
+        Set ds_osolve_equation_systems = dataflow.add_set(OSOLVE_EQUATION_SYSTEMS,
+            {"timestep", "time", "nonlinear_steps", "linear_iterations", "final_linear_residual", "norm_delta", "converged"},
+            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
+        Transformation& dt_solve_equation_systems = dataflow.add_transformation(SOLVE_EQUATION_SYSTEMS, ds_ocreate_equation_systems, ds_osolve_equation_systems);
 
-        Set owrite_mesh = dataflow.add_set("owrite_mesh",{"timestep", "time", "filename"},
-        {
-            NUMERIC, NUMERIC, TEXT
-        });
-        Transformation& write_mesh = dataflow.add_transformation("write_mesh", osolve_equation_systems, owrite_mesh);
+#ifdef LIBMESH_HAVE_EXODUS_API
+        Set ds_owrite_mesh = dataflow.add_set(OWRITE_MESH,
+            {"timestep", "time", "filename"},
+            {NUMERIC, NUMERIC, TEXT});
+        Transformation& dt_write_mesh = dataflow.add_transformation(WRITE_MESH, ds_osolve_equation_systems, ds_owrite_mesh);
+#endif
 
         dataflow.save();
 
-        Task task_init_mesh = Task("systems_of_equations_ex2", "init_mesh", task_id);
-        Dataset& ds_iinit_mesh = task_init_mesh.add_dataset_with_element_values("iinit_mesh",{to_string(libMesh::default_solver_package())});
-        task_init_mesh.begin();
+        init_mesh = new Task(DATAFLOW, INIT_MESH, task_id);
+        init_mesh->add_dataset_with_element_values(IINIT_MESH,{to_string(libMesh::default_solver_package())});
+        init_mesh->begin();
     }
 #endif
-
-    //dfa - init_mesh
-    //iinit_mesh(default_solver_package())
-    //oinit_mesh nx=20, ny=20, xmin=0, xmax=1, ymin=0, ymax=1, type=QUAD9)
 
     // This example requires a linear solver package.
     libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
@@ -175,21 +183,17 @@ int main(int argc, char** argv) {
     // Print information about the mesh to the screen.
     mesh.print_info();
 
-    //dfa - create_equation_systems
-    //dependency - init_mesh
-    //ocreate_equation_systems(dt, time, n_timesteps, n_nonlinear_steps, nonlinear_tolerance, nu)  
-
 #ifdef DFANALYZER
     if (processor_id == 0) {
-        Task init_mesh = Task("systems_of_equations_ex2", "init_mesh", task_id);
-        init_mesh.add_dataset_with_element_values("oinit_mesh",
-            {"20.00", "20.00", "0.0", "1.0", "0.0", "1.0", "QUAD9"});
-        init_mesh.end();
+        init_mesh->add_dataset_with_element_values(OINIT_MESH,{"20.00", "20.00", "0.0", "1.0", "0.0", "1.0", "QUAD9"});
+        init_mesh->end();
+
+        create_equation_systems = new Task(DATAFLOW, CREATE_EQUATION_SYSTEMS, task_id);
+        create_equation_systems->add_dependent_transformation_tag(INIT_MESH);
+        create_equation_systems->add_dependent_transformation_id(init_mesh->get_id());
+        create_equation_systems->begin();
     }
 #endif
-    
-    //debugging
-    return 0;
 
     // Create an equation systems object.
     EquationSystems equation_systems(mesh);
@@ -242,9 +246,12 @@ int main(int argc, char** argv) {
     const unsigned int n_nonlinear_steps = 15;
     const Real nonlinear_tolerance = 1.e-5;
 
+    const unsigned int linear_solver_maximum_iterations = 250;
+    const Real nu = .007;
+
     // We also set a standard linear solver flag in the EquationSystems object
     // which controls the maximum number of linear solver iterations allowed.
-    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
+    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = linear_solver_maximum_iterations;
 
     // Tell the system of equations what the timestep is by using
     // the set_parameter function.  The matrix assembly routine can
@@ -252,7 +259,7 @@ int main(int argc, char** argv) {
     equation_systems.parameters.set<Real> ("dt") = dt;
 
     // The kinematic viscosity, nu = mu/rho, units of length**2/time.
-    equation_systems.parameters.set<Real> ("nu") = .007;
+    equation_systems.parameters.set<Real> ("nu") = nu;
 
     // The first thing to do is to get a copy of the solution at
     // the current nonlinear iteration.  This value will be used to
@@ -263,11 +270,26 @@ int main(int argc, char** argv) {
     // Since we are not doing adaptivity, write all solutions to a single Exodus file.
     ExodusII_IO exo_io(mesh);
 
-    //dfa - solve_equation_systems
-    //dependency - create_equation_systems
-    //osolve_equation_systems(t_step, time, l or n_nonlinear_steps, n_linear_iterations, final_linear_residual, norm_delta, converged)  
+#ifdef DFANALYZER
+    if (processor_id == 0) {
+        create_equation_systems->add_dataset_with_element_values(OCREATE_EQUATION_SYSTEMS,{to_string(dt), to_string(n_timesteps), to_string(n_nonlinear_steps), to_string(nonlinear_tolerance), to_string(nu)});
+        create_equation_systems->end();
+    }
+#endif
 
     for (unsigned int t_step = 1; t_step <= n_timesteps; ++t_step) {
+
+#ifdef DFANALYZER
+        if (processor_id == 0) {
+            solve_equation_systems = new Task(DATAFLOW, SOLVE_EQUATION_SYSTEMS, t_step);
+            solve_equation_systems->add_dependent_transformation_tag(CREATE_EQUATION_SYSTEMS);
+            solve_equation_systems->add_dependent_transformation_id(create_equation_systems->get_id());
+            solve_equation_systems->begin();
+            
+            solve_equation_systems_dependencies.push_back(t_step);
+        }
+#endif
+
         // Increment the time counter, set the time step size as
         // a parameter in the EquationSystem.
         navier_stokes_system.time += dt;
@@ -359,6 +381,20 @@ int main(int argc, char** argv) {
                         << l
                         << std::endl;
                 converged = true;
+            }
+
+#ifdef DFANALYZER
+            if (processor_id == 0) {
+                solve_equation_systems->set_sub_id(l);
+                solve_equation_systems->add_dataset_with_element_values(OSOLVE_EQUATION_SYSTEMS,
+                    {to_string(t_step), to_string(navier_stokes_system.time), to_string(l),
+                    to_string(n_linear_iterations), to_string(final_linear_residual),
+                    to_string(norm_delta), converged ? "true" : "false"});
+                solve_equation_systems->begin();
+            }
+#endif
+
+            if (converged) {
                 break;
             }
 
@@ -370,14 +406,17 @@ int main(int argc, char** argv) {
             Real new_linear_solver_tolerance = std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
             equation_systems.parameters.set<Real> ("linear solver tolerance") = new_linear_solver_tolerance;
         } // end nonlinear loop
+        
+#ifdef DFANALYZER
+        if (processor_id == 0) {
+            solve_equation_systems->set_sub_id(0);
+            solve_equation_systems->end();
+        }
+#endif
 
         // Don't keep going if we failed to converge.
         if (!converged)
             libmesh_error_msg("Error: Newton iterations failed to converge!");
-
-        //dfa - write_mesh
-        //dependency - solve_equation_systems
-        //owrite_mesh(t_step,time,filename)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
         // Write out every nth timestep to file.
@@ -388,6 +427,17 @@ int main(int argc, char** argv) {
                     equation_systems,
                     t_step + 1, // we're off by one since we wrote the IC and the Exodus numbering is 1-based.
                     navier_stokes_system.time);
+            
+#ifdef DFANALYZER
+            if (processor_id == 0) {            
+                write_mesh = new Task(DATAFLOW, WRITE_MESH, t_step);
+                write_mesh->add_dependent_transformation_tag(SOLVE_EQUATION_SYSTEMS);
+                write_mesh->add_dependent_transformation_id(t_step);
+                write_mesh->add_dataset_with_element_values(OWRITE_MESH, 
+                    {to_string(t_step), to_string(navier_stokes_system.time), "out.e"});
+                write_mesh->end();
+            }
+#endif
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     } // end timestep loop.

@@ -13,6 +13,12 @@ void Task::set_status(task_status status) {
     this->status = status;
 }
 
+void Task::set_sub_id(int sub_id){
+    if(sub_id >= 0){
+        this->sub_id = sub_id;
+    }
+}
+
 int Task::get_id() {
     return this->id;
 }
@@ -46,6 +52,18 @@ Dataset& Task::get_dataset_by_tag(string tag) {
 
 Dataset& Task::add_dataset(string dataset_tag) {
     return this->get_dataset_by_tag(dataset_tag);
+}
+
+Dataset& Task::add_dataset_with_element_value(string dataset_tag, string value){
+    Dataset& dataset = this->add_dataset(dataset_tag);
+    dataset.add_element_with_value(value);
+    return dataset;
+}
+
+Dataset& Task::add_dataset_with_element_values(string dataset_tag, vector<string> values){
+    Dataset& dataset = this->add_dataset(dataset_tag);
+    dataset.add_element_with_values(values);
+    return dataset;
 }
 
 void Task::insert_dataset(string dataset_tag) {
@@ -138,6 +156,7 @@ void Task::save() {
     headers = curl_slist_append(headers, "Content-Type: application/text");
 
     string message = this->get_post_message();
+    cout << message << endl;
 
     curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, message.c_str());
@@ -152,6 +171,7 @@ void Task::save() {
 int Task::begin() {
     this->set_status(RUNNING);
     this->save();
+    this->datasets.clear();
 }
 
 int Task::end() {

@@ -79,7 +79,7 @@ string Dataflow::get_post_message() {
 }
 
 void Dataflow::save() {
-    cout << endl << "[DfAnalyzer] saving dataflow..." << endl;
+//    cout << endl << "[DfAnalyzer] saving dataflow..." << endl;
     CURL *hnd = curl_easy_init();
     curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
 
@@ -96,14 +96,14 @@ void Dataflow::save() {
     string message = this->get_post_message();
 
     curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
-    cout << endl << message.c_str() << endl;
+//    cout << endl << message.c_str() << endl;
     curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, message.c_str());
     curl_easy_setopt(hnd, CURLOPT_VERBOSE, 0L); //0 disable messages
 
     curl_easy_perform(hnd); //send request
     curl_easy_cleanup(hnd);
     curl_global_cleanup();
-    cout << endl;
+//    cout << endl;
 }
 
 vector<Transformation> Dataflow::get_sorted_transformations() {

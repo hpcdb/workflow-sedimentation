@@ -16,11 +16,17 @@ SELECT * FROM attribute;
 
 SELECT a.name, a.type, s.tag, a.extractor_id FROM attribute a, data_set s WHERE a.ds_id=s.id ;
 
-SELECT * FROM task;
+SELECT dt.tag, t.* FROM task t, data_transformation dt WHERE t.dt_id = dt.id;
 
 SELECT * FROM iinit_mesh;
 
 SELECT * FROM oinit_mesh;
+
+SELECT * FROM ocreate_equation_systems;
+
+SELECT * FROM osolve_equation_systems;
+
+SELECT * FROM owrite_mesh;
 
 SELECT * FROM ideduplication;
 

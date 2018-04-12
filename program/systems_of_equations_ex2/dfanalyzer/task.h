@@ -63,6 +63,7 @@ public:
     void set_workspace(string workspace);
     void set_resource(string resource);
     void set_status(task_status status);
+    void set_sub_id(int sub_id);
 
     int get_id();
     int get_sub_id();
