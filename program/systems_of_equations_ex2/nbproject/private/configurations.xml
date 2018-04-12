@@ -5,6 +5,8 @@
       <df name=".libs">
       </df>
       <df name="dfanalyzer">
+        <df name="bin">
+        </df>
         <in>attribute.cpp</in>
         <in>attribute.h</in>
         <in>attribute_enum.h</in>
@@ -30,6 +32,8 @@
         <in>task_status_enum.h</in>
         <in>transformation.cpp</in>
         <in>transformation.h</in>
+      </df>
+      <df name="paraview">
       </df>
       <df name="script">
       </df>
@@ -82,6 +86,10 @@
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>
+          <variable name="PARAVIEW_DIR"
+                    value="/media/vitor/data-linux/program/paraview-5.4"/>
+          <variable name="DFANALYZER_DIR"
+                    value="/home/vitor/Documents/dev/workflow-sedimentation/program/systems_of_equations_ex2/dfanalyzer"/>
         </environment>
       </runprofile>
     </conf>
