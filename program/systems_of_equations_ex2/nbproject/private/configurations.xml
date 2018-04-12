@@ -33,8 +33,6 @@
         <in>transformation.cpp</in>
         <in>transformation.h</in>
       </df>
-      <df name="paraview">
-      </df>
       <df name="script">
       </df>
       <in>systems_of_equations_ex2.C</in>

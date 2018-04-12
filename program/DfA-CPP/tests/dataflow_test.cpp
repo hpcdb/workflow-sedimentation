@@ -58,7 +58,6 @@ void test_dataflow(){
 
     task_deduplication.begin();
     
-    ds_ideduplication.clear_elements();
     Dataset& ds_odeduplication = task_deduplication.add_dataset(odeduplication.get_tag());
     ds_odeduplication.add_element_with_values(ideduplication_values);
     task_deduplication.end();
