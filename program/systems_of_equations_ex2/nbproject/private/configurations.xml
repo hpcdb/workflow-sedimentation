@@ -5,6 +5,8 @@
       <df name=".libs">
       </df>
       <df name="rde">
+        <df name="1">
+        </df>
       </df>
       <df name="script">
       </df>
@@ -62,7 +64,7 @@
           <variable name="FASTBIT_DIR"
                     value="/media/vitor/data-linux/program/fastbit-2.0.3"/>
           <variable name="LD_LIBRARY_PATH"
-                    value="/home/vitor/Desktop/dfa-lib/lib:$LD_LIBRARY_PATH"/>
+                    value="/home/vitor/Documents/dev/workflow-sedimentation/program/dfa-lib/lib:$LD_LIBRARY_PATH"/>
         </environment>
       </runprofile>
     </conf>

@@ -10,5 +10,6 @@
 
 #include "task.h"
 #include "raw_data_extractor.h"
+#include "raw_data_indexer.h"
 
 #endif /* DFANALYZER_H */

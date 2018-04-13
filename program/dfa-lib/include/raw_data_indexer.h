@@ -20,16 +20,9 @@
 using namespace std;
 
 class RawDataIndexer {
-//    command_line << std::getenv("DFANALYZER_DIR")
-//                        << "/bin/RDI OPTIMIZED_FASTBIT:INDEX extractor_" << to_string(t_step) 
-//                        << " " << string(path) << "/rde/" << to_string(t_step)
-//                        << " extractor_"  << to_string(t_step) + ".data"
-//                        << " [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC]"
-//                        << " -delimiter=\";\" -bin=\"" 
-//                        << std::getenv("FASTBIT_DIR") << "/bin\"";        
 protected:
-    cartridge_type method;
-    string cartridge = "INDEX";
+    cartridge_type cartridge;
+    string method = "INDEX";
     string extractor_tag;
     string path;
     string file_name_with_extracted_data;
@@ -42,14 +35,17 @@ protected:
 
 public:
 
-    RawDataIndexer(cartridge_type cartridge, string extractor_tag, 
-            string path, string file_name_with_extracted_data, 
+    RawDataIndexer(cartridge_type cartridge, string extractor_tag,
+            string path, string file_name_with_extracted_data,
             vector<string> attribute_names, vector<attribute_type> attribute_types,
             string extra_arguments) {
         this->cartridge = cartridge;
         this->extractor_tag = extractor_tag;
+        this->path = path;
+        this->file_name_with_extracted_data = file_name_with_extracted_data;
         this->set_attribute_names(attribute_names);
         this->set_attribute_types(attribute_types);
+        this->extra_arguments = extra_arguments;
     }
 
     void set_attribute_names(vector<string> attribute_names);
@@ -59,6 +55,7 @@ public:
 
     string get_command_line();
     string get_attributes_as_string();
+    string get_cartridge_as_string();
 };
 
 #endif /* RAW_DATA_INDEXER_H */

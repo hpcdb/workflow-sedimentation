@@ -67,6 +67,7 @@
         <in>element.cpp</in>
         <in>extractor.cpp</in>
         <in>raw_data_extractor.cpp</in>
+        <in>raw_data_indexer.cpp</in>
         <in>set.cpp</in>
         <in>task.cpp</in>
         <in>transformation.cpp</in>

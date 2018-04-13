@@ -28,7 +28,7 @@ string RawDataExtractor::get_attributes_as_string(){
 string RawDataExtractor::get_command_line(){
     stringstream rde_command_line;
     rde_command_line << std::getenv("DFANALYZER_DIR")
-            << "/bin/RDE " << this->method << ":" << this->cartridge 
+            << "/bin/RDE " << this->cartridge << ":" << this->method 
             << " " << this->extractor_tag 
             << " " << this->path
             << " \"" << this->command_line << "\""

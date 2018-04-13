@@ -20,8 +20,8 @@ using namespace std;
 
 class RawDataExtractor {
 protected:
-    string method = "PROGRAM";
-    string cartridge = "EXTRACT";
+    string cartridge = "PROGRAM";
+    string method = "EXTRACT";
     string extractor_tag = "extractor";
     string path = ".";
     string command_line;

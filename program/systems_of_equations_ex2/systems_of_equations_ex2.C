@@ -479,21 +479,21 @@ int main(int argc, char** argv) {
                 command_line.str(string());
                 command_line << std::getenv("PARAVIEW_DIR")
                         << "/bin/pvpython script/exodus_data_extraction.py "  << to_string(t_step);
+                vector<string> attribute_names = {"u","v","w","p","x","y","z"};
+                vector<attribute_type> attribute_types = {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC};
                 
-                RawDataExtractor* extractor = new RawDataExtractor(command_line.str(), 
-                    {"u","v","w","p","x","y","z"},
-                    {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
+                RawDataExtractor* extractor = new RawDataExtractor(command_line.str(), attribute_names, attribute_types);
                 extractor->run();
                 
 #ifdef RAW_DATA_INDEXING
                 command_line.str(string());
-                command_line << std::getenv("DFANALYZER_DIR")
-                        << "/bin/RDI OPTIMIZED_FASTBIT:INDEX extractor_" << to_string(t_step) 
-                        << " " << string(path) << "/rde/" << to_string(t_step)
-                        << " extractor_"  << to_string(t_step) + ".data"
-                        << " [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC]"
-                        << " -delimiter=\";\" -bin=\"" 
-                        << std::getenv("FASTBIT_DIR") << "/bin\"";        
+                stringstream extra_arguments;
+                extra_arguments << "-delimiter=\";\" -bin=\"" << std::getenv("FASTBIT_DIR") << "/bin\"";
+                
+                RawDataIndexer* indexer = new RawDataIndexer(OPTIMIZED_FASTBIT, "extractor_" + to_string(t_step), 
+                        string(path) + "/rde/" + to_string(t_step), "extractor_"  + to_string(t_step) + ".data",
+                        attribute_names, attribute_types, extra_arguments.str());
+                indexer->run();
 #endif                
                 exit_status = std::system(command_line.str().c_str());
 
