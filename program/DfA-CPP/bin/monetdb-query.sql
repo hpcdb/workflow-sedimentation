@@ -2,6 +2,8 @@ select * from data_transformation;
 
 SELECT * FROM data_set;
 
+SELECT * FROM extractor;
+
 SELECT * FROM data_dependency;
 
 SELECT prev_dt.tag as previous_transformation, next_dt.tag as next_transformation, ds.tag as dataset
@@ -27,6 +29,10 @@ SELECT * FROM ocreate_equation_systems;
 SELECT * FROM osolve_equation_systems;
 
 SELECT * FROM owrite_mesh;
+
+SELECT * FROM oextract_data;
+
+SELECT * FROM ext_extractor;
 
 SELECT * FROM ideduplication;
 

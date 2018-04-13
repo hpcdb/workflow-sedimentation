@@ -1,14 +1,16 @@
-import sys
+import sys, os
 #### import the simple module from the paraview
 from paraview.simple import *
 
 if __name__ == "__main__" and len(sys.argv) > 1:
+    time_step = int(sys.argv[1])
+
     #### disable automatic camera reset on 'Show'
     paraview.simple._DisableFirstRenderCameraReset()
 
     # create a new 'ExodusIIReader'
     oute = ExodusIIReader(FileName=['./out.e'])
-    tsteps = oute.TimestepValues
+    timestep_values = oute.TimestepValues
     oute.PointVariables = []
     oute.SideSetArrayStatus = []
 
@@ -24,9 +26,7 @@ if __name__ == "__main__" and len(sys.argv) > 1:
 
     # get active view
     renderView1 = GetActiveViewOrCreate('RenderView')
-    time_step_index = int(sys.argv[1])
-    renderView1.ViewTime = tsteps[time_step_index]
-    print(renderView1.ViewTime)
+    renderView1.ViewTime = timestep_values[time_step - 1]
     # uncomment following to set a specific view size
     # renderView1.ViewSize = [1611, 832]
 
@@ -152,16 +152,20 @@ if __name__ == "__main__" and len(sys.argv) > 1:
     writer.UpdatePipeline()
 
     # clean original extracted raw data from exodus file
-    with open("./original_data_from_extractor.csv", "r") as input_file, open("./extractor.data", "w+") as output_file:
+    with open("./original_data_from_extractor.csv", "r") as input_file, open("./extractor_" + str(time_step) + ".data", "w+") as output_file:
         header = True
         
         for line in input_file:
             if(header):
-                output_file.write("u;v;w;p;x;y;z\n")
+                output_file.write("filename;timestep;time;u;v;w;p;x;y;z")
                 header = False
             else:
-                line = line.replace(",",";")
-                output_file.write(line)
+                line = line.replace(",",";").replace("\n","")
+                splitted_line = line.split(";")
+                output_file.write("\n" + ";".join(["\"" + os.getcwd() + "/out.e\"", 
+                    str(time_step), str(timestep_values[time_step - 1]),
+                    splitted_line[0], splitted_line[1], splitted_line[2], 
+                    splitted_line[3], splitted_line[7], splitted_line[8], splitted_line[9]]))
                 output_file.flush()
         
         output_file.close()

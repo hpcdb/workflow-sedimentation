@@ -99,361 +99,374 @@ int main(int argc, char** argv) {
 
     // Initialize libMesh.
     LibMeshInit init(argc, argv);
-
-//#ifdef DFANALYZER
     int processor_id = libMesh::global_processor_id();
-//    int task_id = 1;
-//    const string DATAFLOW = "systems_of_equations_ex2";
-//    // transformations
-//    const string INIT_MESH = "init_mesh";
-//    const string CREATE_EQUATION_SYSTEMS = "create_equation_systems";
-//    const string SOLVE_EQUATION_SYSTEMS = "solve_equation_systems";
-//    const string WRITE_MESH = "write_mesh";
-//    // datasets
-//    const string IINIT_MESH = "iinit_mesh";
-//    const string OINIT_MESH = "oinit_mesh";
-//    const string OCREATE_EQUATION_SYSTEMS = "ocreate_equation_systems";
-//    const string OSOLVE_EQUATION_SYSTEMS = "osolve_equation_systems";
-//    const string OWRITE_MESH = "owrite_mesh";
-//
-//    Task *init_mesh, *create_equation_systems, *solve_equation_systems, *write_mesh;
-//    vector<int> solve_equation_systems_dependencies;
-//    
-//    if (processor_id == 0) {
-//        Dataflow dataflow = Dataflow(DATAFLOW);
-//
-//        Set ds_iinit_mesh = dataflow.add_set(IINIT_MESH, "solver_package", NUMERIC);
-//        Set ds_oinit_mesh = dataflow.add_set(OINIT_MESH,
-//            {"nx", "ny", "xmin", "xmax", "ymin", "ymax", "type"},
-//            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
-//        Transformation& dt_init_mesh = dataflow.add_transformation(INIT_MESH, ds_iinit_mesh, ds_oinit_mesh);
-//
-//        Set ds_ocreate_equation_systems = dataflow.add_set(OCREATE_EQUATION_SYSTEMS,
-//            {"dt", "timesteps", "nonlinear_steps", "nonlinear_tolerance", "nu"},
-//            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
-//        Transformation& dt_create_equation_systems = dataflow.add_transformation(CREATE_EQUATION_SYSTEMS, ds_oinit_mesh, ds_ocreate_equation_systems);
-//
-//        Set ds_osolve_equation_systems = dataflow.add_set(OSOLVE_EQUATION_SYSTEMS,
-//            {"timestep", "time", "nonlinear_steps", "linear_iterations", "final_linear_residual", "norm_delta", "converged"},
-//            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
-//        Transformation& dt_solve_equation_systems = dataflow.add_transformation(SOLVE_EQUATION_SYSTEMS, ds_ocreate_equation_systems, ds_osolve_equation_systems);
-//
-//#ifdef LIBMESH_HAVE_EXODUS_API
-//        Set ds_owrite_mesh = dataflow.add_set(OWRITE_MESH,
-//            {"timestep", "time", "filename"},
-//            {NUMERIC, NUMERIC, TEXT});
-//        Transformation& dt_write_mesh = dataflow.add_transformation(WRITE_MESH, ds_osolve_equation_systems, ds_owrite_mesh);
-//#endif
-//
-//        dataflow.save();
-//
-//        init_mesh = new Task(DATAFLOW, INIT_MESH, task_id);
-//        init_mesh->add_dataset_with_element_values(IINIT_MESH,{to_string(libMesh::default_solver_package())});
-//        init_mesh->begin();
-//    }
-//#endif
-//
-//    // This example requires a linear solver package.
-//    libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
-//            "--enable-petsc, --enable-trilinos, or --enable-eigen");
-//
-//    // Skip this 2D example if libMesh was compiled as 1D-only.
-//    libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
-//
-//    // This example NaNs with the Eigen sparse linear solvers and
-//    // Trilinos solvers, but should work OK with either PETSc or
-//    // Laspack.
-//    libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
-//    libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc or --enable-laspack");
-//
-//    // Create a mesh, with dimension to be overridden later, distributed
-//    // across the default MPI communicator.
-//    Mesh mesh(init.comm());
-//
-//    // Use the MeshTools::Generation mesh generator to create a uniform
-//    // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
-//    // to build a mesh of 8x8 Quad9 elements in 2D.  Building these
-//    // higher-order elements allows us to use higher-order polynomial
-//    // approximations for the velocity.  
-//    MeshTools::Generation::build_square(mesh,
-//            20, 20,
-//            0., 1.,
-//            0., 1.,
-//            QUAD9);
-//
-//    // Print information about the mesh to the screen.
-//    mesh.print_info();
-//
-//#ifdef DFANALYZER
-//    if (processor_id == 0) {
-//        init_mesh->add_dataset_with_element_values(OINIT_MESH,{"20.00", "20.00", "0.0", "1.0", "0.0", "1.0", "QUAD9"});
-//        init_mesh->end();
-//
-//        create_equation_systems = new Task(DATAFLOW, CREATE_EQUATION_SYSTEMS, task_id);
-//        create_equation_systems->add_dependent_transformation_tag(INIT_MESH);
-//        create_equation_systems->add_dependent_transformation_id(init_mesh->get_id());
-//        create_equation_systems->begin();
-//    }
-//#endif
-//
-//    // Create an equation systems object.
-//    EquationSystems equation_systems(mesh);
-//
-//    // Declare the system and its variables.
-//    // Creates a transient system named "Navier-Stokes"
-//    TransientLinearImplicitSystem & system =
-//            equation_systems.add_system<TransientLinearImplicitSystem> ("Navier-Stokes");
-//
-//    // Add the variables "vel_x" & "vel_y" to "Navier-Stokes".  They
-//    // will be approximated using second-order approximation.
-//    system.add_variable("vel_x", SECOND);
-//    system.add_variable("vel_y", SECOND);
-//
-//    // Add the variable "p" to "Navier-Stokes". This will
-//    // be approximated with a first-order basis,
-//    // providing an LBB-stable pressure-velocity pair.
-//    system.add_variable("p", FIRST);
-//
-//    // Give the system a pointer to the matrix assembly
-//    // function.
-//    system.attach_assemble_function(assemble_stokes);
-//
-//    // Note: only pick one set of BCs!
-//    set_lid_driven_bcs(system);
-//    // set_stagnation_bcs(system);
-//    // set_poiseuille_bcs(system);
-//
-//    // Initialize the data structures for the equation system.
-//    equation_systems.init();
-//
-//    // Prints information about the system to the screen.
-//    equation_systems.print_info();
-//
-//    // Create a performance-logging object for this example
-//    PerfLog perf_log("Systems Example 2");
-//
-//    // Get a reference to the Stokes system to use later.
-//    TransientLinearImplicitSystem & navier_stokes_system =
-//            equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
-//
-//    // Now we begin the timestep loop to compute the time-accurate
-//    // solution of the equations.
-//    const Real dt = 0.1;
-//    navier_stokes_system.time = 0.0;
-//    const unsigned int n_timesteps = 15;
-//
-//    // The number of steps and the stopping criterion are also required
-//    // for the nonlinear iterations.
-//    const unsigned int n_nonlinear_steps = 15;
-//    const Real nonlinear_tolerance = 1.e-5;
-//
-//    const unsigned int linear_solver_maximum_iterations = 250;
-//    const Real nu = .007;
-//
-//    // We also set a standard linear solver flag in the EquationSystems object
-//    // which controls the maximum number of linear solver iterations allowed.
-//    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = linear_solver_maximum_iterations;
-//
-//    // Tell the system of equations what the timestep is by using
-//    // the set_parameter function.  The matrix assembly routine can
-//    // then reference this parameter.
-//    equation_systems.parameters.set<Real> ("dt") = dt;
-//
-//    // The kinematic viscosity, nu = mu/rho, units of length**2/time.
-//    equation_systems.parameters.set<Real> ("nu") = nu;
-//
-//    // The first thing to do is to get a copy of the solution at
-//    // the current nonlinear iteration.  This value will be used to
-//    // determine if we can exit the nonlinear loop.
-//    UniquePtr<NumericVector < Number >>
-//            last_nonlinear_soln(navier_stokes_system.solution->clone());
-//
-//    // Since we are not doing adaptivity, write all solutions to a single Exodus file.
-//    ExodusII_IO exo_io(mesh);
-//
-//#ifdef DFANALYZER
-//    if (processor_id == 0) {
-//        create_equation_systems->add_dataset_with_element_values(OCREATE_EQUATION_SYSTEMS,{to_string(dt), to_string(n_timesteps), to_string(n_nonlinear_steps), to_string(nonlinear_tolerance), to_string(nu)});
-//        create_equation_systems->end();
-//    }
-//#endif
-//
-//    for (unsigned int t_step = 1; t_step <= n_timesteps; ++t_step) {
-//
-//#ifdef DFANALYZER
-//        if (processor_id == 0) {
-//            solve_equation_systems = new Task(DATAFLOW, SOLVE_EQUATION_SYSTEMS, t_step);
-//            solve_equation_systems->add_dependent_transformation_tag(CREATE_EQUATION_SYSTEMS);
-//            solve_equation_systems->add_dependent_transformation_id(create_equation_systems->get_id());
-//            solve_equation_systems->begin();
-//            
-//            solve_equation_systems_dependencies.push_back(t_step);
-//        }
-//#endif
-//
-//        // Increment the time counter, set the time step size as
-//        // a parameter in the EquationSystem.
-//        navier_stokes_system.time += dt;
-//
-//        // A pretty update message
-//        libMesh::out << "\n\n*** Solving time step "
-//                << t_step
-//                << ", time = "
-//                << navier_stokes_system.time
-//                << " ***"
-//                << std::endl;
-//
-//        // Now we need to update the solution vector from the
-//        // previous time step.  This is done directly through
-//        // the reference to the Stokes system.
-//        *navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
-//
-//        // At the beginning of each solve, reset the linear solver tolerance
-//        // to a "reasonable" starting value.
-//        const Real initial_linear_solver_tol = 1.e-6;
-//        equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
-//
-//        // We'll set this flag when convergence is (hopefully) achieved.
-//        bool converged = false;
-//
-//        // Now we begin the nonlinear loop
-//        for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
-//            // Update the nonlinear solution.
-//            last_nonlinear_soln->zero();
-//            last_nonlinear_soln->add(*navier_stokes_system.solution);
-//
-//            // Assemble & solve the linear system.
-//            perf_log.push("linear solve");
-//            equation_systems.get_system("Navier-Stokes").solve();
-//            perf_log.pop("linear solve");
-//
-//            // Compute the difference between this solution and the last
-//            // nonlinear iterate.
-//            last_nonlinear_soln->add(-1., *navier_stokes_system.solution);
-//
-//            // Close the vector before computing its norm
-//            last_nonlinear_soln->close();
-//
-//            // Compute the l2 norm of the difference
-//            const Real norm_delta = last_nonlinear_soln->l2_norm();
-//
-//            // How many iterations were required to solve the linear system?
-//            const unsigned int n_linear_iterations = navier_stokes_system.n_linear_iterations();
-//
-//            // What was the final residual of the linear system?
-//            const Real final_linear_residual = navier_stokes_system.final_linear_residual();
-//
-//            // If the solver did no work (sometimes -ksp_converged_reason
-//            // says "Linear solve converged due to CONVERGED_RTOL
-//            // iterations 0") but the nonlinear residual norm is above
-//            // the tolerance, we need to pick an even lower linear
-//            // solver tolerance and try again.  Note that the tolerance
-//            // is relative to the norm of the RHS, which for this
-//            // particular problem does not go to zero, since we are
-//            // solving for the full solution rather than the update.
-//            //
-//            // Similarly, if the solver did no work and this is the 0th
-//            // nonlinear step, it means that the delta between solutions
-//            // is being inaccurately measured as "0" since the solution
-//            // did not change.  Decrease the tolerance and try again.
-//            if (n_linear_iterations == 0 &&
-//                    (navier_stokes_system.final_linear_residual() >= nonlinear_tolerance || l == 0)) {
-//                Real old_linear_solver_tolerance = equation_systems.parameters.get<Real> ("linear solver tolerance");
-//                equation_systems.parameters.set<Real> ("linear solver tolerance") = 1.e-3 * old_linear_solver_tolerance;
-//                continue;
-//            }
-//
-//            // Print out convergence information for the linear and
-//            // nonlinear iterations.
-//            libMesh::out << "Linear solver converged at step: "
-//                    << n_linear_iterations
-//                    << ", final residual: "
-//                    << final_linear_residual
-//                    << "  Nonlinear convergence: ||u - u_old|| = "
-//                    << norm_delta
-//                    << std::endl;
-//
-//            // Terminate the solution iteration if the difference between
-//            // this nonlinear iterate and the last is sufficiently small, AND
-//            // if the most recent linear system was solved to a sufficient tolerance.
-//            if ((norm_delta < nonlinear_tolerance) &&
-//                    (navier_stokes_system.final_linear_residual() < nonlinear_tolerance)) {
-//                libMesh::out << " Nonlinear solver converged at step "
-//                        << l
-//                        << std::endl;
-//                converged = true;
-//            }
-//
-//#ifdef DFANALYZER
-//            if (processor_id == 0) {
-//                solve_equation_systems->set_sub_id(l);
-//                solve_equation_systems->add_dataset_with_element_values(OSOLVE_EQUATION_SYSTEMS,
-//                    {to_string(t_step), to_string(navier_stokes_system.time), to_string(l),
-//                    to_string(n_linear_iterations), to_string(final_linear_residual),
-//                    to_string(norm_delta), converged ? "true" : "false"});
-//                solve_equation_systems->begin();
-//            }
-//#endif
-//
-//            if (converged) {
-//                break;
-//            }
-//
-//            // Otherwise, decrease the linear system tolerance.  For the inexact Newton
-//            // method, the linear solver tolerance needs to decrease as we get closer to
-//            // the solution to ensure quadratic convergence.  The new linear solver tolerance
-//            // is chosen (heuristically) as the square of the previous linear system residual norm.
-//            //Real flr2 = final_linear_residual*final_linear_residual;
-//            Real new_linear_solver_tolerance = std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
-//            equation_systems.parameters.set<Real> ("linear solver tolerance") = new_linear_solver_tolerance;
-//        } // end nonlinear loop
-//        
-//#ifdef DFANALYZER
-//        if (processor_id == 0) {
-//            solve_equation_systems->set_sub_id(0);
-//            solve_equation_systems->end();
-//        }
-//#endif
-//
-//        // Don't keep going if we failed to converge.
-//        if (!converged)
-//            libmesh_error_msg("Error: Newton iterations failed to converge!");
-//
-//#ifdef LIBMESH_HAVE_EXODUS_API
-//        // Write out every nth timestep to file.
-//        const unsigned int write_interval = 1;
-//
-//        if ((t_step + 1) % write_interval == 0) {
-//            exo_io.write_timestep("out.e",
-//                    equation_systems,
-//                    t_step + 1, // we're off by one since we wrote the IC and the Exodus numbering is 1-based.
-//                    navier_stokes_system.time);
-//            
-//#ifdef DFANALYZER
-//            if (processor_id == 0) {            
-//                write_mesh = new Task(DATAFLOW, WRITE_MESH, t_step);
-//                write_mesh->add_dependent_transformation_tag(SOLVE_EQUATION_SYSTEMS);
-//                write_mesh->add_dependent_transformation_id(t_step);
-//                write_mesh->add_dataset_with_element_values(OWRITE_MESH, 
-//                    {to_string(t_step), to_string(navier_stokes_system.time), "out.e"});
-//                write_mesh->end();
-//            }
-//#endif
-//        }
-//#endif // #ifdef LIBMESH_HAVE_EXODUS_API
-//    } // end timestep loop.
-    
+
 #ifdef DFANALYZER
-    if(processor_id == 0){
-        stringstream rde_command_line;
-        rde_command_line << std::getenv("DFANALYZER_DIR")
-                << "/bin/RDE PROGRAM:EXTRACT extractor . \""
-                << std::getenv("PARAVIEW_DIR")
-                << "/bin/pvpython script/exodus_data_extraction.py 1\" [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC]";
-        cout << rde_command_line.str() << endl;
-        int exit_status = std::system(rde_command_line.str().c_str());
+    int task_id = 1;
+    const string DATAFLOW = "systems_of_equations_ex2";
+    // transformations
+    const string INIT_MESH = "init_mesh";
+    const string CREATE_EQUATION_SYSTEMS = "create_equation_systems";
+    const string SOLVE_EQUATION_SYSTEMS = "solve_equation_systems";
+    const string WRITE_MESH = "write_mesh";
+    const string EXTRACT_DATA = "extract_data";
+    // datasets
+    const string IINIT_MESH = "iinit_mesh";
+    const string OINIT_MESH = "oinit_mesh";
+    const string OCREATE_EQUATION_SYSTEMS = "ocreate_equation_systems";
+    const string OSOLVE_EQUATION_SYSTEMS = "osolve_equation_systems";
+    const string OWRITE_MESH = "owrite_mesh";
+    const string OEXTRACT_DATA = "oextract_data";
+
+    Task *init_mesh, *create_equation_systems, *solve_equation_systems, *write_mesh, *extract_data;
+    
+    if (processor_id == 0) {
+        Dataflow dataflow = Dataflow(DATAFLOW);
+
+        Set ds_iinit_mesh = dataflow.add_set(IINIT_MESH, "solver_package", NUMERIC);
+        Set ds_oinit_mesh = dataflow.add_set(OINIT_MESH,
+            {"nx", "ny", "xmin", "xmax", "ymin", "ymax", "type"},
+            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
+        Transformation& dt_init_mesh = dataflow.add_transformation(INIT_MESH, ds_iinit_mesh, ds_oinit_mesh);
+
+        Set ds_ocreate_equation_systems = dataflow.add_set(OCREATE_EQUATION_SYSTEMS,
+            {"dt", "timesteps", "nonlinear_steps", "nonlinear_tolerance", "nu"},
+            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
+        Transformation& dt_create_equation_systems = dataflow.add_transformation(CREATE_EQUATION_SYSTEMS, ds_oinit_mesh, ds_ocreate_equation_systems);
+
+        Set ds_osolve_equation_systems = dataflow.add_set(OSOLVE_EQUATION_SYSTEMS,
+            {"timestep", "time", "nonlinear_steps", "linear_iterations", "final_linear_residual", "norm_delta", "converged"},
+            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
+        Transformation& dt_solve_equation_systems = dataflow.add_transformation(SOLVE_EQUATION_SYSTEMS, ds_ocreate_equation_systems, ds_osolve_equation_systems);
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+        Set ds_owrite_mesh = dataflow.add_set(OWRITE_MESH,
+            {"timestep", "time", "filename"},
+            {NUMERIC, NUMERIC, TEXT});
+        Transformation& dt_write_mesh = dataflow.add_transformation(WRITE_MESH, ds_osolve_equation_systems, ds_owrite_mesh);
+        
+        Set& ds_oextract_data = dataflow.add_set(OEXTRACT_DATA);
+        Extractor extractor = ds_oextract_data.add_extractor("extractor", EXTRACTION, PROGRAM, 
+            {"timestep", "time", "u", "v", "w", "p", "x", "y", "z"},
+            {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
+        Transformation& dt_extract_data = dataflow.add_transformation(EXTRACT_DATA, ds_owrite_mesh, ds_oextract_data);
+#endif
+
+        dataflow.save();
+
+        init_mesh = new Task(DATAFLOW, INIT_MESH, task_id);
+        init_mesh->add_dataset_with_element_values(IINIT_MESH,{to_string(libMesh::default_solver_package())});
+        init_mesh->begin();
     }
 #endif
+
+    // This example requires a linear solver package.
+    libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
+            "--enable-petsc, --enable-trilinos, or --enable-eigen");
+
+    // Skip this 2D example if libMesh was compiled as 1D-only.
+    libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
+
+    // This example NaNs with the Eigen sparse linear solvers and
+    // Trilinos solvers, but should work OK with either PETSc or
+    // Laspack.
+    libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
+    libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc or --enable-laspack");
+
+    // Create a mesh, with dimension to be overridden later, distributed
+    // across the default MPI communicator.
+    Mesh mesh(init.comm());
+
+    // Use the MeshTools::Generation mesh generator to create a uniform
+    // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
+    // to build a mesh of 8x8 Quad9 elements in 2D.  Building these
+    // higher-order elements allows us to use higher-order polynomial
+    // approximations for the velocity.  
+    MeshTools::Generation::build_square(mesh,
+            20, 20,
+            0., 1.,
+            0., 1.,
+            QUAD9);
+
+    // Print information about the mesh to the screen.
+    mesh.print_info();
+
+#ifdef DFANALYZER
+    if (processor_id == 0) {
+        init_mesh->add_dataset_with_element_values(OINIT_MESH,{"20.00", "20.00", "0.0", "1.0", "0.0", "1.0", "QUAD9"});
+        init_mesh->end();
+
+        create_equation_systems = new Task(DATAFLOW, CREATE_EQUATION_SYSTEMS, task_id);
+        create_equation_systems->add_dependent_transformation_tag(INIT_MESH);
+        create_equation_systems->add_dependent_transformation_id(init_mesh->get_id());
+        create_equation_systems->begin();
+    }
+#endif
+
+    // Create an equation systems object.
+    EquationSystems equation_systems(mesh);
+
+    // Declare the system and its variables.
+    // Creates a transient system named "Navier-Stokes"
+    TransientLinearImplicitSystem & system =
+            equation_systems.add_system<TransientLinearImplicitSystem> ("Navier-Stokes");
+
+    // Add the variables "vel_x" & "vel_y" to "Navier-Stokes".  They
+    // will be approximated using second-order approximation.
+    system.add_variable("vel_x", SECOND);
+    system.add_variable("vel_y", SECOND);
+
+    // Add the variable "p" to "Navier-Stokes". This will
+    // be approximated with a first-order basis,
+    // providing an LBB-stable pressure-velocity pair.
+    system.add_variable("p", FIRST);
+
+    // Give the system a pointer to the matrix assembly
+    // function.
+    system.attach_assemble_function(assemble_stokes);
+
+    // Note: only pick one set of BCs!
+    set_lid_driven_bcs(system);
+    // set_stagnation_bcs(system);
+    // set_poiseuille_bcs(system);
+
+    // Initialize the data structures for the equation system.
+    equation_systems.init();
+
+    // Prints information about the system to the screen.
+    equation_systems.print_info();
+
+    // Create a performance-logging object for this example
+    PerfLog perf_log("Systems Example 2");
+
+    // Get a reference to the Stokes system to use later.
+    TransientLinearImplicitSystem & navier_stokes_system =
+            equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
+
+    // Now we begin the timestep loop to compute the time-accurate
+    // solution of the equations.
+    const Real dt = 0.1;
+    navier_stokes_system.time = 0.0;
+    const unsigned int n_timesteps = 15;
+
+    // The number of steps and the stopping criterion are also required
+    // for the nonlinear iterations.
+    const unsigned int n_nonlinear_steps = 15;
+    const Real nonlinear_tolerance = 1.e-5;
+
+    const unsigned int linear_solver_maximum_iterations = 250;
+    const Real nu = .007;
+
+    // We also set a standard linear solver flag in the EquationSystems object
+    // which controls the maximum number of linear solver iterations allowed.
+    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = linear_solver_maximum_iterations;
+
+    // Tell the system of equations what the timestep is by using
+    // the set_parameter function.  The matrix assembly routine can
+    // then reference this parameter.
+    equation_systems.parameters.set<Real> ("dt") = dt;
+
+    // The kinematic viscosity, nu = mu/rho, units of length**2/time.
+    equation_systems.parameters.set<Real> ("nu") = nu;
+
+    // The first thing to do is to get a copy of the solution at
+    // the current nonlinear iteration.  This value will be used to
+    // determine if we can exit the nonlinear loop.
+    UniquePtr<NumericVector < Number >>
+            last_nonlinear_soln(navier_stokes_system.solution->clone());
+
+    // Since we are not doing adaptivity, write all solutions to a single Exodus file.
+    ExodusII_IO exo_io(mesh);
+
+#ifdef DFANALYZER
+    if (processor_id == 0) {
+        create_equation_systems->add_dataset_with_element_values(OCREATE_EQUATION_SYSTEMS,{to_string(dt), to_string(n_timesteps), to_string(n_nonlinear_steps), to_string(nonlinear_tolerance), to_string(nu)});
+        create_equation_systems->end();
+    }
+#endif
+
+    for (unsigned int t_step = 1; t_step <= n_timesteps; ++t_step) {
+
+#ifdef DFANALYZER
+        if (processor_id == 0) {
+            solve_equation_systems = new Task(DATAFLOW, SOLVE_EQUATION_SYSTEMS, t_step);
+            solve_equation_systems->add_dependent_transformation_tag(CREATE_EQUATION_SYSTEMS);
+            solve_equation_systems->add_dependent_transformation_id(create_equation_systems->get_id());
+            solve_equation_systems->begin();
+        }
+#endif
+
+        // Increment the time counter, set the time step size as
+        // a parameter in the EquationSystem.
+        navier_stokes_system.time += dt;
+
+        // A pretty update message
+        libMesh::out << "\n\n*** Solving time step "
+                << t_step
+                << ", time = "
+                << navier_stokes_system.time
+                << " ***"
+                << std::endl;
+
+        // Now we need to update the solution vector from the
+        // previous time step.  This is done directly through
+        // the reference to the Stokes system.
+        *navier_stokes_system.old_local_solution = *navier_stokes_system.current_local_solution;
+
+        // At the beginning of each solve, reset the linear solver tolerance
+        // to a "reasonable" starting value.
+        const Real initial_linear_solver_tol = 1.e-6;
+        equation_systems.parameters.set<Real> ("linear solver tolerance") = initial_linear_solver_tol;
+
+        // We'll set this flag when convergence is (hopefully) achieved.
+        bool converged = false;
+
+        // Now we begin the nonlinear loop
+        for (unsigned int l = 0; l < n_nonlinear_steps; ++l) {
+            // Update the nonlinear solution.
+            last_nonlinear_soln->zero();
+            last_nonlinear_soln->add(*navier_stokes_system.solution);
+
+            // Assemble & solve the linear system.
+            perf_log.push("linear solve");
+            equation_systems.get_system("Navier-Stokes").solve();
+            perf_log.pop("linear solve");
+
+            // Compute the difference between this solution and the last
+            // nonlinear iterate.
+            last_nonlinear_soln->add(-1., *navier_stokes_system.solution);
+
+            // Close the vector before computing its norm
+            last_nonlinear_soln->close();
+
+            // Compute the l2 norm of the difference
+            const Real norm_delta = last_nonlinear_soln->l2_norm();
+
+            // How many iterations were required to solve the linear system?
+            const unsigned int n_linear_iterations = navier_stokes_system.n_linear_iterations();
+
+            // What was the final residual of the linear system?
+            const Real final_linear_residual = navier_stokes_system.final_linear_residual();
+
+            // If the solver did no work (sometimes -ksp_converged_reason
+            // says "Linear solve converged due to CONVERGED_RTOL
+            // iterations 0") but the nonlinear residual norm is above
+            // the tolerance, we need to pick an even lower linear
+            // solver tolerance and try again.  Note that the tolerance
+            // is relative to the norm of the RHS, which for this
+            // particular problem does not go to zero, since we are
+            // solving for the full solution rather than the update.
+            //
+            // Similarly, if the solver did no work and this is the 0th
+            // nonlinear step, it means that the delta between solutions
+            // is being inaccurately measured as "0" since the solution
+            // did not change.  Decrease the tolerance and try again.
+            if (n_linear_iterations == 0 &&
+                    (navier_stokes_system.final_linear_residual() >= nonlinear_tolerance || l == 0)) {
+                Real old_linear_solver_tolerance = equation_systems.parameters.get<Real> ("linear solver tolerance");
+                equation_systems.parameters.set<Real> ("linear solver tolerance") = 1.e-3 * old_linear_solver_tolerance;
+                continue;
+            }
+
+            // Print out convergence information for the linear and
+            // nonlinear iterations.
+            libMesh::out << "Linear solver converged at step: "
+                    << n_linear_iterations
+                    << ", final residual: "
+                    << final_linear_residual
+                    << "  Nonlinear convergence: ||u - u_old|| = "
+                    << norm_delta
+                    << std::endl;
+
+            // Terminate the solution iteration if the difference between
+            // this nonlinear iterate and the last is sufficiently small, AND
+            // if the most recent linear system was solved to a sufficient tolerance.
+            if ((norm_delta < nonlinear_tolerance) &&
+                    (navier_stokes_system.final_linear_residual() < nonlinear_tolerance)) {
+                libMesh::out << " Nonlinear solver converged at step "
+                        << l
+                        << std::endl;
+                converged = true;
+            }
+
+#ifdef DFANALYZER
+            if (processor_id == 0) {
+                solve_equation_systems->set_sub_id(l);
+                solve_equation_systems->add_dataset_with_element_values(OSOLVE_EQUATION_SYSTEMS,
+                    {to_string(t_step), to_string(navier_stokes_system.time), to_string(l),
+                    to_string(n_linear_iterations), to_string(final_linear_residual),
+                    to_string(norm_delta), converged ? "true" : "false"});
+                solve_equation_systems->begin();
+            }
+#endif
+
+            if (converged) {
+                break;
+            }
+
+            // Otherwise, decrease the linear system tolerance.  For the inexact Newton
+            // method, the linear solver tolerance needs to decrease as we get closer to
+            // the solution to ensure quadratic convergence.  The new linear solver tolerance
+            // is chosen (heuristically) as the square of the previous linear system residual norm.
+            //Real flr2 = final_linear_residual*final_linear_residual;
+            Real new_linear_solver_tolerance = std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
+            equation_systems.parameters.set<Real> ("linear solver tolerance") = new_linear_solver_tolerance;
+        } // end nonlinear loop
+        
+#ifdef DFANALYZER
+        if (processor_id == 0) {
+            solve_equation_systems->set_sub_id(0);
+            solve_equation_systems->end();
+        }
+#endif
+
+        // Don't keep going if we failed to converge.
+        if (!converged)
+            libmesh_error_msg("Error: Newton iterations failed to converge!");
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+        // Write out every nth timestep to file.
+        const unsigned int write_interval = 1;
+
+        if ((t_step + 1) % write_interval == 0) {
+            exo_io.write_timestep("out.e",
+                    equation_systems,
+                    t_step + 1, // we're off by one since we wrote the IC and the Exodus numbering is 1-based.
+                    navier_stokes_system.time);            
+            
+            if (processor_id == 0) {          
+#ifdef DFANALYZER  
+                write_mesh = new Task(DATAFLOW, WRITE_MESH, t_step);
+                write_mesh->add_dependent_transformation_tag(SOLVE_EQUATION_SYSTEMS);
+                write_mesh->add_dependent_transformation_id(t_step);
+                write_mesh->add_dataset_with_element_values(OWRITE_MESH, 
+                    {to_string(t_step), to_string(navier_stokes_system.time), "out.e"});
+                write_mesh->end();
+#endif          
+                
+                stringstream rde_command_line;
+                rde_command_line << std::getenv("DFANALYZER_DIR")
+                        << "/bin/RDE PROGRAM:EXTRACT extractor . \""
+                        << std::getenv("PARAVIEW_DIR")
+                        << "/bin/pvpython script/exodus_data_extraction.py "  << to_string(t_step)
+                        << "\" [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC]";
+                int exit_status = std::system(rde_command_line.str().c_str());
+                
+#ifdef DFANALYZER
+                extract_data = new Task(DATAFLOW, EXTRACT_DATA, t_step);
+                extract_data->add_dependent_transformation_tag(WRITE_MESH);
+                extract_data->add_dependent_transformation_id(t_step);
+                char *path = NULL;
+                size_t size;
+                path = getcwd(path,size);
+                extract_data->add_dataset_with_element_values(OEXTRACT_DATA, 
+                    {string(path) + "/extractor_" + to_string(t_step) + ".data"});
+                extract_data->end();
+#endif       
+            }
+        }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+    } // end timestep loop.
 
     // All done.
     return 0;

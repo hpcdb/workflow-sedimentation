@@ -2,6 +2,8 @@
 #include "dataflow.h"
 #include <curl/curl.h>
 
+//#define DEBUG
+
 Set& Dataflow::add_set(string tag) {
     Set set = Set(tag);
     this->sets.insert(make_pair(tag, set));
@@ -79,7 +81,9 @@ string Dataflow::get_post_message() {
 }
 
 void Dataflow::save() {
-//    cout << endl << "[DfAnalyzer] saving dataflow..." << endl;
+#ifdef DEBUG
+    cout << endl << "[DfAnalyzer] saving dataflow..." << endl;
+#endif
     CURL *hnd = curl_easy_init();
     curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
 
@@ -96,14 +100,15 @@ void Dataflow::save() {
     string message = this->get_post_message();
 
     curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
-//    cout << endl << message.c_str() << endl;
+#ifdef DEBUG
+    cout << message.c_str() << endl << endl;
+#endif
     curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, message.c_str());
     curl_easy_setopt(hnd, CURLOPT_VERBOSE, 0L); //0 disable messages
 
     curl_easy_perform(hnd); //send request
     curl_easy_cleanup(hnd);
     curl_global_cleanup();
-//    cout << endl;
 }
 
 vector<Transformation> Dataflow::get_sorted_transformations() {
@@ -116,7 +121,8 @@ vector<Transformation> Dataflow::get_sorted_transformations() {
         it_transformation++;
     }
 
-    for (int index = 0; index < transformations.size() - 1; index++) {
+    int index = 0;
+    while (index < transformations.size()) {
         Transformation transformation = transformations.at(index);
         int dependent_transformation_position = 
             this->get_dependent_transformation_position_from_dataset_tag(
@@ -126,6 +132,8 @@ vector<Transformation> Dataflow::get_sorted_transformations() {
             Transformation tmp_transformation = transformations.at(index);
             transformations.at(index) = transformations.at(dependent_transformation_position);
             transformations.at(dependent_transformation_position) = tmp_transformation;
+        }else{
+            index++;
         }
     }
     

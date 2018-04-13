@@ -1,6 +1,8 @@
 #include "task.h"
 #include <curl/curl.h>
 
+//#define DEBUG
+
 void Task::set_workspace(string workspace) {
     this->workspace = workspace;
 }
@@ -141,7 +143,9 @@ string Task::get_post_message() {
 }
 
 void Task::save() {
+#ifdef DEBUG
     cout << endl << "[DfAnalyzer] saving task..." << endl;
+#endif
     CURL *hnd = curl_easy_init();
     curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
 
@@ -156,7 +160,9 @@ void Task::save() {
     headers = curl_slist_append(headers, "Content-Type: application/text");
 
     string message = this->get_post_message();
-    cout << message << endl;
+#ifdef DEBUG
+    cout << message << endl << endl;
+#endif
 
     curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, message.c_str());
@@ -165,7 +171,6 @@ void Task::save() {
     curl_easy_perform(hnd); //send request
     curl_easy_cleanup(hnd);
     curl_global_cleanup();
-    cout << endl;
 }
 
 int Task::begin() {
