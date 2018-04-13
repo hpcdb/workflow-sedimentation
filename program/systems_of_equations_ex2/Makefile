@@ -2,7 +2,7 @@
 #
 # Template libMesh application Makefile
 LIBMESH_DIR ?= /media/vitor/data-linux/program/libmesh
-DFANALYZER_DIR ?= ./dfanalyzer
+DFANALYZER_DIR ?= /home/vitor/Desktop/dfa-lib
 
 
 # include the library options determined by configure
@@ -17,9 +17,11 @@ target     := ./example-$(METHOD)
 
 #
 # source files
-srcfiles 	:= $(DFANALYZER_DIR)/*.cpp $(wildcard *.C)
-libmesh_CXXFLAGS +=  -I$(DFANALYZER_DIR)/*.h -lcurl 
+srcfiles 	:= $(wildcard *.C)
+libmesh_CXXFLAGS +=  -I$(DFANALYZER_DIR)/include 
+libmesh_LDFLAGS  += -lcurl -L$(DFANALYZER_DIR)/lib -ldfanalyzer
 
+# libmesh_CXXFLAGS +=  -I$(DFANALYZER_DIR)/include 
 #
 # object files
 objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
@@ -38,7 +40,7 @@ all:: $(notdir $(target))
 # Production rules:  how to make the target - depends on library configuration
 $(notdir $(target)): $(objects)
 	@echo "Linking "$@"..."
-	@$(libmesh_LIBTOOL) --tag=CXX $(LIBTOOLFLAGS) --mode=link \
+	$(libmesh_LIBTOOL) --tag=CXX $(LIBTOOLFLAGS) --mode=link \
 	  $(libmesh_CXX) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(EXTERNAL_FLAGS)
 
 

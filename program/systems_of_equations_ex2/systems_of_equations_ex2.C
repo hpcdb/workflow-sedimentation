@@ -476,7 +476,8 @@ int main(int argc, char** argv) {
                 stringstream command_line;
                 command_line << "mkdir ./rde/" << to_string(t_step) << ";";
                 int exit_status = std::system(command_line.str().c_str());                
-                command_line.clear();
+                
+                command_line.str(string());
                 command_line << std::getenv("PARAVIEW_DIR")
                         << "/bin/pvpython script/exodus_data_extraction.py "  << to_string(t_step);
                 
@@ -486,7 +487,7 @@ int main(int argc, char** argv) {
                 extractor->run();
                 
 #ifdef RAW_DATA_INDEXING
-                command_line.clear();
+                command_line.str(string());
                 command_line << std::getenv("DFANALYZER_DIR")
                         << "/bin/RDI OPTIMIZED_FASTBIT:INDEX extractor_" << to_string(t_step) 
                         << " " << string(path) << "/rde/" << to_string(t_step)
