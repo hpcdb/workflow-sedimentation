@@ -20,7 +20,6 @@ enum method_type {
 enum cartridge_type {
     CSV,
     PROGRAM,
-    FITS,
     FASTBIT,
     OPTIMIZED_FASTBIT,
     POSTGRES_RAW

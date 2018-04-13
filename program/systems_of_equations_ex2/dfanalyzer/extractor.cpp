@@ -70,11 +70,6 @@ string Extractor::get_cartridge() {
             cartridge_str = "PROGRAM";
         }
         break;
-        case FITS:
-        {
-            cartridge_str = "FITS";
-        }
-        break;
         case FASTBIT:
         {
             cartridge_str = "FASTBIT";

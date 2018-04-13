@@ -24,7 +24,11 @@ SELECT * FROM iinit_mesh;
 
 SELECT * FROM oinit_mesh;
 
+SELECT * FROM icreate_equation_systems;
+
 SELECT * FROM ocreate_equation_systems;
+
+SELECT * FROM isolve_equation_systems;
 
 SELECT * FROM osolve_equation_systems;
 

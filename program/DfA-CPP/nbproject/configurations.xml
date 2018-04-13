@@ -26,6 +26,7 @@
         <itemPath>element.h</itemPath>
         <itemPath>task.h</itemPath>
       </logicalFolder>
+      <itemPath>dfanalyzer.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -97,6 +98,8 @@
       <item path="dfa_configuration.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="dfa_configuration_struct.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="dfanalyzer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="element.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -182,6 +185,8 @@
       <item path="dfa_configuration.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="dfa_configuration_struct.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="dfanalyzer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="element.cpp" ex="false" tool="1" flavor2="0">
       </item>

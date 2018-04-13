@@ -115,7 +115,9 @@ int main(int argc, char** argv) {
     // datasets
     const string IINIT_MESH = "iinit_mesh";
     const string OINIT_MESH = "oinit_mesh";
+    const string ICREATE_EQUATION_SYSTEMS = "icreate_equation_systems";
     const string OCREATE_EQUATION_SYSTEMS = "ocreate_equation_systems";
+    const string ISOLVE_EQUATION_SYSTEMS = "isolve_equation_systems";
     const string OSOLVE_EQUATION_SYSTEMS = "osolve_equation_systems";
     const string OWRITE_MESH = "owrite_mesh";
     const string OEXTRACT_DATA = "oextract_data";
@@ -125,21 +127,29 @@ int main(int argc, char** argv) {
     if (processor_id == 0) {
         Dataflow dataflow = Dataflow(DATAFLOW);
 
-        Set ds_iinit_mesh = dataflow.add_set(IINIT_MESH, "solver_package", NUMERIC);
-        Set ds_oinit_mesh = dataflow.add_set(OINIT_MESH,
+        Set ds_iinit_mesh = dataflow.add_set(IINIT_MESH,
             {"nx", "ny", "xmin", "xmax", "ymin", "ymax", "type"},
             {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
+        Set ds_oinit_mesh = dataflow.add_set(OINIT_MESH,
+            {"dimension", "n_elements", "n_nodes"},
+            {NUMERIC, NUMERIC, NUMERIC});
         Transformation& dt_init_mesh = dataflow.add_transformation(INIT_MESH, ds_iinit_mesh, ds_oinit_mesh);
 
+        Set ds_icreate_equation_systems = dataflow.add_set(ICREATE_EQUATION_SYSTEMS,
+            {"u_order", "v_order", "p_order"},
+            {TEXT, TEXT, TEXT});
         Set ds_ocreate_equation_systems = dataflow.add_set(OCREATE_EQUATION_SYSTEMS,
+            {"n_dofs"},
+            {NUMERIC});
+        Transformation& dt_create_equation_systems = dataflow.add_transformation(CREATE_EQUATION_SYSTEMS, {ds_oinit_mesh, ds_icreate_equation_systems}, ds_ocreate_equation_systems);
+
+        Set ds_isolve_equation_systems = dataflow.add_set(ISOLVE_EQUATION_SYSTEMS,
             {"dt", "timesteps", "nonlinear_steps", "nonlinear_tolerance", "nu"},
             {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
-        Transformation& dt_create_equation_systems = dataflow.add_transformation(CREATE_EQUATION_SYSTEMS, ds_oinit_mesh, ds_ocreate_equation_systems);
-
         Set ds_osolve_equation_systems = dataflow.add_set(OSOLVE_EQUATION_SYSTEMS,
             {"timestep", "time", "nonlinear_steps", "linear_iterations", "final_linear_residual", "norm_delta", "converged"},
             {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, TEXT});
-        Transformation& dt_solve_equation_systems = dataflow.add_transformation(SOLVE_EQUATION_SYSTEMS, ds_ocreate_equation_systems, ds_osolve_equation_systems);
+        Transformation& dt_solve_equation_systems = dataflow.add_transformation(SOLVE_EQUATION_SYSTEMS, {ds_ocreate_equation_systems, ds_isolve_equation_systems}, ds_osolve_equation_systems);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
         Set ds_owrite_mesh = dataflow.add_set(OWRITE_MESH,
@@ -161,10 +171,6 @@ int main(int argc, char** argv) {
 #endif
 
         dataflow.save();
-
-        init_mesh = new Task(DATAFLOW, INIT_MESH, task_id);
-        init_mesh->add_dataset_with_element_values(IINIT_MESH,{to_string(libMesh::default_solver_package())});
-        init_mesh->begin();
     }
 #endif
 
@@ -180,6 +186,14 @@ int main(int argc, char** argv) {
     // Laspack.
     libmesh_example_requires(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc or --enable-laspack");
     libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc or --enable-laspack");
+    
+#ifdef DFANALYZER
+    if(processor_id == 0){
+        init_mesh = new Task(DATAFLOW, INIT_MESH, task_id);
+        init_mesh->add_dataset_with_element_values(IINIT_MESH,{"20.00", "20.00", "0.0", "1.0", "0.0", "1.0", "QUAD9"});
+        init_mesh->begin();
+    }
+#endif
 
     // Create a mesh, with dimension to be overridden later, distributed
     // across the default MPI communicator.
@@ -201,12 +215,14 @@ int main(int argc, char** argv) {
 
 #ifdef DFANALYZER
     if (processor_id == 0) {
-        init_mesh->add_dataset_with_element_values(OINIT_MESH,{"20.00", "20.00", "0.0", "1.0", "0.0", "1.0", "QUAD9"});
+        init_mesh->add_dataset_with_element_values(OINIT_MESH,{to_string(mesh.mesh_dimension()), to_string(mesh.n_elem()), to_string(mesh.n_nodes())});
         init_mesh->end();
 
         create_equation_systems = new Task(DATAFLOW, CREATE_EQUATION_SYSTEMS, task_id);
+        //dfa-add_dependent_transformation
         create_equation_systems->add_dependent_transformation_tag(INIT_MESH);
         create_equation_systems->add_dependent_transformation_id(init_mesh->get_id());
+        create_equation_systems->add_dataset_with_element_values(ICREATE_EQUATION_SYSTEMS,{"SECOND", "SECOND", "FIRST"});
         create_equation_systems->begin();
     }
 #endif
@@ -288,18 +304,20 @@ int main(int argc, char** argv) {
 
 #ifdef DFANALYZER
     if (processor_id == 0) {
-        create_equation_systems->add_dataset_with_element_values(OCREATE_EQUATION_SYSTEMS,{to_string(dt), to_string(n_timesteps), to_string(n_nonlinear_steps), to_string(nonlinear_tolerance), to_string(nu)});
+        create_equation_systems->add_dataset_with_element_values(OCREATE_EQUATION_SYSTEMS,{to_string(navier_stokes_system.n_dofs())});
         create_equation_systems->end();
     }
 #endif
 
-    for (unsigned int t_step = 1; t_step <= n_timesteps; ++t_step) {
+    for (unsigned int t_step = 1; t_step <= 1; ++t_step) {
+//    for (unsigned int t_step = 1; t_step <= n_timesteps; ++t_step) {
 
 #ifdef DFANALYZER
         if (processor_id == 0) {
             solve_equation_systems = new Task(DATAFLOW, SOLVE_EQUATION_SYSTEMS, t_step);
             solve_equation_systems->add_dependent_transformation_tag(CREATE_EQUATION_SYSTEMS);
             solve_equation_systems->add_dependent_transformation_id(create_equation_systems->get_id());
+            solve_equation_systems->add_dataset_with_element_values(ISOLVE_EQUATION_SYSTEMS,{to_string(dt), to_string(n_timesteps), to_string(n_nonlinear_steps), to_string(nonlinear_tolerance), to_string(nu)});
             solve_equation_systems->begin();
         }
 #endif
@@ -454,14 +472,14 @@ int main(int argc, char** argv) {
                 write_mesh->add_dataset_with_element_values(OWRITE_MESH, 
                     {to_string(t_step), to_string(navier_stokes_system.time), "out.e"});
                 write_mesh->end();
-#endif          
+                
                 stringstream command_line;
                 command_line << "mkdir ./rde/" << to_string(t_step) << ";";
-                int exit_status = std::system(command_line.str().c_str());
-                
+                int exit_status = std::system(command_line.str().c_str());                
                 command_line.clear();
                 command_line << std::getenv("PARAVIEW_DIR")
                         << "/bin/pvpython script/exodus_data_extraction.py "  << to_string(t_step);
+                
                 RawDataExtractor* extractor = new RawDataExtractor(command_line.str(), 
                     {"u","v","w","p","x","y","z"},
                     {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
@@ -478,8 +496,7 @@ int main(int argc, char** argv) {
                         << std::getenv("FASTBIT_DIR") << "/bin\"";        
 #endif                
                 exit_status = std::system(command_line.str().c_str());
-                
-#ifdef DFANALYZER
+
                 extract_data = new Task(DATAFLOW, EXTRACT_DATA, t_step);
                 extract_data->add_dependent_transformation_tag(WRITE_MESH);
                 extract_data->add_dependent_transformation_id(t_step);
