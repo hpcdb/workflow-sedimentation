@@ -6,12 +6,6 @@
         <df name="data">
           <df name="dataflow_analyzer">
             <df name="bat">
-              <df name="01">
-              </df>
-              <df name="02">
-              </df>
-              <df name="03">
-              </df>
               <df name="04">
               </df>
               <df name="05">
@@ -25,18 +19,6 @@
               <df name="11">
               </df>
               <df name="12">
-              </df>
-              <df name="13">
-              </df>
-              <df name="14">
-              </df>
-              <df name="15">
-              </df>
-              <df name="16">
-              </df>
-              <df name="17">
-              </df>
-              <df name="20">
               </df>
               <df name="BACKUP">
               </df>
@@ -54,8 +36,6 @@
           </df>
         </df>
         <df name="provenance">
-          <df name="systems_of_equations_ex2">
-          </df>
         </df>
       </df>
       <df name="include">

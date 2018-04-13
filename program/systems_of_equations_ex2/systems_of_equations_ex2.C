@@ -78,6 +78,7 @@
 
 // DfAnalyzer
 #define DFANALYZER
+#define RAW_DATA_EXTRACTION
 //#define RAW_DATA_INDEXING
 #include "dfanalyzer.h"
 
@@ -155,7 +156,8 @@ int main(int argc, char** argv) {
             {"timestep", "time", "filename"},
             {NUMERIC, NUMERIC, TEXT});
         Transformation& dt_write_mesh = dataflow.add_transformation(WRITE_MESH, ds_osolve_equation_systems, ds_owrite_mesh);
-        
+
+#ifdef RAW_DATA_EXTRACTION        
         Set& ds_oextract_data = dataflow.add_set(OEXTRACT_DATA);
         method_type raw_method = EXTRACTION;
         cartridge_type raw_cartridge = PROGRAM;
@@ -167,6 +169,7 @@ int main(int argc, char** argv) {
             {"timestep", "time", "u", "v", "w", "p", "x", "y", "z"},
             {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
         Transformation& dt_extract_data = dataflow.add_transformation(EXTRACT_DATA, ds_owrite_mesh, ds_oextract_data);
+#endif
 #endif
 
         dataflow.save();
@@ -468,6 +471,7 @@ int main(int argc, char** argv) {
                     {to_string(t_step), to_string(navier_stokes_system.time), "out.e"});
                 write_mesh->end();
                 
+#ifdef RAW_DATA_EXTRACTION
                 stringstream command_line;
                 command_line << "mkdir ./rde/" << to_string(t_step) << ";";
                 int exit_status = std::system(command_line.str().c_str());                
@@ -503,6 +507,7 @@ int main(int argc, char** argv) {
                     {string(path) + "/rde/" + to_string(t_step) + "/extractor_" + to_string(t_step) + "." + raw_data_file_extension});
                 extract_data->end();
 #endif       
+#endif
             }
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
