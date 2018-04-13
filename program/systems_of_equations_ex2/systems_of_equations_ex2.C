@@ -80,6 +80,7 @@
 #define DFANALYZER
 //#define RAW_DATA_INDEXING
 #include "dfanalyzer/dfanalyzer.h"
+#include "dfanalyzer/raw_data_extractor.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -454,15 +455,20 @@ int main(int argc, char** argv) {
                     {to_string(t_step), to_string(navier_stokes_system.time), "out.e"});
                 write_mesh->end();
 #endif          
-                
                 stringstream command_line;
-                command_line << "mkdir ./rde/" << to_string(t_step) << ";"
-                        << std::getenv("DFANALYZER_DIR")
-                        << "/bin/RDE PROGRAM:EXTRACT extractor . \""
-                        << std::getenv("PARAVIEW_DIR")
-                        << "/bin/pvpython script/exodus_data_extraction.py "  << to_string(t_step)
-                        << "\" [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC];";
+                command_line << "mkdir ./rde/" << to_string(t_step) << ";";
+                int exit_status = std::system(command_line.str().c_str());
+                
+                command_line.clear();
+                command_line << std::getenv("PARAVIEW_DIR")
+                        << "/bin/pvpython script/exodus_data_extraction.py "  << to_string(t_step);
+                RawDataExtractor* extractor = new RawDataExtractor(command_line.str(), 
+                    {"u","v","w","p","x","y","z"},
+                    {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
+                extractor->run();
+                
 #ifdef RAW_DATA_INDEXING
+                command_line.clear();
                 command_line << std::getenv("DFANALYZER_DIR")
                         << "/bin/RDI OPTIMIZED_FASTBIT:INDEX extractor_" << to_string(t_step) 
                         << " " << string(path) << "/rde/" << to_string(t_step)
@@ -471,7 +477,7 @@ int main(int argc, char** argv) {
                         << " -delimiter=\";\" -bin=\"" 
                         << std::getenv("FASTBIT_DIR") << "/bin\"";        
 #endif                
-                int exit_status = std::system(command_line.str().c_str());
+                exit_status = std::system(command_line.str().c_str());
                 
 #ifdef DFANALYZER
                 extract_data = new Task(DATAFLOW, EXTRACT_DATA, t_step);

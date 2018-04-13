@@ -157,13 +157,13 @@ if __name__ == "__main__" and len(sys.argv) > 1:
         
         for line in input_file:
             if(header):
-                output_file.write("timestep;time;u;v;w;p;x;y;z")
+                output_file.write("filename;timestep;time;u;v;w;p;x;y;z")
                 header = False
             else:
                 line = line.replace(",",";").replace("\n","")
                 splitted_line = line.split(";")
                 output_file.write("\n" + ";".join([ 
-                    str(time_step), str(timestep_values[time_step - 1]),
+                    "\"" + os.getcwd() + "/rde/" + str(time_step) + "/extractor_" + str(time_step) + ".data\"", str(time_step), str(timestep_values[time_step - 1]),
                     splitted_line[0], splitted_line[1], splitted_line[2], 
                     splitted_line[3], splitted_line[7], splitted_line[8], splitted_line[9]]))
                 output_file.flush()
