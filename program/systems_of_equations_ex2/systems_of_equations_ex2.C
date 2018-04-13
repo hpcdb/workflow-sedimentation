@@ -309,8 +309,7 @@ int main(int argc, char** argv) {
     }
 #endif
 
-    for (unsigned int t_step = 1; t_step <= 1; ++t_step) {
-//    for (unsigned int t_step = 1; t_step <= n_timesteps; ++t_step) {
+    for (unsigned int t_step = 1; t_step <= n_timesteps; ++t_step) {
 
 #ifdef DFANALYZER
         if (processor_id == 0) {
