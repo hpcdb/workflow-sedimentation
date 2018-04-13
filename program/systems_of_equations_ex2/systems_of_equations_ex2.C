@@ -78,6 +78,7 @@
 
 // DfAnalyzer
 #define DFANALYZER
+//#define RAW_DATA_INDEXING
 #include "dfanalyzer/dfanalyzer.h"
 
 // Bring in everything from the libMesh namespace
@@ -146,7 +147,13 @@ int main(int argc, char** argv) {
         Transformation& dt_write_mesh = dataflow.add_transformation(WRITE_MESH, ds_osolve_equation_systems, ds_owrite_mesh);
         
         Set& ds_oextract_data = dataflow.add_set(OEXTRACT_DATA);
-        Extractor extractor = ds_oextract_data.add_extractor("extractor", EXTRACTION, PROGRAM, 
+        method_type raw_method = EXTRACTION;
+        cartridge_type raw_cartridge = PROGRAM;
+#ifdef RAW_DATA_INDEXING
+        raw_method = INDEXING;
+        raw_cartridge = OPTIMIZED_FASTBIT;
+#endif
+        Extractor extractor = ds_oextract_data.add_extractor("extractor", raw_method, raw_cartridge, 
             {"timestep", "time", "u", "v", "w", "p", "x", "y", "z"},
             {NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC, NUMERIC});
         Transformation& dt_extract_data = dataflow.add_transformation(EXTRACT_DATA, ds_owrite_mesh, ds_oextract_data);
@@ -436,6 +443,10 @@ int main(int argc, char** argv) {
             
             if (processor_id == 0) {          
 #ifdef DFANALYZER  
+                char *path = NULL;
+                size_t size;
+                path = getcwd(path,size);
+                
                 write_mesh = new Task(DATAFLOW, WRITE_MESH, t_step);
                 write_mesh->add_dependent_transformation_tag(SOLVE_EQUATION_SYSTEMS);
                 write_mesh->add_dependent_transformation_id(t_step);
@@ -444,23 +455,34 @@ int main(int argc, char** argv) {
                 write_mesh->end();
 #endif          
                 
-                stringstream rde_command_line;
-                rde_command_line << std::getenv("DFANALYZER_DIR")
+                stringstream command_line;
+                command_line << "mkdir ./rde/" << to_string(t_step) << ";"
+                        << std::getenv("DFANALYZER_DIR")
                         << "/bin/RDE PROGRAM:EXTRACT extractor . \""
                         << std::getenv("PARAVIEW_DIR")
                         << "/bin/pvpython script/exodus_data_extraction.py "  << to_string(t_step)
-                        << "\" [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC]";
-                int exit_status = std::system(rde_command_line.str().c_str());
+                        << "\" [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC];";
+#ifdef RAW_DATA_INDEXING
+                command_line << std::getenv("DFANALYZER_DIR")
+                        << "/bin/RDI OPTIMIZED_FASTBIT:INDEX extractor_" << to_string(t_step) 
+                        << " " << string(path) << "/rde/" << to_string(t_step)
+                        << " extractor_"  << to_string(t_step) + ".data"
+                        << " [u:NUMERIC,v:NUMERIC,w:NUMERIC,p:NUMERIC,x:NUMERIC,y:NUMERIC,z:NUMERIC]"
+                        << " -delimiter=\";\" -bin=\"" 
+                        << std::getenv("FASTBIT_DIR") << "/bin\"";        
+#endif                
+                int exit_status = std::system(command_line.str().c_str());
                 
 #ifdef DFANALYZER
                 extract_data = new Task(DATAFLOW, EXTRACT_DATA, t_step);
                 extract_data->add_dependent_transformation_tag(WRITE_MESH);
                 extract_data->add_dependent_transformation_id(t_step);
-                char *path = NULL;
-                size_t size;
-                path = getcwd(path,size);
+                string raw_data_file_extension = "data";
+#ifdef RAW_DATA_INDEXING
+                raw_data_file_extension = "index";
+#endif
                 extract_data->add_dataset_with_element_values(OEXTRACT_DATA, 
-                    {string(path) + "/extractor_" + to_string(t_step) + ".data"});
+                    {string(path) + "/rde/" + to_string(t_step) + "/extractor_" + to_string(t_step) + "." + raw_data_file_extension});
                 extract_data->end();
 #endif       
             }

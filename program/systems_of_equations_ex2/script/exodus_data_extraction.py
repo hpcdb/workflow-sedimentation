@@ -147,22 +147,22 @@ if __name__ == "__main__" and len(sys.argv) > 1:
     # set active view
     SetActiveView(renderView1)
 
-    writer = CreateWriter("./original_data_from_extractor.csv", plotOverLine1)
+    writer = CreateWriter("./rde/" + str(time_step) + "/original_data_from_extractor.csv", plotOverLine1)
     writer.FieldAssociation = "Points" # or "Cells"
     writer.UpdatePipeline()
 
     # clean original extracted raw data from exodus file
-    with open("./original_data_from_extractor.csv", "r") as input_file, open("./extractor_" + str(time_step) + ".data", "w+") as output_file:
+    with open("./rde/" + str(time_step) + "/original_data_from_extractor.csv", "r") as input_file, open("./rde/" + str(time_step) + "/extractor_" + str(time_step) + ".data", "w+") as output_file:
         header = True
         
         for line in input_file:
             if(header):
-                output_file.write("filename;timestep;time;u;v;w;p;x;y;z")
+                output_file.write("timestep;time;u;v;w;p;x;y;z")
                 header = False
             else:
                 line = line.replace(",",";").replace("\n","")
                 splitted_line = line.split(";")
-                output_file.write("\n" + ";".join(["\"" + os.getcwd() + "/out.e\"", 
+                output_file.write("\n" + ";".join([ 
                     str(time_step), str(timestep_values[time_step - 1]),
                     splitted_line[0], splitted_line[1], splitted_line[2], 
                     splitted_line[3], splitted_line[7], splitted_line[8], splitted_line[9]]))
