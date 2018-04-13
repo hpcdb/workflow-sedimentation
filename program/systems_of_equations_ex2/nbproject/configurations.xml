@@ -35,6 +35,21 @@
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath>example-opt</executablePath>
+          <ccTool>
+            <incDir>
+              <pElem>../dfa-lib/include</pElem>
+              <pElem>/media/vitor/data-linux/program/libmesh/include</pElem>
+              <pElem>/media/vitor/data-linux/program/hdf5-1.8.19/include</pElem>
+              <pElem>/media/vitor/data-linux/program/petsc-3.8.1/include</pElem>
+              <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi</pElem>
+              <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent</pElem>
+              <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent/include</pElem>
+              <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>NDEBUG</Elem>
+            </preprocessorList>
+          </ccTool>
         </makeTool>
         <preBuild>
           <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
@@ -43,19 +58,6 @@
       </makefileType>
       <item path="systems_of_equations_ex2.C" ex="false" tool="1" flavor2="0">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../../../../Desktop/dfa-lib/include</pElem>
-            <pElem>/media/vitor/data-linux/program/libmesh/include</pElem>
-            <pElem>/media/vitor/data-linux/program/hdf5-1.8.19/include</pElem>
-            <pElem>/media/vitor/data-linux/program/petsc-3.8.1/include</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent/include</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include</pElem>
-          </incDir>
-          <preprocessorList>
-            <Elem>NDEBUG</Elem>
-          </preprocessorList>
         </ccTool>
       </item>
     </conf>

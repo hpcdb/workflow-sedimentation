@@ -91,6 +91,9 @@
         <in>task.cpp</in>
         <in>transformation.cpp</in>
       </df>
+      <df name="tests">
+        <in>dataflow_test.cpp</in>
+      </df>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>

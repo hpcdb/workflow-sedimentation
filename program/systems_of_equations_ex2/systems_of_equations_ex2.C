@@ -218,9 +218,7 @@ int main(int argc, char** argv) {
         init_mesh->end();
 
         create_equation_systems = new Task(DATAFLOW, CREATE_EQUATION_SYSTEMS, task_id);
-        //dfa-add_dependent_transformation
-        create_equation_systems->add_dependent_transformation_tag(INIT_MESH);
-        create_equation_systems->add_dependent_transformation_id(init_mesh->get_id());
+        create_equation_systems->add_dependent_transformation(INIT_MESH, init_mesh->get_id());
         create_equation_systems->add_dataset_with_element_values(ICREATE_EQUATION_SYSTEMS,{"SECOND", "SECOND", "FIRST"});
         create_equation_systems->begin();
     }
@@ -314,8 +312,7 @@ int main(int argc, char** argv) {
 #ifdef DFANALYZER
         if (processor_id == 0) {
             solve_equation_systems = new Task(DATAFLOW, SOLVE_EQUATION_SYSTEMS, t_step);
-            solve_equation_systems->add_dependent_transformation_tag(CREATE_EQUATION_SYSTEMS);
-            solve_equation_systems->add_dependent_transformation_id(create_equation_systems->get_id());
+            solve_equation_systems->add_dependent_transformation(CREATE_EQUATION_SYSTEMS, create_equation_systems->get_id());
             solve_equation_systems->add_dataset_with_element_values(ISOLVE_EQUATION_SYSTEMS,{to_string(dt), to_string(n_timesteps), to_string(n_nonlinear_steps), to_string(nonlinear_tolerance), to_string(nu)});
             solve_equation_systems->begin();
         }
@@ -466,8 +463,7 @@ int main(int argc, char** argv) {
                 path = getcwd(path,size);
                 
                 write_mesh = new Task(DATAFLOW, WRITE_MESH, t_step);
-                write_mesh->add_dependent_transformation_tag(SOLVE_EQUATION_SYSTEMS);
-                write_mesh->add_dependent_transformation_id(t_step);
+                write_mesh->add_dependent_transformation(SOLVE_EQUATION_SYSTEMS, t_step);
                 write_mesh->add_dataset_with_element_values(OWRITE_MESH, 
                     {to_string(t_step), to_string(navier_stokes_system.time), "out.e"});
                 write_mesh->end();
@@ -498,8 +494,7 @@ int main(int argc, char** argv) {
                 exit_status = std::system(command_line.str().c_str());
 
                 extract_data = new Task(DATAFLOW, EXTRACT_DATA, t_step);
-                extract_data->add_dependent_transformation_tag(WRITE_MESH);
-                extract_data->add_dependent_transformation_id(t_step);
+                extract_data->add_dependent_transformation(WRITE_MESH, t_step);
                 string raw_data_file_extension = "data";
 #ifdef RAW_DATA_INDEXING
                 raw_data_file_extension = "index";

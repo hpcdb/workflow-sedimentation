@@ -30,6 +30,11 @@ protected:
     string resource;
     task_status status;
     Dependency dependency;
+    
+    void add_dependent_transformation_tag(string transformation_tag);
+    void add_dependent_transformation_tags(vector<string> transformation_tags);
+    void add_dependent_transformation_id(int task_id);
+    void add_dependent_transformation_ids(vector<int> transformation_ids);
 
     void insert_dataset(string dataset_tag);
     string get_post_message();
@@ -54,11 +59,11 @@ public:
     Dataset& add_dataset(string dataset_tag);
     Dataset& add_dataset_with_element_value(string dataset_tag, string value);
     Dataset& add_dataset_with_element_values(string dataset_tag, vector<string> values);
-
-    void add_dependent_transformation_tag(string transformation_tag);
-    void add_dependent_transformation_tags(vector<string> transformation_tags);
-    void add_dependent_transformation_id(int task_id);
-    void add_dependent_transformation_ids(vector<int> transformation_ids);
+    
+    void add_dependent_transformation(string transformation_tag, int transformation_id);
+    void add_dependent_transformation(string transformation_tag, vector<int> transformation_ids);
+    void add_dependent_transformations(vector<string> transformation_tags, int transformation_id);
+    void add_dependent_transformations(vector<string> transformation_tags, vector<int> transformation_ids);
 
     void set_workspace(string workspace);
     void set_resource(string resource);

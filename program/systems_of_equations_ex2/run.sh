@@ -12,4 +12,5 @@ export FASTBIT_DIR=/media/vitor/data-linux/program/fastbit-2.0.3
 
 export LD_LIBRARY_PATH=$DFANALYZER_DIR/lib:$LD_LIBRARY_PATH
 
+./delete.sh
 run_example "$example_name" 

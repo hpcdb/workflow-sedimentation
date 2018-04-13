@@ -9,5 +9,6 @@
 #define DFANALYZER_H
 
 #include "task.h"
+#include "raw_data_extractor.h"
 
 #endif /* DFANALYZER_H */

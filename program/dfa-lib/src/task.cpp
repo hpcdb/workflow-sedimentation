@@ -199,3 +199,23 @@ void Task::add_dependent_transformation_id(int task_id){
 void Task::add_dependent_transformation_ids(vector<int> transformation_ids){
     this->dependency.add_transformation_ids(transformation_ids);
 }
+
+void Task::add_dependent_transformation(string transformation_tag, int transformation_id){
+    this->add_dependent_transformation_tag(transformation_tag);
+    this->add_dependent_transformation_id(transformation_id);
+}
+
+void Task::add_dependent_transformation(string transformation_tag, vector<int> transformation_ids){
+    this->add_dependent_transformation_tag(transformation_tag);
+    this->add_dependent_transformation_ids(transformation_ids);
+}
+
+void Task::add_dependent_transformations(vector<string> transformation_tags, int transformation_id){
+    this->add_dependent_transformation_tags(transformation_tags);
+    this->add_dependent_transformation_id(transformation_id);
+}
+
+void Task::add_dependent_transformations(vector<string> transformation_tags, vector<int> transformation_ids){
+    this->add_dependent_transformation_tags(transformation_tags);
+    this->add_dependent_transformation_ids(transformation_ids);
+}
