@@ -2,43 +2,7 @@
 <configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
-      <df name=".libs">
-      </df>
-      <df name="dfanalyzer">
-        <df name="bin">
-        </df>
-        <in>attribute.cpp</in>
-        <in>attribute.h</in>
-        <in>attribute_enum.h</in>
-        <in>dataflow.cpp</in>
-        <in>dataflow.h</in>
-        <in>dataset.cpp</in>
-        <in>dataset.h</in>
-        <in>dependency.cpp</in>
-        <in>dependency.h</in>
-        <in>dfa_config.cpp</in>
-        <in>dfa_configuration.h</in>
-        <in>dfa_configuration_struct.h</in>
-        <in>dfanalyzer.h</in>
-        <in>element.cpp</in>
-        <in>element.h</in>
-        <in>extractor.cpp</in>
-        <in>extractor.h</in>
-        <in>extractor_enum.h</in>
-        <in>raw_data_extractor.cpp</in>
-        <in>raw_data_extractor.h</in>
-        <in>raw_data_indexer.h</in>
-        <in>set.cpp</in>
-        <in>set.h</in>
-        <in>task.cpp</in>
-        <in>task.h</in>
-        <in>task_status_enum.h</in>
-        <in>transformation.cpp</in>
-        <in>transformation.h</in>
-      </df>
       <df name="rde">
-        <df name="1">
-        </df>
       </df>
       <df name="script">
       </df>

@@ -79,8 +79,7 @@
 // DfAnalyzer
 #define DFANALYZER
 //#define RAW_DATA_INDEXING
-#include "dfanalyzer/dfanalyzer.h"
-#include "dfanalyzer/raw_data_extractor.h"
+#include "dfanalyzer.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

@@ -2,19 +2,6 @@
 <configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
-      <df name="dfanalyzer">
-        <in>attribute.cpp</in>
-        <in>dataflow.cpp</in>
-        <in>dataset.cpp</in>
-        <in>dependency.cpp</in>
-        <in>dfa_config.cpp</in>
-        <in>element.cpp</in>
-        <in>extractor.cpp</in>
-        <in>raw_data_extractor.cpp</in>
-        <in>set.cpp</in>
-        <in>task.cpp</in>
-        <in>transformation.cpp</in>
-      </df>
       <in>systems_of_equations_ex2.C</in>
     </df>
     <logicalFolder name="ExternalFiles"
@@ -39,8 +26,6 @@
       </toolsSet>
       <flagsDictionary>
         <element flagsID="0" commonFlags="-O2 -fopenmp"/>
-        <element flagsID="1" commonFlags="-O2 -fopenmp -fopenmp"/>
-        <element flagsID="2" commonFlags="-std=c++14"/>
       </flagsDictionary>
       <codeAssistance>
       </codeAssistance>
@@ -56,62 +41,6 @@
           <preBuildCommand></preBuildCommand>
         </preBuild>
       </makefileType>
-      <item path="dfanalyzer/attribute.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/dataflow.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/dataset.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/dependency.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/dfa_config.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/element.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/extractor.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/raw_data_extractor.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="2">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/set.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/task.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <item path="dfanalyzer/transformation.cpp" ex="false" tool="1" flavor2="11">
-        <ccTool flags="1">
-        </ccTool>
-      </item>
-      <folder path="0/dfanalyzer">
-        <ccTool>
-          <incDir>
-            <pElem>dfanalyzer/*.h</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi/opal/mca/event/libevent2022/libevent/include</pElem>
-            <pElem>/usr/lib/x86_64-linux-gnu/openmpi/include</pElem>
-            <pElem>.</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
       <item path="systems_of_equations_ex2.C" ex="false" tool="1" flavor2="0">
         <ccTool flags="0">
           <incDir>

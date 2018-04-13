@@ -2,7 +2,7 @@
 #
 # Template libMesh application Makefile
 LIBMESH_DIR ?= /media/vitor/data-linux/program/libmesh
-DFANALYZER_DIR ?= /home/vitor/Desktop/dfa-lib
+DFANALYZER_DIR ?= /home/vitor/Documents/dev/workflow-sedimentation/program/dfa-lib
 
 
 # include the library options determined by configure
@@ -35,7 +35,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 # Target:
 #
 
-all:: $(notdir $(target))
+all: clean $(notdir $(target))
 
 # Production rules:  how to make the target - depends on library configuration
 $(notdir $(target)): $(objects)
