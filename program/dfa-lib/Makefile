@@ -5,7 +5,6 @@ MACOS 		   ?= 1
 DFANALYZER_DIR ?= ./dfanalyzer
 target     := lib/libdfanalyzer.so
 
-
 ###############################################################################
 # File management.  This is where the source, header, and object files are
 # defined

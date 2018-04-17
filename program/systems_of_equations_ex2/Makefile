@@ -1,9 +1,14 @@
 ######################################################################
 #
 # Template libMesh application Makefile
-LIBMESH_DIR ?= /media/vitor/data-linux/program/libmesh
-DFANALYZER_DIR ?= /home/vitor/Documents/dev/workflow-sedimentation/program/dfa-lib
+MACOS			?= 1
+DFANALYZER_DIR 	?= $(DEV)/workflow-sedimentation/program/dfa-lib
 
+ifeq (${MACOS}, 1) 
+	LIBMESH_DIR 	?= $(PROGRAM)/libmesh_apr_2018
+else
+	LIBMESH_DIR 	?= $(PROGRAM)/libmesh
+endif
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
@@ -18,7 +23,7 @@ target     := ./example-$(METHOD)
 #
 # source files
 srcfiles 	:= $(wildcard *.C)
-libmesh_CXXFLAGS +=  -I$(DFANALYZER_DIR)/include 
+libmesh_CXXFLAGS += -w -I$(DFANALYZER_DIR)/include 
 libmesh_LDFLAGS  += -lcurl -L$(DFANALYZER_DIR)/lib -ldfanalyzer
 
 # libmesh_CXXFLAGS +=  -I$(DFANALYZER_DIR)/include 
