@@ -1,8 +1,8 @@
 ######################################################################
-#
+# Environment variables
 
+MACOS 		   ?= 1
 DFANALYZER_DIR ?= ./dfanalyzer
-
 target     := lib/libdfanalyzer.so
 
 
@@ -13,7 +13,12 @@ target     := lib/libdfanalyzer.so
 #
 # source files
 srcfiles :=  $(wildcard src/*.cpp)
-CXXFLAGS := -I./include -g -fPIC  
+
+CXXFLAGS := -I./include -g -fPIC 
+ifeq (${MACOS}, 1) 
+	CXXFLAGS += -w -std=c++11
+endif
+
 LDFLAGS  := -lcurl -shared -fPIC
 
 CXX      := g++
@@ -63,7 +68,7 @@ echo:
 
 %.o: %.cpp $(DEPS)
 	@echo "Compiling "$<"..."
-	@$(CXX)  -c $< -o $@ $(CXXFLAGS)
+	@$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 ###############################################################################
 
