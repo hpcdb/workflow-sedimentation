@@ -63,13 +63,13 @@ make clean
 make
 ```
 
-## Run:
+## Cheat sheet of Execution commands:
 
 ```
 monetdb-start-all
 cd /shared/workflow-sedimentation/src-local/sedimentation
-./pg-dataflow.sh --> gera dataflow "conceitual"
-./delete.sh --> apagar dados de uma execução passada
-./start-data-ingestor.sh --> limpa a base e inicializa o MonetDB
-./execute-solver.sh --> rodar em um terminal separado para rodar junto com a instância do MonetDB. Roda o solver de sedimentação.
+./pg-dataflow.sh --> generates the conceptual dataflow
+./delete.sh --> deletes data from a previous execution
+./start-data-ingestor.sh --> cleans the database and initializes MonetDB
+./execute-solver.sh --> Executes the sedimentation solver
 ```
