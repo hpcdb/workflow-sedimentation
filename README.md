@@ -1,3 +1,7 @@
+# Introduction
+
+This repository contains the source code of **libMesh-sedimentation**. It is a simulation solver built on top of a widely used parallel fine element framework, [libMesh](http://libmesh.github.io), which supports parallel simulation of multiscale, multiphysics applications. libMesh interfaces with several libraries for Computational Science and Engineering applications (e.g., PeTSc, Metis, Parmetis, LAPACK). Also, scientific visualization tools like [ParaView](https://www.paraview.org/), are typically used in these applications to gain insight from the computations. 
+
 # User documentation for docker
 
 ## Clones
