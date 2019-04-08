@@ -2,7 +2,7 @@
 
 ## Clones
 - docker pull vitorss/debian:sedimentation-vitor
-- git clone git@bitbucket.org:vitorss/workflow-sedimentation.git
+- git clone git@github.com:hpcdb/workflow-sedimentation.git
 - LOCAL_DIR=/path/to/repository/in/local/machine
 
 ## Run docker:
