@@ -55,7 +55,7 @@ bin=/programs/fastbit/bin
 extraArguments=[b:precision=2]
 ```
 
-## Make the solver:
+### Make the solver:
 
 Uncomment `include config/config.docker`
 ```
@@ -67,7 +67,7 @@ make clean
 make
 ```
 
-## Cheat sheet of Execution commands:
+### Cheat sheet of Execution commands:
 
 ```
 monetdb-start-all
@@ -77,3 +77,8 @@ cd /shared/workflow-sedimentation/src-local/sedimentation
 ./start-data-ingestor.sh --> cleans the database and initializes MonetDB
 ./execute-solver.sh --> Executes the sedimentation solver
 ```
+
+
+## Disclaimer
+
+You do not need Docker to run any of the programs or libraries used by libMesh-sedimentation. A Docker image is available for convenience so you will have the dependencies packaged together in a container. If cannot use Docker in your execution environment, you will need to download and install all dependencies individually. 
