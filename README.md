@@ -81,4 +81,4 @@ cd /shared/workflow-sedimentation/src-local/sedimentation
 
 ## Disclaimer
 
-You do not need Docker to run any of the programs or libraries used by libMesh-sedimentation. A Docker image is available for convenience so you will have the dependencies packaged together in a container. If cannot use Docker in your execution environment, you will need to download and install all dependencies individually. 
+You do not need Docker to run any of the programs or libraries used by libMesh-sedimentation. A Docker image is available for convenience so you will have the dependencies packaged together in a container. If you cannot use Docker in your execution environment, you will need to download and install all dependencies individually. 
